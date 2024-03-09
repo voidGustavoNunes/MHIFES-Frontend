@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputGroupModule } from 'primeng/inputgroup';
@@ -15,6 +15,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
+import { Subscription, interval } from 'rxjs';
+import { ScrollTopModule } from 'primeng/scrolltop';
 
 @Component({
   selector: 'app-equipamentos-r',
@@ -33,6 +35,7 @@ import { ConfirmPopupModule } from 'primeng/confirmpopup';
     ReactiveFormsModule,
     FormsModule,
     ToastModule,
+    ScrollTopModule,
     ConfirmPopupModule
   ],
   templateUrl: './equipamentos-r.component.html',
@@ -44,13 +47,15 @@ import { ConfirmPopupModule } from 'primeng/confirmpopup';
   ]
 })
 
-export class EquipamentosRComponent implements OnInit {
+export class EquipamentosRComponent implements OnInit, OnDestroy {
   @ViewChild('searchInput') inputSearch!: ElementRef;
 
   equipamentosData: Equipamento[] = [];
   equipamentosFilter: Equipamento[] = [];
   equipamentosCadast: Equipamento[] = [];
   equipamentosEdit: Equipamento[] = [];
+
+  unsubscribe$!: Subscription;
   form: FormGroup;
 
   ehTitulo: string = '';
@@ -63,7 +68,8 @@ export class EquipamentosRComponent implements OnInit {
     private router: Router,
     private formBuilder: FormBuilder,
     private confirmationService: ConfirmationService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private ngZone: NgZone
     ) {
       this.form = this.formBuilder.group({
         id: [null],
@@ -72,40 +78,55 @@ export class EquipamentosRComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.equipamentosData = [
-      {
-          id: 3,
-          nome: 'Name product',
-          // descricao: 'Product Description 3 hjgkytftf hjfuj hjgujj hyfuyhjv kgfhcdgjc  gtchtg jkbgvfjtd hjytfjy ghfht ghjydtrd gcjydjrdjt gdcg fgxhtrd'
-      },
-      {
-          id: 4,
-          nome: 'Name product',
-          // descricao: 'Product Description 4'
-      },
-      {
-          id: 1,
-          nome: 'Name product bhgfhgv hjbkjgvgkh bjhjhv vhgvkhghg vjkgvkhgjkkhgk gvhkgvkgh',
-          // descricao: 'Product Description 1'
-      },
-      {
-          id: 5,
-          nome: 'Name product',
-          // descricao: 'Product Description 5'
-      },
-      {
-          id: 2,
-          nome: 'Name product',
-          // descricao: 'Product Description 2'
-      },
-      {
-          id: 6,
-          nome: 'Name product',
-          // descricao: 'Product Description 6'
-      }
-    ];
+    // this.equipamentosData = [
+    //   {
+    //       id: 3,
+    //       nome: 'Name product',
+    //       // descricao: 'Product Description 3 hjgkytftf hjfuj hjgujj hyfuyhjv kgfhcdgjc  gtchtg jkbgvfjtd hjytfjy ghfht ghjydtrd gcjydjrdjt gdcg fgxhtrd'
+    //   },
+    //   {
+    //       id: 4,
+    //       nome: 'Name product',
+    //       // descricao: 'Product Description 4'
+    //   },
+    //   {
+    //       id: 1,
+    //       nome: 'Name product bhgfhgv hjbkjgvgkh bjhjhv vhgvkhghg vjkgvkhgjkkhgk gvhkgvkgh',
+    //       // descricao: 'Product Description 1'
+    //   },
+    //   {
+    //       id: 5,
+    //       nome: 'Name product',
+    //       // descricao: 'Product Description 5'
+    //   },
+    //   {
+    //       id: 2,
+    //       nome: 'Name product',
+    //       // descricao: 'Product Description 2'
+    //   },
+    //   {
+    //       id: 6,
+    //       nome: 'Name product',
+    //       // descricao: 'Product Description 6'
+    //   }
+    // ];
 
-    this.equipamentosFilter = this.equipamentosData;
+    this.unsubscribe$ = this.equipService.listar()
+    .subscribe({
+      next: (itens:any) => {
+        const data = itens;
+        this.equipamentosData = data.sort((a:any, b:any) => (a.nome < b.nome) ? -1 : 1);
+        this.equipamentosFilter = this.equipamentosData;
+      },
+      error: (err: any) => {
+        // this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Dados não encontrados.', life: 3000 });
+        alert('Dados não encontrados.')
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    this.unsubscribe$.unsubscribe();
   }
 
   showEditDialog(value: Equipamento) {
@@ -122,7 +143,7 @@ export class EquipamentosRComponent implements OnInit {
 
   showDialog() {
     this.form.reset();
-    this.ehTitulo = 'Cadastrar Equipamento'
+    this.ehTitulo = 'Cadastrar Equipamento';
     this.visible = true;
     this.cadastrar = true;
     this.editar = false;
@@ -175,7 +196,7 @@ export class EquipamentosRComponent implements OnInit {
         this.deletarID(id);
       },
       reject: () => {
-        this.messageService.add({ severity: 'error', summary: 'Cancelado', detail: 'Você cancelou ação', life: 3000 });
+        this.messageService.add({ severity: 'error', summary: 'Cancelado', detail: 'Exclusão cancelada.', life: 3000 });
       }
     });
   }
@@ -188,7 +209,7 @@ export class EquipamentosRComponent implements OnInit {
         alert('Equipamento cadastrado com sucesso!');
       },
       error: (err: any) => {
-        alert('Cadastro não enviado.')
+        alert('Erro! Cadastro não enviado.')
       }
     });
   }
@@ -201,7 +222,7 @@ export class EquipamentosRComponent implements OnInit {
         alert('Equipamento editado com sucesso!');
       },
       error: (err: any) => {
-        alert('Edição não enviada.')
+        alert('Erro! Edição não enviada.')
       }
     });
   }
@@ -218,11 +239,17 @@ export class EquipamentosRComponent implements OnInit {
     if (this.form.valid && this.cadastrar) {
       this.equipamentosCadast = this.form.value;
       this.enviarFormSave();
+      this.visible = false;
       this.form.reset();
+      this.ngOnInit();
+      window.location.reload();
     } else if (this.form.valid && this.editar) {
       this.equipamentosEdit = this.form.value;
       this.enviarFormEdit(this.form.get('id')?.value);
+      this.visible = false;
       this.form.reset();
+      this.ngOnInit();
+      window.location.reload();
     } else {
       alert('Informação inválida. Preencha o campo!');
     }
@@ -230,21 +257,21 @@ export class EquipamentosRComponent implements OnInit {
 
   deletarID(id: number) {
     this.equipService.excluir(id)
-    .subscribe(
-      data => {
-        // window.location.reload();
-        alert('Registro deletado');
+    .subscribe({
+      next: (data: any) => {
+        alert('Registro deletado com sucesso!');
         this.ngOnInit();
+        window.location.reload();
       },
-      error => {
-        if (error.status) {
-          alert('Erro: Não foi possível deletar registro.');
+      error: (err: any) => {
+        if (err.status) {
+          alert('Erro! Não foi possível deletar registro.');
         } else {
-          console.log('Erro desconhecido:', error);
-          alert('Erro desconhecido' + error);
+          // console.log('Erro desconhecido:', err);
+          alert('Erro desconhecido' + err);
         }
       }
-    );
+  });
   }
 
 }
