@@ -1,0 +1,24 @@
+/* You can add global styles to this file, and also import other style files */
+
+/* Importing Bootstrap SCSS file. */
+// @import 'bootstrap/scss/bootstrap';
+// @import 'bootstrap/scss/mixins';
+@import "primeicons/primeicons.css";
+@import "primeng/resources/themes/lara-light-blue/theme.css";
+@import "primeng/resources/primeng.css";
+
+@font-face {
+    font-family: Grandstander Semi;
+    src: url(assets/grandstander/Grandstander-SemiBold.ttf);
+}
+@font-face {
+    font-family: Grandstander;
+    src: url(assets/grandstander/Grandstander-Regular.ttf);
+}
+
+html, body { height: 100%; }
+body {
+    margin: 0;
+    // font-size: 1.2rem;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+}

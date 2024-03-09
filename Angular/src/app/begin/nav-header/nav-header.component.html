@@ -1,0 +1,17 @@
+<div class="card">
+    <p-menubar class="menu" [model]="itemsLog" *ngIf="isSpecialPage">
+        <ng-template pTemplate="start">
+            <a routerLink="login" class="logo">
+                <img src="assets/img/logoIfes.svg" alt="Logo do IFES" width="150" height="64"/>
+            </a>
+        </ng-template>
+    </p-menubar>
+
+    <p-menubar class="menu" [model]="itemsHom" *ngIf="!isSpecialPage">
+        <ng-template pTemplate="start">
+            <a routerLink="login" class="logo">
+                <img src="assets/img/logoIfes.svg" alt="Logo do IFES" width="150" height="64"/>
+            </a>
+        </ng-template>
+    </p-menubar>
+</div>

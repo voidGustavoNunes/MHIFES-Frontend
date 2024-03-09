@@ -1,0 +1,46 @@
+.card{
+    // height: 5rem;
+    // width: 100%;
+    // background-color: #00208F;
+    // color: white;
+    // display: flex;
+    // align-items: center;
+    
+    .menu{
+        // margin-left: 1rem;
+        // background-color: #00208F;
+        text-transform: uppercase;
+    }
+}
+
+:host {
+    ::ng-deep .p-menubar{
+        margin: -.1rem;
+        background-color: #00208F;
+        border-radius: 0;
+    }
+    ::ng-deep .p-menubar .p-menubar-button{
+        background-color: #BFE4FF;
+    }
+    ::ng-deep .p-icon path {
+        fill: #256CF0;
+    }
+    ::ng-deep .p-menubar-root-list li:active {
+        background: transparent;
+    }
+    ::ng-deep .p-menubar.p-menubar-mobile-active .p-menubar-root-list {
+        background-color: #00208F;
+    }
+    ::ng-deep .p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-content .p-menuitem-link .p-menuitem-text{
+        color: white;
+    }
+    ::ng-deep .p-menubar .p-menubar-root-list > .p-menuitem:not(.p-highlight):not(.p-disabled):not(:first-child) > .p-menuitem-content:hover{
+        background-color: #256CF0;
+    }
+    ::ng-deep .p-menubar .p-menubar-root-list > .p-menuitem:not(.p-highlight):not(.p-disabled):first-child > .p-menuitem-content:hover{
+        background-color: transparent;
+    }
+    ::ng-deep .p-menubar .p-menubar-root-list > .p-menuitem:not(.p-highlight):not(.p-disabled):first-child > .p-menuitem-content:focus{
+        background-color: #00208F;
+    }
+}

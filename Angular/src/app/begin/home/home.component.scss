@@ -1,0 +1,94 @@
+.caixa{
+    height: calc(100vh - 5rem);
+    color: white;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    position: relative;
+    
+    .card{
+        position: relative;
+        z-index: 1; 
+    }
+
+    .background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: calc(100vh + 5rem);
+        background-image: url("../../../assets/img/J4o.gif");
+        opacity: .85;
+    }
+
+    p{
+        margin: 0 5rem 6rem;
+        font-size: 1.5rem;
+        letter-spacing: .1rem;
+    }
+
+    .rdButton{
+        display: flex;
+    }
+    .rdButton div{
+        margin-right: 3rem;
+    }
+
+    .eqTable{
+        width: 100%;
+        margin: 4rem 0;
+        border: .1rem solid #B1CAFA;
+        
+        .tbHeader{
+            border-radius: .5rem 0;
+            
+            th{
+                background-color: #256CF0 !important;
+                color: white;
+                font-weight: 600;
+                letter-spacing: .1rem;
+                text-align: center;
+                text-transform: uppercase;
+                // border: .1rem solid #B1CAFA;
+            }
+        }
+        
+        .tbBody{
+            td{
+                text-align: center;
+                border-bottom: .1rem solid #B1CAFA;
+            }
+            td:first-child {
+                border-right: .1rem solid #B1CAFA;
+            }
+        }
+        .tbBody:hover{
+            background-color: #E5E7EB;
+        }
+    }
+}
+:host ::ng-deep{
+    p-radiobutton.p-element{
+        margin: 0 1rem;
+    }
+    .p-datatable-striped{
+        // min-width: 50rem;
+        // overflow-x: hidden;
+    }
+}
+
+@media screen and (min-width: 686px) {
+    .card{
+        margin: 3rem 6rem 0;
+    }
+}
+
+@media screen and (max-width: 685px) {
+    .card{
+        margin: 3rem 1rem 0;
+        
+        .eqTable{
+            overflow-x: scroll;
+        }
+    }
+}

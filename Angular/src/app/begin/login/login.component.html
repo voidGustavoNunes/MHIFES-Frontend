@@ -1,0 +1,27 @@
+<div class="card">
+    <div class="background"></div>
+    <p-card>
+        <ng-template pTemplate="header">
+            <p>Ainda não tem conta?</p>
+            <p-button label="Cadastre-se" (click)="navigateToPage()"></p-button>
+            <h2>Bem vindo ao <b>MHIFES</b></h2>
+        </ng-template>
+        
+        <form id="meuFormulario" [formGroup]="form" (ngSubmit)="onSubmit()">
+            <div class="formInput">
+                <p-iconField iconPosition="left">
+                        <p-inputIcon styleClass="pi pi-user" />
+                        <input type="text" class="form-control" formControlName="user" placeholder="Matrícula" pInputText />
+                    </p-iconField>
+                </div>
+                
+            <div class="formInput">
+                <p-password class="form-control" formControlName="senha" placeholder="Senha" [toggleMask]="true"></p-password>
+            </div>
+        </form>
+
+        <ng-template pTemplate="footer">
+            <p-button type="submit" label="Login" (click)="navigateToHome()"></p-button>
+        </ng-template>
+    </p-card>
+</div>

@@ -1,0 +1,80 @@
+<div class="caixa">
+    <h1>Equipamentos</h1>
+
+    <div class="opcao">
+        <a (click)="showDialog()" class="p-button botaoC">Cadastrar +</a>
+        
+        <div class="pesq">
+            <p-inputGroup>
+                <button type="button" pButton icon="pi pi-filter-slash" (click)="limparFilter()"></button>
+                <input #searchInput type="text" pInputText placeholder="Pesquisar equipamento" (keydown)="onKeyDown($event, searchInput.value)" />
+                <button type="button" pButton icon="pi pi-search" (click)="filterField(searchInput.value)"></button>
+            </p-inputGroup>
+        </div>
+    </div>
+
+    <div class="eqTable">
+        <p-table
+            #dt1
+            [value]="equipamentosData"
+            styleClass="p-datatable-striped"
+            [tableStyle]="{'min-width': '50rem'}"
+            [paginator]="true"
+            [rows]="10"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Mostrando do {first} ao {last} de {totalRecords} registros"
+            [rowsPerPageOptions]="[10, 20, 40]"
+        >
+            <ng-template pTemplate="header">
+                <tr class="tbHeader">
+                    <th>Nome</th>
+                    <!-- <th>Descrição</th> -->
+                    <!-- <th></th> -->
+                    <th></th>
+                    <th></th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-equipamento>
+                <tr class="tbBody">
+                    <td>{{equipamento?.nome}}</td>
+                    <!-- <td>{{equipamento?.descricao}}</td> -->
+                    <!-- <td>
+                        <button type="button" class="botaoInfo" pButton>Info</button>
+                    </td> -->
+                    <td>
+                        <button type="button" class="botaoEdit" (click)="showEditDialog(equipamento)" pButton>Editar</button>
+                    </td>
+                    <td>
+                        <p-toast></p-toast>
+                        <p-confirmPopup></p-confirmPopup>
+                        <button type="button" class="botaoDele" (click)="confirm2($event, equipamento?.id)" severity="danger" pButton>Deletar</button>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="3">Não há equipamentos cadastrados.</td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>
+
+
+<div class="card flex justify-content-center">
+    <p-dialog class="pHeader" [header]=ehTitulo [(visible)]="visible" [modal]="true" [breakpoints]="{ '960px': '75vw' }" [style]="{ width: '50vw' }" [draggable]="false" [resizable]="false">
+        <form id="meuFormulario" [formGroup]="form" (ngSubmit)="onSubmit()">
+            <div class="divInput">
+                <span class="p-float-label">
+                    <input pInputText id="nomeEquip" class="form-control" formControlName="nome" />
+                    <label for="nomeEquip">Nome do equipamento</label>
+                </span>
+            </div>
+            <div class="divBotao">
+                <button type="submit" class="botaoSalva" *ngIf="cadastrar" pButton>Salvar</button>
+                <button type="submit" class="botaoEdit" *ngIf="editar" pButton>Atualizar</button>
+                <button type="button" class="botaoCancela" (click)="hideDialog()" pButton>Cancelar</button>
+            </div>
+        </form>
+    </p-dialog>
+</div>

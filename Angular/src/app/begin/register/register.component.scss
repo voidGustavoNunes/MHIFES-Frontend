@@ -1,0 +1,106 @@
+.card{
+    height: calc(100vh - 5rem);
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+
+    .background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: calc(100vh + 5rem);
+        background-image: url("../../../assets/img/J4o.gif");
+        opacity: .85;
+    }
+
+    #meuFormulario{
+        height: fit-content;
+        width: fit-content;
+        margin: 0 auto;
+        flex-direction: column;
+        .formInput{
+            margin: 1rem 0;
+        }
+    }
+}
+
+:host ::ng-deep {
+    p-card.p-element{
+        position: relative;
+        z-index: 1; 
+        box-shadow: 0 1rem 1rem rgba(0, 0, 0, 0.4);
+    }
+    .p-card-footer{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
+    .p-card-footer a{
+        text-decoration: none;
+        color: #256CF0;
+        font-weight: 600;
+        letter-spacing: .1rem;
+        font-size: .85rem;
+    }
+    .p-card-footer .p-button{
+        background-color: #BFE4FF;
+        color: #256CF0;
+        text-transform: uppercase;
+        letter-spacing: .1rem;
+        border: .1rem solid #256CF0;
+        border-radius: 2rem;
+        box-shadow: 0 .2rem .2rem rgba(0, 0, 0, 0.26);
+        margin-bottom: 1rem;
+    }
+    .p-card-footer .p-button:active{
+        box-shadow: none;
+    }
+    .p-inputtext{
+        background-color: #BFE4FF;
+        border: .15rem solid #256CF0;
+        box-shadow: 0 .2rem .2rem rgba(0, 0, 0, 0.26);
+    }
+    .p-input-icon{
+        color: #256CF0;
+    }.p-icon path {
+        fill: #256CF0;
+    }
+    .p-card-header{
+        color: white;
+        letter-spacing: .1rem;
+        text-align: center;
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border-radius: .3rem .3rem 0 0;
+        background-image: url("../../../assets/img/J4o.gif");
+    }
+}
+
+@media screen and (min-width: 686px) {
+    :host {
+        p-card.p-element{
+            width: 30%;
+        }
+        .p-inputtext{
+            width: 100%;
+        }
+    }
+}
+
+@media screen and (max-width: 685px) {
+    :host {
+        p-card.p-element{
+            width: 70%;
+        }
+        .p-inputtext{
+            width: 100%;
+        }
+    }
+}

@@ -1,0 +1,33 @@
+<div class="card">
+    <div class="background"></div>
+    <p-card>
+        <ng-template pTemplate="header">
+            <h2>Crie uma nova conta</h2>
+        </ng-template>
+        
+        <form id="meuFormulario" [formGroup]="form" (ngSubmit)="onSubmit()">
+            <div class="formInput">
+                <p-iconField iconPosition="left">
+                    <p-inputIcon styleClass="pi pi-user" />
+                    <input type="text" class="form-control" formControlName="user" placeholder="Nome de usuário" pInputText />
+                </p-iconField>
+            </div>
+
+            <div class="formInput">
+                <p-iconField iconPosition="left">
+                    <p-inputIcon styleClass="pi pi-id-card" />
+                    <input type="text" class="form-control" formControlName="matricula" placeholder="Matrícula" pInputText />
+                </p-iconField>
+            </div>
+                
+            <div class="formInput">
+                <p-password class="form-control" formControlName="senha" placeholder="Senha" [toggleMask]="true"></p-password>
+            </div>
+        </form>
+
+        <ng-template pTemplate="footer">
+            <p-button type="submit" label="Cadastrar" (click)="navigateToPage()"></p-button>
+            <a href="login" rel="noopener noreferrer" class="font-bold">Já possui uma conta?</a>
+        </ng-template>
+    </p-card>
+</div>
