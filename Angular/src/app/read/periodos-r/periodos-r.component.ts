@@ -76,7 +76,7 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
         dataInicio: [null],
         dataFim: [null],
         descricao: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]]
-      });
+      }, { validator: this.validarDatas });
   }
 
   ngOnInit() {
@@ -95,6 +95,17 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.unsubscribe$.unsubscribe();
+  }
+
+  validarDatas(formGroup: FormGroup) {
+    const dataInicio = formGroup.get('dataInicio')?.value;
+    const dataFim = formGroup.get('dataFim')?.value;
+
+    if (dataInicio && dataFim && new Date(dataFim) < new Date(dataInicio)) {
+      formGroup.get('dataFim')?.setErrors({ 'invalidEndDate': true });
+    } else {
+      formGroup.get('dataFim')?.setErrors(null);
+    }
   }
 
   showEditDialog(value: Periodo) {
