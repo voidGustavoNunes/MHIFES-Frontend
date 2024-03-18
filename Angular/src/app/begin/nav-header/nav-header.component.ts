@@ -80,7 +80,7 @@ export class NavHeaderComponent implements OnInit {
           },
           {
             label:'Professor',
-            routerLink:'professor',
+            routerLink:'professores',
           },
 
         ]

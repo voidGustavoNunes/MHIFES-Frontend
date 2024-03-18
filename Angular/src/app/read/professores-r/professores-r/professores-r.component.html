@@ -1,1 +1,91 @@
-<p>professores-r works!</p>
+<div class="caixa">
+    <h1>Professores</h1>
+
+    <div class="opcao">
+        <a (click)="showDialog()" class="p-button botaoC">Cadastrar +</a>
+        
+        <div class="pesq">
+            <p-inputGroup>
+                <button type="button" pButton icon="pi pi-filter-slash" (click)="limparFilter()"></button>
+                <input #searchInput type="text" pInputText placeholder="Pesquisar professor" (keydown)="onKeyDown($event, searchInput.value)" />
+                <button type="button" pButton icon="pi pi-search" (click)="filterField(searchInput.value)"></button>
+            </p-inputGroup>
+        </div>
+    </div>
+
+    <div class="eqTable">
+        <p-table
+            #dt1
+            [value]="professoresData"
+            styleClass="p-datatable-striped"
+            [tableStyle]="{'min-width': '50rem'}"
+            [paginator]="true"
+            [rows]="10"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Mostrando do {first} ao {last} de {totalRecords} registros"
+            [rowsPerPageOptions]="[10, 20, 40]"
+        >
+            <ng-template pTemplate="header">
+                <tr class="tbHeader">
+                    <th>Nome</th>
+                    <th>Matrícula</th>
+                    <th></th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-professor>
+                <tr class="tbBody">
+                    <td>{{professor?.nome}}</td>
+                    <td>{{professor?.matricula}}</td>
+                    <td>
+                        <button type="button" class="botaoEdit" (click)="showEditDialog(professor)" pButton>Editar</button>
+                        <p-toast></p-toast>
+                        <p-confirmPopup></p-confirmPopup>
+                        <button type="button" class="botaoDele" (click)="confirm2($event, professor?.id)" severity="danger" pButton>Deletar</button>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="3">Não há professores cadastrados.</td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+    
+    <p-scrollTop></p-scrollTop>
+</div>
+
+<div class="card flex justify-content-center">
+    <p-dialog class="pHeader" [header]=ehTitulo [(visible)]="visible" [modal]="true" [breakpoints]="{ '960px': '75vw' }" [style]="{ width: '50vw' }" [draggable]="false" [resizable]="false">
+        <form id="meuFormulario" [formGroup]="form" (ngSubmit)="onSubmit()">
+            <div class="divInput">
+                <span class="p-float-label">
+                    <input pInputText id="nomeProfessor" class="form-control" formControlName="nome" />
+                    <label for="nomeProfessor">Nome do professor</label>
+                </span>
+            </div>
+            <div class="divInput">
+                <span class="p-float-label">
+                    <input pInputText id="matricula" class="form-control" formControlName="matricula" />
+                    <label for="matricula">Matrícula</label>
+                </span>
+            </div>
+            <div class="divInput">
+                <span class="p-float-label">
+                    <p-dropdown [options]="[{label: 'Sim', value: true}, {label: 'Não', value: false}]" placeholder="Selecione Coordenador" formControlName="coordenador"></p-dropdown>
+                </span>
+            </div>
+            <div class="divInput">
+                <span class="p-float-label">
+                    <input pInputText id="curso" class="form-control" formControlName="curso" />
+                    <label for="curso">Curso</label>
+                </span>
+            </div>
+            <div class="divBotao">
+                <button type="submit" class="botaoSalva" *ngIf="cadastrar" pButton>Salvar</button>
+                <button type="submit" class="botaoEdit" *ngIf="editar" pButton>Atualizar</button>
+                <button type="button" class="botaoCancela" (click)="hideDialog()" pButton>Cancelar</button>
+            </div>
+        </form>
+    </p-dialog>
+</div>

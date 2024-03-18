@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { ProfessoresRComponent } from './professores-r.component';
 
 describe('ProfessoresRComponent', () => {
@@ -8,7 +7,7 @@ describe('ProfessoresRComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ProfessoresRComponent]
+      declarations: [ ProfessoresRComponent ]
     })
     .compileComponents();
     
