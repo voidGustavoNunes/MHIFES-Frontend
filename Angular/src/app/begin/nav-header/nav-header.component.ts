@@ -22,14 +22,14 @@ export class NavHeaderComponent implements OnInit {
   specialKeywords: string[] = ['/login', '/registrar'];
 
   constructor(private router: Router){
-    
+
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(() => {
           this.isSpecialPage = this.specialKeywords.some(keyword => this.router.url.includes(keyword));
       });
   }
-  
+
   ngOnInit() {
     this.itemsLog = [
       {
@@ -41,7 +41,7 @@ export class NavHeaderComponent implements OnInit {
         }
       }
     ]
-    
+
     this.itemsHom = [
       {
         label: 'Meu Horário IFES',
@@ -60,12 +60,30 @@ export class NavHeaderComponent implements OnInit {
         }
       },
       {
-        label: 'Equipamentos',
-        routerLink:'equipamentos',
+        label: 'Cadastros',
         style: {
           'margin-right': '.5rem',
           'font-weight': '600'
-        }
+        },
+        items: [
+          {
+            label: 'Aluno',
+            routerLink:'aluno',
+          },
+          {
+            label: 'Equipamentos',
+            routerLink:'equipamentos',
+          },
+          {
+            label: 'Coordenador',
+            routerLink:'coordenador',
+          },
+          {
+            label:'Professor',
+            routerLink:'professor',
+          },
+
+        ]
       },
       {
         label: 'Aulas do semestre',

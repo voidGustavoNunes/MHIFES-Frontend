@@ -5,6 +5,7 @@ import { EquipamentosRComponent } from './read/equipamentos-r/equipamentos-r.com
 import { RegisterComponent } from './begin/register/register.component';
 import { DisciplinasRComponent } from './read/disciplinas-r/disciplinas-r.component';
 import { PeriodosRComponent } from './read/periodos-r/periodos-r.component';
+import { AlunosRComponent } from './read/alunos-r/alunos-r/alunos-r.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -15,4 +16,5 @@ export const routes: Routes = [
     { path: 'equipamentos', component: EquipamentosRComponent },
     { path: 'disciplinas', component: DisciplinasRComponent },
     { path: 'periodos', component: PeriodosRComponent },
+    { path: 'alunos', component: AlunosRComponent },
 ];
