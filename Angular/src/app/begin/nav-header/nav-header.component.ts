@@ -68,7 +68,7 @@ export class NavHeaderComponent implements OnInit {
         items: [
           {
             label: 'Aluno',
-            routerLink:'aluno',
+            routerLink:'alunos',
           },
           {
             label: 'Equipamentos',
@@ -76,11 +76,11 @@ export class NavHeaderComponent implements OnInit {
           },
           {
             label: 'Coordenador',
-            routerLink:'coordenador',
+            routerLink:'coordenadores',
           },
           {
             label:'Professor',
-            routerLink:'professor',
+            routerLink:'professores',
           },
 
         ]

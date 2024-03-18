@@ -7,6 +7,7 @@
     position: relative;
     
     .card{
+        width: 90%;
         position: relative;
         z-index: 1; 
     }
@@ -22,21 +23,24 @@
     }
 
     p{
-        margin: 0 5rem 6rem;
+        margin: 0 3rem 6rem;
         font-size: 1.5rem;
         letter-spacing: .1rem;
+        padding: .5rem;
+        border-radius: 1rem;
+        background-color: rgba(0, 0, 0, 0.5);
     }
 
     .rdButton{
         display: flex;
+        margin: 0 3rem 0;
     }
     .rdButton div{
-        margin-right: 3rem;
     }
 
     .eqTable{
-        width: 100%;
-        margin: 4rem 0;
+        width: 90%;
+        margin: 4rem auto;
         border: .1rem solid #B1CAFA;
         
         .tbHeader{
@@ -71,21 +75,17 @@
     p-radiobutton.p-element{
         margin: 0 1rem;
     }
-    .p-datatable-striped{
-        // min-width: 50rem;
-        // overflow-x: hidden;
-    }
 }
 
 @media screen and (min-width: 686px) {
     .card{
-        margin: 3rem 6rem 0;
+        margin: 3rem auto 0;
     }
 }
 
 @media screen and (max-width: 685px) {
     .card{
-        margin: 3rem 1rem 0;
+        margin: 3rem auto 0;
         
         .eqTable{
             overflow-x: scroll;
