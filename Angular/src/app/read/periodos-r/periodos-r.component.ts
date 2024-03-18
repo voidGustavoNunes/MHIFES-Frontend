@@ -1,11 +1,11 @@
-import { Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Subscription, interval } from 'rxjs';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Equipamento } from '../../models/equipamento.models';
-import { EquipamentoService } from '../../service/equipamento.service';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
+import { PeriodoService } from '../../service/periodo.service';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Subscription } from 'rxjs';
+import { Periodo } from '../../models/periodo.models';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputGroupModule } from 'primeng/inputgroup';
@@ -17,14 +17,17 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ScrollTopModule } from 'primeng/scrolltop';
+import { CalendarModule } from 'primeng/calendar';
 
 @Component({
-  selector: 'app-equipamentos-r',
+  selector: 'app-periodos-r',
   standalone: true,
   imports: [
     CommonModule,
     HttpClientModule,
     RouterModule,
+    ReactiveFormsModule,
+    FormsModule,
     ButtonModule,
     InputTextModule,
     InputGroupModule,
@@ -32,28 +35,26 @@ import { ScrollTopModule } from 'primeng/scrolltop';
     TableModule,
     DialogModule,
     PaginatorModule,
-    ReactiveFormsModule,
-    FormsModule,
     ToastModule,
     ScrollTopModule,
-    ConfirmPopupModule
+    ConfirmPopupModule,
+    CalendarModule
   ],
-  templateUrl: './equipamentos-r.component.html',
-  styleUrl: './equipamentos-r.component.scss',
+  templateUrl: './periodos-r.component.html',
+  styleUrl: './periodos-r.component.scss',
   providers: [
-    EquipamentoService,
+    PeriodoService,
     ConfirmationService,
     MessageService
   ]
 })
-
-export class EquipamentosRComponent implements OnInit, OnDestroy {
+export class PeriodosRComponent implements OnInit, OnDestroy {
   @ViewChild('searchInput') inputSearch!: ElementRef;
 
-  equipamentosData: Equipamento[] = [];
-  equipamentosFilter: Equipamento[] = [];
-  equipamentosCadast: Equipamento[] = [];
-  equipamentosEdit: Equipamento[] = [];
+  periodosData: Periodo[] = [];
+  periodosFilter: Periodo[] = [];
+  periodosCadast: Periodo[] = [];
+  periodosEdit: Periodo[] = [];
 
   unsubscribe$!: Subscription;
   form: FormGroup;
@@ -64,62 +65,29 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
   cadastrar: boolean = false;
 
   constructor(
-    private equipService: EquipamentoService,
+    private periodService: PeriodoService,
     private router: Router,
     private formBuilder: FormBuilder,
     private confirmationService: ConfirmationService,
-    private messageService: MessageService,
-    private ngZone: NgZone
+    private messageService: MessageService
     ) {
       this.form = this.formBuilder.group({
         id: [null],
-        nome: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]]
+        dataInicio: [null],
+        dataFim: [null],
+        descricao: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]]
       });
   }
 
   ngOnInit() {
-    // this.equipamentosData = [
-    //   {
-    //       id: 3,
-    //       nome: 'Name product',
-    //       // descricao: 'Product Description 3 hjgkytftf hjfuj hjgujj hyfuyhjv kgfhcdgjc  gtchtg jkbgvfjtd hjytfjy ghfht ghjydtrd gcjydjrdjt gdcg fgxhtrd'
-    //   },
-    //   {
-    //       id: 4,
-    //       nome: 'Name product',
-    //       // descricao: 'Product Description 4'
-    //   },
-    //   {
-    //       id: 1,
-    //       nome: 'Name product bhgfhgv hjbkjgvgkh bjhjhv vhgvkhghg vjkgvkhgjkkhgk gvhkgvkgh',
-    //       // descricao: 'Product Description 1'
-    //   },
-    //   {
-    //       id: 5,
-    //       nome: 'Name product',
-    //       // descricao: 'Product Description 5'
-    //   },
-    //   {
-    //       id: 2,
-    //       nome: 'Name product',
-    //       // descricao: 'Product Description 2'
-    //   },
-    //   {
-    //       id: 6,
-    //       nome: 'Name product',
-    //       // descricao: 'Product Description 6'
-    //   }
-    // ];
-
-    this.unsubscribe$ = this.equipService.listar()
+    this.unsubscribe$ = this.periodService.listar()
     .subscribe({
       next: (itens:any) => {
         const data = itens;
-        this.equipamentosData = data.sort((a:any, b:any) => (a.nome < b.nome) ? -1 : 1);
-        this.equipamentosFilter = this.equipamentosData;
+        this.periodosData = data.sort((a:any, b:any) => (a.nome < b.nome) ? -1 : 1);
+        this.periodosFilter = this.periodosData;
       },
       error: (err: any) => {
-        // this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Dados não encontrados.', life: 3000 });
         alert('Dados não encontrados.')
       }
     });
@@ -129,21 +97,25 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
     this.unsubscribe$.unsubscribe();
   }
 
-  showEditDialog(value: Equipamento) {
+  showEditDialog(value: Periodo) {
     this.form.reset();
-    this.ehTitulo = 'Atualizar Equipamento'
+    this.ehTitulo = 'Atualizar Período'
     this.visible = true;
     this.cadastrar = false;
     this.editar = true;
     this.form.setValue({
       id: value.id,
-      nome: value.nome
+      dataInicio: value.dataInicio,
+      dataFim: value.dataFim,
+      descricao: value.descricao
     })
+    this.form.controls['dataFim'].setValue(new Date(value.dataFim));
+    this.form.controls['dataInicio'].setValue(new Date(value.dataInicio));
   }
 
   showDialog() {
     this.form.reset();
-    this.ehTitulo = 'Cadastrar Equipamento';
+    this.ehTitulo = 'Cadastrar Período';
     this.visible = true;
     this.cadastrar = true;
     this.editar = false;
@@ -159,13 +131,19 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
     if (inputElement) {
       this.inputSearch.nativeElement.value = '';
     }
-    this.equipamentosData = this.equipamentosFilter;
+    this.periodosData = this.periodosFilter;
   }
 
   searchFilterWord(term: string) {
-    this.equipamentosData = this.equipamentosFilter.filter(el => {
-      if (el.nome.toLowerCase().includes(term.toLowerCase())) {
-        return el;
+    this.periodosData = this.periodosFilter.filter(el => {
+      const searchTermAsNumber = parseInt(term);
+      if (!isNaN(searchTermAsNumber)) {
+        const ano = new Date(el.dataInicio).getFullYear();
+        if (ano === searchTermAsNumber) {
+          return el;
+        } else {
+          return null;
+        }
       } else {
         return null;
       }
@@ -202,11 +180,11 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
   }
 
   enviarFormSave() {
-    this.equipService.criar(this.equipamentosCadast).subscribe({
+    this.periodService.criar(this.periodosCadast).subscribe({
       next: (data: any) => {
-        this.equipamentosCadast = data;
+        this.periodosCadast = data;
         this.goToRouteSave();
-        alert('Equipamento cadastrado com sucesso!');
+        alert('Perídodo cadastrado com sucesso!');
       },
       error: (err: any) => {
         alert('Erro! Cadastro não enviado.')
@@ -215,11 +193,11 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
   }
 
   enviarFormEdit(id: number) {
-    this.equipService.atualizar(id, this.equipamentosEdit).subscribe({
+    this.periodService.atualizar(id, this.periodosEdit).subscribe({
       next: (data: any) => {
-        this.equipamentosEdit = data;
+        this.periodosEdit = data;
         this.goToRouteEdit(id);
-        alert('Equipamento editado com sucesso!');
+        alert('Perídodo editado com sucesso!');
       },
       error: (err: any) => {
         alert('Erro! Edição não enviada.')
@@ -228,23 +206,23 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
   }
 
   goToRouteSave() {
-    this.router.navigate(['api/equipamentos']);
+    this.router.navigate(['api/periodos']);
   }
 
   goToRouteEdit(id: number) {
-    this.router.navigate(['api/equipamentos', id]);
+    this.router.navigate(['api/periodos', id]);
   }
 
   onSubmit() {
     if (this.form.valid && this.cadastrar) {
-      this.equipamentosCadast = this.form.value;
+      this.periodosCadast = this.form.value;
       this.enviarFormSave();
       this.visible = false;
       this.form.reset();
       this.ngOnInit();
       window.location.reload();
     } else if (this.form.valid && this.editar) {
-      this.equipamentosEdit = this.form.value;
+      this.periodosEdit = this.form.value;
       this.enviarFormEdit(this.form.get('id')?.value);
       this.visible = false;
       this.form.reset();
@@ -256,7 +234,7 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
   }
 
   deletarID(id: number) {
-    this.equipService.excluir(id)
+    this.periodService.excluir(id)
     .subscribe({
       next: (data: any) => {
         alert('Registro deletado com sucesso!');
@@ -267,7 +245,6 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
         if (err.status) {
           alert('Erro! Não foi possível deletar registro.');
         } else {
-          // console.log('Erro desconhecido:', err);
           alert('Erro desconhecido' + err);
         }
       }
@@ -275,3 +252,4 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
   }
 
 }
+

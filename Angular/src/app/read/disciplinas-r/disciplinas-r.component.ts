@@ -1,11 +1,11 @@
-import { Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Subscription, interval } from 'rxjs';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Disciplina } from '../../models/disciplina.models';
+import { Subscription } from 'rxjs';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Equipamento } from '../../models/equipamento.models';
-import { EquipamentoService } from '../../service/equipamento.service';
+import { DisciplinaService } from '../../service/disciplina.service';
 import { Router, RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputGroupModule } from 'primeng/inputgroup';
@@ -19,7 +19,7 @@ import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ScrollTopModule } from 'primeng/scrolltop';
 
 @Component({
-  selector: 'app-equipamentos-r',
+  selector: 'app-disciplinas-r',
   standalone: true,
   imports: [
     CommonModule,
@@ -38,22 +38,21 @@ import { ScrollTopModule } from 'primeng/scrolltop';
     ScrollTopModule,
     ConfirmPopupModule
   ],
-  templateUrl: './equipamentos-r.component.html',
-  styleUrl: './equipamentos-r.component.scss',
+  templateUrl: './disciplinas-r.component.html',
+  styleUrl: './disciplinas-r.component.scss',
   providers: [
-    EquipamentoService,
+    DisciplinaService,
     ConfirmationService,
     MessageService
   ]
 })
-
-export class EquipamentosRComponent implements OnInit, OnDestroy {
+export class DisciplinasRComponent implements OnInit, OnDestroy {
   @ViewChild('searchInput') inputSearch!: ElementRef;
 
-  equipamentosData: Equipamento[] = [];
-  equipamentosFilter: Equipamento[] = [];
-  equipamentosCadast: Equipamento[] = [];
-  equipamentosEdit: Equipamento[] = [];
+  disciplinasData: Disciplina[] = [];
+  dicisplinasFilter: Disciplina[] = [];
+  disciplinasCadast: Disciplina[] = [];
+  disciplinasEdit: Disciplina[] = [];
 
   unsubscribe$!: Subscription;
   form: FormGroup;
@@ -64,12 +63,11 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
   cadastrar: boolean = false;
 
   constructor(
-    private equipService: EquipamentoService,
+    private disciService: DisciplinaService,
     private router: Router,
     private formBuilder: FormBuilder,
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
-    private ngZone: NgZone
     ) {
       this.form = this.formBuilder.group({
         id: [null],
@@ -78,48 +76,14 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    // this.equipamentosData = [
-    //   {
-    //       id: 3,
-    //       nome: 'Name product',
-    //       // descricao: 'Product Description 3 hjgkytftf hjfuj hjgujj hyfuyhjv kgfhcdgjc  gtchtg jkbgvfjtd hjytfjy ghfht ghjydtrd gcjydjrdjt gdcg fgxhtrd'
-    //   },
-    //   {
-    //       id: 4,
-    //       nome: 'Name product',
-    //       // descricao: 'Product Description 4'
-    //   },
-    //   {
-    //       id: 1,
-    //       nome: 'Name product bhgfhgv hjbkjgvgkh bjhjhv vhgvkhghg vjkgvkhgjkkhgk gvhkgvkgh',
-    //       // descricao: 'Product Description 1'
-    //   },
-    //   {
-    //       id: 5,
-    //       nome: 'Name product',
-    //       // descricao: 'Product Description 5'
-    //   },
-    //   {
-    //       id: 2,
-    //       nome: 'Name product',
-    //       // descricao: 'Product Description 2'
-    //   },
-    //   {
-    //       id: 6,
-    //       nome: 'Name product',
-    //       // descricao: 'Product Description 6'
-    //   }
-    // ];
-
-    this.unsubscribe$ = this.equipService.listar()
+    this.unsubscribe$ = this.disciService.listar()
     .subscribe({
       next: (itens:any) => {
         const data = itens;
-        this.equipamentosData = data.sort((a:any, b:any) => (a.nome < b.nome) ? -1 : 1);
-        this.equipamentosFilter = this.equipamentosData;
+        this.disciplinasData = data.sort((a:any, b:any) => (a.nome < b.nome) ? -1 : 1);
+        this.dicisplinasFilter = this.disciplinasData;
       },
       error: (err: any) => {
-        // this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Dados não encontrados.', life: 3000 });
         alert('Dados não encontrados.')
       }
     });
@@ -129,9 +93,9 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
     this.unsubscribe$.unsubscribe();
   }
 
-  showEditDialog(value: Equipamento) {
+  showEditDialog(value: Disciplina) {
     this.form.reset();
-    this.ehTitulo = 'Atualizar Equipamento'
+    this.ehTitulo = 'Atualizar Disciplina'
     this.visible = true;
     this.cadastrar = false;
     this.editar = true;
@@ -143,7 +107,7 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
 
   showDialog() {
     this.form.reset();
-    this.ehTitulo = 'Cadastrar Equipamento';
+    this.ehTitulo = 'Cadastrar Disciplina';
     this.visible = true;
     this.cadastrar = true;
     this.editar = false;
@@ -159,11 +123,11 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
     if (inputElement) {
       this.inputSearch.nativeElement.value = '';
     }
-    this.equipamentosData = this.equipamentosFilter;
+    this.disciplinasData = this.dicisplinasFilter;
   }
 
   searchFilterWord(term: string) {
-    this.equipamentosData = this.equipamentosFilter.filter(el => {
+    this.disciplinasData = this.dicisplinasFilter.filter(el => {
       if (el.nome.toLowerCase().includes(term.toLowerCase())) {
         return el;
       } else {
@@ -179,7 +143,7 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
       }
     }
   }
-  
+
   filterField(searchTerm: string) {
     if (searchTerm != null || searchTerm != '') {
       this.searchFilterWord(searchTerm);
@@ -202,11 +166,11 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
   }
 
   enviarFormSave() {
-    this.equipService.criar(this.equipamentosCadast).subscribe({
+    this.disciService.criar(this.disciplinasCadast).subscribe({
       next: (data: any) => {
-        this.equipamentosCadast = data;
+        this.disciplinasCadast = data;
         this.goToRouteSave();
-        alert('Equipamento cadastrado com sucesso!');
+        alert('Disciplina cadastrada com sucesso!');
       },
       error: (err: any) => {
         alert('Erro! Cadastro não enviado.')
@@ -215,11 +179,11 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
   }
 
   enviarFormEdit(id: number) {
-    this.equipService.atualizar(id, this.equipamentosEdit).subscribe({
+    this.disciService.atualizar(id, this.disciplinasEdit).subscribe({
       next: (data: any) => {
-        this.equipamentosEdit = data;
+        this.disciplinasEdit = data;
         this.goToRouteEdit(id);
-        alert('Equipamento editado com sucesso!');
+        alert('Disciplina editada com sucesso!');
       },
       error: (err: any) => {
         alert('Erro! Edição não enviada.')
@@ -228,23 +192,23 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
   }
 
   goToRouteSave() {
-    this.router.navigate(['api/equipamentos']);
+    this.router.navigate(['api/disciplinas']);
   }
 
   goToRouteEdit(id: number) {
-    this.router.navigate(['api/equipamentos', id]);
+    this.router.navigate(['api/disciplinas', id]);
   }
 
   onSubmit() {
     if (this.form.valid && this.cadastrar) {
-      this.equipamentosCadast = this.form.value;
+      this.disciplinasCadast = this.form.value;
       this.enviarFormSave();
       this.visible = false;
       this.form.reset();
       this.ngOnInit();
       window.location.reload();
     } else if (this.form.valid && this.editar) {
-      this.equipamentosEdit = this.form.value;
+      this.disciplinasEdit = this.form.value;
       this.enviarFormEdit(this.form.get('id')?.value);
       this.visible = false;
       this.form.reset();
@@ -256,7 +220,7 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
   }
 
   deletarID(id: number) {
-    this.equipService.excluir(id)
+    this.disciService.excluir(id)
     .subscribe({
       next: (data: any) => {
         alert('Registro deletado com sucesso!');
@@ -267,7 +231,6 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
         if (err.status) {
           alert('Erro! Não foi possível deletar registro.');
         } else {
-          // console.log('Erro desconhecido:', err);
           alert('Erro desconhecido' + err);
         }
       }
@@ -275,3 +238,4 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
   }
 
 }
+

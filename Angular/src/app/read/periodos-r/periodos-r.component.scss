@@ -134,6 +134,18 @@
         color: white;
         letter-spacing: .1rem;
     }
+    .p-calendar input{
+        background-color: #BFE4FF;
+    }
+    .p-dialog-content {
+        overflow-y: visible;
+    }
+    .ng-trigger.ng-trigger-overlayAnimation.ng-tns-c3632051545-2.p-datepicker.p-component.ng-star-inserted {
+        // margin-top: 310px;
+    }
+    .ng-trigger.ng-trigger-overlayAnimation.ng-tns-c3632051545-3.p-datepicker.p-component.ng-star-inserted {
+        // margin-top: 380px;
+    }
 }
 
 @media screen and (min-width: 686px) {
@@ -155,6 +167,11 @@
             .botaoSalva, .botaoEdit{
                 margin-right: 5rem;
             }
+        }
+    }
+    :host ::ng-deep {
+        .p-calendar input{
+            width: 40vw;
         }
     }
 }
@@ -183,6 +200,11 @@
             .botaoSalva, .botaoEdit{
                 margin-bottom: 1rem;
             }
+        }
+    }
+    :host ::ng-deep {
+        .p-calendar input{
+            width: 60vw;
         }
     }
 }

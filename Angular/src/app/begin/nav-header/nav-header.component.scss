@@ -13,34 +13,46 @@
     }
 }
 
-:host {
-    ::ng-deep .p-menubar{
+:host ::ng-deep {
+    .p-menubar{
         margin: -.1rem;
         background-color: #00208F;
         border-radius: 0;
     }
-    ::ng-deep .p-menubar .p-menubar-button{
+    .p-menubar .p-menubar-button{
         background-color: #BFE4FF;
     }
-    ::ng-deep .p-icon path {
+    .p-icon path {
         fill: #256CF0;
     }
-    ::ng-deep .p-menubar-root-list li:active {
+    .p-menubar-root-list li:active {
         background: transparent;
     }
-    ::ng-deep .p-menubar.p-menubar-mobile-active .p-menubar-root-list {
+    .p-menubar.p-menubar-mobile-active .p-menubar-root-list {
         background-color: #00208F;
     }
-    ::ng-deep .p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-content .p-menuitem-link .p-menuitem-text{
+    .p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-content .p-menuitem-link .p-menuitem-text{
         color: white;
     }
-    ::ng-deep .p-menubar .p-menubar-root-list > .p-menuitem:not(.p-highlight):not(.p-disabled):not(:first-child) > .p-menuitem-content:hover{
+    .p-menuitem-content:hover{
         background-color: #256CF0;
     }
-    ::ng-deep .p-menubar .p-menubar-root-list > .p-menuitem:not(.p-highlight):not(.p-disabled):first-child > .p-menuitem-content:hover{
+    .p-submenu-list .p-menuitem-link{
+        background-color: white;
+    }
+    .p-menubar .p-menubar-root-list > .p-menuitem:not(.p-highlight):not(.p-disabled):not(:first-child) > .p-menuitem-content:hover{
+        background-color: #256CF0;
+    }
+    .p-menubar .p-menubar-root-list > .p-menuitem:not(.p-highlight):not(.p-disabled):first-child > .p-menuitem-content:hover{
         background-color: transparent;
     }
-    ::ng-deep .p-menubar .p-menubar-root-list > .p-menuitem:not(.p-highlight):not(.p-disabled):first-child > .p-menuitem-content:focus{
-        background-color: #00208F;
+    // .p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-content:focus{
+    //     background-color: rebeccapurple;
+    // }
+
+
+    .p-menubar .p-menubar-root-list > .p-menuitem:not(.p-highlight):not(.p-disabled):first-child > .p-menuitem-content:focus{
+        // background-color: #256CF0;
+        // background-color: #00208F;
     }
 }

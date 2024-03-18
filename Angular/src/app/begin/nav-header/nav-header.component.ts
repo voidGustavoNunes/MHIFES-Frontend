@@ -55,7 +55,7 @@ export class NavHeaderComponent implements OnInit {
         label: 'Home',
         routerLink:'home',
         style: {
-          'margin-right': '1rem',
+          'margin-right': '.5rem',
           'font-weight': '600'
         }
       },
@@ -63,9 +63,26 @@ export class NavHeaderComponent implements OnInit {
         label: 'Equipamentos',
         routerLink:'equipamentos',
         style: {
-          'margin-right': '1rem',
+          'margin-right': '.5rem',
           'font-weight': '600'
         }
+      },
+      {
+        label: 'Aulas do semestre',
+        style: {
+          'margin-right': '.5rem',
+          'font-weight': '600'
+        },
+        items: [
+          {
+            label: 'Disciplinas',
+            routerLink:'disciplinas',
+          },
+          {
+            label: 'Períodos',
+            routerLink:'periodos',
+          }
+        ]
       }
     ]
   }
