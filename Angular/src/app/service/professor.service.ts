@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
-import { Professor} from '../models/professor.models';
+import { Professor } from '../models/professor.models';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
+    
 @Injectable()
 export class ProfessorService {
-  private readonly API = '/api/professor';
+  private readonly API = '/api/professores';
 
   constructor(private http: HttpClient) { }
 
