@@ -58,6 +58,7 @@ export class AlunosRComponent implements OnInit, OnDestroy {
   unsubscribe$!: Subscription;
   form: FormGroup;
 
+
   ehTitulo: string = '';
   visible: boolean = false;
   editar: boolean = false;
@@ -73,7 +74,9 @@ export class AlunosRComponent implements OnInit, OnDestroy {
     ) {
       this.form = this.formBuilder.group({
         id: [null],
-        nome: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]]
+        nome: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
+        matricula: [null, [Validators.required]],
+        curso: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(50)]]
       });
   }
 
@@ -107,7 +110,6 @@ export class AlunosRComponent implements OnInit, OnDestroy {
       nome: value.nome,
       matricula: value.matricula,
       curso: value.curso,
-      periodo: value.periodo
     })
   }
 

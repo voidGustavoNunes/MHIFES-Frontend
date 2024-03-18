@@ -30,7 +30,6 @@
                   <th>Nome</th>
                   <th>matricula</th>
                   <th>curso</th>
-                  <th>periodo</th>
                   <th></th>
               </tr>
           </ng-template>
@@ -39,7 +38,6 @@
                   <td>{{aluno?.nome}}</td>
                   <td>{{aluno?.matricula}}</td>
                   <td>{{aluno?.curso}}</td>
-                  <td>{{aluno?.periodo}}</td>
                   <td>
                       <button type="button" class="botaoEdit" (click)="showEditDialog(aluno)" pButton>Editar</button>
                       <p-toast></p-toast>
@@ -79,10 +77,6 @@
               <label for="cursoAlun">Curso</label>
           </span>
           <br>
-          <span class="p-float-label">
-            <input pInputText id="periodoAlun" class="form-control" formControlName="periodo" />
-            <label for="periodoAlun">Período</label>
-        </span>
           </div>
           <div class="divBotao">
               <button type="submit" class="botaoSalva" *ngIf="cadastrar" pButton>Salvar</button>
