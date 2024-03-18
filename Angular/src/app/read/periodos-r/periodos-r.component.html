@@ -74,6 +74,9 @@
                     <p-calendar dateFormat="dd/mm/yy" id="fimPer" class="form-control" formControlName="dataFim" ></p-calendar>
                     <label for="fimPer">Data final</label>
                 </span>
+                <div *ngIf="form.get('dataFim')?.invalid && form.get('dataFim')?.touched" class="validation-error">
+                    <p>A data final deve ser maior que a data de início.</p>
+                </div>
             </div>
             <div class="divInput">
                 <span class="p-float-label">
