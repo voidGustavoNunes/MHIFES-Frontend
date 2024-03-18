@@ -68,7 +68,7 @@ export class NavHeaderComponent implements OnInit {
         items: [
           {
             label: 'Aluno',
-            routerLink:'aluno',
+            routerLink:'alunos',
           },
           {
             label: 'Equipamentos',

@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 
 @Injectable()
 export class AlunoService {
-  private readonly API = '/api/aluno';
+  private readonly API = '/api/alunos';
 
   constructor(private http: HttpClient) { }
 
