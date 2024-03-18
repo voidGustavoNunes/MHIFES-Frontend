@@ -6,7 +6,7 @@ import { RegisterComponent } from './begin/register/register.component';
 import { DisciplinasRComponent } from './read/disciplinas-r/disciplinas-r.component';
 import { PeriodosRComponent } from './read/periodos-r/periodos-r.component';
 import { AlunosRComponent } from './read/alunos-r/alunos-r/alunos-r.component';
-
+import { ProfessoresRComponent } from './read/professores-r/professores-r/professores-r.component';
 export const routes: Routes = [
     { path: '', redirectTo: 'login', pathMatch: 'full' },
     // { path: 'login', component: LoginComponent, canActivate: [LoggedGuard] },
@@ -16,5 +16,6 @@ export const routes: Routes = [
     { path: 'equipamentos', component: EquipamentosRComponent },
     { path: 'disciplinas', component: DisciplinasRComponent },
     { path: 'periodos', component: PeriodosRComponent },
+    { path: 'professores', component: ProfessoresRComponent },
     { path: 'alunos', component: AlunosRComponent },
 ];
