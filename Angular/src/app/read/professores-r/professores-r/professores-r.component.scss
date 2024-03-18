@@ -103,6 +103,11 @@
             background-color: #BFE4FF;
         }
     }
+    :host ::ng-deep {
+        .p-dropdown{
+            background-color: #BFE4FF;
+        }
+    }
     .divBotao{
         width: fit-content;
         margin: 5rem auto 0;
@@ -131,6 +136,9 @@
         color: white;
         letter-spacing: .1rem;
     }
+    .p-dropdown{
+        // background-color: #BFE4FF;
+    }
 }
 
 @media screen and (min-width: 686px) {
@@ -154,6 +162,11 @@
             }
         }
     }
+        :host ::ng-deep {
+            .card .p-dropdown{
+                width: 40vw;
+            }
+        }
 }
 
 @media screen and (max-width: 685px) {
@@ -182,4 +195,9 @@
             }
         }
     }
+        :host ::ng-deep {
+            .card .p-dropdown{
+                width: 60vw;
+            }
+        }
 }

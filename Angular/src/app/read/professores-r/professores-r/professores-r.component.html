@@ -29,6 +29,7 @@
                 <tr class="tbHeader">
                     <th>Nome</th>
                     <th>Matrícula</th>
+                    <th>Curso</th>
                     <th></th>
                 </tr>
             </ng-template>
@@ -36,6 +37,7 @@
                 <tr class="tbBody">
                     <td>{{professor?.nome}}</td>
                     <td>{{professor?.matricula}}</td>
+                    <td>{{professor?.curso}}</td>
                     <td>
                         <button type="button" class="botaoEdit" (click)="showEditDialog(professor)" pButton>Editar</button>
                         <p-toast></p-toast>
@@ -70,11 +72,11 @@
                     <label for="matricula">Matrícula</label>
                 </span>
             </div>
-            <div class="divInput">
+            <!-- <div class="divInput">
                 <span class="p-float-label">
-                    <p-dropdown [options]="[{label: 'Sim', value: true}, {label: 'Não', value: false}]" placeholder="Selecione Coordenador" formControlName="coordenador"></p-dropdown>
+                    <p-dropdown [options]="[{label: 'Sim', value: true}, {label: 'Não', value: false}]" placeholder="Selecione Coordenador" class="form-control" formControlName="coordenador"></p-dropdown>
                 </span>
-            </div>
+            </div> -->
             <div class="divInput">
                 <span class="p-float-label">
                     <input pInputText id="curso" class="form-control" formControlName="curso" />

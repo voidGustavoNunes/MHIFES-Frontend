@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 
 @Injectable()
 export class CoordenadorService {
-  private readonly API = '/api/coordenador';
+  private readonly API = '/api/coordenadores';
 
   constructor(private http: HttpClient) { }
 

@@ -19,6 +19,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ScrollTopModule } from 'primeng/scrolltop';
+import { Dropdown, DropdownModule } from 'primeng/dropdown';
 
 @Component({
   selector: 'app-professores-r',
@@ -38,7 +39,8 @@ import { ScrollTopModule } from 'primeng/scrolltop';
     FormsModule,
     ToastModule,
     ScrollTopModule,
-    ConfirmPopupModule
+    ConfirmPopupModule,
+    DropdownModule
   ],
   templateUrl: './professores-r.component.html',
   styleUrls: ['./professores-r.component.scss'],
@@ -51,6 +53,7 @@ import { ScrollTopModule } from 'primeng/scrolltop';
 
 export class ProfessoresRComponent implements OnInit, OnDestroy {
   @ViewChild('searchInput') inputSearch!: ElementRef;
+  // @ViewChild('dropdown') dropdown!: Dropdown;
 
   professoresData: Professor[] = [];
   professoresFilter: Professor[] = [];
@@ -59,6 +62,7 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
 
   unsubscribe$!: Subscription;
   form: FormGroup;
+  selectedDrop: boolean = false;
 
   ehTitulo: string = '';
   visible: boolean = false;
@@ -77,7 +81,8 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
         id: [null],
         nome: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
         matricula: [null, [Validators.required]],
-        curso: [null, [Validators.required]]
+        curso: [null, [Validators.required]],
+        // coordenador: [null, [Validators.required]]
       });
   }
 
@@ -109,7 +114,8 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
       id: value.id,
       nome: value.nome,
       matricula: value.matricula,
-      curso: value.curso
+      curso: value.curso,
+
     })
   }
 
@@ -119,11 +125,13 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
     this.visible = true;
     this.cadastrar = true;
     this.editar = false;
+    // this.dropdown.writeValue(null);
   }
   
   hideDialog() {
     this.visible = false;
     this.form.reset();
+    // this.dropdown.writeValue(null);
   }
   
   limparFilter(){
@@ -207,7 +215,14 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
     this.router.navigate(['api/professores', id]);
   }
 
+  onDropdownChange(event: any) {
+    this.selectedDrop = event.value;
+    alert('Valor selecionado:'+ this.selectedDrop);
+  }
+
   onSubmit() {
+    // alert(this.selectedDrop)
+
     if (this.form.valid && this.cadastrar) {
       this.professoresCadast = this.form.value;
       this.enviarFormSave();
