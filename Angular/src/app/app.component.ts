@@ -2,13 +2,15 @@ import { Component, OnInit } from '@angular/core';
 import { NavHeaderComponent } from './begin/nav-header/nav-header.component';
 import { RouterOutlet } from '@angular/router';
 import { PrimeNGConfig } from 'primeng/api';
+import { FooterComponent } from './begin/footer/footer.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [
     RouterOutlet,
-    NavHeaderComponent
+    NavHeaderComponent,
+    FooterComponent
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
