@@ -75,7 +75,7 @@ export class AlunosRComponent implements OnInit, OnDestroy {
       this.form = this.formBuilder.group({
         id: [null],
         nome: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
-        matricula: [null, [Validators.required]],
+        matricula: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
         curso: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(50)]]
       });
   }
