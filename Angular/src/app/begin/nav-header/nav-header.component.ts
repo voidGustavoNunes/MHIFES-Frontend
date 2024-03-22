@@ -60,7 +60,7 @@ export class NavHeaderComponent implements OnInit {
         }
       },
       {
-        label: 'Cadastros',
+        label: 'Gerenciar pessoas',
         style: {
           'margin-right': '.5rem',
           'font-weight': '600'
@@ -69,10 +69,6 @@ export class NavHeaderComponent implements OnInit {
           {
             label: 'Alunos',
             routerLink:'alunos',
-          },
-          {
-            label: 'Equipamentos',
-            routerLink:'equipamentos',
           },
           {
             label: 'Coordenadores',
@@ -86,12 +82,16 @@ export class NavHeaderComponent implements OnInit {
         ]
       },
       {
-        label: 'Aulas do semestre',
+        label: 'Gerenciar recursos',
         style: {
           'margin-right': '.5rem',
           'font-weight': '600'
         },
         items: [
+          {
+            label: 'Equipamentos',
+            routerLink:'equipamentos',
+          },
           {
             label: 'Disciplinas',
             routerLink:'disciplinas',
@@ -99,6 +99,10 @@ export class NavHeaderComponent implements OnInit {
           {
             label: 'Períodos',
             routerLink:'periodos',
+          },
+          {
+            label: 'Eventos',
+            routerLink:'eventos',
           }
         ]
       }

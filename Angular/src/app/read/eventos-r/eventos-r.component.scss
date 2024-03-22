@@ -1,0 +1,256 @@
+@mixin themeButton($back: #BFE4FF, $color: #256CF0) {
+    background: $back;
+    color: $color;
+    border: none;
+    box-shadow: 0 .2rem .2rem rgba(0, 0, 0, 0.26);
+}
+
+.caixa{
+    h1{
+        font-size: 35px;
+        font-weight: 600;
+        text-align: center;
+        text-transform: uppercase;
+        margin-top: 2rem;
+    }
+
+    .opcao{
+        margin-top: 3rem;
+        .botaoC{
+            color: white;
+            background-color: #00208F;
+            text-decoration: none;
+            letter-spacing: .1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            border: .1rem solid #00208F;
+            box-shadow: 0 .2rem .2rem rgba(0, 0, 0, 0.26);
+        }
+        .botaoC:active{
+            background-color: white;
+            color: #00208F;
+            box-shadow: 0 .2rem .2rem rgba(0, 0, 0, 0.4);
+        }
+
+        .pesq{
+            input{
+                background-color: #BFE4FF;
+                box-shadow: 0 .2rem .2rem rgba(0, 0, 0, 0.26);
+            }
+            input:focus {
+                outline: none;
+                border: .1rem solid #4A82FD;
+            }
+            button{
+                @include themeButton(#4A82FD, white);
+                height: 2.875rem;
+                box-shadow: 0 .2rem .2rem rgba(0, 0, 0, 0.5);
+            }
+            button:active{
+                box-shadow: none;
+            }
+        }
+    }
+
+    .eqTable{
+        margin: 4rem 0;
+        border: .1rem solid #B1CAFA;
+        
+        .tbHeader{
+            border-radius: .5rem 0;
+            
+            th{
+                background-color: #256CF0 !important;
+                color: white;
+                font-weight: 600;
+                letter-spacing: .1rem;
+                text-align: center;
+                text-transform: uppercase;
+            }
+        }
+        
+        .tbBody{
+            
+            td{
+                text-align: center;
+            }
+            
+            button:active{
+                box-shadow: none;
+            }
+            .botaoInfo{
+                @include themeButton(#A2FF7F, #1E8805);
+            }
+            .botaoEdit{
+                @include themeButton(#FFDD77, #846406);
+                margin-right: .5rem;
+            }
+            .botaoDele{
+                @include themeButton(#FF8381, #89041E);
+            }
+        }
+        .tbBody:hover{
+            background-color: #E5E7EB;
+        }
+    }
+}
+
+.card{
+    #meuFormulario{
+        margin-top: 3rem;
+    }
+    .validation-error{
+        margin-top: -0.5rem;
+        margin-bottom: -.4375em;
+        p{
+            color: #dc3545;
+            margin-top: 1em;
+            border-left: 3px solid #dc3545;
+            padding-left: .2em;
+            text-align: start;
+            font-size: .8rem;
+        }
+    }
+    .divInput{
+        width: fit-content;
+        margin: 0 auto 2rem;
+        input, textarea{
+            background-color: #BFE4FF;
+        }
+        textarea{
+            border-radius: 6px;
+            height: 100%;
+            box-sizing: border-box;
+        }
+    }
+    .divBotao{
+        button{
+            padding-left: 4rem;
+            padding-right: 4rem;
+        }
+        button:active{
+            box-shadow: none;
+        }
+        .botaoSalva{
+            @include themeButton();
+        }
+        .botaoEdit{
+            @include themeButton(#FFDD77, #846406);
+        }
+        .botaoCancela{
+            @include themeButton(#FF8381, #89041E);
+        }
+    }
+}
+
+:host ::ng-deep {
+    .p-dialog .p-dialog-header {
+        background-color: rgb(0, 15, 68);
+        color: white;
+        letter-spacing: .1rem;
+    }
+    .p-calendar input{
+        background-color: #BFE4FF;
+    }
+    .p-dialog-content {
+        overflow-y: visible;
+    }
+    .card .p-dropdown{
+        background-color: #BFE4FF;
+    }
+
+    // .ng-trigger.ng-trigger-overlayAnimation.ng-tns-c3632051545-2.p-datepicker.p-component.ng-star-inserted {
+    //     // margin-top: 310px;
+    // }
+    // .ng-trigger.ng-trigger-overlayAnimation.ng-tns-c3632051545-3.p-datepicker.p-component.ng-star-inserted {
+    //     // margin-top: 380px;
+    // }
+}
+
+@media screen and (min-width: 686px) {
+    .caixa{
+        margin: 0 6rem;
+        .opcao{
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: nowrap;
+        }
+    }
+    
+    .card{
+        input{
+            width: 40vw;
+        }
+        textarea{
+            min-width: 40vw;
+            max-width: 40vw;
+        }
+        .divBotao{
+            display: flex;
+            width: fit-content;
+            margin: 5rem auto 0;
+            .botaoSalva, .botaoEdit{
+                margin-right: 5rem;
+            }
+        }
+    }
+    :host ::ng-deep {
+        .p-dialog-content{
+            height: 480px;
+            overflow-y: auto;
+        }
+        .p-calendar input{
+            width: 40vw;
+        }
+        .card .p-dropdown{
+            width: 40vw;
+        }
+    }
+}
+
+@media screen and (max-width: 685px) {
+    .caixa{
+        margin: 0 1rem;
+        .opcao{
+            display: flex;
+            flex-direction: column;
+            
+            .botaoC{width: fit-content;}
+
+            .pesq{
+                margin-top: 2rem;
+            }
+        }
+    }
+    .card{
+
+        input{
+            width: 60vw;
+        }
+        textarea{
+            min-width: 60vw;
+            max-width: 60vw;
+        }
+        .divBotao{
+            display: flex;
+            flex-direction: column;
+            width: fit-content;
+            margin: 3rem auto 0;
+            .botaoSalva, .botaoEdit{
+                margin-bottom: 1rem;
+            }
+        }
+    }
+    :host ::ng-deep {
+        .p-dialog-content{
+            height: 508px;
+            overflow-y: auto;
+        }
+        .p-calendar input{
+            width: 60vw;
+        }
+        .card .p-dropdown{
+            width: 60vw;
+        }
+    }
+}

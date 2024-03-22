@@ -1,11 +1,10 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { PeriodoService } from '../../service/periodo.service';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { Periodo } from '../../models/periodo.models';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputGroupModule } from 'primeng/inputgroup';
@@ -13,21 +12,25 @@ import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { TableModule } from 'primeng/table';
 import { PaginatorModule } from 'primeng/paginator';
 import { DialogModule } from 'primeng/dialog';
-import { ConfirmationService, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ScrollTopModule } from 'primeng/scrolltop';
 import { CalendarModule } from 'primeng/calendar';
+import { Evento } from '../../models/evento.models';
+import { EventoService } from '../../service/evento.service';
+import { Local } from '../../models/local.models';
+import { LocalService } from '../../service/local.service';
+import { Dropdown, DropdownModule } from 'primeng/dropdown';
 
 @Component({
-  selector: 'app-periodos-r',
+  selector: 'app-eventos-r',
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     HttpClientModule,
     RouterModule,
     ReactiveFormsModule,
-    FormsModule,
     ButtonModule,
     InputTextModule,
     InputGroupModule,
@@ -38,25 +41,31 @@ import { CalendarModule } from 'primeng/calendar';
     ToastModule,
     ScrollTopModule,
     ConfirmPopupModule,
-    CalendarModule
+    CalendarModule,
+    DropdownModule
   ],
-  templateUrl: './periodos-r.component.html',
-  styleUrl: './periodos-r.component.scss',
+  templateUrl: './eventos-r.component.html',
+  styleUrl: './eventos-r.component.scss',
   providers: [
-    PeriodoService,
+    EventoService,
+    LocalService,
     ConfirmationService,
     MessageService
   ]
 })
-export class PeriodosRComponent implements OnInit, OnDestroy {
+export class EventosRComponent implements OnInit, OnDestroy {
   @ViewChild('searchInput') inputSearch!: ElementRef;
+  @ViewChild('dropdown') dropdown!: Dropdown;
 
-  periodosData: Periodo[] = [];
-  periodosFilter: Periodo[] = [];
-  periodosCadast: Periodo[] = [];
-  periodosEdit: Periodo[] = [];
+  eventosData: Evento[] = [];
+  eventosFilter: Evento[] = [];
+  eventosCadast: Evento[] = [];
+  eventosEdit: Evento[] = [];
+
+  locaisArray: Local[] = [];
 
   unsubscribe$!: Subscription;
+  unsubscribe$LA!: Subscription;
   form: FormGroup;
 
   ehTitulo: string = '';
@@ -65,7 +74,8 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
   cadastrar: boolean = false;
 
   constructor(
-    private periodService: PeriodoService,
+    private eventService: EventoService,
+    private locService: LocalService,
     private router: Router,
     private formBuilder: FormBuilder,
     private confirmationService: ConfirmationService,
@@ -73,68 +83,71 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
     ) {
       this.form = this.formBuilder.group({
         id: [null],
-        dataInicio: [null],
-        dataFim: [null],
-        descricao: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]]
-      }, { validator: this.validarDatas });
+        intervaloData: this.formBuilder.array([]),
+        descricao: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
+        local: [null, Validators.required]
+      });
   }
 
   ngOnInit() {
-    this.unsubscribe$ = this.periodService.listar()
+    this.unsubscribe$ = this.eventService.listar()
     .subscribe({
       next: (itens:any) => {
         const data = itens;
-        this.periodosData = data;
-        this.periodosFilter = this.periodosData;
+        this.eventosData = data;
+        this.eventosFilter = this.eventosData;
       },
       error: (err: any) => {
-        alert('Dados não encontrados.')
+        alert('Dados de eventos não encontrados.')
+      }
+    });
+
+    this.unsubscribe$LA = this.locService.listar()
+    .subscribe({
+      next: (itens:any) => {
+        const data = itens;
+        this.locaisArray = data.sort((a:any, b:any) => (a.nome < b.nome) ? -1 : 1);
+      },
+      error: (err: any) => {
+        alert('Dados de locais não encontrados.')
       }
     });
   }
 
   ngOnDestroy() {
     this.unsubscribe$.unsubscribe();
+    this.unsubscribe$LA.unsubscribe();
   }
 
-  validarDatas(formGroup: FormGroup) {
-    const dataInicio = formGroup.get('dataInicio')?.value;
-    const dataFim = formGroup.get('dataFim')?.value;
-
-    if (dataInicio && dataFim && new Date(dataFim) < new Date(dataInicio)) {
-      formGroup.get('dataFim')?.setErrors({ 'invalidEndDate': true });
-    } else {
-      formGroup.get('dataFim')?.setErrors(null);
-    }
-  }
-
-  showEditDialog(value: Periodo) {
+  showEditDialog(value: Evento) {
     this.form.reset();
-    this.ehTitulo = 'Atualizar Período'
+    this.ehTitulo = 'Atualizar Evento'
     this.visible = true;
     this.cadastrar = false;
     this.editar = true;
     this.form.setValue({
       id: value.id,
-      dataInicio: value.dataInicio,
-      dataFim: value.dataFim,
-      descricao: value.descricao
+      intervaloData: value.intervaloData,
+      descricao: value.descricao,
+      local: value.local
     })
-    this.form.controls['dataFim'].setValue(new Date(value.dataFim));
-    this.form.controls['dataInicio'].setValue(new Date(value.dataInicio));
+    this.dropdown.writeValue(value.local.nome);
+    // this.form.controls['dataFim'].setValue(new Date(value.dataFim));
   }
 
   showDialog() {
     this.form.reset();
-    this.ehTitulo = 'Cadastrar Período';
+    this.ehTitulo = 'Cadastrar Evento';
     this.visible = true;
     this.cadastrar = true;
     this.editar = false;
+    this.dropdown.writeValue(null);
   }
   
   hideDialog() {
     this.visible = false;
     this.form.reset();
+    this.dropdown.writeValue(null);
   }
   
   limparFilter(){
@@ -142,15 +155,15 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
     if (inputElement) {
       this.inputSearch.nativeElement.value = '';
     }
-    this.periodosData = this.periodosFilter;
+    this.eventosData = this.eventosFilter;
   }
 
   searchFilterWord(term: string) {
-    this.periodosData = this.periodosFilter.filter(el => {
+    this.eventosData = this.eventosFilter.filter(el => {
       const searchTermAsNumber = parseInt(term);
       if (!isNaN(searchTermAsNumber)) {
-        const ano = new Date(el.dataInicio).getFullYear();
-        if (ano === searchTermAsNumber) {
+        const anos = el.intervaloData.map(data => new Date(data).getFullYear());
+        if (anos.includes(searchTermAsNumber)) {
           return el;
         } else {
           return null;
@@ -159,6 +172,18 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
         return null;
       }
     })
+  }
+
+  formatarDatas(intervalo: Date[]): string {
+    const datasFormatadas = intervalo.map(dt => {
+      const dia = dt.getDate();
+      const mes = dt.toLocaleString('default', { month: 'short' });
+      return `${dia}/${mes}`;
+    }).join(', ');
+
+    const ano = intervalo[0].getFullYear();
+
+    return `${datasFormatadas} ${ano}`;
   }
 
   onKeyDown(event: KeyboardEvent, searchTerm: string) {
@@ -191,11 +216,11 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
   }
 
   enviarFormSave() {
-    this.periodService.criar(this.periodosCadast).subscribe({
+    this.eventService.criar(this.eventosCadast).subscribe({
       next: (data: any) => {
-        this.periodosCadast = data;
+        this.eventosCadast = data;
         this.goToRouteSave();
-        alert('Perídodo cadastrado com sucesso!');
+        alert('Evento cadastrado com sucesso!');
       },
       error: (err: any) => {
         alert('Erro! Cadastro não enviado.')
@@ -204,11 +229,11 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
   }
 
   enviarFormEdit(id: number) {
-    this.periodService.atualizar(id, this.periodosEdit).subscribe({
+    this.eventService.atualizar(id, this.eventosEdit).subscribe({
       next: (data: any) => {
-        this.periodosEdit = data;
+        this.eventosEdit = data;
         this.goToRouteEdit(id);
-        alert('Perídodo editado com sucesso!');
+        alert('Evento editado com sucesso!');
       },
       error: (err: any) => {
         alert('Erro! Edição não enviada.')
@@ -217,23 +242,23 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
   }
 
   goToRouteSave() {
-    this.router.navigate(['api/periodos']);
+    this.router.navigate(['api/eventos']);
   }
 
   goToRouteEdit(id: number) {
-    this.router.navigate(['api/periodos', id]);
+    this.router.navigate(['api/eventos', id]);
   }
 
   onSubmit() {
     if (this.form.valid && this.cadastrar) {
-      this.periodosCadast = this.form.value;
+      this.eventosCadast = this.form.value;
       this.enviarFormSave();
       this.visible = false;
       this.form.reset();
       this.ngOnInit();
       window.location.reload();
     } else if (this.form.valid && this.editar) {
-      this.periodosEdit = this.form.value;
+      this.eventosEdit = this.form.value;
       this.enviarFormEdit(this.form.get('id')?.value);
       this.visible = false;
       this.form.reset();
@@ -245,7 +270,7 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
   }
 
   deletarID(id: number) {
-    this.periodService.excluir(id)
+    this.eventService.excluir(id)
     .subscribe({
       next: (data: any) => {
         alert('Registro deletado com sucesso!');
@@ -263,4 +288,5 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
   }
 
 }
+
 

@@ -8,6 +8,8 @@ import { PeriodosRComponent } from './read/periodos-r/periodos-r.component';
 import { AlunosRComponent } from './read/alunos-r/alunos-r/alunos-r.component';
 import { ProfessoresRComponent } from './read/professores-r/professores-r/professores-r.component';
 import { CoordenadoresRComponent } from './read/coordenadores-r/coordenadores-r/coordenadores-r.component';
+import { EventosRComponent } from './read/eventos-r/eventos-r.component';
+
 export const routes: Routes = [
     { path: '', redirectTo: 'login', pathMatch: 'full' },
     // { path: 'login', component: LoginComponent, canActivate: [LoggedGuard] },
@@ -20,4 +22,5 @@ export const routes: Routes = [
     { path: 'professores', component: ProfessoresRComponent },
     { path: 'alunos', component: AlunosRComponent },
     { path: 'coordenadores', component: CoordenadoresRComponent },
+    { path: 'eventos', component: EventosRComponent },
 ];
