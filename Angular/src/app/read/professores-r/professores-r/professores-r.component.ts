@@ -4,7 +4,7 @@ import { Professor } from '../../../models/professor.models';
 import { ProfessorService } from '../../../service/professor.service';
 
 
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
@@ -19,7 +19,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ScrollTopModule } from 'primeng/scrolltop';
-import { Dropdown, DropdownModule } from 'primeng/dropdown';
+import { InputSwitch, InputSwitchModule } from 'primeng/inputswitch';
 
 @Component({
   selector: 'app-professores-r',
@@ -40,7 +40,7 @@ import { Dropdown, DropdownModule } from 'primeng/dropdown';
     ToastModule,
     ScrollTopModule,
     ConfirmPopupModule,
-    DropdownModule
+    InputSwitchModule
   ],
   templateUrl: './professores-r.component.html',
   styleUrls: ['./professores-r.component.scss'],
@@ -53,7 +53,7 @@ import { Dropdown, DropdownModule } from 'primeng/dropdown';
 
 export class ProfessoresRComponent implements OnInit, OnDestroy {
   @ViewChild('searchInput') inputSearch!: ElementRef;
-  // @ViewChild('dropdown') dropdown!: Dropdown;
+  @ViewChild('switch') switch!: InputSwitch;
 
   professoresData: Professor[] = [];
   professoresFilter: Professor[] = [];
@@ -82,7 +82,7 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
         nome: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
         matricula: [null, [Validators.required]],
         curso: [null, [Validators.required]],
-        // coordenador: [null, [Validators.required]]
+        ehCoordenador: [new FormControl<boolean>(false), Validators.required]
       });
   }
 
@@ -115,8 +115,9 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
       nome: value.nome,
       matricula: value.matricula,
       curso: value.curso,
-
-    })
+      ehCoordenador: value.ehCoordenador
+    });
+    this.switch.writeValue(value.ehCoordenador);
   }
 
   showDialog() {
@@ -125,13 +126,13 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
     this.visible = true;
     this.cadastrar = true;
     this.editar = false;
-    // this.dropdown.writeValue(null);
+    this.switch.writeValue(null);
   }
   
   hideDialog() {
     this.visible = false;
     this.form.reset();
-    // this.dropdown.writeValue(null);
+    this.switch.writeValue(null);
   }
   
   limparFilter(){
@@ -221,8 +222,7 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
   }
 
   onSubmit() {
-    // alert(this.selectedDrop)
-
+    console.log(this.form.get('ehCoordenador')?.value)
     if (this.form.valid && this.cadastrar) {
       this.professoresCadast = this.form.value;
       this.enviarFormSave();

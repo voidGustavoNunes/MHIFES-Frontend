@@ -3,5 +3,5 @@ export interface Professor {
   nome: string;
   matricula: number;
   curso: string; // mudar futuramente para quando formos mapear os cursos
-  // coordenador: boolean;
+  ehCoordenador: boolean;
 }
