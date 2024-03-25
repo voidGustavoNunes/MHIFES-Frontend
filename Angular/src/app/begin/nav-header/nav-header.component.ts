@@ -101,9 +101,13 @@ export class NavHeaderComponent implements OnInit {
             routerLink:'periodos',
           },
           {
+            label: 'Locais',
+            routerLink:'locais',
+          },
+          {
             label: 'Eventos',
             routerLink:'eventos',
-          }
+          },
         ]
       }
     ]

@@ -2,7 +2,7 @@ import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/co
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
@@ -15,12 +15,17 @@ import { DialogModule } from 'primeng/dialog';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ScrollTopModule } from 'primeng/scrolltop';
-import { CalendarModule } from 'primeng/calendar';
+import { Calendar, CalendarModule } from 'primeng/calendar';
 import { Evento } from '../../models/evento.models';
 import { EventoService } from '../../service/evento.service';
 import { Local } from '../../models/local.models';
 import { LocalService } from '../../service/local.service';
 import { Dropdown, DropdownModule } from 'primeng/dropdown';
+
+// interface City {
+//   name: string;
+//   code: string;
+// }
 
 @Component({
   selector: 'app-eventos-r',
@@ -56,6 +61,7 @@ import { Dropdown, DropdownModule } from 'primeng/dropdown';
 export class EventosRComponent implements OnInit, OnDestroy {
   @ViewChild('searchInput') inputSearch!: ElementRef;
   @ViewChild('dropdown') dropdown!: Dropdown;
+  @ViewChild('calendario') calendario!: Calendar;
 
   eventosData: Evento[] = [];
   eventosFilter: Evento[] = [];
@@ -63,6 +69,7 @@ export class EventosRComponent implements OnInit, OnDestroy {
   eventosEdit: Evento[] = [];
 
   locaisArray: Local[] = [];
+  // cities: City[] = [];
 
   unsubscribe$!: Subscription;
   unsubscribe$LA!: Subscription;
@@ -83,13 +90,20 @@ export class EventosRComponent implements OnInit, OnDestroy {
     ) {
       this.form = this.formBuilder.group({
         id: [null],
-        intervaloData: this.formBuilder.array([]),
+        intervaloData: this.formBuilder.array([], Validators.required),
         descricao: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
         local: [null, Validators.required]
       });
   }
 
   ngOnInit() {
+  //   this.cities = [
+  //     { name: 'New York', code: 'NY' },
+  //     { name: 'Rome', code: 'RM' },
+  //     { name: 'London', code: 'LDN' },
+  //     { name: 'Istanbul', code: 'IST' },
+  //     { name: 'Paris', code: 'PRS' }
+  // ];
     this.unsubscribe$ = this.eventService.listar()
     .subscribe({
       next: (itens:any) => {
@@ -119,20 +133,31 @@ export class EventosRComponent implements OnInit, OnDestroy {
     this.unsubscribe$LA.unsubscribe();
   }
 
-  showEditDialog(value: Evento) {
+  getIntervalo(): FormArray {
+    return this.form.get('intervaloData') as FormArray;
+  }
+
+  addIntervalo(dt: Date) {
+    this.getIntervalo().push(new FormControl(dt));
+    // console.log('add => ',this.getIntervalo())
+  }
+
+  showEditDialog(value: Evento, intervalo: string) {
     this.form.reset();
     this.ehTitulo = 'Atualizar Evento'
     this.visible = true;
     this.cadastrar = false;
     this.editar = true;
-    this.form.setValue({
+    this.form.patchValue({
       id: value.id,
       intervaloData: value.intervaloData,
       descricao: value.descricao,
       local: value.local
     })
-    this.dropdown.writeValue(value.local.nome);
-    // this.form.controls['dataFim'].setValue(new Date(value.dataFim));
+    this.dropdown.writeValue(value.local);
+
+    const intervaloDataArray = this.formatarDtStrDt(intervalo);
+    this.calendario.writeValue(intervaloDataArray)
   }
 
   showDialog() {
@@ -142,12 +167,14 @@ export class EventosRComponent implements OnInit, OnDestroy {
     this.cadastrar = true;
     this.editar = false;
     this.dropdown.writeValue(null);
+    this.calendario.writeValue(null);
   }
   
   hideDialog() {
     this.visible = false;
     this.form.reset();
     this.dropdown.writeValue(null);
+    this.calendario.writeValue(null);
   }
   
   limparFilter(){
@@ -174,16 +201,38 @@ export class EventosRComponent implements OnInit, OnDestroy {
     })
   }
 
-  formatarDatas(intervalo: Date[]): string {
-    const datasFormatadas = intervalo.map(dt => {
-      const dia = dt.getDate();
-      const mes = dt.toLocaleString('default', { month: 'short' });
-      return `${dia}/${mes}`;
-    }).join(', ');
+  formatarDatas(intervalo: string[]) {
+    const datasFormatadas = intervalo.map(dataStr => {
+      const partes = dataStr.split('-');
+      const ano = parseInt(partes[0], 10);
+      const mes = parseInt(partes[1], 10) - 1;
+      const dia = parseInt(partes[2], 10);
+  
+      const data = new Date(ano, mes, dia);
+  
+      const diaFormatado = ('0' + data.getDate()).slice(-2);
+      const mesFormatado = ('0' + (data.getMonth() + 1)).slice(-2);
+      const anoFormatado = data.getFullYear();
+  
+      return `${diaFormatado}/${mesFormatado}/${anoFormatado}`;
+    });
+  
+    return datasFormatadas.join(', ');
+  }
 
-    const ano = intervalo[0].getFullYear();
+  formatarDtStrDt(intervalo: string) {
+    const datasString: string[] = intervalo.split(', ');
 
-    return `${datasFormatadas} ${ano}`;
+    const intervaloDate = datasString.map(dataStr => {
+      const partes = dataStr.split('/');
+      const ano = parseInt(partes[0], 10);
+      const mes = parseInt(partes[1], 10) - 1;
+      const dia = parseInt(partes[2], 10);
+  
+      return new Date(dia, mes, ano);
+    });
+
+    return intervaloDate;
   }
 
   onKeyDown(event: KeyboardEvent, searchTerm: string) {
@@ -250,6 +299,11 @@ export class EventosRComponent implements OnInit, OnDestroy {
   }
 
   onSubmit() {
+    const selectedDates: Date[] = this.calendario.value;
+    selectedDates.forEach((dt: Date) => {
+      this.addIntervalo(dt);
+    });
+    
     if (this.form.valid && this.cadastrar) {
       this.eventosCadast = this.form.value;
       this.enviarFormSave();

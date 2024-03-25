@@ -27,19 +27,19 @@
         >
             <ng-template pTemplate="header">
                 <tr class="tbHeader">
-                    <th>Intervalo de Datas</th>
                     <th>Descrição</th>
                     <th>Local</th>
+                    <th>Intervalo de Datas</th>
                     <th></th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-evento>
                 <tr class="tbBody">
-                    <td>{{ formatarDatas(evento?.intervaloData) }}</td>
                     <td>{{evento?.descricao}}</td>
-                    <td>{{evento?.local}}</td>
+                    <td>{{evento?.local.nome}}</td>
+                    <td>{{ formatarDatas(evento?.intervaloData) }}</td>
                     <td>
-                        <button type="button" class="botaoEdit" (click)="showEditDialog(evento)" pButton>Editar</button>
+                        <button type="button" class="botaoEdit" (click)="showEditDialog(evento, formatarDatas(evento?.intervaloData))" pButton>Editar</button>
                         <p-toast></p-toast>
                         <p-confirmPopup></p-confirmPopup>
                         <button type="button" class="botaoDele" (click)="confirm2($event, evento?.id)" severity="danger" pButton>Deletar</button>
@@ -62,8 +62,8 @@
     <p-dialog class="pHeader" [header]=ehTitulo [(visible)]="visible" [modal]="true" [breakpoints]="{ '960px': '75vw' }" [style]="{ width: '50vw' }" [draggable]="false" [resizable]="false">
         <form id="meuFormulario" [formGroup]="form" (ngSubmit)="onSubmit()">
             <div class="divInput">
-                <span class="p-float-label">
-                    <p-calendar dateFormat="dd/mm/yy" selectionMode="multiple" id="itvData" class="form-control" formControlName="intervaloData" ></p-calendar>
+                <span class="p-float-label" formArrayName="intervaloData">
+                    <p-calendar #calendario appendTo="body" dateFormat="dd/mm/yy" selectionMode="multiple" [readonlyInput]="true" id="itvData" class="form-control" ></p-calendar>
                     <label for="itvData">Intervalo de Datas</label>
                 </span>
             </div>
@@ -75,7 +75,7 @@
             </div>
             <div class="divInput">
                 <span class="p-float-label">
-                    <p-dropdown #dropdown [options]="locaisArray" optionLabel="name" [filter]="true" filterBy="nome" [showClear]="true" placeholder="Selecione um local" inputId="localEvent" class="form-control" formControlName="local">
+                    <p-dropdown #dropdown appendTo="body" [options]="locaisArray" optionLabel="nome" [filter]="true" filterBy="nome" [showClear]="true" placeholder="Selecione um local" inputId="localEvent" class="form-control" formControlName="local">
                         <ng-template pTemplate="selectedItem" let-selectedOption>
                             <div class="flex align-items-center gap-2">
                                 <div>{{ selectedOption?.nome }}</div>
@@ -87,6 +87,18 @@
                             </div>
                         </ng-template>
                     </p-dropdown>
+                    <!-- <p-dropdown #dropdown appendTo="body" [options]="cities" optionLabel="name" [filter]="true" filterBy="name" [showClear]="true" placeholder="Selecione um local" inputId="localEvent" class="form-control" (onChange)="verLocal($event)">
+                        <ng-template pTemplate="selectedItem" let-selectedOption>
+                            <div class="flex align-items-center gap-2">
+                                <div>{{ selectedOption?.name }}</div>
+                            </div>
+                        </ng-template>
+                        <ng-template let-localData pTemplate="item">
+                            <div class="flex align-items-center gap-2">
+                                <div>{{ localData.name }}</div>
+                            </div>
+                        </ng-template>
+                    </p-dropdown> -->
                     <label for="localEvent">Local</label>
                 </span>
             </div>

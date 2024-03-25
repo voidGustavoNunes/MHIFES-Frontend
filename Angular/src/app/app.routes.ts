@@ -9,6 +9,7 @@ import { AlunosRComponent } from './read/alunos-r/alunos-r/alunos-r.component';
 import { ProfessoresRComponent } from './read/professores-r/professores-r/professores-r.component';
 import { CoordenadoresRComponent } from './read/coordenadores-r/coordenadores-r/coordenadores-r.component';
 import { EventosRComponent } from './read/eventos-r/eventos-r.component';
+import { LocaisRComponent } from './read/locais-r/locais-r.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -23,4 +24,5 @@ export const routes: Routes = [
     { path: 'alunos', component: AlunosRComponent },
     { path: 'coordenadores', component: CoordenadoresRComponent },
     { path: 'eventos', component: EventosRComponent },
+    { path: 'locais', component: LocaisRComponent },
 ];

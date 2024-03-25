@@ -99,31 +99,16 @@
     #meuFormulario{
         margin-top: 3rem;
     }
-    .validation-error{
-        margin-top: -0.5rem;
-        margin-bottom: -.4375em;
-        p{
-            color: #dc3545;
-            margin-top: 1em;
-            border-left: 3px solid #dc3545;
-            padding-left: .2em;
-            text-align: start;
-            font-size: .8rem;
-        }
-    }
     .divInput{
         width: fit-content;
         margin: 0 auto 2rem;
-        input, textarea{
+        input{
             background-color: #BFE4FF;
-        }
-        textarea{
-            border-radius: 6px;
-            height: 100%;
-            box-sizing: border-box;
         }
     }
     .divBotao{
+        width: fit-content;
+        margin: 0 auto 2rem;
         button{
             padding-left: 4rem;
             padding-right: 4rem;
@@ -149,24 +134,14 @@
         color: white;
         letter-spacing: .1rem;
     }
-    .p-calendar input{
+    .p-inputnumber-input, .p-multiselect{
         background-color: #BFE4FF;
     }
-    .card .p-dropdown{
-        background-color: #BFE4FF;
-    }
-    .p-dropdown-panel{
+    .p-dialog .p-multiselect-panel{
         z-index: 10000;
         position: absolute;
         overflow-y: auto;
     }
-
-    // .ng-trigger.ng-trigger-overlayAnimation.ng-tns-c3632051545-2.p-datepicker.p-component.ng-star-inserted {
-    //     // margin-top: 310px;
-    // }
-    // .ng-trigger.ng-trigger-overlayAnimation.ng-tns-c3632051545-3.p-datepicker.p-component.ng-star-inserted {
-    //     // margin-top: 380px;
-    // }
 }
 
 @media screen and (min-width: 686px) {
@@ -183,25 +158,19 @@
         input{
             width: 40vw;
         }
-        textarea{
-            min-width: 40vw;
-            max-width: 40vw;
-        }
         .divBotao{
             display: flex;
-            width: fit-content;
-            margin: 5rem auto 0;
             .botaoSalva, .botaoEdit{
                 margin-right: 5rem;
             }
         }
     }
     :host ::ng-deep {
-        .p-calendar input{
+        .p-inputnumber-input, .p-multiselect, .p-multiselect-panel{
             width: 40vw;
         }
-        .card .p-dropdown{
-            width: 40vw;
+        .p-dialog-content .p-multiselect-panel{
+            overflow-y: visible;
         }
     }
 }
@@ -221,29 +190,19 @@
         }
     }
     .card{
-
         input{
             width: 60vw;
-        }
-        textarea{
-            min-width: 60vw;
-            max-width: 60vw;
         }
         .divBotao{
             display: flex;
             flex-direction: column;
-            width: fit-content;
-            margin: 3rem auto 0;
             .botaoSalva, .botaoEdit{
                 margin-bottom: 1rem;
             }
         }
     }
     :host ::ng-deep {
-        .p-calendar input{
-            width: 60vw;
-        }
-        .card .p-dropdown{
+        .p-inputnumber-input, .p-multiselect, .p-multiselect-panel{
             width: 60vw;
         }
     }
