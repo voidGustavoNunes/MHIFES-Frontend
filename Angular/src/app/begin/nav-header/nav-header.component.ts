@@ -70,10 +70,10 @@ export class NavHeaderComponent implements OnInit {
             label: 'Alunos',
             routerLink:'alunos',
           },
-          {
-            label: 'Coordenadores',
-            routerLink:'coordenadores',
-          },
+          // {
+          //   label: 'Coordenadores',
+          //   routerLink:'coordenadores',
+          // },
           {
             label:'Professores',
             routerLink:'professores',
