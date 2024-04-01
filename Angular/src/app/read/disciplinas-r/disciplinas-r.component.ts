@@ -13,10 +13,11 @@ import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { TableModule } from 'primeng/table';
 import { PaginatorModule } from 'primeng/paginator';
 import { DialogModule } from 'primeng/dialog';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService, Message } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ScrollTopModule } from 'primeng/scrolltop';
+import { MessagesModule } from 'primeng/messages';
 
 @Component({
   selector: 'app-disciplinas-r',
@@ -36,14 +37,14 @@ import { ScrollTopModule } from 'primeng/scrolltop';
     FormsModule,
     ToastModule,
     ScrollTopModule,
-    ConfirmPopupModule
+    ConfirmPopupModule,
+    MessagesModule
   ],
   templateUrl: './disciplinas-r.component.html',
   styleUrl: './disciplinas-r.component.scss',
   providers: [
     DisciplinaService,
-    ConfirmationService,
-    MessageService
+    ConfirmationService
   ]
 })
 export class DisciplinasRComponent implements OnInit, OnDestroy {
@@ -61,13 +62,15 @@ export class DisciplinasRComponent implements OnInit, OnDestroy {
   visible: boolean = false;
   editar: boolean = false;
   cadastrar: boolean = false;
+  
+  messages!: Message[];
+  mss: boolean = false;
 
   constructor(
     private disciService: DisciplinaService,
     private router: Router,
     private formBuilder: FormBuilder,
-    private confirmationService: ConfirmationService,
-    private messageService: MessageService,
+    private confirmationService: ConfirmationService
     ) {
       this.form = this.formBuilder.group({
         id: [null],
@@ -84,7 +87,9 @@ export class DisciplinasRComponent implements OnInit, OnDestroy {
         this.dicisplinasFilter = this.disciplinasData;
       },
       error: (err: any) => {
-        alert('Dados não encontrados.')
+        this.messages = [
+          { severity: 'error', summary: 'Erro', detail: 'Dados não encontrados.' },
+        ];
       }
     });
   }
@@ -160,7 +165,9 @@ export class DisciplinasRComponent implements OnInit, OnDestroy {
         this.deletarID(id);
       },
       reject: () => {
-        this.messageService.add({ severity: 'error', summary: 'Cancelado', detail: 'Exclusão cancelada.', life: 3000 });
+        this.messages = [
+          { severity: 'info', summary: 'Cancelado', detail: 'Exclusão cancelada.' },
+        ];
       }
     });
   }
@@ -170,10 +177,14 @@ export class DisciplinasRComponent implements OnInit, OnDestroy {
       next: (data: any) => {
         this.disciplinasCadast = data;
         this.goToRouteSave();
-        alert('Disciplina cadastrada com sucesso!');
+        this.messages = [
+          { severity: 'success', summary: 'Sucesso', detail: 'Disciplina cadastrada com sucesso!' },
+        ];
       },
       error: (err: any) => {
-        alert('Erro! Cadastro não enviado.')
+        this.messages = [
+          { severity: 'error', summary: 'Erro', detail: 'Cadastro não enviado.' },
+        ];
       }
     });
   }
@@ -183,10 +194,14 @@ export class DisciplinasRComponent implements OnInit, OnDestroy {
       next: (data: any) => {
         this.disciplinasEdit = data;
         this.goToRouteEdit(id);
-        alert('Disciplina editada com sucesso!');
+        this.messages = [
+          { severity: 'success', summary: 'Sucesso', detail: 'Disciplina editada com sucesso!' },
+        ];
       },
       error: (err: any) => {
-        alert('Erro! Edição não enviada.')
+        this.messages = [
+          { severity: 'error', summary: 'Erro', detail: 'Edição não enviada.' },
+        ];
       }
     });
   }
@@ -215,7 +230,9 @@ export class DisciplinasRComponent implements OnInit, OnDestroy {
       this.ngOnInit();
       window.location.reload();
     } else {
-      alert('Informação inválida. Preencha o campo!');
+      this.messages = [
+        { severity: 'warn', summary: 'Atenção', detail: 'Informação inválida. Preencha os campos!' },
+      ];
     }
   }
 
@@ -223,15 +240,21 @@ export class DisciplinasRComponent implements OnInit, OnDestroy {
     this.disciService.excluir(id)
     .subscribe({
       next: (data: any) => {
-        alert('Registro deletado com sucesso!');
+        this.messages = [
+          { severity: 'success', summary: 'Sucesso', detail: 'Registro deletado com sucesso!' },
+        ];
         this.ngOnInit();
         window.location.reload();
       },
       error: (err: any) => {
         if (err.status) {
-          alert('Erro! Não foi possível deletar registro.');
+          this.messages = [
+            { severity: 'error', summary: 'Erro', detail: 'Não foi possível deletar registro.' },
+          ];
         } else {
-          alert('Erro desconhecido' + err);
+          this.messages = [
+            { severity: 'error', summary: 'Erro desconhecido', detail: err },
+          ];
         }
       }
   });

@@ -11,7 +11,7 @@ import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { TableModule } from 'primeng/table';
 import { PaginatorModule } from 'primeng/paginator';
 import { DialogModule } from 'primeng/dialog';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService, Message } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ScrollTopModule } from 'primeng/scrolltop';
@@ -21,6 +21,9 @@ import { EquipamentoService } from '../../service/equipamento.service';
 import { Equipamento } from '../../models/equipamento.models';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { MultiSelect, MultiSelectModule } from 'primeng/multiselect';
+import { MessagesModule } from 'primeng/messages';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { FiltrarPesquisa } from '../../models/share/filtrar-pesquisa.models';
 
 @Component({
   selector: 'app-locais-r',
@@ -42,15 +45,16 @@ import { MultiSelect, MultiSelectModule } from 'primeng/multiselect';
     ScrollTopModule,
     ConfirmPopupModule,
     InputNumberModule,
-    MultiSelectModule
+    MultiSelectModule,
+    MessagesModule,
+    OverlayPanelModule
   ],
   templateUrl: './locais-r.component.html',
   styleUrl: './locais-r.component.scss',
   providers: [
     LocalService,
     EquipamentoService,
-    ConfirmationService,
-    MessageService
+    ConfirmationService
   ]
 })
 export class LocaisRComponent implements OnInit, OnDestroy {
@@ -72,14 +76,22 @@ export class LocaisRComponent implements OnInit, OnDestroy {
   visible: boolean = false;
   editar: boolean = false;
   cadastrar: boolean = false;
+  
+  localInfo!: Local;
+  visibleInfo: boolean = false;
+  
+  messages!: Message[];
+  mss: boolean = false;
+  
+  filterOptions: FiltrarPesquisa[] = [];
+  selectedFilter!: FiltrarPesquisa;
 
   constructor(
     private locService: LocalService,
     private equipService: EquipamentoService,
     private router: Router,
     private formBuilder: FormBuilder,
-    private confirmationService: ConfirmationService,
-    private messageService: MessageService,
+    private confirmationService: ConfirmationService
     ) {
       this.form = this.formBuilder.group({
         id: [null],
@@ -90,6 +102,11 @@ export class LocaisRComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.filterOptions = [
+      {nome: 'Nome do local', id: 0},
+      {nome: 'Nome do equipamento', id: 1}
+    ];
+
     this.unsubscribe$ = this.locService.listar()
     .subscribe({
       next: (itens:any) => {
@@ -98,7 +115,9 @@ export class LocaisRComponent implements OnInit, OnDestroy {
         this.locaisFilter = this.locaisData;
       },
       error: (err: any) => {
-        alert('Dados de locais não encontrados.')
+        this.messages = [
+          { severity: 'error', summary: 'Erro', detail: 'Dados de locais não encontrados.' },
+        ];
       }
     });
 
@@ -109,7 +128,9 @@ export class LocaisRComponent implements OnInit, OnDestroy {
         this.equipamentosData = data.sort((a:any, b:any) => (a.nome < b.nome) ? -1 : 1);
       },
       error: (err: any) => {
-        alert('Dados de equipamentos não encontrados.')
+        this.messages = [
+          { severity: 'error', summary: 'Erro', detail: 'Dados de equipamentos não encontrados.' },
+        ];
       }
     });
   }
@@ -135,6 +156,11 @@ export class LocaisRComponent implements OnInit, OnDestroy {
     event.value.forEach((equip: Equipamento) => {
       this.addEquip(equip);
     });
+  }
+
+  showInfoDialog(value: Local) {
+    this.visibleInfo = true;
+    this.localInfo = value;
   }
   
   showEditDialog(value: Local) {
@@ -174,30 +200,49 @@ export class LocaisRComponent implements OnInit, OnDestroy {
     if (inputElement) {
       this.inputSearch.nativeElement.value = '';
     }
+    this.selectedFilter = {} as FiltrarPesquisa;
     this.locaisData = this.locaisFilter;
   }
 
-  searchFilterWord(term: string) {
-    this.locaisData = this.locaisFilter.filter(el => {
-      if (el.nome.toLowerCase().includes(term.toLowerCase())) {
-        return el;
+  searchFilter0(term: string) {
+    this.locaisData = this.locaisFilter.filter(local => {
+      if (local.nome.toLowerCase().includes(term.toLowerCase())) {
+        return local;
       } else {
         return null;
       }
     })
   }
 
+  searchFilter1(term: string) {
+    this.locaisData = this.locaisFilter.filter(local => {
+      local.equipamentos.filter(equip =>{
+        if (equip.nome.toLowerCase().includes(term.toLowerCase())) {
+          return local;
+        } else {
+          return null;
+        }
+      })
+    })
+  }
+
   onKeyDown(event: KeyboardEvent, searchTerm: string) {
     if (event.key === "Enter") {
       if (searchTerm != null || searchTerm != '') {
-        this.searchFilterWord(searchTerm);
+        if(this.selectedFilter) {
+          if(this.selectedFilter.id == 0) this.searchFilter0(searchTerm);
+          if(this.selectedFilter.id == 1) this.searchFilter1(searchTerm);
+        }
       }
     }
   }
 
   filterField(searchTerm: string) {
     if (searchTerm != null || searchTerm != '') {
-      this.searchFilterWord(searchTerm);
+      if(this.selectedFilter) {
+        if(this.selectedFilter.id == 0) this.searchFilter0(searchTerm);
+        if(this.selectedFilter.id == 1) this.searchFilter1(searchTerm);
+      }
     }
   }
 
@@ -221,7 +266,9 @@ export class LocaisRComponent implements OnInit, OnDestroy {
         this.deletarID(id);
       },
       reject: () => {
-        this.messageService.add({ severity: 'error', summary: 'Cancelado', detail: 'Exclusão cancelada.', life: 3000 });
+        this.messages = [
+          { severity: 'info', summary: 'Cancelado', detail: 'Exclusão cancelada.' },
+        ];
       }
     });
   }
@@ -231,10 +278,14 @@ export class LocaisRComponent implements OnInit, OnDestroy {
       next: (data: any) => {
         this.locaisCadast = data;
         this.goToRouteSave();
-        alert('Local cadastrado com sucesso!');
+        this.messages = [
+          { severity: 'success', summary: 'Sucesso', detail: 'Local cadastrado com sucesso!' },
+        ];
       },
       error: (err: any) => {
-        alert('Erro! Cadastro não enviado.')
+        this.messages = [
+          { severity: 'error', summary: 'Erro', detail: 'Cadastro não enviado.' },
+        ];
       }
     });
   }
@@ -244,10 +295,14 @@ export class LocaisRComponent implements OnInit, OnDestroy {
       next: (data: any) => {
         this.locaisEdit = data;
         this.goToRouteEdit(id);
-        alert('Local editado com sucesso!');
+        this.messages = [
+          { severity: 'success', summary: 'Sucesso', detail: 'Local editado com sucesso!' },
+        ];
       },
       error: (err: any) => {
-        alert('Erro! Edição não enviada.')
+        this.messages = [
+          { severity: 'error', summary: 'Erro', detail: 'Edição não enviada.' },
+        ];
       }
     });
   }
@@ -276,7 +331,9 @@ export class LocaisRComponent implements OnInit, OnDestroy {
       this.ngOnInit();
       window.location.reload();
     } else {
-      alert('Informação inválida. Preencha o campo!');
+      this.messages = [
+        { severity: 'warn', summary: 'Atenção', detail: 'Informação inválida. Preencha os campos!' },
+      ];
     }
   }
 
@@ -284,15 +341,21 @@ export class LocaisRComponent implements OnInit, OnDestroy {
     this.locService.excluir(id)
     .subscribe({
       next: (data: any) => {
-        alert('Registro deletado com sucesso!');
+        this.messages = [
+          { severity: 'success', summary: 'Sucesso', detail: 'Registro deletado com sucesso!' },
+        ];
         this.ngOnInit();
         window.location.reload();
       },
       error: (err: any) => {
         if (err.status) {
-          alert('Erro! Não foi possível deletar registro.');
+          this.messages = [
+            { severity: 'error', summary: 'Erro', detail: 'Não foi possível deletar registro.' },
+          ];
         } else {
-          alert('Erro desconhecido' + err);
+          this.messages = [
+            { severity: 'error', summary: 'Erro desconhecido', detail: err },
+          ];
         }
       }
   });

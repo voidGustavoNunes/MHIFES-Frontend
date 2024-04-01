@@ -137,7 +137,30 @@
         letter-spacing: .1rem;
     }
     .p-inputswitch{
-        margin-left: 1rem;
+        margin-right: 1rem;
+    }
+    .divInput.pSwtich{
+        display: flex;
+        align-items: center;
+    }
+    .p-messages {
+        width: fit-content;
+        position: fixed;
+        bottom: 1.25rem;
+        right: 1.25rem;
+        z-index: 11000;
+    }
+    .p-datatable-header{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: fit-content;
+    }
+    .p-datatable-header input{
+        background-color: #BFE4FF;
+    }
+    .p-datatable-header i.pi.pi-search {
+        color: #256CF0;
     }
 }
 

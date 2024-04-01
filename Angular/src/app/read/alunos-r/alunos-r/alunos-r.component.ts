@@ -11,12 +11,13 @@ import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { TableModule } from 'primeng/table';
 import { PaginatorModule } from 'primeng/paginator';
 import { DialogModule } from 'primeng/dialog';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService, Message } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ScrollTopModule } from 'primeng/scrolltop';
 import { AlunoService } from '../../../service/aluno.service';
 import { Aluno } from '../../../models/aluno.models';
+import { MessagesModule } from 'primeng/messages';
 
 @Component({
   selector: 'app-alunos-r',
@@ -36,14 +37,14 @@ import { Aluno } from '../../../models/aluno.models';
     FormsModule,
     ToastModule,
     ScrollTopModule,
-    ConfirmPopupModule
+    ConfirmPopupModule,
+    MessagesModule
   ],
   templateUrl: './alunos-r.component.html',
   styleUrl: './alunos-r.component.scss',
   providers: [
     AlunoService,
-    ConfirmationService,
-    MessageService
+    ConfirmationService
   ]
 })
 
@@ -58,19 +59,19 @@ export class AlunosRComponent implements OnInit, OnDestroy {
   unsubscribe$!: Subscription;
   form: FormGroup;
 
-
   ehTitulo: string = '';
   visible: boolean = false;
   editar: boolean = false;
   cadastrar: boolean = false;
+  
+  messages!: Message[];
+  mss: boolean = false;
 
   constructor(
     private alunService: AlunoService,
     private router: Router,
     private formBuilder: FormBuilder,
-    private confirmationService: ConfirmationService,
-    private messageService: MessageService,
-    private ngZone: NgZone
+    private confirmationService: ConfirmationService
     ) {
       this.form = this.formBuilder.group({
         id: [null],
@@ -89,8 +90,9 @@ export class AlunosRComponent implements OnInit, OnDestroy {
         this.alunosFilter = this.alunosData;
       },
       error: (err: any) => {
-        // this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Dados não encontrados.', life: 3000 });
-        alert('Dados não encontrados.')
+        this.messages = [
+          { severity: 'error', summary: 'Erro', detail: 'Dados não encontrados.' },
+        ];
       }
     });
   }
@@ -168,7 +170,9 @@ export class AlunosRComponent implements OnInit, OnDestroy {
         this.deletarID(id);
       },
       reject: () => {
-        this.messageService.add({ severity: 'error', summary: 'Cancelado', detail: 'Exclusão cancelada.', life: 3000 });
+        this.messages = [
+          { severity: 'info', summary: 'Cancelado', detail: 'Exclusão cancelada.' },
+        ];
       }
     });
   }
@@ -178,10 +182,14 @@ export class AlunosRComponent implements OnInit, OnDestroy {
       next: (data: any) => {
         this.alunosCadast = data;
         this.goToRouteSave();
-        alert('Aluno cadastrado com sucesso!');
+        this.messages = [
+          { severity: 'success', summary: 'Sucesso', detail: 'Aluno cadastrado com sucesso!' },
+        ];
       },
       error: (err: any) => {
-        alert('Erro! Cadastro não enviado.')
+        this.messages = [
+          { severity: 'error', summary: 'Erro', detail: 'Cadastro não enviado.' },
+        ];
       }
     });
   }
@@ -191,10 +199,14 @@ export class AlunosRComponent implements OnInit, OnDestroy {
       next: (data: any) => {
         this.alunosEdit = data;
         this.goToRouteEdit(id);
-        alert('aluno editado com sucesso!');
+        this.messages = [
+          { severity: 'success', summary: 'Sucesso', detail: 'Aluno editado com sucesso!' },
+        ];
       },
       error: (err: any) => {
-        alert('Erro! Edição não enviada.')
+        this.messages = [
+          { severity: 'error', summary: 'Erro', detail: 'Edição não enviada.' },
+        ];
       }
     });
   }
@@ -223,7 +235,9 @@ export class AlunosRComponent implements OnInit, OnDestroy {
       this.ngOnInit();
       window.location.reload();
     } else {
-      alert('Informação inválida. Preencha o campo!');
+      this.messages = [
+        { severity: 'warn', summary: 'Atenção', detail: 'Informação inválida. Preencha os campos!' },
+      ];
     }
   }
 
@@ -231,16 +245,22 @@ export class AlunosRComponent implements OnInit, OnDestroy {
     this.alunService.excluir(id)
     .subscribe({
       next: (data: any) => {
-        alert('Registro deletado com sucesso!');
+        this.messages = [
+          { severity: 'success', summary: 'Sucesso', detail: 'Registro deletado com sucesso!' },
+        ];
         this.ngOnInit();
         window.location.reload();
       },
       error: (err: any) => {
         if (err.status) {
-          alert('Erro! Não foi possível deletar registro.');
+          this.messages = [
+            { severity: 'error', summary: 'Erro', detail: 'Não foi possível deletar registro.' },
+          ];
         } else {
+          this.messages = [
+            { severity: 'error', summary: 'Erro desconhecido', detail: err },
+          ];
           // console.log('Erro desconhecido:', err);
-          alert('Erro desconhecido' + err);
         }
       }
   });

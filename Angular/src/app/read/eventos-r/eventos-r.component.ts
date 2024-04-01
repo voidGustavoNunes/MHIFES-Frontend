@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService, Message } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputGroupModule } from 'primeng/inputgroup';
@@ -21,11 +21,12 @@ import { EventoService } from '../../service/evento.service';
 import { Local } from '../../models/local.models';
 import { LocalService } from '../../service/local.service';
 import { Dropdown, DropdownModule } from 'primeng/dropdown';
-
-// interface City {
-//   name: string;
-//   code: string;
-// }
+import { InputMaskModule } from 'primeng/inputmask';
+import { InputSwitch, InputSwitchModule } from 'primeng/inputswitch';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { MessagesModule } from 'primeng/messages';
+import { FiltrarPesquisa } from '../../models/share/filtrar-pesquisa.models';
+import { Semana } from '../../models/share/semana.models';
 
 @Component({
   selector: 'app-eventos-r',
@@ -47,63 +48,98 @@ import { Dropdown, DropdownModule } from 'primeng/dropdown';
     ScrollTopModule,
     ConfirmPopupModule,
     CalendarModule,
-    DropdownModule
+    DropdownModule,
+    InputMaskModule,
+    InputSwitchModule,
+    OverlayPanelModule,
+    MessagesModule
   ],
   templateUrl: './eventos-r.component.html',
   styleUrl: './eventos-r.component.scss',
   providers: [
     EventoService,
     LocalService,
-    ConfirmationService,
-    MessageService
+    ConfirmationService
   ]
 })
 export class EventosRComponent implements OnInit, OnDestroy {
   @ViewChild('searchInput') inputSearch!: ElementRef;
   @ViewChild('dropdown') dropdown!: Dropdown;
+  @ViewChild('switch') switch!: InputSwitch;
+  @ViewChild('calendarExtra') calendarExtra!: Calendar;
+  @ViewChild('dropdownExtra') dropdownExtra!: Dropdown;
   @ViewChild('calendario') calendario!: Calendar;
 
   eventosData: Evento[] = [];
   eventosFilter: Evento[] = [];
   eventosCadast: Evento[] = [];
   eventosEdit: Evento[] = [];
+  eventoInfo!: Evento;
 
   locaisArray: Local[] = [];
-  // cities: City[] = [];
 
   unsubscribe$!: Subscription;
   unsubscribe$LA!: Subscription;
   form: FormGroup;
 
   ehTitulo: string = '';
-  visible: boolean = false;
   editar: boolean = false;
   cadastrar: boolean = false;
+  
+  visible: boolean = false;
+  visibleExtra: boolean = false;
+  visibleEdit: boolean = false;
+  visibleInfo: boolean = false;
+  
+  valor: boolean = false;
+  opcaoSemana: Semana[] = [];
+  selectedSemana!: Semana;
+  diasIntervalo: Date[] = [];
+  dataFim!: Date;
+
+  disableDrop: boolean = true;
+  disableSwit: boolean = true;
+
+  filterOptions: FiltrarPesquisa[] = [];
+  selectedFilter!: FiltrarPesquisa;
+
+  messages!: Message[];
+  mss: boolean = false;
 
   constructor(
     private eventService: EventoService,
     private locService: LocalService,
     private router: Router,
     private formBuilder: FormBuilder,
-    private confirmationService: ConfirmationService,
-    private messageService: MessageService
+    private confirmationService: ConfirmationService
     ) {
       this.form = this.formBuilder.group({
         id: [null],
-        intervaloData: this.formBuilder.array([], Validators.required),
+        dataEvento: [null, Validators.required],
         descricao: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
+        horarioInicio: [null, [Validators.required]],
+        horarioFim: [null, Validators.required],
         local: [null, Validators.required]
-      });
+      }, { validator: this.verificarHoraFimMaiorQueInicio });
   }
 
   ngOnInit() {
-  //   this.cities = [
-  //     { name: 'New York', code: 'NY' },
-  //     { name: 'Rome', code: 'RM' },
-  //     { name: 'London', code: 'LDN' },
-  //     { name: 'Istanbul', code: 'IST' },
-  //     { name: 'Paris', code: 'PRS' }
-  // ];
+    this.opcaoSemana = [
+      { nome: 'Domingo', code: 0 },
+      { nome: 'Segunda-feira', code: 1 },
+      { nome: 'Terça-feira', code: 2 },
+      { nome: 'Quarta-feira', code: 3 },
+      { nome: 'Quinta-feira', code: 4 },
+      { nome: 'Sexta-feira', code: 5 },
+      { nome: 'Sábado', code: 6 }
+    ];
+
+    this.filterOptions = [
+      {nome: 'Ano do Evento', id: 0},
+      {nome: 'Descrição', id: 1},
+      {nome: 'Nome do local', id: 2}
+    ];
+
     this.unsubscribe$ = this.eventService.listar()
     .subscribe({
       next: (itens:any) => {
@@ -112,7 +148,9 @@ export class EventosRComponent implements OnInit, OnDestroy {
         this.eventosFilter = this.eventosData;
       },
       error: (err: any) => {
-        alert('Dados de eventos não encontrados.')
+        this.messages = [
+          { severity: 'error', summary: 'Erro', detail: 'Dados de eventos não encontrados.' },
+        ];
       }
     });
 
@@ -123,7 +161,9 @@ export class EventosRComponent implements OnInit, OnDestroy {
         this.locaisArray = data.sort((a:any, b:any) => (a.nome < b.nome) ? -1 : 1);
       },
       error: (err: any) => {
-        alert('Dados de locais não encontrados.')
+        this.messages = [
+          { severity: 'error', summary: 'Erro', detail: 'Dados de locais não encontrados.' },
+        ];
       }
     });
   }
@@ -132,32 +172,48 @@ export class EventosRComponent implements OnInit, OnDestroy {
     this.unsubscribe$.unsubscribe();
     this.unsubscribe$LA.unsubscribe();
   }
+  
+  validarDatas() {
+    const dataEvento = this.form.get('dataEvento')?.value;
 
-  getIntervalo(): FormArray {
-    return this.form.get('intervaloData') as FormArray;
+    if (dataEvento && this.dataFim && new Date(this.dataFim) < new Date(dataEvento)) {
+      this.form.get('dataEvento')?.setErrors({ 'invalidEndDate': true });
+    } else {
+      this.form.get('dataEvento')?.setErrors(null);
+    }
+  }
+  
+  verificarHoraFimMaiorQueInicio(formGroup: FormGroup) {
+    const horaInicio = formGroup.get('horarioInicio')?.value;
+    const horaFim = formGroup.get('horarioFim')?.value;
+
+    if (horaInicio && horaFim && horaInicio >= horaFim) {
+      formGroup.get('horarioFim')?.setErrors({ 'horaFimMenorQueInicio': true });
+    } else {
+      formGroup.get('horarioFim')?.setErrors(null);
+    }
+  }
+  
+  showInfoDialog(value: Evento) {
+    this.visibleInfo = true;
+    this.eventoInfo = value;
   }
 
-  addIntervalo(dt: Date) {
-    this.getIntervalo().push(new FormControl(dt));
-    // console.log('add => ',this.getIntervalo())
-  }
-
-  showEditDialog(value: Evento, intervalo: string) {
+  showEditDialog(value: Evento) {
     this.form.reset();
     this.ehTitulo = 'Atualizar Evento'
-    this.visible = true;
+    this.visibleEdit = true;
     this.cadastrar = false;
     this.editar = true;
     this.form.patchValue({
       id: value.id,
-      intervaloData: value.intervaloData,
+      dataEvento: value.dataEvento,
       descricao: value.descricao,
+      horarioInicio: value.horarioInicio,
+      horarioFim: value.horarioFim,
       local: value.local
     })
     this.dropdown.writeValue(value.local);
-
-    const intervaloDataArray = this.formatarDtStrDt(intervalo);
-    this.calendario.writeValue(intervaloDataArray)
   }
 
   showDialog() {
@@ -168,13 +224,102 @@ export class EventosRComponent implements OnInit, OnDestroy {
     this.editar = false;
     this.dropdown.writeValue(null);
     this.calendario.writeValue(null);
+    this.switch.writeValue(null);
+
+    this.valor = false;
+    this.selectedSemana = { nome: '', code: 0 };
+    this.diasIntervalo = [];
+    this.dataFim = new Date();
+
+    this.dropdownExtra.writeValue(null);
+    this.calendarExtra.writeValue(null);
+    this.calendario.writeValue(null);
   }
   
   hideDialog() {
-    this.visible = false;
-    this.form.reset();
-    this.dropdown.writeValue(null);
-    this.calendario.writeValue(null);
+    if(this.cadastrar) {
+      if(this.visibleExtra) {
+        this.visibleExtra = false;
+        this.valor = false;
+        this.dropdownExtra.writeValue(null);
+        this.calendarExtra.writeValue(null);
+        this.calendario.writeValue(null);
+      }
+      this.visible = false;
+      this.form.reset();
+      this.dropdown.writeValue(null);
+      this.calendario.writeValue(null);
+      this.switch.writeValue(null);
+    } else if(this.editar) {
+      this.visibleEdit = false;
+      this.form.reset();
+      this.dropdown.writeValue(null);
+    }
+  }
+
+  handleChange() {
+    if (this.valor) {
+      this.visibleExtra = true;
+    } else {
+      this.visibleExtra = false;
+    }
+  }
+  
+  onClickHide() {
+    if(this.visibleExtra) this.visibleExtra = false;
+  }
+
+  onDropdownChange() {
+    let ini: Date = this.form.get('dataEvento')?.value;
+    if(ini && this.dataFim) {
+      this.disableDrop = false;
+      this.atualizarDiasSemana(this.selectedSemana.code);
+    } else {
+      this.disableDrop = true;
+    }
+  }
+
+  onDateIniSelect() {
+    let ini: Date = this.form.get('dataEvento')?.value;
+    
+    if(ini) {
+      this.disableSwit = false;
+    } else {
+      this.disableSwit = true;
+    }
+  }
+
+  atualizarDiasSemana(code: number) {
+    let ini: Date = this.form.get('dataEvento')?.value;
+    let fim: Date = this.dataFim;
+
+    if(ini && fim) {
+      this.diasIntervalo = this.calcularDiasSemana(ini, fim, code);
+      this.calendario.writeValue(this.diasIntervalo);
+    }
+  }
+
+  calcularDiasSemana(dtIni: Date, dtFim: Date, diaSemana: number): Date[] {
+    let diasSemana: Date[] = [];
+    let dataTemp = new Date(dtIni);
+
+    dataTemp.setDate(dataTemp.getDate() + (diaSemana - dataTemp.getDay() + 7) % 7);
+
+    while (dataTemp <= dtFim) {
+      if (dataTemp >= dtIni && dataTemp <= dtFim) {
+        diasSemana.push(new Date(dataTemp));
+      }
+      dataTemp.setDate(dataTemp.getDate() + 7);
+    }
+
+    if (!diasSemana.some(dia => dia.getTime() === dtIni.getTime())) {
+      diasSemana.push(new Date(dtIni));
+    }
+    if (!diasSemana.some(dia => dia.getTime() === dtFim.getTime())) {
+      diasSemana.push(new Date(dtFim));
+    }
+
+    return diasSemana;
   }
   
   limparFilter(){
@@ -182,16 +327,17 @@ export class EventosRComponent implements OnInit, OnDestroy {
     if (inputElement) {
       this.inputSearch.nativeElement.value = '';
     }
+    this.selectedFilter = {} as FiltrarPesquisa;
     this.eventosData = this.eventosFilter;
   }
 
-  searchFilterWord(term: string) {
-    this.eventosData = this.eventosFilter.filter(el => {
+  searchFilter0(term: string) {
+    this.eventosData = this.eventosFilter.filter(evento => {
       const searchTermAsNumber = parseInt(term);
       if (!isNaN(searchTermAsNumber)) {
-        const anos = el.intervaloData.map(data => new Date(data).getFullYear());
-        if (anos.includes(searchTermAsNumber)) {
-          return el;
+        const anos = new Date(evento.dataEvento).getFullYear();
+        if (anos == searchTermAsNumber) {
+          return evento;
         } else {
           return null;
         }
@@ -201,51 +347,73 @@ export class EventosRComponent implements OnInit, OnDestroy {
     })
   }
 
-  formatarDatas(intervalo: string[]) {
-    const datasFormatadas = intervalo.map(dataStr => {
-      const partes = dataStr.split('-');
-      const ano = parseInt(partes[0], 10);
-      const mes = parseInt(partes[1], 10) - 1;
-      const dia = parseInt(partes[2], 10);
-  
-      const data = new Date(ano, mes, dia);
-  
-      const diaFormatado = ('0' + data.getDate()).slice(-2);
-      const mesFormatado = ('0' + (data.getMonth() + 1)).slice(-2);
-      const anoFormatado = data.getFullYear();
-  
-      return `${diaFormatado}/${mesFormatado}/${anoFormatado}`;
-    });
-  
-    return datasFormatadas.join(', ');
+  searchFilter1(term: string) {
+    this.eventosData = this.eventosFilter.filter(evento => {
+      if (evento.descricao.toLowerCase().includes(term.toLowerCase())) {
+        return evento;
+      } else {
+        return null;
+      }
+    })
   }
 
-  formatarDtStrDt(intervalo: string) {
-    const datasString: string[] = intervalo.split(', ');
+  searchFilter2(term: string) {
+    this.eventosData = this.eventosFilter.filter(evento => {
+      if (evento.local.nome.toLowerCase().includes(term.toLowerCase())) {
+        return evento;
+      } else {
+        return null;
+      }
+    })
+  }
 
-    const intervaloDate = datasString.map(dataStr => {
-      const partes = dataStr.split('/');
+  formatarDatas(date: string) {
+    const partes = date.split('-');
+    const ano = parseInt(partes[0], 10);
+    const mes = parseInt(partes[1], 10) - 1;
+    const dia = parseInt(partes[2], 10);
+
+    const data = new Date(ano, mes, dia);
+
+    const diaFormatado = ('0' + data.getDate()).slice(-2);
+    const mesFormatado = ('0' + (data.getMonth() + 1)).slice(-2);
+    const anoFormatado = data.getFullYear();
+
+    return `${diaFormatado}/${mesFormatado}/${anoFormatado}`;
+  }
+
+  formatarDtStrDt(date: string) {
+    if(date) {
+      const partes = date.split('/');
       const ano = parseInt(partes[0], 10);
       const mes = parseInt(partes[1], 10) - 1;
       const dia = parseInt(partes[2], 10);
-  
-      return new Date(dia, mes, ano);
-    });
 
-    return intervaloDate;
+      return new Date(dia, mes, ano);
+    } else {
+      return null;
+    }
   }
 
   onKeyDown(event: KeyboardEvent, searchTerm: string) {
     if (event.key === "Enter") {
       if (searchTerm != null || searchTerm != '') {
-        this.searchFilterWord(searchTerm);
+        if(this.selectedFilter) {
+          if(this.selectedFilter.id == 0) this.searchFilter0(searchTerm);
+          if(this.selectedFilter.id == 1) this.searchFilter1(searchTerm);
+          if(this.selectedFilter.id == 2) this.searchFilter2(searchTerm);
+        }
       }
     }
   }
   
   filterField(searchTerm: string) {
     if (searchTerm != null || searchTerm != '') {
-      this.searchFilterWord(searchTerm);
+      if(this.selectedFilter) {
+        if(this.selectedFilter.id == 0) this.searchFilter0(searchTerm);
+        if(this.selectedFilter.id == 1) this.searchFilter1(searchTerm);
+        if(this.selectedFilter.id == 2) this.searchFilter2(searchTerm);
+      }
     }
   }
 
@@ -259,7 +427,9 @@ export class EventosRComponent implements OnInit, OnDestroy {
         this.deletarID(id);
       },
       reject: () => {
-        this.messageService.add({ severity: 'error', summary: 'Cancelado', detail: 'Exclusão cancelada.', life: 3000 });
+        this.messages = [
+          { severity: 'error', summary: 'Cancelado', detail: 'Exclusão cancelada.' },
+        ];
       }
     });
   }
@@ -269,10 +439,16 @@ export class EventosRComponent implements OnInit, OnDestroy {
       next: (data: any) => {
         this.eventosCadast = data;
         this.goToRouteSave();
-        alert('Evento cadastrado com sucesso!');
+        if(this.mss) {
+          this.messages = [
+            { severity: 'success', summary: 'Sucesso', detail: 'Evento cadastrado com sucesso!' },
+          ];
+        }
       },
       error: (err: any) => {
-        alert('Erro! Cadastro não enviado.')
+        this.messages = [
+          { severity: 'error', summary: 'Erro', detail: 'Cadastro não enviado.' },
+        ];
       }
     });
   }
@@ -282,10 +458,14 @@ export class EventosRComponent implements OnInit, OnDestroy {
       next: (data: any) => {
         this.eventosEdit = data;
         this.goToRouteEdit(id);
-        alert('Evento editado com sucesso!');
+        this.messages = [
+          { severity: 'success', summary: 'Sucesso', detail: 'Evento editado com sucesso!' },
+        ];
       },
       error: (err: any) => {
-        alert('Erro! Edição não enviada.')
+        this.messages = [
+          { severity: 'error', summary: 'Erro', detail: 'Edição não enviada.' },
+        ];
       }
     });
   }
@@ -299,27 +479,71 @@ export class EventosRComponent implements OnInit, OnDestroy {
   }
 
   onSubmit() {
-    const selectedDates: Date[] = this.calendario.value;
-    selectedDates.forEach((dt: Date) => {
-      this.addIntervalo(dt);
-    });
-    
     if (this.form.valid && this.cadastrar) {
-      this.eventosCadast = this.form.value;
-      this.enviarFormSave();
+      if(this.valor) {
+        this.conditionCreateSave();
+      } else {
+        this.eventosCadast = this.form.value;
+        this.enviarFormSave();
+      }
+      this.mss = false;
       this.visible = false;
+      this.visibleExtra = false;
       this.form.reset();
       this.ngOnInit();
       window.location.reload();
     } else if (this.form.valid && this.editar) {
       this.eventosEdit = this.form.value;
       this.enviarFormEdit(this.form.get('id')?.value);
-      this.visible = false;
+      this.visibleEdit = false;
       this.form.reset();
       this.ngOnInit();
       window.location.reload();
     } else {
-      alert('Informação inválida. Preencha o campo!');
+      this.messages = [
+        { severity: 'warn', summary: 'Atenção', detail: 'Informação inválida. Preencha os campos!' },
+      ];
+    }
+  }
+
+  conditionCreateSave() {
+    if(this.diasIntervalo) {
+      let ini: Date = this.form.get('dataEvento')?.value;
+      
+      //  DATA INÍCIO
+      this.eventosCadast = this.form.value;
+      this.enviarFormSave();
+      
+      //  DATAS INTERVALO
+      this.diasIntervalo.forEach((dt: Date) => {
+        if(dt != ini && dt != this.dataFim) {
+          this.form.patchValue({
+            dataEvento: dt
+          });
+          this.eventosCadast = this.form.value;
+          this.enviarFormSave();
+        }
+      });
+
+      // DATA FIM
+      this.form.patchValue({
+        dataEvento: this.dataFim
+      });
+      this.mss = true;
+      this.eventosCadast = this.form.value;
+      this.enviarFormSave();
+    } else {
+      //  DATA INÍCIO
+      this.eventosCadast = this.form.value;
+      this.enviarFormSave();
+
+      // DATA FIM
+      this.form.patchValue({
+        dataEvento: this.dataFim
+      });
+      this.eventosCadast = this.form.value;
+      this.mss = true;
+      this.enviarFormSave();
     }
   }
 
@@ -327,18 +551,24 @@ export class EventosRComponent implements OnInit, OnDestroy {
     this.eventService.excluir(id)
     .subscribe({
       next: (data: any) => {
-        alert('Registro deletado com sucesso!');
+        this.messages = [
+          { severity: 'success', summary: 'Sucesso', detail: 'Registro deletado com sucesso!' },
+        ];
         this.ngOnInit();
         window.location.reload();
       },
       error: (err: any) => {
         if (err.status) {
-          alert('Erro! Não foi possível deletar registro.');
+          this.messages = [
+            { severity: 'error', summary: 'Erro', detail: 'Não foi possível deletar registro.' },
+          ];
         } else {
-          alert('Erro desconhecido' + err);
+          this.messages = [
+            { severity: 'error', summary: 'Erro', detail: 'Erro desconhecido ' + err },
+          ];
         }
       }
-  });
+    });
   }
 
 }

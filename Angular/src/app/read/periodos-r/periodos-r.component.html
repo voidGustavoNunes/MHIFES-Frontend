@@ -75,7 +75,7 @@
                     <label for="fimPer">Data final</label>
                 </span>
                 <div *ngIf="form.get('dataFim')?.invalid && form.get('dataFim')?.touched" class="validation-error">
-                    <p>A data final deve ser maior que a data de início.</p>
+                    <p>A data final deve ser maior ou igual que a data de início.</p>
                 </div>
             </div>
             <div class="divInput">
@@ -91,4 +91,8 @@
             </div>
         </form>
     </p-dialog>
+</div>
+
+<div class="card">
+    <p-messages [(value)]="messages" [showTransitionOptions]="'500ms'" [hideTransitionOptions]="'500ms'" [enableService]="false"></p-messages>
 </div>

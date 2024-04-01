@@ -5,8 +5,14 @@
         <a (click)="showDialog()" class="p-button botaoC">Cadastrar +</a>
         
         <div class="pesq">
+            <p-overlayPanel #op>
+                <div style="display: flex; flex-direction: column; align-items: center; gap: .5rem;">
+                    <p-dropdown [options]="filterOptions" [(ngModel)]="selectedFilter" optionLabel="nome" [showClear]="true" placeholder="Selecione um filtro"></p-dropdown>
+                    <p-button label="Limpar filtro" severity="warning" (click)="limparFilter()"></p-button>
+                </div>
+            </p-overlayPanel>
             <p-inputGroup>
-                <button type="button" pButton icon="pi pi-filter-slash" (click)="limparFilter()"></button>
+                <button type="button" pButton (click)="op.toggle($event)" icon="pi pi-filter-fill"></button>
                 <input #searchInput type="text" pInputText placeholder="Pesquisar local" (keydown)="onKeyDown($event, searchInput.value)" />
                 <button type="button" pButton icon="pi pi-search" (click)="filterField(searchInput.value)"></button>
             </p-inputGroup>
@@ -29,7 +35,7 @@
                 <tr class="tbHeader">
                     <th>Nome</th>
                     <th>Capacidade</th>
-                    <th>Equipamentos</th>
+                    <!-- <th>Equipamentos</th> -->
                     <th></th>
                 </tr>
             </ng-template>
@@ -39,6 +45,7 @@
                     <td>{{local?.capacidade}}</td>
                     <td>{{ formatarEquipamentos(local?.equipamentos) }}</td>
                     <td>
+                        <button type="button" class="botaoInfo" (click)="showInfoDialog(local)" pButton>Info</button>
                         <button type="button" class="botaoEdit" (click)="showEditDialog(local)" pButton>Editar</button>
                         <p-toast></p-toast>
                         <p-confirmPopup></p-confirmPopup>
@@ -86,4 +93,31 @@
             </div>
         </form>
     </p-dialog>
+</div>
+
+<div class="card flex justify-content-center">
+    <p-dialog header="Info do Local" [(visible)]="visibleInfo" [breakpoints]="{ '960px': '75vw' }" [style]="{width: '50vw', 'z-index': '1102'}">
+        <div id="meuFormulario">
+            <div class="divInput">
+                <b>Nome do local:</b> {{localInfo?.nome | date: 'dd/MM/yyyy'}}
+            </div>
+            <div class="divInput">
+                <b>Capacidade:</b> {{localInfo?.capacidade}}
+            </div>
+            <div class="divInput">
+                <b>Equipamentos:</b>
+                <div *ngFor="let equip of localInfo?.equipamentos">
+                    <br>
+                    {{equip?.nome}}, <b>Quantidade: </b> <!--{{quantidade}}-->
+                </div>
+            </div>
+            <div class="divBotao">
+                <button type="button" class="botaoInfo" (click)="visibleInfo = false" pButton>Ok</button>
+            </div>
+        </div>
+    </p-dialog>
+</div>
+
+<div class="card">
+    <p-messages [(value)]="messages" [showTransitionOptions]="'500ms'" [hideTransitionOptions]="'500ms'" [enableService]="false"></p-messages>
 </div>

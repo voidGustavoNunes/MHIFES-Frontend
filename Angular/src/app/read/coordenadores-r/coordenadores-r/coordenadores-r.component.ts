@@ -11,12 +11,13 @@ import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { TableModule } from 'primeng/table';
 import { PaginatorModule } from 'primeng/paginator';
 import { DialogModule } from 'primeng/dialog';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService, Message } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ScrollTopModule } from 'primeng/scrolltop';
 import { CoordenadorService } from '../../../service/coordenador.service';
 import { Coordenador } from '../../../models/coordenador.models';
+import { MessagesModule } from 'primeng/messages';
 
 @Component({
   selector: 'app-coordenadores-r',
@@ -37,13 +38,13 @@ import { Coordenador } from '../../../models/coordenador.models';
     ToastModule,
     ScrollTopModule,
     ConfirmPopupModule,
+    MessagesModule
   ],
   templateUrl: './coordenadores-r.component.html',
   styleUrl: './coordenadores-r.component.scss',
   providers: [
     CoordenadorService,
-    ConfirmationService,
-    MessageService
+    ConfirmationService
   ]
 })
 export class CoordenadoresRComponent implements OnInit, OnDestroy {
@@ -61,13 +62,15 @@ export class CoordenadoresRComponent implements OnInit, OnDestroy {
   visible: boolean = false;
   editar: boolean = false;
   cadastrar: boolean = false;
+  
+  messages!: Message[];
+  mss: boolean = false;
 
   constructor(
     private coordService: CoordenadorService,
     private router: Router,
     private formBuilder: FormBuilder,
-    private confirmationService: ConfirmationService,
-    private messageService: MessageService,
+    private confirmationService: ConfirmationService
     ) {
       this.form = this.formBuilder.group({
         id: [null],
@@ -86,7 +89,9 @@ export class CoordenadoresRComponent implements OnInit, OnDestroy {
         this.coordenadoresFilter = this.coordenadoresData;
       },
       error: (err: any) => {
-        alert('Dados não encontrados.')
+        this.messages = [
+          { severity: 'error', summary: 'Erro', detail: 'Dados não encontrados.' },
+        ];
       }
     });
   }
@@ -164,7 +169,9 @@ export class CoordenadoresRComponent implements OnInit, OnDestroy {
         this.deletarID(id);
       },
       reject: () => {
-        this.messageService.add({ severity: 'error', summary: 'Cancelado', detail: 'Exclusão cancelada.', life: 3000 });
+        this.messages = [
+          { severity: 'info', summary: 'Cancelado', detail: 'Exclusão cancelada.' },
+        ];
       }
     });
   }
@@ -174,10 +181,14 @@ export class CoordenadoresRComponent implements OnInit, OnDestroy {
       next: (data: any) => {
         this.coordenadoresCadast = data;
         this.goToRouteSave();
-        alert('Coordenador cadastrado com sucesso!');
+        this.messages = [
+          { severity: 'success', summary: 'Sucesso', detail: 'Coordenador cadastrado com sucesso!' },
+        ];
       },
       error: (err: any) => {
-        alert('Erro! Cadastro não enviado.')
+        this.messages = [
+          { severity: 'error', summary: 'Erro', detail: 'Cadastro não enviado.' },
+        ];
       }
     });
   }
@@ -187,10 +198,14 @@ export class CoordenadoresRComponent implements OnInit, OnDestroy {
       next: (data: any) => {
         this.coordenadoresEdit = data;
         this.goToRouteEdit(id);
-        alert('Coordenador editado com sucesso!');
+        this.messages = [
+          { severity: 'success', summary: 'Sucesso', detail: 'Coordenador editado com sucesso!' },
+        ];
       },
       error: (err: any) => {
-        alert('Erro! Edição não enviada.')
+        this.messages = [
+          { severity: 'error', summary: 'Erro', detail: 'Edição não enviada.' },
+        ];
       }
     });
   }
@@ -219,7 +234,9 @@ export class CoordenadoresRComponent implements OnInit, OnDestroy {
       this.ngOnInit();
       window.location.reload();
     } else {
-      alert('Informação inválida. Preencha o campo!');
+      this.messages = [
+        { severity: 'warn', summary: 'Atenção', detail: 'Informação inválida. Preencha os campos!' },
+      ];
     }
   }
 
@@ -227,16 +244,22 @@ export class CoordenadoresRComponent implements OnInit, OnDestroy {
     this.coordService.excluir(id)
     .subscribe({
       next: (data: any) => {
-        alert('Registro deletado com sucesso!');
+        this.messages = [
+          { severity: 'success', summary: 'Sucesso', detail: 'Registro deletado com sucesso!' },
+        ];
         this.ngOnInit();
         window.location.reload();
       },
       error: (err: any) => {
         if (err.status) {
-          alert('Erro! Não foi possível deletar registro.');
+          this.messages = [
+            { severity: 'error', summary: 'Erro', detail: 'Não foi possível deletar registro.' },
+          ];
         } else {
+          this.messages = [
+            { severity: 'error', summary: 'Erro desconhecido', detail: err },
+          ];
           // console.log('Erro desconhecido:', err);
-          alert('Erro desconhecido' + err);
         }
       }
   });

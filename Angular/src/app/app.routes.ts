@@ -10,6 +10,7 @@ import { ProfessoresRComponent } from './read/professores-r/professores-r/profes
 import { CoordenadoresRComponent } from './read/coordenadores-r/coordenadores-r/coordenadores-r.component';
 import { EventosRComponent } from './read/eventos-r/eventos-r.component';
 import { LocaisRComponent } from './read/locais-r/locais-r.component';
+import { CoordenadoriasRComponent } from './read/coordenadorias-r/coordenadorias-r.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -22,7 +23,7 @@ export const routes: Routes = [
     { path: 'periodos', component: PeriodosRComponent },
     { path: 'professores', component: ProfessoresRComponent },
     { path: 'alunos', component: AlunosRComponent },
-    { path: 'coordenadores', component: CoordenadoresRComponent },
+    { path: 'coordenadorias', component: CoordenadoriasRComponent },
     { path: 'eventos', component: EventosRComponent },
     { path: 'locais', component: LocaisRComponent },
 ];

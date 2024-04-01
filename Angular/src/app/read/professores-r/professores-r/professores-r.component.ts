@@ -15,11 +15,12 @@ import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { TableModule } from 'primeng/table';
 import { PaginatorModule } from 'primeng/paginator';
 import { DialogModule } from 'primeng/dialog';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService, Message } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ScrollTopModule } from 'primeng/scrolltop';
 import { InputSwitch, InputSwitchModule } from 'primeng/inputswitch';
+import { MessagesModule } from 'primeng/messages';
 
 @Component({
   selector: 'app-professores-r',
@@ -40,42 +41,45 @@ import { InputSwitch, InputSwitchModule } from 'primeng/inputswitch';
     ToastModule,
     ScrollTopModule,
     ConfirmPopupModule,
-    InputSwitchModule
+    InputSwitchModule,
+    MessagesModule
   ],
   templateUrl: './professores-r.component.html',
   styleUrls: ['./professores-r.component.scss'],
   providers: [
     ProfessorService,
-    ConfirmationService,
-    MessageService
+    ConfirmationService
   ]
 })
 
 export class ProfessoresRComponent implements OnInit, OnDestroy {
   @ViewChild('searchInput') inputSearch!: ElementRef;
+  @ViewChild('searchTable2') searchTable2!: ElementRef;
+  @ViewChild('searchTable1') searchTable1!: ElementRef;
   @ViewChild('switch') switch!: InputSwitch;
 
-  professoresData: Professor[] = [];
+  professoresNaoOrienta: Professor[] = [];
+  professoresOrientador: Professor[] = [];
   professoresFilter: Professor[] = [];
   professoresCadast: Professor[] = [];
   professoresEdit: Professor[] = [];
 
   unsubscribe$!: Subscription;
   form: FormGroup;
-  selectedDrop: boolean = false;
 
   ehTitulo: string = '';
   visible: boolean = false;
   editar: boolean = false;
   cadastrar: boolean = false;
+  
+  messages!: Message[];
+  mss: boolean = false;
 
   constructor(
     private professorService: ProfessorService,
     private router: Router,
     private formBuilder: FormBuilder,
-    private confirmationService: ConfirmationService,
-    private messageService: MessageService,
-    private ngZone: NgZone
+    private confirmationService: ConfirmationService
     ) {
       this.form = this.formBuilder.group({
         id: [null],
@@ -90,12 +94,23 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
     this.unsubscribe$ = this.professorService.listar()
     .subscribe({
       next: (itens:any) => {
-        const data = itens;
-        this.professoresData = data.sort((a:any, b:any) => (a.nome < b.nome) ? -1 : 1);
-        this.professoresFilter = this.professoresData;
+        const data = itens.sort((a:any, b:any) => (a.nome < b.nome) ? -1 : 1);;
+        this.professoresNaoOrienta = data.forEach((prf: Professor) => {
+          if(!prf.ehCoordenador) {
+            this.professoresNaoOrienta.push(prf);
+          }
+        })
+        // this.professoresFilter = this.professoresNaoOrienta;
+        this.professoresNaoOrienta.forEach((prf: Professor) => {
+          if(prf.ehCoordenador) {
+            this.professoresOrientador.push(prf);
+          }
+        })
       },
       error: (err: any) => {
-        alert('Dados não encontrados.')
+        this.messages = [
+          { severity: 'error', summary: 'Erro', detail: 'Dados não encontrados.' },
+        ];
       }
     });
   }
@@ -135,37 +150,37 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
     this.switch.writeValue(null);
   }
   
-  limparFilter(){
-    const inputElement = this.inputSearch.nativeElement.value
-    if (inputElement) {
-      this.inputSearch.nativeElement.value = '';
-    }
-    this.professoresData = this.professoresFilter;
-  }
+  // limparFilter(){
+  //   const inputElement = this.inputSearch.nativeElement.value
+  //   if (inputElement) {
+  //     this.inputSearch.nativeElement.value = '';
+  //   }
+  //   this.professoresNaoOrienta = this.professoresFilter;
+  // }
 
-  searchFilterWord(term: string) {
-    this.professoresData = this.professoresFilter.filter(el => {
-      if (el.nome.toLowerCase().includes(term.toLowerCase())) {
-        return el;
-      } else {
-        return null;
-      }
-    })
-  }
+  // searchFilterWord(term: string) {
+  //   this.professoresNaoOrienta = this.professoresFilter.filter(el => {
+  //     if (el.nome.toLowerCase().includes(term.toLowerCase())) {
+  //       return el;
+  //     } else {
+  //       return null;
+  //     }
+  //   })
+  // }
 
-  onKeyDown(event: KeyboardEvent, searchTerm: string) {
-    if (event.key === "Enter") {
-      if (searchTerm != null || searchTerm != '') {
-        this.searchFilterWord(searchTerm);
-      }
-    }
-  }
+  // onKeyDown(event: KeyboardEvent, searchTerm: string) {
+  //   if (event.key === "Enter") {
+  //     if (searchTerm != null || searchTerm != '') {
+  //       this.searchFilterWord(searchTerm);
+  //     }
+  //   }
+  // }
   
-  filterField(searchTerm: string) {
-    if (searchTerm != null || searchTerm != '') {
-      this.searchFilterWord(searchTerm);
-    }
-  }
+  // filterField(searchTerm: string) {
+  //   if (searchTerm != null || searchTerm != '') {
+  //     this.searchFilterWord(searchTerm);
+  //   }
+  // }
 
   confirm2(event: Event, id: number) {
     this.confirmationService.confirm({
@@ -177,7 +192,9 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
         this.deletarID(id);
       },
       reject: () => {
-        this.messageService.add({ severity: 'error', summary: 'Cancelado', detail: 'Exclusão cancelada.', life: 3000 });
+        this.messages = [
+          { severity: 'info', summary: 'Cancelado', detail: 'Exclusão cancelada.' },
+        ];
       }
     });
   }
@@ -187,10 +204,14 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
       next: (data: any) => {
         this.professoresCadast = data;
         this.goToRouteSave();
-        alert('Professor cadastrado com sucesso!');
+        this.messages = [
+          { severity: 'success', summary: 'Sucesso', detail: 'Professor cadastrado com sucesso!' },
+        ];
       },
       error: (err: any) => {
-        alert('Erro! Cadastro não enviado.')
+        this.messages = [
+          { severity: 'error', summary: 'Erro', detail: 'Cadastro não enviado.' },
+        ];
       }
     });
   }
@@ -200,10 +221,14 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
       next: (data: any) => {
         this.professoresEdit = data;
         this.goToRouteEdit(id);
-        alert('Professor editado com sucesso!');
+        this.messages = [
+          { severity: 'success', summary: 'Sucesso', detail: 'Professor editado com sucesso!' },
+        ];
       },
       error: (err: any) => {
-        alert('Erro! Edição não enviada.')
+        this.messages = [
+          { severity: 'error', summary: 'Erro', detail: 'Edição não enviada.' },
+        ];
       }
     });
   }
@@ -214,11 +239,6 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
 
   goToRouteEdit(id: number) {
     this.router.navigate(['api/professores', id]);
-  }
-
-  onDropdownChange(event: any) {
-    this.selectedDrop = event.value;
-    alert('Valor selecionado:'+ this.selectedDrop);
   }
 
   onSubmit() {
@@ -238,7 +258,9 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
       this.ngOnInit();
       window.location.reload();
     } else {
-      alert('Informação inválida. Preencha os campos corretamente!');
+      this.messages = [
+        { severity: 'warn', summary: 'Atenção', detail: 'Informação inválida. Preencha os campos!' },
+      ];
     }
   }
 
@@ -246,15 +268,21 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
     this.professorService.excluir(id)
     .subscribe({
       next: (data: any) => {
-        alert('Registro deletado com sucesso!');
+        this.messages = [
+          { severity: 'success', summary: 'Sucesso', detail: 'Registro deletado com sucesso!' },
+        ];
         this.ngOnInit();
         window.location.reload();
       },
       error: (err: any) => {
         if (err.status) {
-          alert('Erro! Não foi possível deletar registro.');
+          this.messages = [
+            { severity: 'error', summary: 'Erro', detail: 'Não foi possível deletar registro.' },
+          ];
         } else {
-          alert('Erro desconhecido' + err);
+          this.messages = [
+            { severity: 'error', summary: 'Erro desconhecido', detail: err },
+          ];
         }
       }
   });

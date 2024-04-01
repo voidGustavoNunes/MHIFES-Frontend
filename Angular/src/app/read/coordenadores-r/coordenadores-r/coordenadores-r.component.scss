@@ -134,6 +134,13 @@
         color: white;
         letter-spacing: .1rem;
     }
+    .p-messages {
+        width: fit-content;
+        position: fixed;
+        bottom: 1.25rem;
+        right: 1.25rem;
+        z-index: 11000;
+    }
   }
   
   @media screen and (min-width: 686px) {

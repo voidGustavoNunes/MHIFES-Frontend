@@ -83,7 +83,7 @@
             }
             .botaoEdit{
                 @include themeButton(#FFDD77, #846406);
-                margin-right: .5rem;
+                margin: 0 .5rem;
             }
             .botaoDele{
                 @include themeButton(#FF8381, #89041E);
@@ -116,6 +116,9 @@
         button:active{
             box-shadow: none;
         }
+        .botaoInfo{
+            @include themeButton(#A2FF7F, #1E8805);
+        }
         .botaoSalva{
             @include themeButton();
         }
@@ -141,6 +144,13 @@
         z-index: 10000;
         position: absolute;
         overflow-y: auto;
+    }
+    .p-messages {
+        width: fit-content;
+        position: fixed;
+        bottom: 1.25rem;
+        right: 1.25rem;
+        z-index: 11000;
     }
 }
 

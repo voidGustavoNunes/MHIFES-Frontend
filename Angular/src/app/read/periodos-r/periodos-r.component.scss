@@ -152,6 +152,13 @@
     .p-dialog-content {
         overflow-y: visible;
     }
+    .p-messages {
+        width: fit-content;
+        position: fixed;
+        bottom: 1.25rem;
+        right: 1.25rem;
+        z-index: 11000;
+    }
     .ng-trigger.ng-trigger-overlayAnimation.ng-tns-c3632051545-2.p-datepicker.p-component.ng-star-inserted {
         // margin-top: 310px;
     }

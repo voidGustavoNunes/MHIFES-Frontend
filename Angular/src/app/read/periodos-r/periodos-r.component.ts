@@ -13,11 +13,12 @@ import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { TableModule } from 'primeng/table';
 import { PaginatorModule } from 'primeng/paginator';
 import { DialogModule } from 'primeng/dialog';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService, Message } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ScrollTopModule } from 'primeng/scrolltop';
 import { CalendarModule } from 'primeng/calendar';
+import { MessagesModule } from 'primeng/messages';
 
 @Component({
   selector: 'app-periodos-r',
@@ -38,14 +39,14 @@ import { CalendarModule } from 'primeng/calendar';
     ToastModule,
     ScrollTopModule,
     ConfirmPopupModule,
-    CalendarModule
+    CalendarModule,
+    MessagesModule
   ],
   templateUrl: './periodos-r.component.html',
   styleUrl: './periodos-r.component.scss',
   providers: [
     PeriodoService,
-    ConfirmationService,
-    MessageService
+    ConfirmationService
   ]
 })
 export class PeriodosRComponent implements OnInit, OnDestroy {
@@ -63,13 +64,15 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
   visible: boolean = false;
   editar: boolean = false;
   cadastrar: boolean = false;
+  
+  messages!: Message[];
+  mss: boolean = false;
 
   constructor(
     private periodService: PeriodoService,
     private router: Router,
     private formBuilder: FormBuilder,
-    private confirmationService: ConfirmationService,
-    private messageService: MessageService
+    private confirmationService: ConfirmationService
     ) {
       this.form = this.formBuilder.group({
         id: [null],
@@ -88,7 +91,9 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
         this.periodosFilter = this.periodosData;
       },
       error: (err: any) => {
-        alert('Dados não encontrados.')
+        this.messages = [
+          { severity: 'error', summary: 'Erro', detail: 'Dados não encontrados.' },
+        ];
       }
     });
   }
@@ -185,7 +190,9 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
         this.deletarID(id);
       },
       reject: () => {
-        this.messageService.add({ severity: 'error', summary: 'Cancelado', detail: 'Exclusão cancelada.', life: 3000 });
+        this.messages = [
+          { severity: 'info', summary: 'Cancelado', detail: 'Exclusão cancelada.' },
+        ];
       }
     });
   }
@@ -195,10 +202,14 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
       next: (data: any) => {
         this.periodosCadast = data;
         this.goToRouteSave();
-        alert('Perídodo cadastrado com sucesso!');
+        this.messages = [
+          { severity: 'success', summary: 'Sucesso', detail: 'Perídodo cadastrado com sucesso!' },
+        ];
       },
       error: (err: any) => {
-        alert('Erro! Cadastro não enviado.')
+        this.messages = [
+          { severity: 'error', summary: 'Erro', detail: 'Cadastro não enviado.' },
+        ];
       }
     });
   }
@@ -208,10 +219,14 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
       next: (data: any) => {
         this.periodosEdit = data;
         this.goToRouteEdit(id);
-        alert('Perídodo editado com sucesso!');
+        this.messages = [
+          { severity: 'success', summary: 'Sucesso', detail: 'Perídodo editado com sucesso!' },
+        ];
       },
       error: (err: any) => {
-        alert('Erro! Edição não enviada.')
+        this.messages = [
+          { severity: 'error', summary: 'Erro', detail: 'Edição não enviada.' },
+        ];
       }
     });
   }
@@ -240,7 +255,9 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
       this.ngOnInit();
       window.location.reload();
     } else {
-      alert('Informação inválida. Preencha o campo!');
+      this.messages = [
+        { severity: 'warn', summary: 'Atenção', detail: 'Informação inválida. Preencha os campos!' },
+      ];
     }
   }
 
@@ -248,15 +265,21 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
     this.periodService.excluir(id)
     .subscribe({
       next: (data: any) => {
-        alert('Registro deletado com sucesso!');
+        this.messages = [
+          { severity: 'success', summary: 'Sucesso', detail: 'Registro deletado com sucesso!' },
+        ];
         this.ngOnInit();
         window.location.reload();
       },
       error: (err: any) => {
         if (err.status) {
-          alert('Erro! Não foi possível deletar registro.');
+          this.messages = [
+            { severity: 'error', summary: 'Erro', detail: 'Não foi possível deletar registro.' },
+          ];
         } else {
-          alert('Erro desconhecido' + err);
+          this.messages = [
+            { severity: 'error', summary: 'Erro desconhecido', detail: err },
+          ];
         }
       }
   });

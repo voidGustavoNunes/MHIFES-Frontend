@@ -5,9 +5,15 @@
         <a (click)="showDialog()" class="p-button botaoC">Cadastrar +</a>
         
         <div class="pesq">
+            <p-overlayPanel #op>
+                <div style="display: flex; flex-direction: column; align-items: center; gap: .5rem;">
+                    <p-dropdown [options]="filterOptions" [(ngModel)]="selectedFilter" optionLabel="nome" [showClear]="true" placeholder="Selecione um filtro"></p-dropdown>
+                    <p-button label="Limpar filtro" severity="warning" (click)="limparFilter()"></p-button>
+                </div>
+            </p-overlayPanel>
             <p-inputGroup>
-                <button type="button" pButton icon="pi pi-filter-slash" (click)="limparFilter()"></button>
-                <input #searchInput type="text" pInputText placeholder="Pesquisar evento por ano" (keydown)="onKeyDown($event, searchInput.value)" />
+                <button type="button" pButton (click)="op.toggle($event)" icon="pi pi-filter-fill"></button>
+                <input #searchInput type="text" pInputText placeholder="Pesquisar evento" (keydown)="onKeyDown($event, searchInput.value)" />
                 <button type="button" pButton icon="pi pi-search" (click)="filterField(searchInput.value)"></button>
             </p-inputGroup>
         </div>
@@ -27,19 +33,20 @@
         >
             <ng-template pTemplate="header">
                 <tr class="tbHeader">
-                    <th>Descrição</th>
+                    <th>Data do Evento</th>
+                    <th>Horário de início</th>
                     <th>Local</th>
-                    <th>Intervalo de Datas</th>
                     <th></th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-evento>
                 <tr class="tbBody">
-                    <td>{{evento?.descricao}}</td>
+                    <td>{{evento?.dataEvento | date: 'dd/MM/yyyy'}}</td>
+                    <td>{{evento?.horarioInicio}}</td>
                     <td>{{evento?.local.nome}}</td>
-                    <td>{{ formatarDatas(evento?.intervaloData) }}</td>
                     <td>
-                        <button type="button" class="botaoEdit" (click)="showEditDialog(evento, formatarDatas(evento?.intervaloData))" pButton>Editar</button>
+                        <button type="button" class="botaoInfo" (click)="showInfoDialog(evento)" pButton>Info</button>
+                        <button type="button" class="botaoEdit" (click)="showEditDialog(evento)" pButton>Editar</button>
                         <p-toast></p-toast>
                         <p-confirmPopup></p-confirmPopup>
                         <button type="button" class="botaoDele" (click)="confirm2($event, evento?.id)" severity="danger" pButton>Deletar</button>
@@ -62,16 +69,33 @@
     <p-dialog class="pHeader" [header]=ehTitulo [(visible)]="visible" [modal]="true" [breakpoints]="{ '960px': '75vw' }" [style]="{ width: '50vw' }" [draggable]="false" [resizable]="false">
         <form id="meuFormulario" [formGroup]="form" (ngSubmit)="onSubmit()">
             <div class="divInput">
-                <span class="p-float-label" formArrayName="intervaloData">
-                    <p-calendar #calendario appendTo="body" dateFormat="dd/mm/yy" selectionMode="multiple" [readonlyInput]="true" id="itvData" class="form-control" ></p-calendar>
-                    <label for="itvData">Intervalo de Datas</label>
-                </span>
-            </div>
-            <div class="divInput">
                 <span class="p-float-label">
-                    <textarea pInputTextarea rows="5" cols="30" id="descEvent" class="form-control" formControlName="descricao" ></textarea>
-                    <label for="descEvent">Descrição</label>
+                    <p-calendar appendTo="body" dateFormat="dd/mm/yy" [readonlyInput]="true" id="iniData" class="form-control" formControlName="dataEvento" (onSelect)="onDateIniSelect()" ></p-calendar>
+                    <label for="iniData">Data de Início</label>
                 </span>
+                <div *ngIf="form.get('dataEvento')?.invalid && form.get('dataEvento')?.touched" class="validation-error">
+                    <p>A data de início deve ser menor ou igual que a data final.</p>
+                </div>
+            </div>
+            <div class="divInput pSwtich">
+                <p-inputSwitch #switch [disabled]="disableSwit" [(ngModel)]="valor" [ngModelOptions]="{standalone: true}" id="checkRepl" (onChange)="handleChange()"></p-inputSwitch>
+                <label for="checkRepl">Replicar dias</label>
+            </div>
+            <div class="divInput labelFlex">
+                <label for="descEvent">Descrição</label>
+                <textarea pInputTextarea rows="5" cols="30" id="descEvent" class="form-control" formControlName="descricao" ></textarea>
+            </div>
+            <div class="divInput labelFlex">
+                <label for="horinIni">Hora de início</label>
+                <input pInputText type="time" id="horinIni" class="form-control" formControlName="horarioInicio">
+            </div>
+            <div class="divInput labelFlex">
+                <label for="horinFim">Hora final</label>
+                <input pInputText type="time" id="horinFim" class="form-control" formControlName="horarioFim">
+
+                <div *ngIf="form.get('horarioFim')?.invalid && form.get('horarioFim')?.touched" class="validation-error">
+                    <p>Hora final deve ser maior que a hora de início</p>
+                </div>
             </div>
             <div class="divInput">
                 <span class="p-float-label">
@@ -87,18 +111,6 @@
                             </div>
                         </ng-template>
                     </p-dropdown>
-                    <!-- <p-dropdown #dropdown appendTo="body" [options]="cities" optionLabel="name" [filter]="true" filterBy="name" [showClear]="true" placeholder="Selecione um local" inputId="localEvent" class="form-control" (onChange)="verLocal($event)">
-                        <ng-template pTemplate="selectedItem" let-selectedOption>
-                            <div class="flex align-items-center gap-2">
-                                <div>{{ selectedOption?.name }}</div>
-                            </div>
-                        </ng-template>
-                        <ng-template let-localData pTemplate="item">
-                            <div class="flex align-items-center gap-2">
-                                <div>{{ localData.name }}</div>
-                            </div>
-                        </ng-template>
-                    </p-dropdown> -->
                     <label for="localEvent">Local</label>
                 </span>
             </div>
@@ -109,4 +121,111 @@
             </div>
         </form>
     </p-dialog>
+</div>
+
+<div class="card flex justify-content-center">
+    <p-dialog header="Replicar dias do evento" [(visible)]="visibleExtra" [breakpoints]="{ '960px': '75vw' }" [style]="{width: '50vw', 'z-index': '1102'}">
+        <div id="meuFormulario">
+            <div class="divInput">
+                <span class="p-float-label">
+                    <p-calendar #calendarExtra appendTo="body" dateFormat="dd/mm/yy" [readonlyInput]="true" id="fimData" [(ngModel)]="dataFim" [ngModelOptions]="{standalone: true}" (onSelect)="validarDatas()" #calendar="ngModel" ></p-calendar>
+                    <label for="fimData">Data Final</label>
+                </span>
+            </div>
+            <div class="divInput">
+                <span class="p-float-label">
+                    <p-dropdown #dropdownExtra appendTo="body" [options]="opcaoSemana" [(ngModel)]="selectedSemana" placeholder="Selecione um dia da semana" optionLabel="nome" inputId="float-week" (onChange)="onDropdownChange()"></p-dropdown>
+                    <label for="float-week">Selecione um dia da semana</label>
+                </span>
+            </div>
+            <div class="divInput">
+                <span class="p-float-label">
+                    <p-calendar #calendario [disabled]="disableDrop" [(ngModel)]="diasIntervalo" appendTo="body" selectionMode="multiple" dateFormat="dd/mm/yy" [readonlyInput]="true" id="itvData" class="form-control" ></p-calendar>
+                    <label for="itvData">Intervalo de dias</label>
+                </span>
+            </div>
+            <div class="divBotao replica">
+                <button type="button" class="botaoSalva" (click)="onClickHide()" pButton>Salvar</button>
+            </div>
+        </div>
+    </p-dialog>
+</div>
+
+<div class="card flex justify-content-center">
+    <p-dialog class="pHeader" [header]=ehTitulo [(visible)]="visibleEdit" [modal]="true" [breakpoints]="{ '960px': '75vw' }" [style]="{ width: '50vw' }" [draggable]="false" [resizable]="false">
+        <form id="meuFormulario" [formGroup]="form" (ngSubmit)="onSubmit()">
+            <div class="divInput">
+                <span class="p-float-label">
+                    <p-calendar appendTo="body" dateFormat="dd/mm/yy" [readonlyInput]="true" id="iniData" class="form-control" formControlName="dataEvento" ></p-calendar>
+                    <label for="iniData">Data do Evento</label>
+                </span>
+            </div>
+            <div class="divInput labelFlex">
+                <label for="descEvent">Descrição</label>
+                <textarea pInputTextarea rows="5" cols="30" id="descEvent" class="form-control" formControlName="descricao" ></textarea>
+            </div>
+            <div class="divInput labelFlex">
+                <label for="horinIni">Hora de início</label>
+                <input pInputText type="time" id="horinIni" class="form-control" formControlName="horarioInicio">
+            </div>
+            <div class="divInput labelFlex">
+                <label for="horinFim">Hora final</label>
+                <input pInputText type="time" id="horinFim" class="form-control" formControlName="horarioFim">
+                
+                <div *ngIf="form.get('horarioFim')?.invalid && form.get('horarioFim')?.touched" class="validation-error">
+                    <p>Hora final deve ser maior que a hora de início</p>
+                </div>
+            </div>
+            <div class="divInput">
+                <span class="p-float-label">
+                    <p-dropdown #dropdown appendTo="body" [options]="locaisArray" optionLabel="nome" [filter]="true" filterBy="nome" [showClear]="true" placeholder="Selecione um local" inputId="localEvent" class="form-control" formControlName="local">
+                        <ng-template pTemplate="selectedItem" let-selectedOption>
+                            <div class="flex align-items-center gap-2">
+                                <div>{{ selectedOption?.nome }}</div>
+                            </div>
+                        </ng-template>
+                        <ng-template let-localData pTemplate="item">
+                            <div class="flex align-items-center gap-2">
+                                <div>{{ localData.nome }}</div>
+                            </div>
+                        </ng-template>
+                    </p-dropdown>
+                    <label for="localEvent">Local</label>
+                </span>
+            </div>
+            <div class="divBotao">
+                <button type="submit" class="botaoEdit" *ngIf="editar" pButton>Atualizar</button>
+                <button type="button" class="botaoCancela" (click)="hideDialog()" pButton>Cancelar</button>
+            </div>
+        </form>
+    </p-dialog>
+</div>
+
+<div class="card flex justify-content-center">
+    <p-dialog header="Info do Evento" [(visible)]="visibleInfo" [breakpoints]="{ '960px': '75vw' }" [style]="{width: '50vw', 'z-index': '1102'}">
+        <div id="meuFormulario">
+            <div class="divInput">
+                <b>Data do evento:</b> {{eventoInfo?.dataEvento | date: 'dd/MM/yyyy'}}
+            </div>
+            <div class="divInput">
+                <b>Hora de início:</b> {{eventoInfo?.horarioInicio}}
+            </div>
+            <div class="divInput">
+                <b>Hora de fim:</b> {{eventoInfo?.horarioFim}}
+            </div>
+            <div class="divInput">
+                <b>Local do evento:</b> {{eventoInfo?.local}}
+            </div>
+            <div class="divInput">
+                <b>Descrição:</b> <br> {{eventoInfo?.descricao}}
+            </div>
+            <div class="divBotao replica">
+                <button type="button" class="botaoInfo" (click)="visibleInfo = false" pButton>Ok</button>
+            </div>
+        </div>
+    </p-dialog>
+</div>
+
+<div class="card">
+    <p-messages [(value)]="messages" [showTransitionOptions]="'500ms'" [hideTransitionOptions]="'500ms'" [enableService]="false"></p-messages>
 </div>

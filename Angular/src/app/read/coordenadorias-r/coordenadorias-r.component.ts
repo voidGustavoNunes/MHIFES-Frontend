@@ -1,11 +1,9 @@
-import { Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Subscription, interval } from 'rxjs';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Equipamento } from '../../models/equipamento.models';
-import { EquipamentoService } from '../../service/equipamento.service';
 import { Router, RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputGroupModule } from 'primeng/inputgroup';
@@ -18,9 +16,11 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ScrollTopModule } from 'primeng/scrolltop';
 import { MessagesModule } from 'primeng/messages';
+import { CoordenadoriaService } from '../../service/coordenadoria.service';
+import { Coordenadoria } from '../../models/coordenadoria.models';
 
 @Component({
-  selector: 'app-equipamentos-r',
+  selector: 'app-coordenadorias-r',
   standalone: true,
   imports: [
     CommonModule,
@@ -40,21 +40,20 @@ import { MessagesModule } from 'primeng/messages';
     ConfirmPopupModule,
     MessagesModule
   ],
-  templateUrl: './equipamentos-r.component.html',
-  styleUrl: './equipamentos-r.component.scss',
+  templateUrl: './coordenadorias-r.component.html',
+  styleUrl: './coordenadorias-r.component.scss',
   providers: [
-    EquipamentoService,
+    CoordenadoriaService,
     ConfirmationService
   ]
 })
-
-export class EquipamentosRComponent implements OnInit, OnDestroy {
+export class CoordenadoriasRComponent implements OnInit, OnDestroy {
   @ViewChild('searchInput') inputSearch!: ElementRef;
 
-  equipamentosData: Equipamento[] = [];
-  equipamentosFilter: Equipamento[] = [];
-  equipamentosCadast: Equipamento[] = [];
-  equipamentosEdit: Equipamento[] = [];
+  coordenadoriasData: Coordenadoria[] = [];
+  coordenadoriasFilter: Coordenadoria[] = [];
+  coordenadoriasCadast: Coordenadoria[] = [];
+  coordenadoriasEdit: Coordenadoria[] = [];
 
   unsubscribe$!: Subscription;
   form: FormGroup;
@@ -68,7 +67,7 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
   mss: boolean = false;
 
   constructor(
-    private equipService: EquipamentoService,
+    private coordaService: CoordenadoriaService,
     private router: Router,
     private formBuilder: FormBuilder,
     private confirmationService: ConfirmationService
@@ -80,45 +79,12 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    // this.equipamentosData = [
-    //   {
-    //       id: 3,
-    //       nome: 'Name product',
-    //       // descricao: 'Product Description 3 hjgkytftf hjfuj hjgujj hyfuyhjv kgfhcdgjc  gtchtg jkbgvfjtd hjytfjy ghfht ghjydtrd gcjydjrdjt gdcg fgxhtrd'
-    //   },
-    //   {
-    //       id: 4,
-    //       nome: 'Name product',
-    //       // descricao: 'Product Description 4'
-    //   },
-    //   {
-    //       id: 1,
-    //       nome: 'Name product bhgfhgv hjbkjgvgkh bjhjhv vhgvkhghg vjkgvkhgjkkhgk gvhkgvkgh',
-    //       // descricao: 'Product Description 1'
-    //   },
-    //   {
-    //       id: 5,
-    //       nome: 'Name product',
-    //       // descricao: 'Product Description 5'
-    //   },
-    //   {
-    //       id: 2,
-    //       nome: 'Name product',
-    //       // descricao: 'Product Description 2'
-    //   },
-    //   {
-    //       id: 6,
-    //       nome: 'Name product',
-    //       // descricao: 'Product Description 6'
-    //   }
-    // ];
-
-    this.unsubscribe$ = this.equipService.listar()
+    this.unsubscribe$ = this.coordaService.listar()
     .subscribe({
       next: (itens:any) => {
         const data = itens;
-        this.equipamentosData = data.sort((a:any, b:any) => (a.nome < b.nome) ? -1 : 1);
-        this.equipamentosFilter = this.equipamentosData;
+        this.coordenadoriasData = data.sort((a:any, b:any) => (a.nome < b.nome) ? -1 : 1);
+        this.coordenadoriasFilter = this.coordenadoriasData;
       },
       error: (err: any) => {
         this.messages = [
@@ -132,9 +98,9 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
     this.unsubscribe$.unsubscribe();
   }
 
-  showEditDialog(value: Equipamento) {
+  showEditDialog(value: Coordenadoria) {
     this.form.reset();
-    this.ehTitulo = 'Atualizar Equipamento'
+    this.ehTitulo = 'Atualizar Coordenadoria'
     this.visible = true;
     this.cadastrar = false;
     this.editar = true;
@@ -146,7 +112,7 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
 
   showDialog() {
     this.form.reset();
-    this.ehTitulo = 'Cadastrar Equipamento';
+    this.ehTitulo = 'Cadastrar Coordenadoria';
     this.visible = true;
     this.cadastrar = true;
     this.editar = false;
@@ -162,11 +128,11 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
     if (inputElement) {
       this.inputSearch.nativeElement.value = '';
     }
-    this.equipamentosData = this.equipamentosFilter;
+    this.coordenadoriasData = this.coordenadoriasFilter;
   }
 
   searchFilterWord(term: string) {
-    this.equipamentosData = this.equipamentosFilter.filter(el => {
+    this.coordenadoriasData = this.coordenadoriasFilter.filter(el => {
       if (el.nome.toLowerCase().includes(term.toLowerCase())) {
         return el;
       } else {
@@ -182,7 +148,7 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
       }
     }
   }
-  
+
   filterField(searchTerm: string) {
     if (searchTerm != null || searchTerm != '') {
       this.searchFilterWord(searchTerm);
@@ -207,12 +173,12 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
   }
 
   enviarFormSave() {
-    this.equipService.criar(this.equipamentosCadast).subscribe({
+    this.coordaService.criar(this.coordenadoriasCadast).subscribe({
       next: (data: any) => {
-        this.equipamentosCadast = data;
+        this.coordenadoriasCadast = data;
         this.goToRouteSave();
         this.messages = [
-          { severity: 'success', summary: 'Sucesso', detail: 'Equipamento cadastrado com sucesso!' },
+          { severity: 'success', summary: 'Sucesso', detail: 'Coordenadoria cadastrada com sucesso!' },
         ];
       },
       error: (err: any) => {
@@ -224,12 +190,12 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
   }
 
   enviarFormEdit(id: number) {
-    this.equipService.atualizar(id, this.equipamentosEdit).subscribe({
+    this.coordaService.atualizar(id, this.coordenadoriasEdit).subscribe({
       next: (data: any) => {
-        this.equipamentosEdit = data;
+        this.coordenadoriasEdit = data;
         this.goToRouteEdit(id);
         this.messages = [
-          { severity: 'success', summary: 'Sucesso', detail: 'Equipamento editado com sucesso!' },
+          { severity: 'success', summary: 'Sucesso', detail: 'Coordenadoria editada com sucesso!' },
         ];
       },
       error: (err: any) => {
@@ -241,23 +207,23 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
   }
 
   goToRouteSave() {
-    this.router.navigate(['api/equipamentos']);
+    this.router.navigate(['api/coordenadorias']);
   }
 
   goToRouteEdit(id: number) {
-    this.router.navigate(['api/equipamentos', id]);
+    this.router.navigate(['api/coordenadorias', id]);
   }
 
   onSubmit() {
     if (this.form.valid && this.cadastrar) {
-      this.equipamentosCadast = this.form.value;
+      this.coordenadoriasCadast = this.form.value;
       this.enviarFormSave();
       this.visible = false;
       this.form.reset();
       this.ngOnInit();
       window.location.reload();
     } else if (this.form.valid && this.editar) {
-      this.equipamentosEdit = this.form.value;
+      this.coordenadoriasEdit = this.form.value;
       this.enviarFormEdit(this.form.get('id')?.value);
       this.visible = false;
       this.form.reset();
@@ -271,7 +237,7 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
   }
 
   deletarID(id: number) {
-    this.equipService.excluir(id)
+    this.coordaService.excluir(id)
     .subscribe({
       next: (data: any) => {
         this.messages = [
@@ -289,10 +255,9 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
           this.messages = [
             { severity: 'error', summary: 'Erro desconhecido', detail: err },
           ];
-          // console.log('Erro desconhecido:', err);
         }
       }
-    });
+  });
   }
 
 }
