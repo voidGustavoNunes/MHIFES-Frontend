@@ -13,7 +13,7 @@ import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { TableModule } from 'primeng/table';
 import { PaginatorModule } from 'primeng/paginator';
 import { DialogModule } from 'primeng/dialog';
-import { ConfirmationService, Message } from 'primeng/api';
+import { ConfirmationService, Message, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ScrollTopModule } from 'primeng/scrolltop';
@@ -44,7 +44,8 @@ import { MessagesModule } from 'primeng/messages';
   styleUrl: './equipamentos-r.component.scss',
   providers: [
     EquipamentoService,
-    ConfirmationService
+    ConfirmationService,
+    MessageService
   ]
 })
 
@@ -80,39 +81,6 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    // this.equipamentosData = [
-    //   {
-    //       id: 3,
-    //       nome: 'Name product',
-    //       // descricao: 'Product Description 3 hjgkytftf hjfuj hjgujj hyfuyhjv kgfhcdgjc  gtchtg jkbgvfjtd hjytfjy ghfht ghjydtrd gcjydjrdjt gdcg fgxhtrd'
-    //   },
-    //   {
-    //       id: 4,
-    //       nome: 'Name product',
-    //       // descricao: 'Product Description 4'
-    //   },
-    //   {
-    //       id: 1,
-    //       nome: 'Name product bhgfhgv hjbkjgvgkh bjhjhv vhgvkhghg vjkgvkhgjkkhgk gvhkgvkgh',
-    //       // descricao: 'Product Description 1'
-    //   },
-    //   {
-    //       id: 5,
-    //       nome: 'Name product',
-    //       // descricao: 'Product Description 5'
-    //   },
-    //   {
-    //       id: 2,
-    //       nome: 'Name product',
-    //       // descricao: 'Product Description 2'
-    //   },
-    //   {
-    //       id: 6,
-    //       nome: 'Name product',
-    //       // descricao: 'Product Description 6'
-    //   }
-    // ];
-
     this.unsubscribe$ = this.equipService.listar()
     .subscribe({
       next: (itens:any) => {
@@ -122,7 +90,7 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
       },
       error: (err: any) => {
         this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Dados não encontrados.' },
+          { severity: 'error', summary: 'Erro', detail: 'Dados não encontrados.', life: 3000 },
         ];
       }
     });
@@ -200,7 +168,7 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
       },
       reject: () => {
         this.messages = [
-          { severity: 'info', summary: 'Cancelado', detail: 'Exclusão cancelada.' },
+          { severity: 'info', summary: 'Cancelado', detail: 'Exclusão cancelada.', life: 3000 },
         ];
       }
     });
@@ -211,13 +179,14 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
       next: (data: any) => {
         this.equipamentosCadast = data;
         this.goToRouteSave();
+        this.ngOnInit();
         this.messages = [
-          { severity: 'success', summary: 'Sucesso', detail: 'Equipamento cadastrado com sucesso!' },
+          { severity: 'success', summary: 'Sucesso', detail: 'Equipamento cadastrado com sucesso!', life: 3000 },
         ];
       },
       error: (err: any) => {
         this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Cadastro não enviado.' },
+          { severity: 'error', summary: 'Erro', detail: 'Cadastro não enviado.', life: 3000 },
         ];
       }
     });
@@ -228,13 +197,14 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
       next: (data: any) => {
         this.equipamentosEdit = data;
         this.goToRouteEdit(id);
+        this.ngOnInit();
         this.messages = [
-          { severity: 'success', summary: 'Sucesso', detail: 'Equipamento editado com sucesso!' },
+          { severity: 'success', summary: 'Sucesso', detail: 'Equipamento editado com sucesso!', life: 3000 },
         ];
       },
       error: (err: any) => {
         this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Edição não enviada.' },
+          { severity: 'error', summary: 'Erro', detail: 'Edição não enviada.', life: 3000 },
         ];
       }
     });
@@ -255,17 +225,17 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
       this.visible = false;
       this.form.reset();
       this.ngOnInit();
-      window.location.reload();
+      // window.location.reload();
     } else if (this.form.valid && this.editar) {
       this.equipamentosEdit = this.form.value;
       this.enviarFormEdit(this.form.get('id')?.value);
       this.visible = false;
       this.form.reset();
       this.ngOnInit();
-      window.location.reload();
+      // window.location.reload();
     } else {
       this.messages = [
-        { severity: 'warn', summary: 'Atenção', detail: 'Informação inválida. Preencha os campos!' },
+        { severity: 'warn', summary: 'Atenção', detail: 'Informação inválida. Preencha os campos!', life: 3000 },
       ];
     }
   }
@@ -275,19 +245,19 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
     .subscribe({
       next: (data: any) => {
         this.messages = [
-          { severity: 'success', summary: 'Sucesso', detail: 'Registro deletado com sucesso!' },
+          { severity: 'success', summary: 'Sucesso', detail: 'Registro deletado com sucesso!', life: 3000 },
         ];
         this.ngOnInit();
-        window.location.reload();
+        // window.location.reload();
       },
       error: (err: any) => {
         if (err.status) {
           this.messages = [
-            { severity: 'error', summary: 'Erro', detail: 'Não foi possível deletar registro.' },
+            { severity: 'error', summary: 'Erro', detail: 'Não foi possível deletar registro.', life: 3000 },
           ];
         } else {
           this.messages = [
-            { severity: 'error', summary: 'Erro desconhecido', detail: err },
+            { severity: 'error', summary: 'Erro desconhecido', detail: err, life: 3000 },
           ];
           // console.log('Erro desconhecido:', err);
         }

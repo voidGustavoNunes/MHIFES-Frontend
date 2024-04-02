@@ -11,7 +11,7 @@ import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { TableModule } from 'primeng/table';
 import { PaginatorModule } from 'primeng/paginator';
 import { DialogModule } from 'primeng/dialog';
-import { ConfirmationService, Message } from 'primeng/api';
+import { ConfirmationService, Message, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ScrollTopModule } from 'primeng/scrolltop';
@@ -44,7 +44,8 @@ import { MessagesModule } from 'primeng/messages';
   styleUrl: './coordenadores-r.component.scss',
   providers: [
     CoordenadorService,
-    ConfirmationService
+    ConfirmationService,
+    MessageService
   ]
 })
 export class CoordenadoresRComponent implements OnInit, OnDestroy {
@@ -90,7 +91,7 @@ export class CoordenadoresRComponent implements OnInit, OnDestroy {
       },
       error: (err: any) => {
         this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Dados não encontrados.' },
+          { severity: 'error', summary: 'Erro', detail: 'Dados não encontrados.', life: 3000 },
         ];
       }
     });
@@ -170,7 +171,7 @@ export class CoordenadoresRComponent implements OnInit, OnDestroy {
       },
       reject: () => {
         this.messages = [
-          { severity: 'info', summary: 'Cancelado', detail: 'Exclusão cancelada.' },
+          { severity: 'info', summary: 'Cancelado', detail: 'Exclusão cancelada.', life: 3000 },
         ];
       }
     });
@@ -181,13 +182,14 @@ export class CoordenadoresRComponent implements OnInit, OnDestroy {
       next: (data: any) => {
         this.coordenadoresCadast = data;
         this.goToRouteSave();
+        this.ngOnInit();
         this.messages = [
-          { severity: 'success', summary: 'Sucesso', detail: 'Coordenador cadastrado com sucesso!' },
+          { severity: 'success', summary: 'Sucesso', detail: 'Coordenador cadastrado com sucesso!', life: 3000 },
         ];
       },
       error: (err: any) => {
         this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Cadastro não enviado.' },
+          { severity: 'error', summary: 'Erro', detail: 'Cadastro não enviado.', life: 3000 },
         ];
       }
     });
@@ -198,13 +200,14 @@ export class CoordenadoresRComponent implements OnInit, OnDestroy {
       next: (data: any) => {
         this.coordenadoresEdit = data;
         this.goToRouteEdit(id);
+        this.ngOnInit();
         this.messages = [
-          { severity: 'success', summary: 'Sucesso', detail: 'Coordenador editado com sucesso!' },
+          { severity: 'success', summary: 'Sucesso', detail: 'Coordenador editado com sucesso!', life: 3000 },
         ];
       },
       error: (err: any) => {
         this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Edição não enviada.' },
+          { severity: 'error', summary: 'Erro', detail: 'Edição não enviada.', life: 3000 },
         ];
       }
     });
@@ -225,17 +228,17 @@ export class CoordenadoresRComponent implements OnInit, OnDestroy {
       this.visible = false;
       this.form.reset();
       this.ngOnInit();
-      window.location.reload();
+      // window.location.reload();
     } else if (this.form.valid && this.editar) {
       this.coordenadoresEdit = this.form.value;
       this.enviarFormEdit(this.form.get('id')?.value);
       this.visible = false;
       this.form.reset();
       this.ngOnInit();
-      window.location.reload();
+      // window.location.reload();
     } else {
       this.messages = [
-        { severity: 'warn', summary: 'Atenção', detail: 'Informação inválida. Preencha os campos!' },
+        { severity: 'warn', summary: 'Atenção', detail: 'Informação inválida. Preencha os campos!', life: 3000 },
       ];
     }
   }
@@ -245,19 +248,18 @@ export class CoordenadoresRComponent implements OnInit, OnDestroy {
     .subscribe({
       next: (data: any) => {
         this.messages = [
-          { severity: 'success', summary: 'Sucesso', detail: 'Registro deletado com sucesso!' },
+          { severity: 'success', summary: 'Sucesso', detail: 'Registro deletado com sucesso!', life: 3000 },
         ];
         this.ngOnInit();
-        window.location.reload();
       },
       error: (err: any) => {
         if (err.status) {
           this.messages = [
-            { severity: 'error', summary: 'Erro', detail: 'Não foi possível deletar registro.' },
+            { severity: 'error', summary: 'Erro', detail: 'Não foi possível deletar registro.', life: 3000 },
           ];
         } else {
           this.messages = [
-            { severity: 'error', summary: 'Erro desconhecido', detail: err },
+            { severity: 'error', summary: 'Erro desconhecido', detail: err, life: 3000 },
           ];
           // console.log('Erro desconhecido:', err);
         }

@@ -5,9 +5,15 @@
         <a (click)="showDialog()" class="p-button botaoC">Cadastrar +</a>
         
         <div class="pesq">
+            <p-overlayPanel #op>
+                <div style="display: flex; flex-direction: column; align-items: center; gap: .5rem;">
+                    <p-dropdown [options]="filterOptions" [(ngModel)]="selectedFilter" optionLabel="nome" [showClear]="true" (ngModelChange)="updateMask()" placeholder="Selecione um filtro"></p-dropdown>
+                    <p-button label="Limpar filtro" severity="warning" (click)="limparFilter()"></p-button>
+                </div>
+            </p-overlayPanel>
             <p-inputGroup>
-                <button type="button" pButton icon="pi pi-filter-slash" (click)="limparFilter()"></button>
-                <input #searchInput type="text" pInputText placeholder="Pesquisar período por ano" (keydown)="onKeyDown($event, searchInput.value)" />
+                <button type="button" pButton (click)="op.toggle($event)" icon="pi pi-filter-fill"></button>
+                <input #searchInput type="text" pInputText [placeholder]="txtFilter" (keydown)="onKeyDown($event, searchInput.value)" />
                 <button type="button" pButton icon="pi pi-search" (click)="filterField(searchInput.value)"></button>
             </p-inputGroup>
         </div>
@@ -78,11 +84,9 @@
                     <p>A data final deve ser maior ou igual que a data de início.</p>
                 </div>
             </div>
-            <div class="divInput">
-                <span class="p-float-label">
-                    <input pInputText id="descrPer" class="form-control" formControlName="descricao" />
-                    <label for="descrPer">Descrição do período</label>
-                </span>
+            <div class="divInput labelFlex">
+                <label for="descEvent">Descrição</label>
+                <textarea pInputTextarea rows="5" cols="30" maxlength="5000" id="descEvent" class="form-control" formControlName="descricao" ></textarea>
             </div>
             <div class="divBotao">
                 <button type="submit" class="botaoSalva" *ngIf="cadastrar" pButton>Salvar</button>

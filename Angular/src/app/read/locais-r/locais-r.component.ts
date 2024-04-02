@@ -11,7 +11,7 @@ import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { TableModule } from 'primeng/table';
 import { PaginatorModule } from 'primeng/paginator';
 import { DialogModule } from 'primeng/dialog';
-import { ConfirmationService, Message } from 'primeng/api';
+import { ConfirmationService, Message, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ScrollTopModule } from 'primeng/scrolltop';
@@ -54,7 +54,8 @@ import { FiltrarPesquisa } from '../../models/share/filtrar-pesquisa.models';
   providers: [
     LocalService,
     EquipamentoService,
-    ConfirmationService
+    ConfirmationService,
+    MessageService
   ]
 })
 export class LocaisRComponent implements OnInit, OnDestroy {
@@ -96,8 +97,8 @@ export class LocaisRComponent implements OnInit, OnDestroy {
       this.form = this.formBuilder.group({
         id: [null],
         nome: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
-        capacidade: [null, Validators.required],
-        equipamentos: this.formBuilder.array([], Validators.required)
+        capacidade: [null, [Validators.required]],
+        equipamentos: this.formBuilder.array([], [Validators.required])
       });
   }
 
@@ -267,7 +268,7 @@ export class LocaisRComponent implements OnInit, OnDestroy {
       },
       reject: () => {
         this.messages = [
-          { severity: 'info', summary: 'Cancelado', detail: 'Exclusão cancelada.' },
+          { severity: 'info', summary: 'Cancelado', detail: 'Exclusão cancelada.', life: 3000 },
         ];
       }
     });
@@ -278,13 +279,14 @@ export class LocaisRComponent implements OnInit, OnDestroy {
       next: (data: any) => {
         this.locaisCadast = data;
         this.goToRouteSave();
+        this.ngOnInit();
         this.messages = [
-          { severity: 'success', summary: 'Sucesso', detail: 'Local cadastrado com sucesso!' },
+          { severity: 'success', summary: 'Sucesso', detail: 'Local cadastrado com sucesso!', life: 3000 },
         ];
       },
       error: (err: any) => {
         this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Cadastro não enviado.' },
+          { severity: 'error', summary: 'Erro', detail: 'Cadastro não enviado.', life: 3000 },
         ];
       }
     });
@@ -295,13 +297,14 @@ export class LocaisRComponent implements OnInit, OnDestroy {
       next: (data: any) => {
         this.locaisEdit = data;
         this.goToRouteEdit(id);
+        this.ngOnInit();
         this.messages = [
-          { severity: 'success', summary: 'Sucesso', detail: 'Local editado com sucesso!' },
+          { severity: 'success', summary: 'Sucesso', detail: 'Local editado com sucesso!', life: 3000 },
         ];
       },
       error: (err: any) => {
         this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Edição não enviada.' },
+          { severity: 'error', summary: 'Erro', detail: 'Edição não enviada.', life: 3000 },
         ];
       }
     });
@@ -322,17 +325,17 @@ export class LocaisRComponent implements OnInit, OnDestroy {
       this.visible = false;
       this.form.reset();
       this.ngOnInit();
-      window.location.reload();
+      // window.location.reload();
     } else if (this.form.valid && this.editar) {
       this.locaisEdit = this.form.value;
       this.enviarFormEdit(this.form.get('id')?.value);
       this.visible = false;
       this.form.reset();
       this.ngOnInit();
-      window.location.reload();
+      // window.location.reload();
     } else {
       this.messages = [
-        { severity: 'warn', summary: 'Atenção', detail: 'Informação inválida. Preencha os campos!' },
+        { severity: 'warn', summary: 'Atenção', detail: 'Informação inválida. Preencha os campos!', life: 3000 },
       ];
     }
   }
@@ -342,19 +345,19 @@ export class LocaisRComponent implements OnInit, OnDestroy {
     .subscribe({
       next: (data: any) => {
         this.messages = [
-          { severity: 'success', summary: 'Sucesso', detail: 'Registro deletado com sucesso!' },
+          { severity: 'success', summary: 'Sucesso', detail: 'Registro deletado com sucesso!', life: 3000 },
         ];
         this.ngOnInit();
-        window.location.reload();
+        // window.location.reload();
       },
       error: (err: any) => {
         if (err.status) {
           this.messages = [
-            { severity: 'error', summary: 'Erro', detail: 'Não foi possível deletar registro.' },
+            { severity: 'error', summary: 'Erro', detail: 'Não foi possível deletar registro.', life: 3000 },
           ];
         } else {
           this.messages = [
-            { severity: 'error', summary: 'Erro desconhecido', detail: err },
+            { severity: 'error', summary: 'Erro desconhecido', detail: err, life: 3000 },
           ];
         }
       }

@@ -1,10 +1,10 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Time } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { ConfirmationService, Message } from 'primeng/api';
+import { ConfirmationService, Message, MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputGroupModule } from 'primeng/inputgroup';
@@ -27,6 +27,9 @@ import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { MessagesModule } from 'primeng/messages';
 import { FiltrarPesquisa } from '../../models/share/filtrar-pesquisa.models';
 import { Semana } from '../../models/share/semana.models';
+import { registerLocaleData } from '@angular/common';
+import localePT from '@angular/common/locales/pt';
+registerLocaleData(localePT);
 
 @Component({
   selector: 'app-eventos-r',
@@ -59,13 +62,15 @@ import { Semana } from '../../models/share/semana.models';
   providers: [
     EventoService,
     LocalService,
-    ConfirmationService
+    ConfirmationService,
+    MessageService
   ]
 })
 export class EventosRComponent implements OnInit, OnDestroy {
   @ViewChild('searchInput') inputSearch!: ElementRef;
   @ViewChild('dropdown') dropdown!: Dropdown;
   @ViewChild('switch') switch!: InputSwitch;
+  @ViewChild('calendarEdit') calendarEdit!: Calendar;
   @ViewChild('calendarExtra') calendarExtra!: Calendar;
   @ViewChild('dropdownExtra') dropdownExtra!: Dropdown;
   @ViewChild('calendario') calendario!: Calendar;
@@ -102,6 +107,7 @@ export class EventosRComponent implements OnInit, OnDestroy {
 
   filterOptions: FiltrarPesquisa[] = [];
   selectedFilter!: FiltrarPesquisa;
+  txtFilter: string = 'Pesquisar evento';
 
   messages!: Message[];
   mss: boolean = false;
@@ -115,11 +121,11 @@ export class EventosRComponent implements OnInit, OnDestroy {
     ) {
       this.form = this.formBuilder.group({
         id: [null],
-        dataEvento: [null, Validators.required],
-        descricao: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
+        dataEvento: [null, [Validators.required]],
+        descricao: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(5000)]],
         horarioInicio: [null, [Validators.required]],
-        horarioFim: [null, Validators.required],
-        local: [null, Validators.required]
+        horarioFim: [null, [Validators.required]],
+        local: [null, [Validators.required]]
       }, { validator: this.verificarHoraFimMaiorQueInicio });
   }
 
@@ -135,9 +141,10 @@ export class EventosRComponent implements OnInit, OnDestroy {
     ];
 
     this.filterOptions = [
-      {nome: 'Ano do Evento', id: 0},
+      {nome: 'Data do Evento', id: 0},
       {nome: 'Descrição', id: 1},
-      {nome: 'Nome do local', id: 2}
+      {nome: 'Nome do local', id: 2},
+      {nome: 'Ano do Evento', id: 3}
     ];
 
     this.unsubscribe$ = this.eventService.listar()
@@ -145,6 +152,13 @@ export class EventosRComponent implements OnInit, OnDestroy {
       next: (itens:any) => {
         const data = itens;
         this.eventosData = data;
+        
+        data.sort((a: Evento, b: Evento) => {
+          const dateA = new Date(a.dataEvento);
+          const dateB = new Date(b.dataEvento);
+          return dateB.getTime() - dateA.getTime();
+        });
+        
         this.eventosFilter = this.eventosData;
       },
       error: (err: any) => {
@@ -199,10 +213,11 @@ export class EventosRComponent implements OnInit, OnDestroy {
     this.eventoInfo = value;
   }
 
-  showEditDialog(value: Evento) {
+  showEditDialog(value: Evento, dtEv: string) {
     this.form.reset();
     this.ehTitulo = 'Atualizar Evento'
     this.visibleEdit = true;
+    this.visibleInfo = false;
     this.cadastrar = false;
     this.editar = true;
     this.form.patchValue({
@@ -214,12 +229,16 @@ export class EventosRComponent implements OnInit, OnDestroy {
       local: value.local
     })
     this.dropdown.writeValue(value.local);
+
+    const eventoData = this.formatarDtStrDt(dtEv);
+    this.calendarEdit.writeValue(eventoData);
   }
 
   showDialog() {
     this.form.reset();
     this.ehTitulo = 'Cadastrar Evento';
     this.visible = true;
+    this.visibleInfo = false;
     this.cadastrar = true;
     this.editar = false;
     this.dropdown.writeValue(null);
@@ -254,6 +273,7 @@ export class EventosRComponent implements OnInit, OnDestroy {
       this.visibleEdit = false;
       this.form.reset();
       this.dropdown.writeValue(null);
+      this.calendarEdit.writeValue(null);
     }
   }
 
@@ -331,20 +351,34 @@ export class EventosRComponent implements OnInit, OnDestroy {
     this.eventosData = this.eventosFilter;
   }
 
+  updateMask() {
+    if (this.selectedFilter?.id == 0) {
+      this.txtFilter = '00/00/0000';
+    } else {
+      this.txtFilter = 'Pesquisar evento';
+    }
+  }
+
   searchFilter0(term: string) {
-    this.eventosData = this.eventosFilter.filter(evento => {
-      const searchTermAsNumber = parseInt(term);
-      if (!isNaN(searchTermAsNumber)) {
-        const anos = new Date(evento.dataEvento).getFullYear();
-        if (anos == searchTermAsNumber) {
-          return evento;
+    const dateTerm = this.formatarDtStrDt(term);
+    
+    if (dateTerm instanceof Date && !isNaN(dateTerm.getTime())) {
+      this.eventosData = this.eventosFilter.filter(evento => {
+        const tiparDT = evento.dataEvento;
+        if (typeof tiparDT === 'string') {
+          const tiparFormat = this.formatarDatas(tiparDT);
+          const searchTerm = this.formatarDtStrDt(tiparFormat);
+          
+          if (dateTerm.getTime() === searchTerm?.getTime()) {
+            return evento;
+          } else {
+            return null;
+          }
         } else {
           return null;
         }
-      } else {
-        return null;
-      }
-    })
+      })
+    }
   }
 
   searchFilter1(term: string) {
@@ -361,6 +395,22 @@ export class EventosRComponent implements OnInit, OnDestroy {
     this.eventosData = this.eventosFilter.filter(evento => {
       if (evento.local.nome.toLowerCase().includes(term.toLowerCase())) {
         return evento;
+      } else {
+        return null;
+      }
+    })
+  }
+
+  searchFilter3(term: string) {
+    this.eventosData = this.eventosFilter.filter(evento => {
+      const searchTermAsNumber = parseInt(term);
+      if (!isNaN(searchTermAsNumber)) {
+        const anos = new Date(evento.dataEvento).getFullYear();
+        if (anos == searchTermAsNumber) {
+          return evento;
+        } else {
+          return null;
+        }
       } else {
         return null;
       }
@@ -395,6 +445,34 @@ export class EventosRComponent implements OnInit, OnDestroy {
     }
   }
 
+  formatarHora(tempo: any) {
+    if (typeof tempo === 'string') {
+      const partes = tempo.split(':');
+      const horas = partes[0];
+      const minutos = partes[1];
+      const segundos = partes[2];
+
+      return `${horas}h ${minutos}min`;
+    }
+    return null;
+  }
+
+  formatarTmStrTm(tempo: any) {
+    if(tempo) {
+      const partes = tempo.split(':');
+      const horas =  parseInt(partes[0], 10);
+      const minutos =  parseInt(partes[1], 10) - 1;
+      
+      if (!isNaN(horas) && !isNaN(minutos) && horas >= 0 && horas <= 23 && minutos >= 0 && minutos <= 59) {
+        return { horas, minutos };
+      } else {
+        return null;
+      }
+    } else {
+      return null;
+    }
+  }
+
   onKeyDown(event: KeyboardEvent, searchTerm: string) {
     if (event.key === "Enter") {
       if (searchTerm != null || searchTerm != '') {
@@ -402,6 +480,7 @@ export class EventosRComponent implements OnInit, OnDestroy {
           if(this.selectedFilter.id == 0) this.searchFilter0(searchTerm);
           if(this.selectedFilter.id == 1) this.searchFilter1(searchTerm);
           if(this.selectedFilter.id == 2) this.searchFilter2(searchTerm);
+          if(this.selectedFilter.id == 3) this.searchFilter3(searchTerm);
         }
       }
     }
@@ -413,6 +492,7 @@ export class EventosRComponent implements OnInit, OnDestroy {
         if(this.selectedFilter.id == 0) this.searchFilter0(searchTerm);
         if(this.selectedFilter.id == 1) this.searchFilter1(searchTerm);
         if(this.selectedFilter.id == 2) this.searchFilter2(searchTerm);
+        if(this.selectedFilter.id == 3) this.searchFilter3(searchTerm);
       }
     }
   }
@@ -439,15 +519,16 @@ export class EventosRComponent implements OnInit, OnDestroy {
       next: (data: any) => {
         this.eventosCadast = data;
         this.goToRouteSave();
+        this.ngOnInit();
         if(this.mss) {
           this.messages = [
-            { severity: 'success', summary: 'Sucesso', detail: 'Evento cadastrado com sucesso!' },
+            { severity: 'success', summary: 'Sucesso', detail: 'Evento cadastrado com sucesso!', life: 3000 },
           ];
         }
       },
       error: (err: any) => {
         this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Cadastro não enviado.' },
+          { severity: 'error', summary: 'Erro', detail: 'Cadastro não enviado.', life: 3000 },
         ];
       }
     });
@@ -458,13 +539,14 @@ export class EventosRComponent implements OnInit, OnDestroy {
       next: (data: any) => {
         this.eventosEdit = data;
         this.goToRouteEdit(id);
+        this.ngOnInit();
         this.messages = [
-          { severity: 'success', summary: 'Sucesso', detail: 'Evento editado com sucesso!' },
+          { severity: 'success', summary: 'Sucesso', detail: 'Evento editado com sucesso!', life: 3000 },
         ];
       },
       error: (err: any) => {
         this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Edição não enviada.' },
+          { severity: 'error', summary: 'Erro', detail: 'Edição não enviada.', life: 3000 },
         ];
       }
     });
@@ -484,6 +566,7 @@ export class EventosRComponent implements OnInit, OnDestroy {
         this.conditionCreateSave();
       } else {
         this.eventosCadast = this.form.value;
+        this.mss = true;
         this.enviarFormSave();
       }
       this.mss = false;
@@ -491,17 +574,17 @@ export class EventosRComponent implements OnInit, OnDestroy {
       this.visibleExtra = false;
       this.form.reset();
       this.ngOnInit();
-      window.location.reload();
+      // window.location.reload();
     } else if (this.form.valid && this.editar) {
       this.eventosEdit = this.form.value;
       this.enviarFormEdit(this.form.get('id')?.value);
       this.visibleEdit = false;
       this.form.reset();
       this.ngOnInit();
-      window.location.reload();
+      // window.location.reload();
     } else {
       this.messages = [
-        { severity: 'warn', summary: 'Atenção', detail: 'Informação inválida. Preencha os campos!' },
+        { severity: 'warn', summary: 'Atenção', detail: 'Informação inválida. Preencha os campos!', life: 3000 },
       ];
     }
   }
@@ -552,15 +635,15 @@ export class EventosRComponent implements OnInit, OnDestroy {
     .subscribe({
       next: (data: any) => {
         this.messages = [
-          { severity: 'success', summary: 'Sucesso', detail: 'Registro deletado com sucesso!' },
+          { severity: 'success', summary: 'Sucesso', detail: 'Registro deletado com sucesso!', life: 3000 },
         ];
         this.ngOnInit();
-        window.location.reload();
+        // window.location.reload();
       },
       error: (err: any) => {
         if (err.status) {
           this.messages = [
-            { severity: 'error', summary: 'Erro', detail: 'Não foi possível deletar registro.' },
+            { severity: 'error', summary: 'Erro', detail: 'Não foi possível deletar registro.', life: 3000 },
           ];
         } else {
           this.messages = [

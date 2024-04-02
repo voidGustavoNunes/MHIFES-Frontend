@@ -15,12 +15,14 @@ import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { TableModule } from 'primeng/table';
 import { PaginatorModule } from 'primeng/paginator';
 import { DialogModule } from 'primeng/dialog';
-import { ConfirmationService, Message } from 'primeng/api';
+import { ConfirmationService, Message, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ScrollTopModule } from 'primeng/scrolltop';
 import { InputSwitch, InputSwitchModule } from 'primeng/inputswitch';
 import { MessagesModule } from 'primeng/messages';
+import { FiltrarPesquisa } from '../../../models/share/filtrar-pesquisa.models';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
 
 @Component({
   selector: 'app-professores-r',
@@ -42,27 +44,33 @@ import { MessagesModule } from 'primeng/messages';
     ScrollTopModule,
     ConfirmPopupModule,
     InputSwitchModule,
-    MessagesModule
+    MessagesModule,
+    OverlayPanelModule
   ],
   templateUrl: './professores-r.component.html',
   styleUrls: ['./professores-r.component.scss'],
   providers: [
     ProfessorService,
-    ConfirmationService
+    ConfirmationService,
+    MessageService
   ]
 })
 
 export class ProfessoresRComponent implements OnInit, OnDestroy {
-  @ViewChild('searchInput') inputSearch!: ElementRef;
+  @ViewChild('searchInputOri') inputSearchOri!: ElementRef;
+  @ViewChild('searchInputProf') inputSearchProf!: ElementRef;
   @ViewChild('searchTable2') searchTable2!: ElementRef;
   @ViewChild('searchTable1') searchTable1!: ElementRef;
   @ViewChild('switch') switch!: InputSwitch;
 
-  professoresNaoOrienta: Professor[] = [];
-  professoresOrientador: Professor[] = [];
-  professoresFilter: Professor[] = [];
   professoresCadast: Professor[] = [];
   professoresEdit: Professor[] = [];
+  
+  professoresFilterOri: Professor[] = [];
+  professoresNaoOrienta: Professor[] = [];
+  
+  professoresFilterProf: Professor[] = [];
+  professoresOrientador: Professor[] = [];
 
   unsubscribe$!: Subscription;
   form: FormGroup;
@@ -74,6 +82,10 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
   
   messages!: Message[];
   mss: boolean = false;
+  
+  filterOptions: FiltrarPesquisa[] = [];
+  selectedFilterOri!: FiltrarPesquisa;
+  selectedFilterProf!: FiltrarPesquisa;
 
   constructor(
     private professorService: ProfessorService,
@@ -86,30 +98,40 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
         nome: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
         matricula: [null, [Validators.required]],
         curso: [null, [Validators.required]],
-        ehCoordenador: [new FormControl<boolean>(false), Validators.required]
+        ehCoordenador: [false, [Validators.required]]
       });
   }
 
   ngOnInit() {
+    this.filterOptions = [
+      {nome: 'Nome', id: 0},
+      {nome: 'Matrícula', id: 1},
+      {nome: 'Curso', id: 2},
+    ];
+
     this.unsubscribe$ = this.professorService.listar()
     .subscribe({
       next: (itens:any) => {
-        const data = itens.sort((a:any, b:any) => (a.nome < b.nome) ? -1 : 1);;
-        this.professoresNaoOrienta = data.forEach((prf: Professor) => {
+        const data = itens.sort((a:any, b:any) => (a.nome < b.nome) ? -1 : 1);
+        this.professoresNaoOrienta = [];
+        this.professoresOrientador = [];
+
+        data.forEach((prf: Professor) => {
           if(!prf.ehCoordenador) {
             this.professoresNaoOrienta.push(prf);
+            this.professoresFilterProf.push(prf);
           }
         })
-        // this.professoresFilter = this.professoresNaoOrienta;
-        this.professoresNaoOrienta.forEach((prf: Professor) => {
+        data.forEach((prf: Professor) => {
           if(prf.ehCoordenador) {
             this.professoresOrientador.push(prf);
+            this.professoresFilterOri.push(prf);
           }
         })
       },
       error: (err: any) => {
         this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Dados não encontrados.' },
+          { severity: 'error', summary: 'Erro', detail: 'Dados não encontrados.', life: 3000 },
         ];
       }
     });
@@ -137,6 +159,9 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
 
   showDialog() {
     this.form.reset();
+    this.form.patchValue({
+      ehCoordenador: false
+    });
     this.ehTitulo = 'Cadastrar Professor';
     this.visible = true;
     this.cadastrar = true;
@@ -150,37 +175,121 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
     this.switch.writeValue(null);
   }
   
-  // limparFilter(){
-  //   const inputElement = this.inputSearch.nativeElement.value
-  //   if (inputElement) {
-  //     this.inputSearch.nativeElement.value = '';
-  //   }
-  //   this.professoresNaoOrienta = this.professoresFilter;
-  // }
+  limparFilter(tipo: string){
+    if(tipo == 'o') {
+      const inputElement = this.inputSearchOri.nativeElement.value
+      if (inputElement) {
+        this.inputSearchOri.nativeElement.value = '';
+      }
+      this.selectedFilterOri = {} as FiltrarPesquisa;
+      this.professoresOrientador = this.professoresFilterOri;
+    } else if(tipo == 'p') {
+      const inputElement = this.inputSearchProf.nativeElement.value
+      if (inputElement) {
+        this.inputSearchProf.nativeElement.value = '';
+      }
+      this.selectedFilterProf = {} as FiltrarPesquisa;
+      this.professoresNaoOrienta = this.professoresFilterProf;
+    }
+  }
 
-  // searchFilterWord(term: string) {
-  //   this.professoresNaoOrienta = this.professoresFilter.filter(el => {
-  //     if (el.nome.toLowerCase().includes(term.toLowerCase())) {
-  //       return el;
-  //     } else {
-  //       return null;
-  //     }
-  //   })
-  // }
+  searchFilter1(tipo: string, term: string) {
+    if(tipo == 'o') {
+      this.professoresOrientador = this.professoresFilterOri.filter(el => {
+        if (el.matricula.toString().toLowerCase().includes(term.toLowerCase())) {
+          return el;
+        } else {
+          return null;
+        }
+      })
+    } else if(tipo == 'p') {
+      this.professoresNaoOrienta = this.professoresFilterProf.filter(el => {
+        if (el.matricula.toString().toLowerCase().includes(term.toLowerCase())) {
+          return el;
+        } else {
+          return null;
+        }
+      })
+    }
+  }
 
-  // onKeyDown(event: KeyboardEvent, searchTerm: string) {
-  //   if (event.key === "Enter") {
-  //     if (searchTerm != null || searchTerm != '') {
-  //       this.searchFilterWord(searchTerm);
-  //     }
-  //   }
-  // }
+  searchFilter2(tipo: string, term: string) {
+    if(tipo == 'o') {
+      this.professoresOrientador = this.professoresFilterOri.filter(el => {
+        if (el.curso.toLowerCase().includes(term.toLowerCase())) {
+          return el;
+        } else {
+          return null;
+        }
+      })
+    } else if(tipo == 'p') {
+      this.professoresNaoOrienta = this.professoresFilterProf.filter(el => {
+        if (el.curso.toLowerCase().includes(term.toLowerCase())) {
+          return el;
+        } else {
+          return null;
+        }
+      })
+    }
+  }
+
+  searchFilter0(tipo: string, term: string) {
+    if(tipo == 'o') {
+      this.professoresOrientador = this.professoresFilterOri.filter(el => {
+        if (el.nome.toLowerCase().includes(term.toLowerCase())) {
+          return el;
+        } else {
+          return null;
+        }
+      })
+    } else if(tipo == 'p') {
+      this.professoresNaoOrienta = this.professoresFilterProf.filter(el => {
+        if (el.nome.toLowerCase().includes(term.toLowerCase())) {
+          return el;
+        } else {
+          return null;
+        }
+      })
+    }
+  }
+
+  onKeyDown(tipo: string, event: KeyboardEvent, searchTerm: string) {
+    if (event.key === "Enter") {
+      if (searchTerm != null || searchTerm != '') {
+        if(tipo == 'o') {
+          if(this.selectedFilterOri) {
+            if(this.selectedFilterOri.id == 0) this.searchFilter0(tipo, searchTerm);
+            if(this.selectedFilterOri.id == 1) this.searchFilter1(tipo, searchTerm);
+            if(this.selectedFilterOri.id == 2) this.searchFilter2(tipo, searchTerm);
+          }
+        } else if(tipo == 'p') {
+          if(this.selectedFilterProf) {
+            if(this.selectedFilterProf.id == 0) this.searchFilter0(tipo, searchTerm);
+            if(this.selectedFilterProf.id == 1) this.searchFilter1(tipo, searchTerm);
+            if(this.selectedFilterProf.id == 2) this.searchFilter2(tipo, searchTerm);
+          }
+        }
+      }
+    }
+  }
   
-  // filterField(searchTerm: string) {
-  //   if (searchTerm != null || searchTerm != '') {
-  //     this.searchFilterWord(searchTerm);
-  //   }
-  // }
+  filterField(tipo: string, searchTerm: string) {
+    if (searchTerm != null || searchTerm != '') {
+      if(tipo == 'o') {
+        if(this.selectedFilterOri) {
+          if(this.selectedFilterOri.id == 0) this.searchFilter0(tipo, searchTerm);
+          if(this.selectedFilterOri.id == 1) this.searchFilter1(tipo, searchTerm);
+          if(this.selectedFilterOri.id == 2) this.searchFilter2(tipo, searchTerm);
+        }
+      } else if(tipo == 'p') {
+        if(this.selectedFilterProf) {
+          if(this.selectedFilterProf.id == 0) this.searchFilter0(tipo, searchTerm);
+          if(this.selectedFilterProf.id == 1) this.searchFilter1(tipo, searchTerm);
+          if(this.selectedFilterProf.id == 2) this.searchFilter2(tipo, searchTerm);
+        }
+      }
+    }
+  }
 
   confirm2(event: Event, id: number) {
     this.confirmationService.confirm({
@@ -193,7 +302,7 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
       },
       reject: () => {
         this.messages = [
-          { severity: 'info', summary: 'Cancelado', detail: 'Exclusão cancelada.' },
+          { severity: 'info', summary: 'Cancelado', detail: 'Exclusão cancelada.', life: 3000 },
         ];
       }
     });
@@ -204,13 +313,14 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
       next: (data: any) => {
         this.professoresCadast = data;
         this.goToRouteSave();
+        this.ngOnInit();
         this.messages = [
-          { severity: 'success', summary: 'Sucesso', detail: 'Professor cadastrado com sucesso!' },
+          { severity: 'success', summary: 'Sucesso', detail: 'Professor cadastrado com sucesso!', life: 3000 },
         ];
       },
       error: (err: any) => {
         this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Cadastro não enviado.' },
+          { severity: 'error', summary: 'Erro', detail: 'Cadastro não enviado.', life: 3000 },
         ];
       }
     });
@@ -221,13 +331,14 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
       next: (data: any) => {
         this.professoresEdit = data;
         this.goToRouteEdit(id);
+        this.ngOnInit();
         this.messages = [
-          { severity: 'success', summary: 'Sucesso', detail: 'Professor editado com sucesso!' },
+          { severity: 'success', summary: 'Sucesso', detail: 'Professor editado com sucesso!', life: 3000 },
         ];
       },
       error: (err: any) => {
         this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Edição não enviada.' },
+          { severity: 'error', summary: 'Erro', detail: 'Edição não enviada.', life: 3000 },
         ];
       }
     });
@@ -249,17 +360,17 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
       this.visible = false;
       this.form.reset();
       this.ngOnInit();
-      window.location.reload();
+      // window.location.reload();
     } else if (this.form.valid && this.editar) {
       this.professoresEdit = this.form.value;
       this.enviarFormEdit(this.form.get('id')?.value);
       this.visible = false;
       this.form.reset();
       this.ngOnInit();
-      window.location.reload();
+      // window.location.reload();
     } else {
       this.messages = [
-        { severity: 'warn', summary: 'Atenção', detail: 'Informação inválida. Preencha os campos!' },
+        { severity: 'warn', summary: 'Atenção', detail: 'Informação inválida. Preencha os campos!', life: 3000 },
       ];
     }
   }
@@ -269,19 +380,19 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
     .subscribe({
       next: (data: any) => {
         this.messages = [
-          { severity: 'success', summary: 'Sucesso', detail: 'Registro deletado com sucesso!' },
+          { severity: 'success', summary: 'Sucesso', detail: 'Registro deletado com sucesso!', life: 3000 },
         ];
         this.ngOnInit();
-        window.location.reload();
+        // window.location.reload();
       },
       error: (err: any) => {
         if (err.status) {
           this.messages = [
-            { severity: 'error', summary: 'Erro', detail: 'Não foi possível deletar registro.' },
+            { severity: 'error', summary: 'Erro', detail: 'Não foi possível deletar registro.', life: 3000 },
           ];
         } else {
           this.messages = [
-            { severity: 'error', summary: 'Erro desconhecido', detail: err },
+            { severity: 'error', summary: 'Erro desconhecido', detail: err, life: 3000 },
           ];
         }
       }

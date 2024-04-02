@@ -21,6 +21,7 @@
     }
     .p-menubar .p-menubar-button{
         background-color: #BFE4FF;
+        border-radius: 0;
     }
     .p-icon path {
         fill: #256CF0;
@@ -37,6 +38,7 @@
     .p-menuitem-content:hover{
         background-color: #256CF0;
     }
+
     .p-submenu-list .p-menuitem-link{
         background-color: white;
     }
@@ -49,10 +51,26 @@
     // .p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-content:focus{
     //     background-color: rebeccapurple;
     // }
+}
 
 
-    .p-menubar .p-menubar-root-list > .p-menuitem:not(.p-highlight):not(.p-disabled):first-child > .p-menuitem-content:focus{
-        // background-color: #256CF0;
-        // background-color: #00208F;
+@media screen and (max-width: 960px) {
+    :host ::ng-deep {
+        .p-menubar{
+            flex-flow: row-reverse;
+        }
+        .p-menubar-start {
+            order: 1;
+        }
+        ul#pn_id_1 {
+            overflow-x: hidden;
+        }
+        a.p-menubar-button {
+            order: 1;
+            margin: 0 1rem;
+        }
+        .logo {
+            order: 2;
+        }
     }
 }

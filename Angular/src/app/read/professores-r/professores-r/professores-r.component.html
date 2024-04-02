@@ -23,18 +23,25 @@
         >
             <ng-template pTemplate="caption">
                 <h3>Orientadores</h3>
-                <div class="flex">
-                    <span class="p-input-icon-left ml-auto">
-                        <i class="pi pi-search"></i>
-                        <input #searchTable2 pInputText type="text" (input)="dt2.filterGlobal(searchTable2.value, 'contains')" placeholder="Pesquisar palavra-chave" />
-                    </span>
+                <div class="pesq">
+                    <p-overlayPanel #op>
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: .5rem;">
+                            <p-dropdown [options]="filterOptions" [(ngModel)]="selectedFilterOri" optionLabel="nome" [showClear]="true" placeholder="Selecione um filtro"></p-dropdown>
+                            <p-button label="Limpar filtro" severity="warning" (click)="limparFilter('o')"></p-button>
+                        </div>
+                    </p-overlayPanel>
+                    <p-inputGroup>
+                        <button type="button" pButton (click)="op.toggle($event)" icon="pi pi-filter-fill"></button>
+                        <input #searchInputOri type="text" pInputText placeholder="Pesquisar orientador" (keydown)="onKeyDown('o',$event, searchInputOri.value)" />
+                        <button type="button" pButton icon="pi pi-search" (click)="filterField('o',searchInputOri.value)"></button>
+                    </p-inputGroup>
                 </div>
             </ng-template>
             <ng-template pTemplate="header">
                 <tr class="tbHeader">
-                    <th field="nome">Nome</th>
-                    <th field="matricula">Matrícula</th>
-                    <th field="curso">Curso</th>
+                    <th>Nome</th>
+                    <th>Matrícula</th>
+                    <th>Curso</th>
                     <th></th>
                 </tr>
             </ng-template>
@@ -70,22 +77,28 @@
             [showCurrentPageReport]="true"
             currentPageReportTemplate="Mostrando do {first} ao {last} de {totalRecords} registros"
             [rowsPerPageOptions]="[10, 20, 40]"
-            [globalFilterFields]="['nome', 'matricula', 'curso']"
         >
             <ng-template pTemplate="caption">
                 <h3>Professores</h3>
-                <div class="flex">
-                    <span class="p-input-icon-left ml-auto">
-                        <i class="pi pi-search"></i>
-                        <input #searchTable1 pInputText type="text" (input)="dt1.filterGlobal(searchTable1.value, 'contains')" placeholder="Pesquisar palavra-chave" />
-                    </span>
+                <div class="pesq">
+                    <p-overlayPanel #op1>
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: .5rem;">
+                            <p-dropdown [options]="filterOptions" [(ngModel)]="selectedFilterProf" optionLabel="nome" [showClear]="true" placeholder="Selecione um filtro"></p-dropdown>
+                            <p-button label="Limpar filtro" severity="warning" (click)="limparFilter('p')"></p-button>
+                        </div>
+                    </p-overlayPanel>
+                    <p-inputGroup>
+                        <button type="button" pButton (click)="op1.toggle($event)" icon="pi pi-filter-fill"></button>
+                        <input #searchInputProf type="text" pInputText placeholder="Pesquisar professor" (keydown)="onKeyDown('p',$event, searchInputProf.value)" />
+                        <button type="button" pButton icon="pi pi-search" (click)="filterField('p',searchInputProf.value)"></button>
+                    </p-inputGroup>
                 </div>
             </ng-template>
             <ng-template pTemplate="header">
                 <tr class="tbHeader">
-                    <th field="nome">Nome</th>
-                    <th field="matricula">Matrícula</th>
-                    <th field="curso">Curso</th>
+                    <th>Nome</th>
+                    <th>Matrícula</th>
+                    <th>Curso</th>
                     <th></th>
                 </tr>
             </ng-template>
@@ -94,8 +107,6 @@
                     <td>{{professor?.nome}}</td>
                     <td>{{professor?.matricula}}</td>
                     <td>{{professor?.curso}}</td>
-                    <td *ngIf="professor.ehCoordenador == false">Não</td>
-                    <td *ngIf="professor.ehCoordenador == true">Sim</td>
                     <td>
                         <button type="button" class="botaoEdit" (click)="showEditDialog(professor)" pButton>Editar</button>
                         <p-toast></p-toast>
@@ -119,7 +130,7 @@
     <p-dialog class="pHeader" [header]=ehTitulo [(visible)]="visible" [modal]="true" [breakpoints]="{ '960px': '75vw' }" [style]="{ width: '50vw' }" [draggable]="false" [resizable]="false">
         <form id="meuFormulario" [formGroup]="form" (ngSubmit)="onSubmit()">
             <div class="divInput pSwtich">
-                <p-inputSwitch #switch id="coordProf" class="form-control"  formControlName="ehCoordenador"></p-inputSwitch>
+                <p-inputSwitch #switch id="coordProf" class="form-control" formControlName="ehCoordenador"></p-inputSwitch>
                 <label for="coordProf">É coordenador?</label>
             </div>
             <div class="divInput">

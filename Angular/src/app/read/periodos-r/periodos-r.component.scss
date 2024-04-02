@@ -114,9 +114,27 @@
     .divInput{
         width: fit-content;
         margin: 0 auto 2rem;
-        input{
+        input, textarea{
             background-color: #BFE4FF;
         }
+        textarea{
+            border: .02rem solid #D1D5DB;
+            border-radius: 6px;
+            height: 100%;
+            box-sizing: border-box;
+        }
+        textarea:hover{
+            border: .02rem solid #256CF0;
+        }
+        textarea:focus{
+            border: .02rem solid #256CF0;
+            outline: none;
+        }
+    }
+    .divInput.labelFlex{
+        display: flex;
+        flex-direction: column;
+        column-gap: 2;
     }
     .divBotao{
         width: fit-content;
@@ -149,9 +167,6 @@
     .p-calendar input{
         background-color: #BFE4FF;
     }
-    .p-dialog-content {
-        overflow-y: visible;
-    }
     .p-messages {
         width: fit-content;
         position: fixed;
@@ -180,6 +195,10 @@
     .card{
         input{
             width: 40vw;
+        }
+        textarea, .validation-error{
+            min-width: 40vw;
+            max-width: 40vw;
         }
         .divBotao{
             display: flex;
@@ -212,6 +231,10 @@
     .card{
         input{
             width: 60vw;
+        }
+        textarea, .validation-error{
+            min-width: 60vw;
+            max-width: 60vw;
         }
         .divBotao{
             display: flex;
