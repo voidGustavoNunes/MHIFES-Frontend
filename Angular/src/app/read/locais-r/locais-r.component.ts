@@ -182,6 +182,7 @@ export class LocaisRComponent implements OnInit, OnDestroy {
           // tempEquipamento.local = lc;
           this.addEquip(tempEquipamento);
         }
+        console.log(this.getEquipamento().value)
     } else {
       this.selectedQtd = [];
       this.previousSelection = [];
@@ -360,6 +361,11 @@ export class LocaisRComponent implements OnInit, OnDestroy {
 
   onSubmit() {
     if(this.selectedEquip.length > 0 && this.selectedQtd.length > 0) {
+      for (let i = this.getEquipamento().length - 1; i >= 0; i--) {
+        if (this.getEquipamento().at(i).value === null) {
+          this.getEquipamento().removeAt(i);
+        }
+      }
       if (this.form.valid && this.cadastrar) {
         this.locaisCadast = this.form.value;
         console.log(this.form.value)

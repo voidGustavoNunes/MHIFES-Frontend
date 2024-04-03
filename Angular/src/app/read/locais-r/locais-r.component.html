@@ -80,7 +80,7 @@
             </div>
             <div class="divInput">
                 <span class="p-float-label">
-                    <p-multiSelect #multiselect appendTo="body" display="chip" [showClear]="true" inputId="equipLocal" [(ngModel)]="selectedEquip" [ngModelOptions]="{standalone: true}" [options]="equipamentosData" (onChange)="onSelectEquipamentos()" optionLabel="nome" >
+                    <p-multiSelect #multiselect appendTo="body" display="chip" [showClear]="true" inputId="equipLocal" [(ngModel)]="selectedEquip" [ngModelOptions]="{standalone: true}" [options]="equipamentosData" (ngModelChange)="onSelectEquipamentos()" optionLabel="nome" >
                     </p-multiSelect>
                     <label for="equipLocal">Selecione os equipamentos</label>
                 </span>

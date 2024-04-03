@@ -381,9 +381,9 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
 
     this.multiselectEdit.writeValue(value.alunos);
     this.selectedAlunos = value.alunos;
-    value.alunos.forEach(aln => {
-      this.addAluno(aln);
-    })
+    // value.alunos.forEach(aln => {
+    //   this.addAluno(aln);
+    // })
     
     const writeEdit = this.opcaoSemana.find(ops => ops.nome == value.diaSemana);
     if (writeEdit) {
@@ -400,6 +400,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     this.editar = false;
     this.switch.writeValue(null);
     this.getAluno().clear();
+    this.selectedAlunos = [];
   }
   
   hideDialog() {
@@ -435,6 +436,9 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     if(ini && this.dataFim) {
       this.disableDrop = false;
       this.atualizarDiasSemana(this.selectedSemana.code);
+      this.form.patchValue({
+        diaSemana: this.selectedSemana.nome
+      })
     } else {
       this.disableDrop = true;
     }
@@ -815,11 +819,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   }
 
   onSubmit() {
-    if(this.cadastrar) {
-      this.form.patchValue({
-        alunos: this.selectedAlunos
-      });
-    }
+      console.log(this.form.value)
 
     if (this.form.valid && this.cadastrar && this.valor) {
       this.conditionCreateSave();
@@ -830,7 +830,6 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       this.ngOnInit();
     } else if (this.form.valid && this.editar) {
       this.alocacoesEdit = this.form.value;
-      console.log(this.form.value)
       this.enviarFormEdit(this.form.get('id')?.value);
       this.visibleEdit = false;
       this.form.reset();
