@@ -35,7 +35,6 @@
                 <tr class="tbHeader">
                     <th>Nome</th>
                     <th>Capacidade</th>
-                    <!-- <th>Equipamentos</th> -->
                     <th></th>
                 </tr>
             </ng-template>
@@ -43,7 +42,6 @@
                 <tr class="tbBody">
                     <td>{{local?.nome}}</td>
                     <td>{{local?.capacidade}}</td>
-                    <!-- <td>{{ formatarEquipamentos(local?.equipamentos) }}</td> -->
                     <td>
                         <button type="button" class="botaoInfo" (click)="showInfoDialog(local)" pButton>Info</button>
                         <button type="button" class="botaoEdit" (click)="showEditDialog(local)" pButton>Editar</button>
@@ -88,10 +86,9 @@
                 </span>
             </div>
             <div class="divInput" *ngIf="selectedEquip.length > 0">
-                <h3>Defina quantidade dos equipamentos</h3>
-                <div class="flexContainer" *ngFor="let option of selectedEquip">
-                    <b>{{ option.nome }}</b>
-                    <p-inputNumber inputId="integeronly" mode="decimal" [min]="1" [(ngModel)]="selectedQtd" [ngModelOptions]="{standalone: true}" placeholder="Quantidade"> </p-inputNumber>
+                <div class="flexContainer" *ngFor="let option of selectedEquip; index as i">
+                    <b>Quantidade de {{ option.nome }}:</b>
+                    <p-inputNumber inputId="integeronly" mode="decimal" [min]="1" [(ngModel)]="selectedQtd[i]" [ngModelOptions]="{standalone: true}" placeholder="Quantidade" (onInput)="onSelectEquipamentos()"> </p-inputNumber>
                 </div>
             </div>
             <div class="divBotao">

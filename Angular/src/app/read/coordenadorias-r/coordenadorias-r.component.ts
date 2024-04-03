@@ -53,8 +53,8 @@ export class CoordenadoriasRComponent implements OnInit, OnDestroy {
 
   coordenadoriasData: Coordenadoria[] = [];
   coordenadoriasFilter: Coordenadoria[] = [];
-  coordenadoriasCadast: Coordenadoria[] = [];
-  coordenadoriasEdit: Coordenadoria[] = [];
+  coordenadoriasCadast!: Coordenadoria;
+  coordenadoriasEdit!: Coordenadoria;
 
   unsubscribe$!: Subscription;
   form: FormGroup;
@@ -220,6 +220,7 @@ export class CoordenadoriasRComponent implements OnInit, OnDestroy {
   onSubmit() {
     if (this.form.valid && this.cadastrar) {
       this.coordenadoriasCadast = this.form.value;
+      console.log(this.form.value)
       this.enviarFormSave();
       this.visible = false;
       this.form.reset();

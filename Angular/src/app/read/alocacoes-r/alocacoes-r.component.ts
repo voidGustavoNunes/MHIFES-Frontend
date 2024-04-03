@@ -148,6 +148,8 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   disableDrop: boolean = true;
   disableSwit: boolean = true;
 
+  dtAulaCalendar!: Date;
+
   constructor(
     private alocService: AlocacaoService,
     private router: Router,
@@ -164,7 +166,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
         numAulas: [null, [Validators.required]],
         horaInicio: [null, [Validators.required]],
         horaFinal: [null, [Validators.required]],
-        turma: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(10)]],
+        turma: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(30)]],
         diaSemana: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(30)]],
         dataAula: [null, [Validators.required]],
         local: [null, [Validators.required]],
@@ -190,10 +192,10 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       {nome: 'Data da aula', id: 0},
       {nome: 'Turma', id: 1},
       {nome: 'Dia da semana', id: 2},
-      {nome: 'Disciplina', id: 3},
-      {nome: 'Local', id: 4},
-      {nome: 'Professor', id: 5},
-      {nome: 'Aluno', id: 6},
+      {nome: 'Nome da Disciplina', id: 3},
+      {nome: 'Nome do Local', id: 4},
+      {nome: 'Nome do Professor', id: 5},
+      {nome: 'Nome do Aluno', id: 6},
       {nome: 'Hora de início', id: 7},
       {nome: 'Número de aulas', id: 8},
       {nome: 'Ano da aula', id: 9}
@@ -346,14 +348,15 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     this.alocacaoInfo = valueInfo;
   }
 
-  showEditDialog(value: Alocacao) {
+  showEditDialog(value: Alocacao, dtEv: string) {
     this.form.reset();
+    this.getAluno().clear();
     this.ehTitulo = 'Atualizar Alocação'
     this.visibleEdit = true;
     this.visibleInfo = false;
     this.cadastrar = false;
     this.editar = true;
-    this.form.setValue({
+    this.form.patchValue({
       id: value.id,
       numAulas: value.numAulas,
       horaInicio: value.horaInicio,
@@ -367,15 +370,25 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       professor: value.professor,
       alunos: value.alunos,
     })
-    this.calendarEdit.writeValue(value.dataAula);
+
+    const eventoData = this.formatarDtStrDt(dtEv);
+    this.calendarEdit.writeValue(eventoData);
+    
     this.dropdownDiscEdit.writeValue(value.disciplina);
     this.dropdownPeriodoEdit.writeValue(value.periodo);
     this.dropdownLocalEdit.writeValue(value.local);
     this.dropdownProfEdit.writeValue(value.professor);
+
     this.multiselectEdit.writeValue(value.alunos);
+    this.selectedAlunos = value.alunos;
+    value.alunos.forEach(aln => {
+      this.addAluno(aln);
+    })
     
     const writeEdit = this.opcaoSemana.find(ops => ops.nome == value.diaSemana);
-    this.dropdownSemanaEdit.writeValue(writeEdit);
+    if (writeEdit) {
+      this.dropdownSemanaEdit.writeValue(writeEdit);
+    }
   }
 
   showDialog() {
@@ -386,6 +399,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     this.cadastrar = true;
     this.editar = false;
     this.switch.writeValue(null);
+    this.getAluno().clear();
   }
   
   hideDialog() {
@@ -477,6 +491,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     if (inputElement) {
       this.inputSearch.nativeElement.value = '';
     }
+    this.selectedFilter = {} as FiltrarPesquisa;
     this.alocacoesData = this.alocacoesFilter;
   }
 
@@ -719,13 +734,15 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     }
   }
 
-  calcularDiaSemana(event: any) {
-    const dataSelecionada: Date = event.value;
+  calcularDiaSemana() {
+    const dataSelecionada: Date = this.dtAulaCalendar;
     const diaDaSemana: string = this.calcularNomeDiaSemana(dataSelecionada);
-    this.form.get('diaSemana')?.setValue(diaDaSemana);
+    this.form.patchValue({
+      dataAula: dataSelecionada,
+      diaSemana: diaDaSemana
+    });
     const writeEdit = this.opcaoSemana.find(ops => ops.nome == diaDaSemana);
     this.dropdownSemanaEdit.writeValue(writeEdit);
-    console.log(diaDaSemana);
   }
 
   calcularNomeDiaSemana(data: Date): string {
@@ -798,10 +815,11 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   }
 
   onSubmit() {
-    this.form.patchValue({
-      diaSemana: this.selectedSemana.nome,
-      alunos: this.selectedAlunos
-    });
+    if(this.cadastrar) {
+      this.form.patchValue({
+        alunos: this.selectedAlunos
+      });
+    }
 
     if (this.form.valid && this.cadastrar && this.valor) {
       this.conditionCreateSave();
@@ -812,6 +830,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       this.ngOnInit();
     } else if (this.form.valid && this.editar) {
       this.alocacoesEdit = this.form.value;
+      console.log(this.form.value)
       this.enviarFormEdit(this.form.get('id')?.value);
       this.visibleEdit = false;
       this.form.reset();

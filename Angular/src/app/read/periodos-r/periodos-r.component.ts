@@ -60,12 +60,14 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
   periodosFilter: Periodo[] = [];
   periodosCadast: Periodo[] = [];
   periodosEdit: Periodo[] = [];
+  periodoInfo!: Periodo;
 
   unsubscribe$!: Subscription;
   form: FormGroup;
 
   ehTitulo: string = '';
   visible: boolean = false;
+  visibleInfo: boolean = false;
   editar: boolean = false;
   cadastrar: boolean = false;
   
@@ -139,6 +141,7 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
     this.form.reset();
     this.ehTitulo = 'Atualizar Período'
     this.visible = true;
+    this.visibleInfo = false;
     this.cadastrar = false;
     this.editar = true;
     this.form.setValue({
@@ -151,10 +154,16 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
     this.form.controls['dataInicio'].setValue(new Date(value.dataInicio));
   }
 
+  showInfoDialog(value: Periodo) {
+    this.visibleInfo = true;
+    this.periodoInfo = value;
+  }
+
   showDialog() {
     this.form.reset();
     this.ehTitulo = 'Cadastrar Período';
     this.visible = true;
+    this.visibleInfo = false;
     this.cadastrar = true;
     this.editar = false;
   }

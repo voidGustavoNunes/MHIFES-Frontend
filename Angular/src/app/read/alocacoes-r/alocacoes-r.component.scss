@@ -86,7 +86,7 @@
             }
             .botaoEdit{
                 @include themeButton(#FFDD77, #846406);
-                margin-right: .5rem;
+                margin: 0 .5rem;
             }
             .botaoDele{
                 @include themeButton(#FF8381, #89041E);
@@ -106,9 +106,14 @@
         .dtAlocacao{
             text-transform: capitalize;
         }
-        .divInput .flexContainer{
+        .divInput.dtAlocacao.flexContainer{
             display: flex;
-            justify-content: space-between;
+        }
+        .divInput.flexContainer{
+            display: flex;
+        }
+        .flexContainer > div:not(.lastDiv) {
+            margin-right: 2rem;
         }
     }
     #meuFormulario{

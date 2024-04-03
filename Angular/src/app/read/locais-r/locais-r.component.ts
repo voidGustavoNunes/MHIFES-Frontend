@@ -16,7 +16,7 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ScrollTopModule } from 'primeng/scrolltop';
 import { LocalService } from '../../service/local.service';
-import { Local } from '../../models/local.models';
+import { Local, LocalDTO, LocalEquipamento } from '../../models/local.models';
 import { EquipamentoService } from '../../service/equipamento.service';
 import { Equipamento } from '../../models/equipamento.models';
 import { InputNumberModule } from 'primeng/inputnumber';
@@ -24,7 +24,6 @@ import { MultiSelect, MultiSelectModule } from 'primeng/multiselect';
 import { MessagesModule } from 'primeng/messages';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { FiltrarPesquisa } from '../../models/share/filtrar-pesquisa.models';
-import { LocalEquipMultiSelect, LocalEquipamento } from '../../models/local-equipamento.models';
 
 @Component({
   selector: 'app-locais-r',
@@ -66,13 +65,15 @@ export class LocaisRComponent implements OnInit, OnDestroy {
   locaisData: Local[] = [];
   locaisFilter: Local[] = [];
   locaisCadast!: Local;
-  locaisEdit: Local[] = [];
+  locaisEdit!: Local;
+  localCadEdit!: Local;
   
   equipamentosData: Equipamento[] = [];
   selectedEquipLocal: LocalEquipamento[] = [];
   selectedEquip: Equipamento[]=[];
   selectedQtd: number[]=[];
   previousSelection: Equipamento[]=[];
+  // localBodyDto!: LocalDTO;
   
   unsubscribe$!: Subscription;
   unsubscribe$EQ!: Subscription;
@@ -103,7 +104,7 @@ export class LocaisRComponent implements OnInit, OnDestroy {
         id: [null],
         nome: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
         capacidade: [null, [Validators.required]],
-        localEquipamentos: this.formBuilder.array([])
+        localEquipamentos: this.formBuilder.array([], [Validators.required])
       });
   }
 
@@ -152,26 +153,15 @@ export class LocaisRComponent implements OnInit, OnDestroy {
 
   addEquip(equip: LocalEquipamento) {
     this.getEquipamento().push(new FormControl(equip));
-    console.log('add => ',this.getEquipamento())
   }
 
-  // onEquipamentosChange(event: any) {
-  //   this.getEquipamento().clear();
-  //   // console.log('clear => ',this.getEquipamento())
-
-  //   event.value.forEach((equip: Equipamento) => {
-  //     this.addEquip(equip);
-  //   });
-  // }
-
   onSelectEquipamentos() {
+    console.log(this.selectedQtd)
     if(this.selectedEquip.length > 0) {
-      console.log('prim ',this.selectedEquip.length)
-      console.log('seg ',this.previousSelection.length)
+      this.getEquipamento().clear();
+      
       const removedItems = this.previousSelection.filter(item => !this.selectedEquip.includes(item));
       const removedItemIndices = removedItems.map(item => this.previousSelection.indexOf(item));
-      
-      console.log('Índices dos itens removidos:', removedItemIndices);
       
       removedItemIndices.forEach(index => {
         if (index !== -1) {
@@ -179,9 +169,23 @@ export class LocaisRComponent implements OnInit, OnDestroy {
         }
       });
       this.previousSelection = this.selectedEquip;
+      
+      const lc: Local = this.form.value;
+        for (let i = 0; i < this.selectedEquip.length; i++) {
+          const tempEquipamento: LocalEquipamento = {
+            id: null,
+            local: lc,
+            equipamento:this.selectedEquip[i],
+            quantidade:this.selectedQtd[i]
+          };
+          // lc.localEquipamentos.push(tempEquipamento);
+          // tempEquipamento.local = lc;
+          this.addEquip(tempEquipamento);
+        }
     } else {
       this.selectedQtd = [];
       this.previousSelection = [];
+      this.getEquipamento().clear();
     }
   }
 
@@ -197,22 +201,32 @@ export class LocaisRComponent implements OnInit, OnDestroy {
     this.cadastrar = false;
     this.editar = true;
     
+    this.clearSelect();
+
     this.form.patchValue({
       id: value.id,
       nome: value.nome,
       capacidade: value.capacidade,
-      equipamentos: value.localEquipamentos
+      localEquipamentos: value.localEquipamentos
     });
+
+    this.previousSelection = value.localEquipamentos
+      .filter(le => le.equipamento !== null)
+      .map(le => le.equipamento as Equipamento);
+
+    this.selectedEquip = value.localEquipamentos
+      .filter(le => le.equipamento !== null)
+      .map(le => le.equipamento as Equipamento);
+
+    this.selectedQtd = value.localEquipamentos
+      .filter(le => le.quantidade !== null)
+      .map(le => le.quantidade as number);
     
-    this.previousSelection = [];
-    const arrayEquip = value.localEquipamentos?.forEach(le => {
-      this.previousSelection.push(le.equipamento);
-      return le.equipamento;
+    value.localEquipamentos.map(le=>{
+      this.addEquip(le)
     });
-    this.multiselect.writeValue(arrayEquip);
-    this.selectedEquipLocal = [];
-    this.selectedEquip = [];
-    this.selectedQtd = [];
+
+    this.multiselect.writeValue(value.localEquipamentos.map(le => le.equipamento));
   }
 
   showDialog() {
@@ -222,9 +236,7 @@ export class LocaisRComponent implements OnInit, OnDestroy {
     this.cadastrar = true;
     this.editar = false;
     this.multiselect.writeValue(null);
-    this.selectedEquipLocal = [];
-    this.selectedEquip = [];
-    this.selectedQtd = [];
+    this.clearSelect();
   }
   
   hideDialog() {
@@ -284,16 +296,6 @@ export class LocaisRComponent implements OnInit, OnDestroy {
     }
   }
 
-  formatarEquipamentos(equip: Equipamento[]): string {
-    if (equip.length === 0) {
-      return 'Erro! Equipamento não encontrados.';
-    }
-  
-    let formattedString = equip.map(equipamento => equipamento.nome).join(', ');
-  
-    return formattedString;
-  }
-
   confirm2(event: Event, id: number) {
     this.confirmationService.confirm({
       target: event.target as EventTarget,
@@ -312,7 +314,7 @@ export class LocaisRComponent implements OnInit, OnDestroy {
   }
 
   enviarFormSave() {
-    this.locService.criar(this.locaisCadast, this.selectedEquip, this.selectedEquipLocal).subscribe({
+    this.locService.criar(this.locaisCadast).subscribe({
       next: (data: any) => {
         this.locaisCadast = data;
         this.goToRouteSave();
@@ -341,7 +343,8 @@ export class LocaisRComponent implements OnInit, OnDestroy {
       },
       error: (err: any) => {
         this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Edição não enviada.', life: 3000 },
+          { severity: 'error', summary: 'Erro', detail: err, life: 3000 },
+          // { severity: 'error', summary: 'Erro', detail: 'Edição não enviada.', life: 3000 },
         ];
       }
     });
@@ -356,31 +359,29 @@ export class LocaisRComponent implements OnInit, OnDestroy {
   }
 
   onSubmit() {
-    for (let i = 0; i < this.selectedEquip.length; i++) {
-      const arrayTerm = {
-        id: 0,
-        local: this.locaisCadast,
-        equipamento: this.selectedEquip[i],
-        quantidade: this.selectedQtd[i],
-      };
-      this.addEquip(arrayTerm);
-    }
-    console.log(this.form.value)
+    if(this.selectedEquip.length > 0 && this.selectedQtd.length > 0) {
+      if (this.form.valid && this.cadastrar) {
+        this.locaisCadast = this.form.value;
+        console.log(this.form.value)
+        this.enviarFormSave();
+        this.visible = false;
+        this.form.reset();
+        this.clearSelect();
+        this.ngOnInit();
+      } else if (this.form.valid && this.editar) {
+        this.locaisEdit = this.form.value;
+        console.log(this.form.value)
 
-    if (this.form.valid && this.cadastrar) {
-      this.locaisCadast = this.form.value;
-      this.enviarFormSave();
-      this.visible = false;
-      this.form.reset();
-      this.ngOnInit();
-      // window.location.reload();
-    } else if (this.form.valid && this.editar) {
-      this.locaisEdit = this.form.value;
-      this.enviarFormEdit(this.form.get('id')?.value);
-      this.visible = false;
-      this.form.reset();
-      this.ngOnInit();
-      // window.location.reload();
+        this.enviarFormEdit(this.form.get('id')?.value);
+        this.visible = false;
+        this.form.reset();
+        this.clearSelect();
+        this.ngOnInit();
+      } else {
+        this.messages = [
+          { severity: 'warn', summary: 'Atenção', detail: 'Informação inválida. Preencha os campos!', life: 3000 },
+        ];
+      }
     } else {
       this.messages = [
         { severity: 'warn', summary: 'Atenção', detail: 'Informação inválida. Preencha os campos!', life: 3000 },
@@ -388,14 +389,22 @@ export class LocaisRComponent implements OnInit, OnDestroy {
     }
   }
 
+  clearSelect() {
+    this.previousSelection = [];
+    this.selectedEquip = [];
+    this.selectedEquipLocal = [];
+    this.selectedQtd = [];
+    this.getEquipamento().clear();
+  }
+
   deletarID(id: number) {
     this.locService.excluir(id)
     .subscribe({
       next: (data: any) => {
+        this.ngOnInit();
         this.messages = [
           { severity: 'success', summary: 'Sucesso', detail: 'Registro deletado com sucesso!', life: 3000 },
         ];
-        this.ngOnInit();
         // window.location.reload();
       },
       error: (err: any) => {

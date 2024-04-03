@@ -17,11 +17,11 @@ export class CoordenadoriaService {
     return this.http.get<Coordenadoria>(`${this.API}/${id}`);
   }
 
-  criar(record: Coordenadoria[]): Observable<Object> {
+  criar(record: Coordenadoria): Observable<Object> {
     return this.http.post(`${this.API}`, record);
   }
 
-  atualizar(id: number, record: Coordenadoria[]): Observable<Object> {
+  atualizar(id: number, record: Coordenadoria): Observable<Object> {
     return this.http.put(`${this.API}/${id}`, record);
   }
 
