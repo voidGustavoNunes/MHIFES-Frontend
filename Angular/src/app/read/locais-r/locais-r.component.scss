@@ -109,6 +109,12 @@
             background-color: #BFE4FF;
         }
     }
+    .flexContainer{
+        display: flex;
+        flex-flow: column;
+        align-items: center;
+        gap: 1rem;
+    }
     .divBotao{
         width: fit-content;
         margin: 0 auto 2rem;
@@ -143,18 +149,21 @@
     .p-inputnumber-input, .p-multiselect{
         background-color: #BFE4FF;
     }
-    .p-dialog .p-multiselect-panel{
-        z-index: 10000;
-        position: absolute;
-        overflow-y: auto;
+    .p-multiselect{
+        min-height: 2.875rem;
     }
     .p-messages {
         width: fit-content;
         position: fixed;
-        bottom: 1.25rem;
+        top: 1.25rem;
         right: 1.25rem;
         z-index: 11000;
     }
+    // .p-multiselect-panel .p-multiselect-items .p-multiselect-item > .flexContainer{
+    //     display: flex;
+    //     align-items: center;
+    //     gap: 1rem;
+    // }
 }
 
 @media screen and (min-width: 686px) {
@@ -181,9 +190,6 @@
     :host ::ng-deep {
         .p-inputnumber-input, .p-multiselect, .p-multiselect-panel{
             width: 40vw;
-        }
-        .p-dialog-content .p-multiselect-panel{
-            overflow-y: visible;
         }
     }
 }

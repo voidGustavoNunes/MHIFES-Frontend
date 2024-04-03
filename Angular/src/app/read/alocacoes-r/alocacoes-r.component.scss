@@ -13,10 +13,10 @@
         text-transform: uppercase;
         margin-top: 2rem;
     }
-    .dtEvento{
+    .dtAlocacao{
         text-transform: capitalize;
     }
-    
+
     .opcao{
         margin-top: 3rem;
         .botaoC{
@@ -36,7 +36,6 @@
         }
 
         .pesq{
-            display: flex;
             input{
                 background-color: #BFE4FF;
                 box-shadow: 0 .2rem .2rem rgba(0, 0, 0, 0.26);
@@ -87,7 +86,7 @@
             }
             .botaoEdit{
                 @include themeButton(#FFDD77, #846406);
-                margin: 0 .5rem;
+                margin-right: .5rem;
             }
             .botaoDele{
                 @include themeButton(#FF8381, #89041E);
@@ -104,8 +103,12 @@
         .divInput{
             margin: 2rem 0;
         }
-        .dtEvento{
+        .dtAlocacao{
             text-transform: capitalize;
+        }
+        .divInput .flexContainer{
+            display: flex;
+            justify-content: space-between;
         }
     }
     #meuFormulario{
@@ -130,9 +133,17 @@
             background-color: #BFE4FF;
         }
         textarea{
+            border: .02rem solid #D1D5DB;
             border-radius: 6px;
             height: 100%;
             box-sizing: border-box;
+        }
+        textarea:hover{
+            border: .02rem solid #256CF0;
+        }
+        textarea:focus{
+            border: .02rem solid #256CF0;
+            outline: none;
         }
     }
     .divInput.labelFlex{
@@ -141,6 +152,8 @@
         column-gap: 2;
     }
     .divBotao{
+        width: fit-content;
+        margin: 5rem auto 0;
         button{
             padding-left: 4rem;
             padding-right: 4rem;
@@ -148,11 +161,11 @@
         button:active{
             box-shadow: none;
         }
-        .botaoInfo{
-            @include themeButton(#A2FF7F, #1E8805);
-        }
         .botaoSalva{
             @include themeButton();
+        }
+        .botaoInfo{
+            @include themeButton(#A2FF7F, #1E8805);
         }
         .botaoEdit{
             @include themeButton(#FFDD77, #846406);
@@ -172,22 +185,6 @@
     .p-calendar input{
         background-color: #BFE4FF;
     }
-    .card .p-dropdown, .p-inputmask{
-        background-color: #BFE4FF;
-    }
-    .p-dropdown-panel{
-        z-index: 10000;
-        position: absolute;
-        overflow-y: auto;
-    }
-    .p-inputswitch{
-        margin-right: 1rem;
-    }
-    .divInput.pSwtich{
-        display: flex;
-        align-items: center;
-        margin: 0 auto 1rem;
-    }
     .p-messages {
         width: fit-content;
         position: fixed;
@@ -195,13 +192,14 @@
         right: 1.25rem;
         z-index: 11000;
     }
-
-    // .ng-trigger.ng-trigger-overlayAnimation.ng-tns-c3632051545-2.p-datepicker.p-component.ng-star-inserted {
-    //     // margin-top: 310px;
-    // }
-    // .ng-trigger.ng-trigger-overlayAnimation.ng-tns-c3632051545-3.p-datepicker.p-component.ng-star-inserted {
-    //     // margin-top: 380px;
-    // }
+    .card .p-dropdown, .p-multiselect, .p-inputnumber-input{
+        background-color: #BFE4FF;
+    }
+    .divInput.pSwtich{
+        display: flex;
+        align-items: center;
+        margin: 0 auto 1rem;
+    }
 }
 
 @media screen and (min-width: 686px) {
@@ -224,15 +222,8 @@
         }
         .divBotao{
             display: flex;
-            width: fit-content;
-            margin: 5rem auto 0;
             .botaoSalva, .botaoEdit{
                 margin-right: 5rem;
-            }
-        }
-        .divBotao.replica{
-            .botaoSalva{
-                margin-right: 0;
             }
         }
     }
@@ -240,7 +231,7 @@
         .p-calendar input{
             width: 40vw;
         }
-        .card .p-dropdown, .p-inputmask{
+        .card .p-dropdown, .p-multiselect, .p-inputnumber{
             width: 40vw;
         }
     }
@@ -261,7 +252,6 @@
         }
     }
     .card{
-
         input{
             width: 60vw;
         }
@@ -272,8 +262,6 @@
         .divBotao{
             display: flex;
             flex-direction: column;
-            width: fit-content;
-            margin: 3rem auto 0;
             .botaoSalva, .botaoEdit{
                 margin-bottom: 1rem;
             }
@@ -283,7 +271,7 @@
         .p-calendar input{
             width: 60vw;
         }
-        .card .p-dropdown, .p-inputmask{
+        .card .p-dropdown, .p-multiselect, .p-inputnumber{
             width: 60vw;
         }
     }

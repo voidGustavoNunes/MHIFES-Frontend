@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Local } from '../models/local.models';
+import { Equipamento } from '../models/equipamento.models';
+import { LocalEquipamento } from '../models/local-equipamento.models';
 
 @Injectable()
 export class LocalService {
@@ -17,7 +19,12 @@ export class LocalService {
     return this.http.get<Local>(`${this.API}/${id}`);
   }
 
-  criar(record: Local[]): Observable<Object> {
+  criar(local: Local, equipamentos: Equipamento[], localEquipamentos: LocalEquipamento[]): Observable<Object> {
+    const record = {
+      local: local,
+      equipamentos: equipamentos,
+      localEquipamentos: localEquipamentos
+    };
     return this.http.post(`${this.API}`, record);
   }
 

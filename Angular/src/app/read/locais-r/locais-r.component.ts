@@ -24,6 +24,7 @@ import { MultiSelect, MultiSelectModule } from 'primeng/multiselect';
 import { MessagesModule } from 'primeng/messages';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { FiltrarPesquisa } from '../../models/share/filtrar-pesquisa.models';
+import { LocalEquipMultiSelect, LocalEquipamento } from '../../models/local-equipamento.models';
 
 @Component({
   selector: 'app-locais-r',
@@ -64,10 +65,14 @@ export class LocaisRComponent implements OnInit, OnDestroy {
 
   locaisData: Local[] = [];
   locaisFilter: Local[] = [];
-  locaisCadast: Local[] = [];
+  locaisCadast!: Local;
   locaisEdit: Local[] = [];
   
   equipamentosData: Equipamento[] = [];
+  selectedEquipLocal: LocalEquipamento[] = [];
+  selectedEquip: Equipamento[]=[];
+  selectedQtd: number[]=[];
+  previousSelection: Equipamento[]=[];
   
   unsubscribe$!: Subscription;
   unsubscribe$EQ!: Subscription;
@@ -98,7 +103,7 @@ export class LocaisRComponent implements OnInit, OnDestroy {
         id: [null],
         nome: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
         capacidade: [null, [Validators.required]],
-        equipamentos: this.formBuilder.array([], [Validators.required])
+        localEquipamentos: this.formBuilder.array([])
       });
   }
 
@@ -142,21 +147,42 @@ export class LocaisRComponent implements OnInit, OnDestroy {
   }
 
   getEquipamento(): FormArray {
-    return this.form.get('equipamentos') as FormArray;
+    return this.form.get('localEquipamentos') as FormArray;
   }
 
-  addEquip(equip: Equipamento) {
+  addEquip(equip: LocalEquipamento) {
     this.getEquipamento().push(new FormControl(equip));
-    // console.log('add => ',this.getEquipamento())
+    console.log('add => ',this.getEquipamento())
   }
 
-  onEquipamentosChange(event: any) {
-    this.getEquipamento().clear();
-    // console.log('clear => ',this.getEquipamento())
+  // onEquipamentosChange(event: any) {
+  //   this.getEquipamento().clear();
+  //   // console.log('clear => ',this.getEquipamento())
 
-    event.value.forEach((equip: Equipamento) => {
-      this.addEquip(equip);
-    });
+  //   event.value.forEach((equip: Equipamento) => {
+  //     this.addEquip(equip);
+  //   });
+  // }
+
+  onSelectEquipamentos() {
+    if(this.selectedEquip.length > 0) {
+      console.log('prim ',this.selectedEquip.length)
+      console.log('seg ',this.previousSelection.length)
+      const removedItems = this.previousSelection.filter(item => !this.selectedEquip.includes(item));
+      const removedItemIndices = removedItems.map(item => this.previousSelection.indexOf(item));
+      
+      console.log('Índices dos itens removidos:', removedItemIndices);
+      
+      removedItemIndices.forEach(index => {
+        if (index !== -1) {
+          this.selectedQtd.splice(index, 1);
+        }
+      });
+      this.previousSelection = this.selectedEquip;
+    } else {
+      this.selectedQtd = [];
+      this.previousSelection = [];
+    }
   }
 
   showInfoDialog(value: Local) {
@@ -175,10 +201,18 @@ export class LocaisRComponent implements OnInit, OnDestroy {
       id: value.id,
       nome: value.nome,
       capacidade: value.capacidade,
-      equipamentos: value.equipamentos
+      equipamentos: value.localEquipamentos
     });
-
-    this.multiselect.writeValue(value.equipamentos)
+    
+    this.previousSelection = [];
+    const arrayEquip = value.localEquipamentos?.forEach(le => {
+      this.previousSelection.push(le.equipamento);
+      return le.equipamento;
+    });
+    this.multiselect.writeValue(arrayEquip);
+    this.selectedEquipLocal = [];
+    this.selectedEquip = [];
+    this.selectedQtd = [];
   }
 
   showDialog() {
@@ -188,6 +222,9 @@ export class LocaisRComponent implements OnInit, OnDestroy {
     this.cadastrar = true;
     this.editar = false;
     this.multiselect.writeValue(null);
+    this.selectedEquipLocal = [];
+    this.selectedEquip = [];
+    this.selectedQtd = [];
   }
   
   hideDialog() {
@@ -217,8 +254,8 @@ export class LocaisRComponent implements OnInit, OnDestroy {
 
   searchFilter1(term: string) {
     this.locaisData = this.locaisFilter.filter(local => {
-      local.equipamentos.filter(equip =>{
-        if (equip.nome.toLowerCase().includes(term.toLowerCase())) {
+      local.localEquipamentos?.filter(equip =>{
+        if (equip.equipamento?.nome.toLowerCase().includes(term.toLowerCase())) {
           return local;
         } else {
           return null;
@@ -275,7 +312,7 @@ export class LocaisRComponent implements OnInit, OnDestroy {
   }
 
   enviarFormSave() {
-    this.locService.criar(this.locaisCadast).subscribe({
+    this.locService.criar(this.locaisCadast, this.selectedEquip, this.selectedEquipLocal).subscribe({
       next: (data: any) => {
         this.locaisCadast = data;
         this.goToRouteSave();
@@ -319,6 +356,17 @@ export class LocaisRComponent implements OnInit, OnDestroy {
   }
 
   onSubmit() {
+    for (let i = 0; i < this.selectedEquip.length; i++) {
+      const arrayTerm = {
+        id: 0,
+        local: this.locaisCadast,
+        equipamento: this.selectedEquip[i],
+        quantidade: this.selectedQtd[i],
+      };
+      this.addEquip(arrayTerm);
+    }
+    console.log(this.form.value)
+
     if (this.form.valid && this.cadastrar) {
       this.locaisCadast = this.form.value;
       this.enviarFormSave();

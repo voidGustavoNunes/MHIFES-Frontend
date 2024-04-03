@@ -11,6 +11,7 @@ import { CoordenadoresRComponent } from './read/coordenadores-r/coordenadores-r/
 import { EventosRComponent } from './read/eventos-r/eventos-r.component';
 import { LocaisRComponent } from './read/locais-r/locais-r.component';
 import { CoordenadoriasRComponent } from './read/coordenadorias-r/coordenadorias-r.component';
+import { AlocacoesRComponent } from './read/alocacoes-r/alocacoes-r.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -26,4 +27,5 @@ export const routes: Routes = [
     { path: 'coordenadorias', component: CoordenadoriasRComponent },
     { path: 'eventos', component: EventosRComponent },
     { path: 'locais', component: LocaisRComponent },
+    { path: 'alocacoes', component: AlocacoesRComponent }
 ];

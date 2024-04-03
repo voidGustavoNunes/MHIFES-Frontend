@@ -81,10 +81,18 @@
                 </span>
             </div>
             <div class="divInput">
-                <span class="p-float-label" formArrayName="equipamentos">
-                    <p-multiSelect #multiselect appendTo="body" inputId="equipLocal" display="chip" [options]="equipamentosData" optionLabel="nome" (onChange)="onEquipamentosChange($event)" ></p-multiSelect>
+                <span class="p-float-label">
+                    <p-multiSelect #multiselect appendTo="body" display="chip" [showClear]="true" inputId="equipLocal" [(ngModel)]="selectedEquip" [ngModelOptions]="{standalone: true}" [options]="equipamentosData" (onChange)="onSelectEquipamentos()" optionLabel="nome" >
+                    </p-multiSelect>
                     <label for="equipLocal">Selecione os equipamentos</label>
                 </span>
+            </div>
+            <div class="divInput" *ngIf="selectedEquip.length > 0">
+                <h3>Defina quantidade dos equipamentos</h3>
+                <div class="flexContainer" *ngFor="let option of selectedEquip">
+                    <b>{{ option.nome }}</b>
+                    <p-inputNumber inputId="integeronly" mode="decimal" [min]="1" [(ngModel)]="selectedQtd" [ngModelOptions]="{standalone: true}" placeholder="Quantidade"> </p-inputNumber>
+                </div>
             </div>
             <div class="divBotao">
                 <button type="submit" class="botaoSalva" *ngIf="cadastrar" pButton>Salvar</button>
@@ -106,9 +114,9 @@
             </div>
             <div class="divInput">
                 <b>Equipamentos:</b>
-                <ul *ngFor="let equip of localInfo?.equipamentos">
+                <ul *ngFor="let equip of localInfo?.localEquipamentos">
                     <li>
-                        {{equip?.nome}} - <b>Quantidade: </b> <!--{{quantidade}}-->
+                        {{equip?.equipamento?.nome}} - <b>Quantidade: </b> {{equip.quantidade}}
                     </li>
                 </ul>
             </div>

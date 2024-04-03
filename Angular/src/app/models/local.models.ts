@@ -1,8 +1,8 @@
-import { Equipamento } from "./equipamento.models";
+import { LocalEquipamento } from "./local-equipamento.models";
 
 export interface Local {
     id: number;
     nome: string;
     capacidade: number;
-    equipamentos: Array<Equipamento>;
+    localEquipamentos: Array<LocalEquipamento>;
 }

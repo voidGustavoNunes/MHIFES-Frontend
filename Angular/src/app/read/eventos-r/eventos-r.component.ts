@@ -591,22 +591,12 @@ export class EventosRComponent implements OnInit, OnDestroy {
 
   conditionCreateSave() {
     if(this.diasIntervalo) {
-      let ini: Date = this.form.get('dataEvento')?.value;
-      
       //  DATA INÍCIO
       this.eventosCadast = this.form.value;
       this.enviarFormSave();
       
       //  DATAS INTERVALO
-      this.diasIntervalo.forEach((dt: Date) => {
-        if(dt != ini && dt != this.dataFim) {
-          this.form.patchValue({
-            dataEvento: dt
-          });
-          this.eventosCadast = this.form.value;
-          this.enviarFormSave();
-        }
-      });
+      this.formatarDtIntervalo();
 
       // DATA FIM
       this.form.patchValue({
@@ -627,6 +617,34 @@ export class EventosRComponent implements OnInit, OnDestroy {
       this.eventosCadast = this.form.value;
       this.mss = true;
       this.enviarFormSave();
+    }
+  }
+  
+  formatarDtIntervalo() {
+    let ini: Date = this.form.get('dataEvento')?.value;
+    let fim: Date = this.dataFim;
+
+    if (typeof ini === 'string' && typeof fim === 'string') {
+      const iniFormat = this.formatarDtStrDt(ini);
+      const fimFormat = this.formatarDtStrDt(fim);
+      if ((iniFormat instanceof Date && !isNaN(iniFormat.getTime())) && (fimFormat instanceof Date && !isNaN(fimFormat.getTime()))) {
+        
+        this.diasIntervalo.forEach((dt: Date) => {
+          const tiparDT = dt;
+          if (typeof tiparDT === 'string') {
+            const tiparFormat = this.formatarDatas(tiparDT);
+            const dtFormat = this.formatarDtStrDt(tiparFormat);
+            
+            if(dtFormat?.getTime() != iniFormat.getTime() && dtFormat?.getTime() != fimFormat.getTime()) {
+              this.form.patchValue({
+                dataEvento: dt
+              });
+              this.eventosCadast = this.form.value;
+              this.enviarFormSave();
+            }
+          }
+        });
+      }
     }
   }
 

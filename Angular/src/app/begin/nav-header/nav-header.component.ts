@@ -108,6 +108,10 @@ export class NavHeaderComponent implements OnInit {
             label: 'Eventos',
             routerLink:'eventos',
           },
+          {
+            label: 'Alocações',
+            routerLink:'alocacoes',
+          }
         ]
       }
     ]

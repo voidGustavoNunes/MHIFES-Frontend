@@ -84,8 +84,8 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
     ) {
       this.form = this.formBuilder.group({
         id: [null],
-        dataInicio: [null],
-        dataFim: [null],
+        dataInicio: [null, [Validators.required]],
+        dataFim: [null, [Validators.required]],
         descricao: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(5000)]]
       }, { validator: this.validarDatas });
   }
