@@ -877,33 +877,33 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     }
   }
 
-  formatarDtIntervalo() {
-    const ini: Date = this.form.get('dataAula')?.value;
-    const fim: Date = this.dataFim;
+  // formatarDtIntervalo() {
+  //   const ini: Date = this.form.get('dataAula')?.value;
+  //   const fim: Date = this.dataFim;
 
-    if (typeof ini === 'string' && typeof fim === 'string') {
-      const iniFormat = this.formatarDtStrDt(ini);
-      const fimFormat = this.formatarDtStrDt(fim);
-      if ((iniFormat instanceof Date && !isNaN(iniFormat.getTime())) && (fimFormat instanceof Date && !isNaN(fimFormat.getTime()))) {
+  //   if (typeof ini === 'string' && typeof fim === 'string') {
+  //     const iniFormat = this.formatarDtStrDt(ini);
+  //     const fimFormat = this.formatarDtStrDt(fim);
+  //     if ((iniFormat instanceof Date && !isNaN(iniFormat.getTime())) && (fimFormat instanceof Date && !isNaN(fimFormat.getTime()))) {
         
-        this.diasIntervalo.forEach((dt: Date) => {
-          const tiparDT = dt;
-          if (typeof tiparDT === 'string') {
-            const tiparFormat = this.formatarDatas(tiparDT);
-            const dtFormat = this.formatarDtStrDt(tiparFormat);
+  //       this.diasIntervalo.forEach((dt: Date) => {
+  //         const tiparDT = dt;
+  //         if (typeof tiparDT === 'string') {
+  //           const tiparFormat = this.formatarDatas(tiparDT);
+  //           const dtFormat = this.formatarDtStrDt(tiparFormat);
             
-            if(dtFormat?.getTime() != iniFormat.getTime() && dtFormat?.getTime() != fimFormat.getTime()) {
-              this.form.patchValue({
-                dataAula: dt
-              });
-              this.alocacoesCadast = this.form.value;
-              this.enviarFormSave();
-            }
-          }
-        });
-      }
-    }
-  }
+  //           if(dtFormat?.getTime() != iniFormat.getTime() && dtFormat?.getTime() != fimFormat.getTime()) {
+  //             this.form.patchValue({
+  //               dataAula: dt
+  //             });
+  //             this.alocacoesCadast = this.form.value;
+  //             this.enviarFormSave();
+  //           }
+  //         }
+  //       });
+  //     }
+  //   }
+  // }
 
   deletarID(id: number) {
     this.alocService.excluir(id)

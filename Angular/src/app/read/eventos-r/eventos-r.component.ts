@@ -612,12 +612,14 @@ export class EventosRComponent implements OnInit, OnDestroy {
       });
 
       // DATA FIM
-      this.form.patchValue({
-        dataEvento: this.dataFim
-      });
+      if(ini?.getTime() != this.dataFim?.getTime()) {
+        this.form.patchValue({
+          dataEvento: this.dataFim
+        });
+        this.eventosCadast = this.form.value;
+        this.enviarFormSave();
+      }
       this.mss = true;
-      this.eventosCadast = this.form.value;
-      this.enviarFormSave();
     } else {
       //  DATA INÍCIO
       this.eventosCadast = this.form.value;
@@ -633,33 +635,33 @@ export class EventosRComponent implements OnInit, OnDestroy {
     }
   }
   
-  formatarDtIntervalo() {
-    let ini: Date = this.form.get('dataEvento')?.value;
-    let fim: Date = this.dataFim;
+  // formatarDtIntervalo() {
+  //   let ini: Date = this.form.get('dataEvento')?.value;
+  //   let fim: Date = this.dataFim;
 
-    if (typeof ini === 'string' && typeof fim === 'string') {
-      const iniFormat = this.formatarDtStrDt(ini);
-      const fimFormat = this.formatarDtStrDt(fim);
-      if ((iniFormat instanceof Date && !isNaN(iniFormat.getTime())) && (fimFormat instanceof Date && !isNaN(fimFormat.getTime()))) {
+  //   if (typeof ini === 'string' && typeof fim === 'string') {
+  //     const iniFormat = this.formatarDtStrDt(ini);
+  //     const fimFormat = this.formatarDtStrDt(fim);
+  //     if ((iniFormat instanceof Date && !isNaN(iniFormat.getTime())) && (fimFormat instanceof Date && !isNaN(fimFormat.getTime()))) {
         
-        this.diasIntervalo.forEach((dt: Date) => {
-          const tiparDT = dt;
-          if (typeof tiparDT === 'string') {
-            const tiparFormat = this.formatarDatas(tiparDT);
-            const dtFormat = this.formatarDtStrDt(tiparFormat);
+  //       this.diasIntervalo.forEach((dt: Date) => {
+  //         const tiparDT = dt;
+  //         if (typeof tiparDT === 'string') {
+  //           const tiparFormat = this.formatarDatas(tiparDT);
+  //           const dtFormat = this.formatarDtStrDt(tiparFormat);
             
-            if(dtFormat?.getTime() != iniFormat.getTime() && dtFormat?.getTime() != fimFormat.getTime()) {
-              this.form.patchValue({
-                dataEvento: dt
-              });
-              this.eventosCadast = this.form.value;
-              this.enviarFormSave();
-            }
-          }
-        });
-      }
-    }
-  }
+  //           if(dtFormat?.getTime() != iniFormat.getTime() && dtFormat?.getTime() != fimFormat.getTime()) {
+  //             this.form.patchValue({
+  //               dataEvento: dt
+  //             });
+  //             this.eventosCadast = this.form.value;
+  //             this.enviarFormSave();
+  //           }
+  //         }
+  //       });
+  //     }
+  //   }
+  // }
 
   deletarID(id: number) {
     this.eventService.excluir(id)
