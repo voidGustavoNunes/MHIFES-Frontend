@@ -304,8 +304,11 @@ export class EventosRComponent implements OnInit, OnDestroy {
     
     if(ini) {
       this.disableSwit = false;
+      this.dataFim = ini;
+      this.calendarExtra.writeValue(ini);
     } else {
       this.disableSwit = true;
+      this.calendarExtra.writeValue(null);
     }
   }
 
@@ -590,13 +593,23 @@ export class EventosRComponent implements OnInit, OnDestroy {
   }
 
   conditionCreateSave() {
+    let ini: Date = this.form.get('dataEvento')?.value;
     if(this.diasIntervalo) {
       //  DATA INÍCIO
       this.eventosCadast = this.form.value;
       this.enviarFormSave();
       
       //  DATAS INTERVALO
-      this.formatarDtIntervalo();
+      // this.formatarDtIntervalo();
+      this.diasIntervalo.forEach((dt: Date) => {
+        if(dt?.getTime() != ini?.getTime() && dt?.getTime() != this.dataFim?.getTime()) {
+          this.form.patchValue({
+            dataEvento: dt
+          });
+          this.eventosCadast = this.form.value;
+          this.enviarFormSave();
+        }
+      });
 
       // DATA FIM
       this.form.patchValue({

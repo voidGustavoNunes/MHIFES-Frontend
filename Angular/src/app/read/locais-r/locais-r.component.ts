@@ -69,7 +69,7 @@ export class LocaisRComponent implements OnInit, OnDestroy {
   localCadEdit!: Local;
   
   equipamentosData: Equipamento[] = [];
-  selectedEquipLocal: LocalEquipamento[] = [];
+  previousEquipLocal: LocalEquipamento[] = [];
   selectedEquip: Equipamento[]=[];
   selectedQtd: number[]=[];
   previousSelection: Equipamento[]=[];
@@ -156,7 +156,6 @@ export class LocaisRComponent implements OnInit, OnDestroy {
   }
 
   onSelectEquipamentos() {
-    console.log(this.selectedQtd)
     if(this.selectedEquip.length > 0) {
       this.getEquipamento().clear();
       
@@ -170,16 +169,13 @@ export class LocaisRComponent implements OnInit, OnDestroy {
       });
       this.previousSelection = this.selectedEquip;
       
-      const lc: Local = this.form.value;
         for (let i = 0; i < this.selectedEquip.length; i++) {
           const tempEquipamento: LocalEquipamento = {
             id: null,
-            local: lc,
+            local: null,
             equipamento:this.selectedEquip[i],
             quantidade:this.selectedQtd[i]
           };
-          // lc.localEquipamentos.push(tempEquipamento);
-          // tempEquipamento.local = lc;
           this.addEquip(tempEquipamento);
         }
         console.log(this.getEquipamento().value)
@@ -189,6 +185,44 @@ export class LocaisRComponent implements OnInit, OnDestroy {
       this.getEquipamento().clear();
     }
   }
+
+  onSelectEquipamentosEdit() {
+    if(this.selectedEquip.length > 0) {
+      this.getEquipamento().clear();
+      
+      this.selectedEquip.forEach((equipamento, index) => {
+        const selectedEquipamento = this.selectedEquip[index];
+        const selectedQtd = this.selectedQtd[index];
+
+        const existingEquipamento = this.previousEquipLocal.find(prevEquip => prevEquip.equipamento === selectedEquipamento);
+        if (existingEquipamento) {
+            const tempEquipamento: LocalEquipamento = {
+                id: existingEquipamento.id,
+                local: null,
+                equipamento: selectedEquipamento,
+                quantidade: selectedQtd
+            };
+            this.addEquip(tempEquipamento);
+        } else {
+            const tempEquipamento: LocalEquipamento = {
+                id: null,
+                local: null,
+                equipamento: selectedEquipamento,
+                quantidade: selectedQtd
+            };
+            this.addEquip(tempEquipamento);
+        }
+        this.previousSelection.push(equipamento);
+      });
+
+      console.log(this.getEquipamento().value);
+    } else {
+      this.selectedQtd = [];
+      this.previousSelection = [];
+      this.previousEquipLocal = [];
+      this.getEquipamento().clear();
+    }
+}
 
   showInfoDialog(value: Local) {
     this.visibleInfo = true;
@@ -226,6 +260,8 @@ export class LocaisRComponent implements OnInit, OnDestroy {
     value.localEquipamentos.map(le=>{
       this.addEquip(le)
     });
+
+    this.previousEquipLocal = value.localEquipamentos;
 
     this.multiselect.writeValue(value.localEquipamentos.map(le => le.equipamento));
   }
@@ -344,8 +380,8 @@ export class LocaisRComponent implements OnInit, OnDestroy {
       },
       error: (err: any) => {
         this.messages = [
-          { severity: 'error', summary: 'Erro', detail: err, life: 3000 },
-          // { severity: 'error', summary: 'Erro', detail: 'Edição não enviada.', life: 3000 },
+          // { severity: 'error', summary: 'Erro', detail: err, life: 3000 },
+          { severity: 'error', summary: 'Erro', detail: 'Edição não enviada.', life: 3000 },
         ];
       }
     });
@@ -398,7 +434,7 @@ export class LocaisRComponent implements OnInit, OnDestroy {
   clearSelect() {
     this.previousSelection = [];
     this.selectedEquip = [];
-    this.selectedEquipLocal = [];
+    this.previousEquipLocal = [];
     this.selectedQtd = [];
     this.getEquipamento().clear();
   }

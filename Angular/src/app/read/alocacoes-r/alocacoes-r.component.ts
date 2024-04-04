@@ -381,9 +381,9 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
 
     this.multiselectEdit.writeValue(value.alunos);
     this.selectedAlunos = value.alunos;
-    // value.alunos.forEach(aln => {
-    //   this.addAluno(aln);
-    // })
+    value.alunos.forEach(aln => {
+      this.addAluno(aln);
+    })
     
     const writeEdit = this.opcaoSemana.find(ops => ops.nome == value.diaSemana);
     if (writeEdit) {
@@ -399,6 +399,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     this.cadastrar = true;
     this.editar = false;
     this.switch.writeValue(null);
+    this.multiselect.writeValue(null);
     this.getAluno().clear();
     this.selectedAlunos = [];
   }
@@ -819,8 +820,6 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   }
 
   onSubmit() {
-      console.log(this.form.value)
-
     if (this.form.valid && this.cadastrar && this.valor) {
       this.conditionCreateSave();
       this.mss = false;
@@ -842,13 +841,27 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   }
 
   conditionCreateSave() {
+    const ini: Date = this.form.get('dataAula')?.value;
+
     if(this.diasIntervalo) {
       //  DATA INÍCIO
       this.alocacoesCadast = this.form.value;
       this.enviarFormSave();
       
       //  DATAS INTERVALO
-      this.formatarDtIntervalo();
+      // this.formatarDtIntervalo();
+      this.diasIntervalo.forEach((dt: Date) => {
+        console.log('dt ini ', dt?.getTime() != ini?.getTime())
+        console.log('dt fim ', dt?.getTime() != this.dataFim?.getTime())
+        if(dt?.getTime() != ini?.getTime() && dt?.getTime() != this.dataFim?.getTime()) {
+          this.form.patchValue({
+            dataAula: dt
+          });
+          console.log('intv form ',this.form.value)
+          this.alocacoesCadast = this.form.value;
+          this.enviarFormSave();
+        }
+      });
 
       // DATA FIM
       this.form.patchValue({
