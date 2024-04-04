@@ -35,7 +35,7 @@
                 <tr class="tbHeader">
                     <th>Disciplina</th>
                     <th>Data da aula</th>
-                    <th>Professor</th>
+                    <!-- <th>Professor</th> -->
                     <!-- <th></th> -->
                     <th></th>
                 </tr>
@@ -44,7 +44,7 @@
                 <tr class="tbBody">
                     <td>{{alocacao?.disciplina.nome}}</td>
                     <td>{{alocacao?.dataAula | date: 'dd/MM/yyyy'}}</td>
-                    <td>{{alocacao?.professor.nome}}</td>
+                    <!-- <td>{{alocacao?.professor.nome}}</td> -->
                     <!-- <td></td> -->
                     <td>
                         <button type="button" class="botaoInfo" (click)="showInfoDialog(alocacao)" pButton>Info</button>

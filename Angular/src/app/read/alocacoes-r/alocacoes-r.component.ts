@@ -862,12 +862,14 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       });
 
       // DATA FIM
-      this.form.patchValue({
-        dataAula: this.dataFim,
-      });
+      if(ini?.getTime() != this.dataFim?.getTime()) {
+        this.form.patchValue({
+          dataAula: this.dataFim,
+        });
+        this.alocacoesCadast = this.form.value;
+        this.enviarFormSave();
+      }
       this.mss = true;
-      this.alocacoesCadast = this.form.value;
-      this.enviarFormSave();
     } else {
       this.messages = [
         { severity: 'warn', summary: 'Atenção', detail: 'Informação inválida. Preencha os campos!', life: 3000 },
