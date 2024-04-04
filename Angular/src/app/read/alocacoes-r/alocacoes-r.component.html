@@ -342,7 +342,7 @@
             </div>
             <div class="divInput">
                 <span class="p-float-label" formArrayName="alunos">
-                    <p-multiSelect #multiselectEdit appendTo="body" inputId="alunoAloc" display="chip" [(ngModel)]="selectedAlunos" [ngModelOptions]="{standalone: true}" [options]="alunosArray" optionLabel="nome" (onChange)="onAlunosChange($event)" ></p-multiSelect>
+                    <p-multiSelect #multiselectEdit appendTo="body" inputId="alunoAloc" display="chip" [(ngModel)]="selectedAlunos" [ngModelOptions]="{standalone: true}" [options]="alunosArray" optionLabel="nome" (ngModelChange)="onAlunosChange($event)" ></p-multiSelect>
                     <label for="alunoAloc">Selecione os alunos</label>
                 </span>
             </div>

@@ -381,9 +381,9 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
 
     this.multiselectEdit.writeValue(value.alunos);
     this.selectedAlunos = value.alunos;
-    // value.alunos.forEach(aln => {
-    //   this.addAluno(aln);
-    // })
+    value.alunos.forEach(aln => {
+      this.addAluno(aln);
+    })
     
     const writeEdit = this.opcaoSemana.find(ops => ops.nome == value.diaSemana);
     if (writeEdit) {
