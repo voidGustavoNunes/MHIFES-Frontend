@@ -34,7 +34,7 @@
             <ng-template pTemplate="header">
                 <tr class="tbHeader">
                     <th>Disciplina</th>
-                    <th>Turma</th>
+                    <th>Data da aula</th>
                     <th>Professor</th>
                     <!-- <th></th> -->
                     <th></th>
@@ -43,7 +43,7 @@
             <ng-template pTemplate="body" let-alocacao>
                 <tr class="tbBody">
                     <td>{{alocacao?.disciplina.nome}}</td>
-                    <td>{{alocacao?.turma}}</td>
+                    <td>{{alocacao?.dataAula | date: 'dd/MM/yyyy'}}</td>
                     <td>{{alocacao?.professor.nome}}</td>
                     <!-- <td></td> -->
                     <td>
@@ -175,16 +175,7 @@
             </div>
             <div class="divInput">
                 <span class="p-float-label" formArrayName="alunos">
-                    <p-multiSelect #multiselect appendTo="body" inputId="alunoAloc" display="chip" [(ngModel)]="selectedAlunos" [ngModelOptions]="{standalone: true}" [options]="alunosArray" (onChange)="onAlunosChange($event)" >
-                        <ng-template let-alunosArray pTemplate="selectedItem">
-                            <div>{{ alunosArray.nome }}</div>
-                          </ng-template>
-                          <ng-template let-alunosArray pTemplate="item">
-                            <div class="flex align-items-center gap-2">
-                              <div>{{ alunosArray.nome }} - {{ alunosArray.matricula }}</div>
-                            </div>
-                          </ng-template>
-                    </p-multiSelect>
+                    <p-multiSelect #multiselect appendTo="body" inputId="alunoAloc" display="chip" [(ngModel)]="selectedAlunos" [ngModelOptions]="{standalone: true}" [options]="alunosArray" optionLabel="nome" (onChange)="onAlunosChange($event)" ></p-multiSelect>
                     <label for="alunoAloc">Selecione os alunos</label>
                 </span>
             </div>
