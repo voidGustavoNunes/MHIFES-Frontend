@@ -60,14 +60,15 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
   periodosFilter: Periodo[] = [];
   periodosCadast: Periodo[] = [];
   periodosEdit: Periodo[] = [];
+
   periodoInfo!: Periodo;
+  visibleInfo: boolean = false;
 
   unsubscribe$!: Subscription;
   form: FormGroup;
 
   ehTitulo: string = '';
   visible: boolean = false;
-  visibleInfo: boolean = false;
   editar: boolean = false;
   cadastrar: boolean = false;
   

@@ -67,6 +67,9 @@ export class AlunosRComponent implements OnInit, OnDestroy {
   
   messages!: Message[];
   mss: boolean = false;
+  
+  alunoInfo!: Aluno;
+  visibleInfo: boolean = false;
 
   constructor(
     private alunService: AlunoService,
@@ -102,10 +105,16 @@ export class AlunosRComponent implements OnInit, OnDestroy {
     this.unsubscribe$.unsubscribe();
   }
 
+  showInfoDialog(value: Aluno) {
+    this.visibleInfo = true;
+    this.alunoInfo = value;
+  }
+
   showEditDialog(value: Aluno) {
     this.form.reset();
     this.ehTitulo = 'Atualizar Aluno'
     this.visible = true;
+    this.visibleInfo = false;
     this.cadastrar = false;
     this.editar = true;
     this.form.setValue({
@@ -120,6 +129,7 @@ export class AlunosRComponent implements OnInit, OnDestroy {
     this.form.reset();
     this.ehTitulo = 'Cadastrar Aluno';
     this.visible = true;
+    this.visibleInfo = false;
     this.cadastrar = true;
     this.editar = false;
   }

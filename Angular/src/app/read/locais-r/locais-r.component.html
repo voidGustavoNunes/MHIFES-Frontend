@@ -80,28 +80,28 @@
             </div>
             <div class="divInput">
                 <span class="p-float-label" *ngIf="cadastrar">
-                    <p-multiSelect #multiselect appendTo="body" display="chip" [showClear]="true" inputId="equipLocal" [(ngModel)]="selectedEquip" [ngModelOptions]="{standalone: true}" [options]="equipamentosData" (ngModelChange)="onSelectEquipamentos()" optionLabel="nome" >
+                    <p-multiSelect #multiselect appendTo="body" display="chip" [showClear]="true" inputId="equipLocal" [(ngModel)]="selectedEquipamentos" [ngModelOptions]="{standalone: true}" (ngModelChange)="onSelectEquipamentos()" [options]="equipamentosData" optionLabel="nome" >
                     </p-multiSelect>
                     <label for="equipLocal">Selecione os equipamentos</label>
                 </span>
 
                 <span class="p-float-label" *ngIf="editar">
-                    <p-multiSelect #multiselect appendTo="body" display="chip" [showClear]="true" inputId="equipLocal" [(ngModel)]="selectedEquip" [ngModelOptions]="{standalone: true}" [options]="equipamentosData" (ngModelChange)="onSelectEquipamentosEdit()" optionLabel="nome" >
+                    <p-multiSelect #multiselect appendTo="body" display="chip" [showClear]="true" inputId="equipLocal" [(ngModel)]="selectedEquipamentos" [ngModelOptions]="{standalone: true}" (ngModelChange)="onSelectEquipamentos()" [options]="equipamentosData" optionLabel="nome" >
                     </p-multiSelect>
                     <label for="equipLocal">Selecione os equipamentos</label>
                 </span>
             </div>
-            <div class="divInput" *ngIf="selectedEquip.length > 0 && cadastrar">
-                <div class="flexContainer" *ngFor="let option of selectedEquip; index as i">
+            <div class="divInput" *ngIf="selectedEquipamentos.length > 0 && cadastrar">
+                <div class="flexContainer" *ngFor="let option of selectedEquipamentos; index as i">
                     <b>Quantidade de {{ option.nome }}:</b>
-                    <p-inputNumber inputId="integeronly" mode="decimal" [min]="1" [(ngModel)]="selectedQtd[i]" [ngModelOptions]="{standalone: true}" placeholder="Quantidade" (ngModelChange)="onSelectEquipamentos()"> </p-inputNumber>
+                    <p-inputNumber inputId="integeronly" mode="decimal" [min]="1" [(ngModel)]="selectedQtd[i]" [ngModelOptions]="{standalone: true}" (ngModelChange)="adicionarEquipamentoComQuantidade(option, selectedQtd[i])" placeholder="Quantidade"> </p-inputNumber>
                 </div>
             </div>
                 
-            <div class="divInput" *ngIf="selectedEquip.length > 0 && editar">
-                <div class="flexContainer" *ngFor="let option of selectedEquip; index as i">
+            <div class="divInput" *ngIf="selectedEquipamentos.length > 0 && editar">
+                <div class="flexContainer" *ngFor="let option of selectedEquipamentos; index as i">
                     <b>Quantidade de {{ option.nome }}:</b>
-                    <p-inputNumber inputId="integeronly" mode="decimal" [min]="1" [(ngModel)]="selectedQtd[i]" [ngModelOptions]="{standalone: true}" placeholder="Quantidade" (ngModelChange)="onSelectEquipamentosEdit()"> </p-inputNumber>
+                    <p-inputNumber inputId="integeronly" mode="decimal" [min]="1" [(ngModel)]="selectedQtd[i]" [ngModelOptions]="{standalone: true}" (ngModelChange)="adicionarEquipamentoComQuantidadeEdit(option, selectedQtd[i])" placeholder="Quantidade"> </p-inputNumber>
                 </div>
             </div>
             <div class="divBotao">

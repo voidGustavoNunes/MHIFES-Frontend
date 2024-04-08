@@ -16,7 +16,7 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ScrollTopModule } from 'primeng/scrolltop';
 import { LocalService } from '../../service/local.service';
-import { Local, LocalDTO, LocalEquipamento } from '../../models/local.models';
+import { Local, LocalDTO, LocalEquipMultiSelect, LocalEquipamento } from '../../models/local.models';
 import { EquipamentoService } from '../../service/equipamento.service';
 import { Equipamento } from '../../models/equipamento.models';
 import { InputNumberModule } from 'primeng/inputnumber';
@@ -70,10 +70,10 @@ export class LocaisRComponent implements OnInit, OnDestroy {
   
   equipamentosData: Equipamento[] = [];
   previousEquipLocal: LocalEquipamento[] = [];
-  selectedEquip: Equipamento[]=[];
-  selectedQtd: number[]=[];
-  previousSelection: Equipamento[]=[];
-  // localBodyDto!: LocalDTO;
+  
+  selectedEquipamentos: Equipamento[]=[];
+  selectedEquipQtd: LocalEquipMultiSelect[] = [];
+  selectedQtd: number[] = [];
   
   unsubscribe$!: Subscription;
   unsubscribe$EQ!: Subscription;
@@ -156,73 +156,93 @@ export class LocaisRComponent implements OnInit, OnDestroy {
   }
 
   onSelectEquipamentos() {
-    if(this.selectedEquip.length > 0) {
-      this.getEquipamento().clear();
+    if(this.selectedEquipamentos.length <= 0) {
+      this.clearSelect();
+    } else if(this.selectedEquipamentos.length > 0 && this.selectedEquipQtd.length > 0) {
+      this.verificarGetEquip();
+
+      let removedIndexes = [];
       
-      const removedItems = this.previousSelection.filter(item => !this.selectedEquip.includes(item));
-      const removedItemIndices = removedItems.map(item => this.previousSelection.indexOf(item));
-      
-      removedItemIndices.forEach(index => {
-        if (index !== -1) {
-          this.selectedQtd.splice(index, 1);
+      for (let i = 0; i < this.selectedEquipQtd.length; i++) {
+        const item = this.selectedEquipQtd[i];
+        if (!this.selectedEquipamentos.some(e => e.id === item.equipamento?.id)) {
+          removedIndexes.push(i);
         }
-      });
-      this.previousSelection = this.selectedEquip;
-      
-        for (let i = 0; i < this.selectedEquip.length; i++) {
-          const tempEquipamento: LocalEquipamento = {
-            id: null,
-            local: null,
-            equipamento:this.selectedEquip[i],
-            quantidade:this.selectedQtd[i]
-          };
-          this.addEquip(tempEquipamento);
-        }
-        console.log(this.getEquipamento().value)
-    } else {
-      this.selectedQtd = [];
-      this.previousSelection = [];
-      this.getEquipamento().clear();
+      }
+
+      for (let i = removedIndexes.length - 1; i >= 0; i--) {
+        const index = removedIndexes[i];
+        this.selectedEquipQtd.splice(index, 1);
+        this.selectedQtd.splice(index, 1);
+        this.getEquipamento().removeAt(index);
+      }
     }
   }
 
-  onSelectEquipamentosEdit() {
-    if(this.selectedEquip.length > 0) {
-      this.getEquipamento().clear();
-      
-      this.selectedEquip.forEach((equipamento, index) => {
-        const selectedEquipamento = this.selectedEquip[index];
-        const selectedQtd = this.selectedQtd[index];
+  pushGetEquipVazio(equipamento: Equipamento, quantidade: number) {
+    const tempEquipamento: LocalEquipamento = {
+      id: null,
+      local: null,
+      equipamento: equipamento,
+      quantidade: quantidade
+    };
+    this.addEquip(tempEquipamento);
+  }
 
-        const existingEquipamento = this.previousEquipLocal.find(prevEquip => prevEquip.equipamento === selectedEquipamento);
-        if (existingEquipamento) {
-            const tempEquipamento: LocalEquipamento = {
-                id: existingEquipamento.id,
-                local: null,
-                equipamento: selectedEquipamento,
-                quantidade: selectedQtd
-            };
-            this.addEquip(tempEquipamento);
-        } else {
-            const tempEquipamento: LocalEquipamento = {
-                id: null,
-                local: null,
-                equipamento: selectedEquipamento,
-                quantidade: selectedQtd
-            };
-            this.addEquip(tempEquipamento);
-        }
-        this.previousSelection.push(equipamento);
-      });
+  pushGetEquipId(equipamento: Equipamento, quantidade: number, index: number, id: number | null, local: Local | null) {
+    this.getEquipamento().at(index).patchValue({
+      id: id,
+      local: local,
+      equipamento: equipamento,
+      quantidade: quantidade
+    });
+  }
 
-      console.log(this.getEquipamento().value);
+  adicionarEquipamentoComQuantidade(equipamento: Equipamento, quantidade: number) {
+    this.verificarGetEquip();
+    
+    const index = this.selectedEquipQtd.findIndex(item => item.equipamento?.id === equipamento.id);
+    if (index === -1) {
+      this.selectedEquipQtd.push({ equipamento, quantidade });
+      this.pushGetEquipVazio(equipamento, quantidade);
     } else {
-      this.selectedQtd = [];
-      this.previousSelection = [];
-      this.previousEquipLocal = [];
-      this.getEquipamento().clear();
+      this.selectedEquipQtd[index].equipamento = equipamento;
+      this.selectedEquipQtd[index].quantidade = quantidade;
+      if(this.getEquipamento().length <= 0){
+        this.pushGetEquipVazio(equipamento, quantidade);
+      } else {
+        this.pushGetEquipId(equipamento, quantidade, index, null, null);
+      }
     }
-}
+  }
+
+  adicionarEquipamentoComQuantidadeEdit(equipamento: Equipamento, quantidade: number) {
+    let idPrevious: number | null = null;
+    let idPreviousEquip: number | undefined = undefined;
+    let localPrevious: Local | null = null;
+    this.verificarGetEquip();
+
+    const previousIndex = this.previousEquipLocal.findIndex(item => item.equipamento?.id === equipamento.id);
+    if (previousIndex !== -1) {
+      idPrevious = this.previousEquipLocal[previousIndex].id;
+      idPreviousEquip = this.previousEquipLocal[previousIndex].equipamento?.id;
+      localPrevious = this.previousEquipLocal[previousIndex].local;
+    }
+    
+    const index = this.selectedEquipQtd.findIndex(item => item.equipamento?.id === equipamento.id);
+    if (index === -1 || (index === -1 && equipamento.id != idPreviousEquip)) {
+      this.selectedEquipQtd.push({ equipamento, quantidade });
+      this.pushGetEquipVazio(equipamento, quantidade);
+    } else if((index !== -1) || (equipamento.id == idPreviousEquip)) {
+      this.selectedEquipQtd[index].equipamento = equipamento;
+      this.selectedEquipQtd[index].quantidade = quantidade;
+      if(this.getEquipamento().length <= 0){
+        this.pushGetEquipVazio(equipamento, quantidade);
+      } else {
+        this.pushGetEquipId(equipamento, quantidade, index, idPrevious, localPrevious);
+      }
+    }
+  }
 
   showInfoDialog(value: Local) {
     this.visibleInfo = true;
@@ -245,25 +265,27 @@ export class LocaisRComponent implements OnInit, OnDestroy {
       localEquipamentos: value.localEquipamentos
     });
 
-    this.previousSelection = value.localEquipamentos
-      .filter(le => le.equipamento !== null)
-      .map(le => le.equipamento as Equipamento);
-
-    this.selectedEquip = value.localEquipamentos
-      .filter(le => le.equipamento !== null)
-      .map(le => le.equipamento as Equipamento);
-
-    this.selectedQtd = value.localEquipamentos
-      .filter(le => le.quantidade !== null)
-      .map(le => le.quantidade as number);
+    value.localEquipamentos
+    .filter(le => {
+      if(le.equipamento !== null && le.quantidade !== null && le.local !== null) {
+        this.selectedEquipamentos.push(le.equipamento);
+        this.selectedQtd.push(le.quantidade);
+        this.selectedEquipQtd.push({equipamento: le.equipamento, quantidade: le.quantidade })
+        
+        const tempEquipamento: LocalEquipamento = {
+          id: le.id,
+          local: value,
+          equipamento: le.equipamento,
+          quantidade: le.quantidade
+        };
+        this.addEquip(tempEquipamento);
+      }
+    })
+    console.log('show edit \n',this.form.value)
     
-    value.localEquipamentos.map(le=>{
-      this.addEquip(le)
-    });
-
     this.previousEquipLocal = value.localEquipamentos;
-
     this.multiselect.writeValue(value.localEquipamentos.map(le => le.equipamento));
+
   }
 
   showDialog() {
@@ -280,6 +302,7 @@ export class LocaisRComponent implements OnInit, OnDestroy {
     this.visible = false;
     this.form.reset();
     this.multiselect.writeValue(null);
+    this.clearSelect();
   }
   
   limparFilter(){
@@ -396,15 +419,13 @@ export class LocaisRComponent implements OnInit, OnDestroy {
   }
 
   onSubmit() {
-    if(this.selectedEquip.length > 0 && this.selectedQtd.length > 0) {
-      for (let i = this.getEquipamento().length - 1; i >= 0; i--) {
-        if (this.getEquipamento().at(i).value === null) {
-          this.getEquipamento().removeAt(i);
-        }
-      }
+    console.log(this.form.value)
+
+    if(this.getEquipamento().length > 0) {
+      this.verificarGetEquip();
+
       if (this.form.valid && this.cadastrar) {
         this.locaisCadast = this.form.value;
-        console.log(this.form.value)
         this.enviarFormSave();
         this.visible = false;
         this.form.reset();
@@ -412,8 +433,6 @@ export class LocaisRComponent implements OnInit, OnDestroy {
         this.ngOnInit();
       } else if (this.form.valid && this.editar) {
         this.locaisEdit = this.form.value;
-        console.log(this.form.value)
-
         this.enviarFormEdit(this.form.get('id')?.value);
         this.visible = false;
         this.form.reset();
@@ -432,11 +451,18 @@ export class LocaisRComponent implements OnInit, OnDestroy {
   }
 
   clearSelect() {
-    this.previousSelection = [];
-    this.selectedEquip = [];
-    this.previousEquipLocal = [];
+    this.selectedEquipamentos = [];
     this.selectedQtd = [];
+    this.selectedEquipQtd = [];
     this.getEquipamento().clear();
+  }
+
+  verificarGetEquip() {
+    for (let i = this.getEquipamento().length - 1; i >= 0; i--) {
+      if (this.getEquipamento().at(i).value === null) {
+        this.getEquipamento().removeAt(i);
+      }
+    }
   }
 
   deletarID(id: number) {

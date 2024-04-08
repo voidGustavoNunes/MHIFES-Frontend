@@ -85,12 +85,23 @@
             .botaoInfo{
                 @include themeButton(#A2FF7F, #1E8805);
             }
+            .botaoInfo:focus{
+                border: .02rem solid #1E8805;
+            }
+
             .botaoEdit{
                 @include themeButton(#FFDD77, #846406);
                 margin: 0 .5rem;
             }
+            .botaoEdit:focus{
+                border: .02rem solid #846406;
+            }
+
             .botaoDele{
                 @include themeButton(#FF8381, #89041E);
+            }
+            .botaoDele:focus{
+                border: .02rem solid #89041E;
             }
         }
         .tbBody:hover{
@@ -134,6 +145,13 @@
             height: 100%;
             box-sizing: border-box;
         }
+        textarea:hover{
+            border: .02rem solid #256CF0;
+        }
+        textarea:focus{
+            border: .02rem solid #256CF0;
+            outline: none;
+        }
     }
     .divInput.labelFlex{
         display: flex;
@@ -151,14 +169,29 @@
         .botaoInfo{
             @include themeButton(#A2FF7F, #1E8805);
         }
+        .botaoInfo:focus{
+            border: .02rem solid #1E8805;
+        }
+
         .botaoSalva{
             @include themeButton();
         }
+        .botaoSalva:focus{
+            border: .02rem solid #256CF0;
+        }
+
         .botaoEdit{
             @include themeButton(#FFDD77, #846406);
         }
+        .botaoEdit:focus{
+            border: .02rem solid #846406;
+        }
+
         .botaoCancela{
             @include themeButton(#FF8381, #89041E);
+        }
+        .botaoCancela:focus{
+            border: .02rem solid #89041E;
         }
     }
 }

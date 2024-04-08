@@ -86,6 +86,9 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
   filterOptions: FiltrarPesquisa[] = [];
   selectedFilterOri!: FiltrarPesquisa;
   selectedFilterProf!: FiltrarPesquisa;
+  
+  professorInfo!: Professor;
+  visibleInfo: boolean = false;
 
   constructor(
     private professorService: ProfessorService,
@@ -141,10 +144,16 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
     this.unsubscribe$.unsubscribe();
   }
 
+  showInfoDialog(value: Professor) {
+    this.visibleInfo = true;
+    this.professorInfo = value;
+  }
+
   showEditDialog(value: Professor) {
     this.form.reset();
     this.ehTitulo = 'Atualizar Professor'
     this.visible = true;
+    this.visibleInfo = false;
     this.cadastrar = false;
     this.editar = true;
     this.form.setValue({
@@ -164,6 +173,7 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
     });
     this.ehTitulo = 'Cadastrar Professor';
     this.visible = true;
+    this.visibleInfo = false;
     this.cadastrar = true;
     this.editar = false;
     this.switch.writeValue(null);

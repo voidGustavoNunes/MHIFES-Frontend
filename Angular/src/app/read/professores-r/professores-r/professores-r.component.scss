@@ -78,12 +78,26 @@
             button:active{
                 box-shadow: none;
             }
+            .botaoInfo{
+                @include themeButton(#A2FF7F, #1E8805);
+            }
+            .botaoInfo:focus{
+                border: .02rem solid #1E8805;
+            }
+
             .botaoEdit{
                 @include themeButton(#FFDD77, #846406);
-                margin-right: .5rem;
+                margin: 0 .5rem;
             }
+            .botaoEdit:focus{
+                border: .02rem solid #846406;
+            }
+
             .botaoDele{
                 @include themeButton(#FF8381, #89041E);
+            }
+            .botaoDele:focus{
+                border: .02rem solid #89041E;
             }
         }
         .tbBody:hover{
@@ -93,6 +107,11 @@
 }
 
 .card{
+    #meuFormInfo{
+        .divInput{
+            margin: 2rem 0;
+        }
+    }
     #meuFormulario{
         margin-top: 3rem;
     }
@@ -118,14 +137,33 @@
         button:active{
             box-shadow: none;
         }
+
         .botaoSalva{
             @include themeButton();
         }
+        .botaoSalva:focus{
+            border: .02rem solid #256CF0;
+        }
+        
+        .botaoInfo{
+            @include themeButton(#A2FF7F, #1E8805);
+        }
+        .botaoInfo:focus{
+            border: .02rem solid #1E8805;
+        }
+
         .botaoEdit{
             @include themeButton(#FFDD77, #846406);
         }
+        .botaoEdit:focus{
+            border: .02rem solid #846406;
+        }
+
         .botaoCancela{
             @include themeButton(#FF8381, #89041E);
+        }
+        .botaoCancela:focus{
+            border: .02rem solid #89041E;
         }
     }
 }

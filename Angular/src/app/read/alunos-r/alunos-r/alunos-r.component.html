@@ -29,7 +29,7 @@
               <tr class="tbHeader">
                   <th>Nome</th>
                   <th>matricula</th>
-                  <th>curso</th>
+                  <!-- <th>curso</th> -->
                   <th></th>
               </tr>
           </ng-template>
@@ -37,8 +37,9 @@
               <tr class="tbBody">
                   <td>{{aluno?.nome}}</td>
                   <td>{{aluno?.matricula}}</td>
-                  <td>{{aluno?.curso}}</td>
+                  <!-- <td>{{aluno?.curso}}</td> -->
                   <td>
+                    <button type="button" class="botaoInfo" (click)="showInfoDialog(aluno)" pButton>Info</button>
                       <button type="button" class="botaoEdit" (click)="showEditDialog(aluno)" pButton>Editar</button>
                       <p-toast></p-toast>
                       <p-confirmPopup></p-confirmPopup>
@@ -85,6 +86,25 @@
           </div>
       </form>
   </p-dialog>
+</div>
+
+<div class="card flex justify-content-center">
+    <p-dialog header="Info do Aluno" [(visible)]="visibleInfo" [breakpoints]="{ '960px': '75vw' }" [style]="{width: '50vw', 'z-index': '1102'}">
+        <div id="meuFormInfo">
+            <div class="divInput">
+                <b>Nome do aluno:</b> {{alunoInfo?.nome}}
+            </div>
+            <div class="divInput">
+                <b>Matrícula:</b> {{alunoInfo?.matricula}}
+            </div>
+            <div class="divInput" style="white-space: pre-line;">
+                <b>Curso:</b> {{alunoInfo?.curso}}
+            </div>
+            <div class="divBotao">
+                <button type="button" class="botaoInfo" (click)="visibleInfo = false" pButton>Ok</button>
+            </div>
+        </div>
+    </p-dialog>
 </div>
 
 <div class="card">
