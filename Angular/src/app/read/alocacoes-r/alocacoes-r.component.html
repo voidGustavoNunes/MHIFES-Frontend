@@ -133,7 +133,7 @@
             <!-- <div class="divInput"> -->
                 <div>
                     <span class="p-float-label">
-                        <p-calendar #calendarExtra appendTo="body" dateFormat="dd/mm/yy" [readonlyInput]="true" id="fimData" [(ngModel)]="dataFim" [ngModelOptions]="{standalone: true}" (ngModelChange)="validarDatas()" ></p-calendar>
+                        <p-calendar #calendarExtra [disabled]="disableDateFinal" appendTo="body" dateFormat="dd/mm/yy" [readonlyInput]="true" id="fimData" [(ngModel)]="dataFim" [ngModelOptions]="{standalone: true}" (ngModelChange)="validarDatas()" ></p-calendar>
                         <label for="fimData">Data Final</label>
                     </span>
                     <div *ngIf="!validExtraCalendar" class="validation-error">

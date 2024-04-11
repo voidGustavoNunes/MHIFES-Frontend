@@ -260,12 +260,15 @@
 
             input{width: 18vw;}
             div{
+                width: 18vw;
                 display: flex;
                 flex-direction: column;
-                .validation-error {
-                    word-wrap: break-word;
-                }
             }
+            div p {
+                width: 10rem;
+                white-space: break-spaces;
+            }
+              
         }
     }
     :host ::ng-deep {

@@ -147,6 +147,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   disableSemana: boolean = true;
   disableDrop: boolean = true;
   disableSwit: boolean = true;
+  disableDateFinal: boolean = true;
 
   validExtraCalendar: boolean = true;
 
@@ -311,25 +312,19 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     const dataFim = this.dataFim;
     const periodo = this.form.get('periodo')?.value;
 
-    console.log('chegou valid')
     if (dataAula && dataFim && periodo) {
       const periodoInicio = new Date(periodo.dataInicio);
       const periodoFim = new Date(periodo.dataFim);
-      const dataAulaValida = new Date(dataAula) >= periodoInicio && new Date(dataAula) <= periodoFim;
-      const dataFimAula = new Date(dataFim) >= periodoInicio && new Date(dataFim) <= periodoFim;
-      const dataFimValida = new Date(dataFim) >= new Date(dataAula);
+      const dataAulaValida = new Date(dataAula).getTime() >= periodoInicio.getTime() && new Date(dataAula).getTime() <= periodoFim.getTime();
+      const dataFimAula = new Date(dataFim).getTime() >= periodoInicio.getTime() && new Date(dataFim).getTime() <= periodoFim.getTime();
+      const dataFimValida = new Date(dataFim).getTime() >= new Date(dataAula).getTime();
       
-      console.log('passou valid 1')
       if (dataAulaValida && dataFimAula && dataFimValida) {
         this.disableSemana = false;
-        this.form.get('dataAula')?.setErrors(null);
         this.validExtraCalendar = true;
-        console.log('passou valid 2 true')
       } else {
         this.disableSemana = true;
-        this.form.get('dataAula')?.setErrors({ 'invalidEndDate': true });
         this.validExtraCalendar = false;
-        console.log('passou valid 2 false')
       }
     }
   }
@@ -463,9 +458,9 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     if (dataAula && dataFim && periodo) {
       const periodoInicio = new Date(periodo.dataInicio);
       const periodoFim = new Date(periodo.dataFim);
-      const dataAulaValida = new Date(dataAula) >= periodoInicio && new Date(dataAula) <= periodoFim;
-      const dataFimAula = new Date(dataFim) >= periodoInicio && new Date(dataFim) <= periodoFim;
-      const dataFimValida = new Date(dataFim) >= new Date(dataAula);
+      const dataAulaValida = new Date(dataAula).getTime() >= periodoInicio.getTime() && new Date(dataAula).getTime() <= periodoFim.getTime();
+      const dataFimAula = new Date(dataFim).getTime() >= periodoInicio.getTime() && new Date(dataFim).getTime() <= periodoFim.getTime();
+      const dataFimValida = new Date(dataFim).getTime() >= new Date(dataAula).getTime();
 
       if (dataAulaValida && dataFimAula && dataFimValida) {
         this.form.get('dataAula')?.setErrors(null);
@@ -486,10 +481,12 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
         this.disableSwit = false;
         this.calendarExtra.writeValue(dataAula);
         this.dataFim = dataAula;
+        this.disableDateFinal = false;
       } else {
         this.form.get('dataAula')?.setErrors({ 'invalidEndDate': true });
         this.disableSwit = true;
         this.calendarExtra.writeValue(null);
+        this.disableDateFinal = true;
       }
     }
     
