@@ -88,15 +88,18 @@
                 </span>
             </div>
             <div class="divInput labelFlex">
-                <label for="horinIni">Hora de início</label>
-                <input pInputText type="time" id="horinIni" class="form-control" formControlName="horaInicio">
-            </div>
-            <div class="divInput labelFlex">
-                <label for="horinFim">Hora final</label>
-                <input pInputText type="time" id="horinFim" class="form-control" formControlName="horaFinal">
-
-                <div *ngIf="form.get('horaFinal')?.invalid && form.get('horaFinal')?.touched" class="validation-error">
-                    <p>Hora final deve ser maior que a hora de início</p>
+                <div>
+                    <label for="horinIni">Hora de início</label>
+                    <input pInputText type="time" id="horinIni" class="form-control" formControlName="horaInicio">
+                </div>
+            <!-- </div> -->
+            <!-- <div class="divInput labelFlex"> -->
+                <div>
+                    <label for="horinFim">Hora final</label>
+                    <input pInputText type="time" id="horinFim" class="form-control" formControlName="horaFinal">
+                    <div *ngIf="form.get('horaFinal')?.invalid && form.get('horaFinal')?.touched" class="validation-error">
+                        <p>Hora final deve ser maior que a hora de início</p>
+                    </div>
                 </div>
             </div>
             <div class="divInput">
@@ -114,30 +117,61 @@
                     <label for="perdAloc">Período</label>
                 </span>
             </div>
-            <div class="divInput">
-                <span class="p-float-label">
-                    <p-calendar dateFormat="dd/mm/yy" id="fimPer" class="form-control" formControlName="dataAula" (onSelect)="onDateIniSelect()" ></p-calendar>
-                    <label for="fimPer">Data da aula</label>
-                </span>
-                <div *ngIf="form.get('dataAula')?.invalid && form.get('dataAula')?.touched" class="validation-error">
-                    <p>A data do início de aula deve ser menor ou igual que a data final.</p>
+            <div class="divInput labelFlex">
+                <div>
+                    <span class="p-float-label">
+                        <p-calendar dateFormat="dd/mm/yy" id="iniPer" class="form-control" formControlName="dataAula" (onSelect)="onDateIniSelect()" ></p-calendar>
+                        <label for="iniPer">Data da aula</label>
+                    </span>
+                    <div *ngIf="form.get('dataAula')?.invalid && form.get('dataAula')?.touched" class="validation-error">
+                        <p>A data do início de aula deve ser menor ou igual que a data final e dentro do período.</p>
+                    </div>
+                </div>
+            <!-- </div> -->
+            <!-- conteúdo da janela extra -->
+            
+            <!-- <div class="divInput"> -->
+                <div>
+                    <span class="p-float-label">
+                        <p-calendar #calendarExtra appendTo="body" dateFormat="dd/mm/yy" [readonlyInput]="true" id="fimData" [(ngModel)]="dataFim" [ngModelOptions]="{standalone: true}" (ngModelChange)="validarDatas()" ></p-calendar>
+                        <label for="fimData">Data Final</label>
+                    </span>
+                    <div *ngIf="!validExtraCalendar" class="validation-error">
+                        <p>Data final deve ser maior ou igual que a data do início e dentro do período.</p>
+                    </div>
                 </div>
             </div>
-            <div class="divInput pSwtich">
+            <div class="divInput">
+                <span class="p-float-label">
+                    <p-dropdown #dropdownExtra [disabled]="disableSemana" appendTo="body" [options]="opcaoSemana" [(ngModel)]="selectedSemana" [ngModelOptions]="{standalone: true}" placeholder="Selecione um dia da semana" optionLabel="nome" inputId="float-week" (ngModelChange)="onDropdownChange()"></p-dropdown>
+                    <label for="float-week">Selecione um dia da semana</label>
+                </span>
+            </div>
+            <div class="divInput">
+                <span class="p-float-label">
+                    <p-calendar #calendario [disabled]="disableDrop" [(ngModel)]="diasIntervalo" [ngModelOptions]="{standalone: true}" appendTo="body" selectionMode="multiple" dateFormat="dd/mm/yy" [readonlyInput]="true" id="itvData" class="form-control" ></p-calendar>
+                    <label for="itvData">Intervalo de dias</label>
+                </span>
+            </div>
+            <!-- <div class="divInput pSwtich">
                 <p-inputSwitch #switch [disabled]="disableSwit" [(ngModel)]="valor" [ngModelOptions]="{standalone: true}" id="checkRepl" (onChange)="handleChange()"></p-inputSwitch>
                 <label for="checkRepl">Replicar dias</label>
-            </div>
-            <div class="divInput">
-                <span class="p-float-label">
-                    <p-inputNumber inputId="integeronly" id="numAloc" class="form-control" formControlName="numAulas" [min]="1" ></p-inputNumber>
-                    <label for="numAloc">Número de Aulas</label>
-                </span>
-            </div>
-            <div class="divInput">
-                <span class="p-float-label">
-                    <input pInputText maxlength="10" id="turmaAloc" class="form-control" formControlName="turma" />
-                    <label for="turmaAloc">Turma</label>
-                </span>
+            </div> -->
+            <div class="divInput labelFlex">
+                <div>
+                    <span class="p-float-label">
+                        <p-inputNumber inputId="integeronly" id="numAloc" class="form-control" formControlName="numAulas" [min]="1" ></p-inputNumber>
+                        <label for="numAloc">Número de Aulas</label>
+                    </span>
+                </div>
+            <!-- </div> -->
+            <!-- <div class="divInput"> -->
+                <div>
+                    <span class="p-float-label">
+                        <input pInputText maxlength="10" id="turmaAloc" class="form-control" formControlName="turma" />
+                        <label for="turmaAloc">Turma</label>
+                    </span>
+                </div>
             </div>
             <div class="divInput">
                 <span class="p-float-label">
@@ -201,7 +235,7 @@
     </p-dialog>
 </div>
 
-<div class="card flex justify-content-center">
+<!-- <div class="card flex justify-content-center">
     <p-dialog header="Replicar dias da Alocação" [(visible)]="visibleExtra" [breakpoints]="{ '960px': '75vw' }" [style]="{width: '50vw', 'z-index': '1102'}">
         <div id="meuFormulario">
             <div class="divInput">
@@ -227,7 +261,7 @@
             </div>
         </div>
     </p-dialog>
-</div>
+</div> -->
 
 <div class="card flex justify-content-center">
     <p-dialog class="pHeader" [header]=ehTitulo [(visible)]="visibleEdit" [modal]="true" [breakpoints]="{ '960px': '75vw' }" [style]="{ width: '50vw' }" [draggable]="false" [resizable]="false">

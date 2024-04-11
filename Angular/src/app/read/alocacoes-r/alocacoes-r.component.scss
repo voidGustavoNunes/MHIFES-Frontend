@@ -117,15 +117,6 @@
         .dtAlocacao{
             text-transform: capitalize;
         }
-        .divInput.dtAlocacao.flexContainer{
-            display: flex;
-        }
-        .divInput.flexContainer{
-            display: flex;
-        }
-        .flexContainer > div:not(.lastDiv) {
-            margin-right: 2rem;
-        }
     }
     #meuFormulario{
         margin-top: 3rem;
@@ -161,11 +152,6 @@
             border: .02rem solid #256CF0;
             outline: none;
         }
-    }
-    .divInput.labelFlex{
-        display: flex;
-        flex-direction: column;
-        column-gap: 2;
     }
     .divBotao{
         width: fit-content;
@@ -244,6 +230,17 @@
     }
     
     .card{
+        #meuFormInfo{
+            .divInput.dtAlocacao.flexContainer{
+                display: flex;
+            }
+            .divInput.flexContainer{
+                display: flex;
+            }
+            .flexContainer > div:not(.lastDiv) {
+                margin-right: 2rem;
+            }
+        }
         input{
             width: 40vw;
         }
@@ -257,6 +254,19 @@
                 margin-right: 5rem;
             }
         }
+        .divInput.labelFlex{
+            display: flex;
+            gap: 4vw;
+
+            input{width: 18vw;}
+            div{
+                display: flex;
+                flex-direction: column;
+                .validation-error {
+                    word-wrap: break-word;
+                }
+            }
+        }
     }
     :host ::ng-deep {
         .p-calendar input{
@@ -264,6 +274,9 @@
         }
         .card .p-dropdown, .p-multiselect, .p-inputnumber{
             width: 40vw;
+        }
+        .divInput.labelFlex{
+            span.p-inputnumber.p-component, input#integeronly, .p-calendar input{width: 18vw;}
         }
     }
 }
@@ -283,6 +296,21 @@
         }
     }
     .card{
+        #meuFormInfo{
+            .divInput.dtAlocacao.flexContainer{
+                display: flex;
+                flex-direction: column;
+                column-gap: 2;
+            }
+            .divInput.flexContainer{
+                display: flex;
+                flex-direction: column;
+                column-gap: 2;
+            }
+            .flexContainer > div:not(.lastDiv) {
+                margin-right: 0;
+            }
+        }
         input{
             width: 60vw;
         }
@@ -296,6 +324,12 @@
             .botaoSalva, .botaoEdit{
                 margin-bottom: 1rem;
             }
+        }
+        .divInput.labelFlex{
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin: 1.7rem;
         }
     }
     :host ::ng-deep {

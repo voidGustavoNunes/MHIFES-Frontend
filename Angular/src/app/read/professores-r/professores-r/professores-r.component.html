@@ -1,5 +1,6 @@
 <div class="caixa">
-    <h1>Professores & Orientadores</h1>
+    <h1 *ngIf="professoresOrientador.length <= 0">Professores</h1>
+    <h1 *ngIf="professoresOrientador.length > 0">Professores & Orientadores</h1>
 
     <div class="opcao">
         <a (click)="showDialog()" class="p-button botaoC">Cadastrar +</a>
@@ -13,7 +14,7 @@
         </div>
     </div>
 
-    <div class="eqTable">
+    <div class="eqTable" *ngIf="professoresOrientador.length > 0">
         <p-table
             #dt2
             [value]="professoresOrientador"

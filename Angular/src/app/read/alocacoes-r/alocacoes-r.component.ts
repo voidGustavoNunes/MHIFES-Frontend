@@ -139,14 +139,16 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   visibleEdit: boolean = false;
   visibleInfo: boolean = false;
   
-  valor: boolean = false;
   opcaoSemana: Semana[] = [];
   selectedSemana!: Semana;
   diasIntervalo: Date[] = [];
   dataFim!: Date;
-
+  
+  disableSemana: boolean = true;
   disableDrop: boolean = true;
   disableSwit: boolean = true;
+
+  validExtraCalendar: boolean = true;
 
   dtAulaCalendar!: Date;
 
@@ -306,11 +308,29 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
 
   validarDatas() {
     const dataAula = this.form.get('dataAula')?.value;
+    const dataFim = this.dataFim;
+    const periodo = this.form.get('periodo')?.value;
 
-    if (dataAula && this.dataFim && new Date(this.dataFim) < new Date(dataAula)) {
-      this.form.get('dataAula')?.setErrors({ 'invalidEndDate': true });
-    } else {
-      this.form.get('dataAula')?.setErrors(null);
+    console.log('chegou valid')
+    if (dataAula && dataFim && periodo) {
+      const periodoInicio = new Date(periodo.dataInicio);
+      const periodoFim = new Date(periodo.dataFim);
+      const dataAulaValida = new Date(dataAula) >= periodoInicio && new Date(dataAula) <= periodoFim;
+      const dataFimAula = new Date(dataFim) >= periodoInicio && new Date(dataFim) <= periodoFim;
+      const dataFimValida = new Date(dataFim) >= new Date(dataAula);
+      
+      console.log('passou valid 1')
+      if (dataAulaValida && dataFimAula && dataFimValida) {
+        this.disableSemana = false;
+        this.form.get('dataAula')?.setErrors(null);
+        this.validExtraCalendar = true;
+        console.log('passou valid 2 true')
+      } else {
+        this.disableSemana = true;
+        this.form.get('dataAula')?.setErrors({ 'invalidEndDate': true });
+        this.validExtraCalendar = false;
+        console.log('passou valid 2 false')
+      }
     }
   }
 
@@ -407,7 +427,6 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     if(this.cadastrar) {
       if(this.visibleExtra) {
         this.visibleExtra = false;
-        this.valor = false;
       }
       this.visible = false;
       this.form.reset();
@@ -415,14 +434,6 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     } else if(this.editar) {
       this.visibleEdit = false;
       this.form.reset();
-    }
-  }
-  
-  handleChange() {
-    if (this.valor) {
-      this.visibleExtra = true;
-    } else {
-      this.visibleExtra = false;
     }
   }
   
@@ -445,16 +456,52 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   }
   
   onDateIniSelect() {
-    let ini: Date = this.form.get('dataAula')?.value;
-    
-    if(ini) {
-      this.disableSwit = false;
-      this.calendarExtra.writeValue(ini);
-      this.dataFim = ini;
-    } else {
-      this.disableSwit = true;
-      this.calendarExtra.writeValue(null);
+    const dataAula = this.form.get('dataAula')?.value;
+    const dataFim = this.dataFim;
+    const periodo = this.form.get('periodo')?.value;
+
+    if (dataAula && dataFim && periodo) {
+      const periodoInicio = new Date(periodo.dataInicio);
+      const periodoFim = new Date(periodo.dataFim);
+      const dataAulaValida = new Date(dataAula) >= periodoInicio && new Date(dataAula) <= periodoFim;
+      const dataFimAula = new Date(dataFim) >= periodoInicio && new Date(dataFim) <= periodoFim;
+      const dataFimValida = new Date(dataFim) >= new Date(dataAula);
+
+      if (dataAulaValida && dataFimAula && dataFimValida) {
+        this.form.get('dataAula')?.setErrors(null);
+        this.disableSwit = false;
+        this.validExtraCalendar = true;
+      } else {
+        this.form.get('dataAula')?.setErrors({ 'invalidEndDate': true });
+        this.disableSwit = true;
+        this.validExtraCalendar = false;
+      }
+    } else if(dataAula && periodo) {
+      const periodoInicio = new Date(periodo.dataInicio);
+      const periodoFim = new Date(periodo.dataFim);
+      const dataAulaValida = new Date(dataAula) >= periodoInicio && new Date(dataAula) <= periodoFim;
+      
+      if (dataAulaValida) {
+        this.form.get('dataAula')?.setErrors(null);
+        this.disableSwit = false;
+        this.calendarExtra.writeValue(dataAula);
+        this.dataFim = dataAula;
+      } else {
+        this.form.get('dataAula')?.setErrors({ 'invalidEndDate': true });
+        this.disableSwit = true;
+        this.calendarExtra.writeValue(null);
+      }
     }
+    
+    
+    // if(ini) {
+    //   this.disableSwit = false;
+    //   this.calendarExtra.writeValue(ini);
+    //   this.dataFim = ini;
+    // } else {
+    //   this.disableSwit = true;
+    //   this.calendarExtra.writeValue(null);
+    // }
   }
 
   atualizarDiasSemana(code: number) {
@@ -821,7 +868,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   onSubmit() {
       console.log(this.form.value)
 
-    if (this.form.valid && this.cadastrar && this.valor) {
+    if (this.form.valid && this.cadastrar) {
       this.conditionCreateSave();
       this.mss = false;
       this.visible = false;
