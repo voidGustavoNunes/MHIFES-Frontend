@@ -104,6 +104,8 @@ export class EventosRComponent implements OnInit, OnDestroy {
 
   disableDrop: boolean = true;
   disableSwit: boolean = true;
+  disableFinal: boolean = true;
+  disableSemana: boolean = true;
 
   filterOptions: FiltrarPesquisa[] = [];
   selectedFilter!: FiltrarPesquisa;
@@ -192,8 +194,10 @@ export class EventosRComponent implements OnInit, OnDestroy {
 
     if (dataEvento && this.dataFim && new Date(this.dataFim) < new Date(dataEvento)) {
       this.form.get('dataEvento')?.setErrors({ 'invalidEndDate': true });
+      this.disableSemana = true;
     } else {
       this.form.get('dataEvento')?.setErrors(null);
+      this.disableSemana = false;
     }
   }
   
@@ -299,15 +303,46 @@ export class EventosRComponent implements OnInit, OnDestroy {
     }
   }
 
+  verificarDataFinal() {
+    let ini: Date = this.form.get('dataEvento')?.value;
+    let final: Date | null = null;
+    
+    this.diasIntervalo.sort((a, b) => a.getTime() - b.getTime());
+
+    this.diasIntervalo.forEach(di => {
+      if (di > this.dataFim) {
+        final = di;
+    }
+      if(di < ini) {
+        this.form.patchValue({
+          dataEvento: di
+        })
+      }
+    })
+
+    if (final) {
+      this.dataFim = final;
+    }
+  }
+
   onDateIniSelect() {
     let ini: Date = this.form.get('dataEvento')?.value;
+    let final: Date = this.dataFim;
     
-    if(ini) {
+    if(ini && (final === undefined || final === null)) {
       this.disableSwit = false;
+      this.disableFinal = false;
+      this.disableSemana = false;
       this.dataFim = ini;
       this.calendarExtra.writeValue(ini);
+    } else if(ini && final) {
+      this.disableSwit = false;
+      this.disableFinal = false;
+      this.disableSemana = false;
     } else {
       this.disableSwit = true;
+      this.disableFinal = true;
+      this.disableSemana = true;
       this.calendarExtra.writeValue(null);
     }
   }

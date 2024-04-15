@@ -194,7 +194,7 @@
         justify-content: space-between;
         height: fit-content;
     }
-    .p-datatable-header input{
+    .card .p-dropdown, .p-datatable-header input{
         background-color: #BFE4FF;
     }
     .p-datatable-header i.pi.pi-search {
@@ -223,11 +223,11 @@
             }
         }
     }
-        :host ::ng-deep {
-            .card .p-dropdown{
-                width: 40vw;
-            }
+    :host ::ng-deep {
+        .card .p-dropdown{
+            width: 40vw;
         }
+    }
 }
 
 @media screen and (max-width: 685px) {
@@ -256,9 +256,9 @@
             }
         }
     }
-        :host ::ng-deep {
-            .card .p-dropdown{
-                width: 60vw;
-            }
+    :host ::ng-deep {
+        .card .p-dropdown{
+            width: 60vw;
         }
+    }
 }

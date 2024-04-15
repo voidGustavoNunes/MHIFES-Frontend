@@ -69,33 +69,54 @@
 <div class="card flex justify-content-center">
     <p-dialog class="pHeader" [header]=ehTitulo [(visible)]="visible" [modal]="true" [breakpoints]="{ '960px': '75vw' }" [style]="{ width: '50vw' }" [draggable]="false" [resizable]="false">
         <form id="meuFormulario" [formGroup]="form" (ngSubmit)="onSubmit()">
-            <div class="divInput">
-                <span class="p-float-label">
-                    <p-calendar appendTo="body" dateFormat="dd/mm/yy" [readonlyInput]="true" id="iniData" class="form-control" formControlName="dataEvento" (onSelect)="onDateIniSelect()" ></p-calendar>
-                    <label for="iniData">Data de Início</label>
-                </span>
-                <div *ngIf="form.get('dataEvento')?.invalid && form.get('dataEvento')?.touched" class="validation-error">
-                    <p>A data de início deve ser menor ou igual que a data final.</p>
+            <div class="divInput labelFlex">
+                <div>
+                    <span class="p-float-label">
+                        <p-calendar appendTo="body" dateFormat="dd/mm/yy" [readonlyInput]="true" id="iniData" class="form-control" formControlName="dataEvento" (onSelect)="onDateIniSelect()" ></p-calendar>
+                        <label for="iniData">Data de Início</label>
+                    </span>
+                    <div *ngIf="form.get('dataEvento')?.invalid && form.get('dataEvento')?.touched" class="validation-error">
+                        <p>A data de início deve ser menor ou igual que a data final.</p>
+                    </div>
+                </div>
+                <div>
+                    <span class="p-float-label">
+                        <p-calendar #calendarExtra [disabled]="disableFinal" appendTo="body" dateFormat="dd/mm/yy" [readonlyInput]="true" id="fimData" [(ngModel)]="dataFim" [ngModelOptions]="{standalone: true}" (ngModelChange)="validarDatas()" #calendar="ngModel" ></p-calendar>
+                        <label for="fimData">Data Final</label>
+                    </span>
                 </div>
             </div>
-            <div class="divInput pSwtich">
+                <div class="divInput">
+                    <span class="p-float-label">
+                        <p-dropdown #dropdownExtra [disabled]="disableSemana" appendTo="body" [options]="opcaoSemana" [(ngModel)]="selectedSemana" [ngModelOptions]="{standalone: true}" placeholder="Selecione um dia da semana" optionLabel="nome" inputId="float-week" (ngModelChange)="onDropdownChange()"></p-dropdown>
+                        <label for="float-week">Selecione um dia da semana</label>
+                    </span>
+                </div>
+                <div class="divInput">
+                    <span class="p-float-label">
+                        <p-calendar #calendario [disabled]="disableDrop" [(ngModel)]="diasIntervalo" [ngModelOptions]="{standalone: true}" appendTo="body" selectionMode="multiple" dateFormat="dd/mm/yy" [readonlyInput]="true" id="itvData" class="form-control" (ngModelChange)="verificarDataFinal()" ></p-calendar>
+                        <label for="itvData">Intervalo de dias</label>
+                    </span>
+                </div>
+            <!-- <div class="divInput pSwtich">
                 <p-inputSwitch #switch [disabled]="disableSwit" [(ngModel)]="valor" [ngModelOptions]="{standalone: true}" id="checkRepl" (onChange)="handleChange()"></p-inputSwitch>
                 <label for="checkRepl">Replicar dias</label>
-            </div>
-            <div class="divInput labelFlex">
+            </div> -->
+            <div class="divInput labelDescFlex">
                 <label for="descEvent">Descrição</label>
                 <textarea pInputTextarea rows="5" cols="30" maxlength="5000" id="descEvent" class="form-control" formControlName="descricao" ></textarea>
             </div>
             <div class="divInput labelFlex">
-                <label for="horinIni">Hora de início</label>
-                <input pInputText type="time" id="horinIni" class="form-control" formControlName="horarioInicio">
-            </div>
-            <div class="divInput labelFlex">
-                <label for="horinFim">Hora final</label>
-                <input pInputText type="time" id="horinFim" class="form-control" formControlName="horarioFim">
-
-                <div *ngIf="form.get('horarioFim')?.invalid && form.get('horarioFim')?.touched" class="validation-error">
-                    <p>Hora final deve ser maior que a hora de início</p>
+                <div>
+                    <label for="horinIni">Hora de início</label>
+                    <input pInputText type="time" id="horinIni" class="form-control" formControlName="horarioInicio">
+                </div>
+                <div>
+                    <label for="horinFim">Hora final</label>
+                    <input pInputText type="time" id="horinFim" class="form-control" formControlName="horarioFim">
+                    <div *ngIf="form.get('horarioFim')?.invalid && form.get('horarioFim')?.touched" class="validation-error">
+                        <p>Hora final deve ser maior que a hora de início</p>
+                    </div>
                 </div>
             </div>
             <div class="divInput">
@@ -124,7 +145,7 @@
     </p-dialog>
 </div>
 
-<div class="card flex justify-content-center">
+<!-- <div class="card flex justify-content-center">
     <p-dialog header="Replicar dias do evento" [(visible)]="visibleExtra" [breakpoints]="{ '960px': '75vw' }" [style]="{width: '50vw', 'z-index': '1102'}">
         <div id="meuFormulario">
             <div class="divInput">
@@ -150,7 +171,7 @@
             </div>
         </div>
     </p-dialog>
-</div>
+</div> -->
 
 <div class="card flex justify-content-center">
     <p-dialog class="pHeader" [header]=ehTitulo [(visible)]="visibleEdit" [modal]="true" [breakpoints]="{ '960px': '75vw' }" [style]="{ width: '50vw' }" [draggable]="false" [resizable]="false">
@@ -161,20 +182,24 @@
                     <label for="iniData">Data do Evento</label>
                 </span>
             </div>
-            <div class="divInput labelFlex">
+            <div class="divInput labelDescFlex">
                 <label for="descEvent">Descrição</label>
                 <textarea pInputTextarea rows="5" cols="30" maxlength="5000" id="descEvent" class="form-control" formControlName="descricao" ></textarea>
             </div>
             <div class="divInput labelFlex">
-                <label for="horinIni">Hora de início</label>
-                <input pInputText type="time" id="horinIni" class="form-control" formControlName="horarioInicio">
-            </div>
-            <div class="divInput labelFlex">
-                <label for="horinFim">Hora final</label>
-                <input pInputText type="time" id="horinFim" class="form-control" formControlName="horarioFim">
-                
-                <div *ngIf="form.get('horarioFim')?.invalid && form.get('horarioFim')?.touched" class="validation-error">
-                    <p>Hora final deve ser maior que a hora de início</p>
+                <div>
+                    <label for="horinIni">Hora de início</label>
+                    <input pInputText type="time" id="horinIni" class="form-control" formControlName="horarioInicio">
+                </div>
+            <!-- </div> -->
+            <!-- <div class="divInput labelFlex"> -->
+                <div>
+                    <label for="horinFim">Hora final</label>
+                    <input pInputText type="time" id="horinFim" class="form-control" formControlName="horarioFim">
+                    
+                    <div *ngIf="form.get('horarioFim')?.invalid && form.get('horarioFim')?.touched" class="validation-error">
+                        <p>Hora final deve ser maior que a hora de início</p>
+                    </div>
                 </div>
             </div>
             <div class="divInput">
@@ -208,11 +233,13 @@
             <div class="divInput dtEvento">
                 <b>Data do evento:</b> {{eventoInfo?.dataEvento | date: 'fullDate' : '' : 'pt-BR'}}
             </div>
-            <div class="divInput">
-                <b>Hora de início:</b> {{ formatarHora(eventoInfo?.horarioInicio) }}
-            </div>
-            <div class="divInput">
-                <b>Hora de fim:</b> {{ formatarHora(eventoInfo?.horarioFim) }}
+            <div class="divInput flexContainer">
+                <div>
+                    <b>Hora de início:</b> {{ formatarHora(eventoInfo?.horarioInicio) }}
+                </div>
+                <div class="lastDiv">
+                    <b>Hora de fim:</b> {{ formatarHora(eventoInfo?.horarioFim) }}
+                </div>
             </div>
             <div class="divInput">
                 <b>Local do evento:</b> {{eventoInfo?.local?.nome}}

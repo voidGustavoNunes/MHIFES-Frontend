@@ -449,13 +449,35 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       this.disableDrop = true;
     }
   }
+
+  verificarDataFinal() {
+    let ini: Date = this.form.get('dataAula')?.value;
+    let final: Date | null = null;
+    
+    this.diasIntervalo.sort((a, b) => a.getTime() - b.getTime());
+
+    this.diasIntervalo.forEach(di => {
+      if (di > this.dataFim) {
+        final = di;
+    }
+      if(di < ini) {
+        this.form.patchValue({
+          dataAula: di
+        })
+      }
+    })
+
+    if (final) {
+      this.dataFim = final;
+    }
+  }
   
   onDateIniSelect() {
     const dataAula = this.form.get('dataAula')?.value;
     const dataFim = this.dataFim;
     const periodo = this.form.get('periodo')?.value;
 
-    if (dataAula && dataFim && periodo) {
+    if (dataAula && (dataFim !== undefined || dataFim !== null) && periodo) {
       const periodoInicio = new Date(periodo.dataInicio);
       const periodoFim = new Date(periodo.dataFim);
       const dataAulaValida = new Date(dataAula).getTime() >= periodoInicio.getTime() && new Date(dataAula).getTime() <= periodoFim.getTime();
@@ -471,7 +493,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
         this.disableSwit = true;
         this.validExtraCalendar = false;
       }
-    } else if(dataAula && periodo) {
+    } else if(dataAula && periodo && (dataFim === undefined || dataFim === null)) {
       const periodoInicio = new Date(periodo.dataInicio);
       const periodoFim = new Date(periodo.dataFim);
       const dataAulaValida = new Date(dataAula) >= periodoInicio && new Date(dataAula) <= periodoFim;
@@ -865,7 +887,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   onSubmit() {
       console.log(this.form.value)
 
-    if (this.form.valid && this.cadastrar) {
+    if (this.form.valid && this.cadastrar && this.isValidDates()) {
       this.conditionCreateSave();
       this.mss = false;
       this.visible = false;
@@ -883,6 +905,28 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
         { severity: 'warn', summary: 'Atenção', detail: 'Informação inválida. Preencha os campos!', life: 3000 },
       ];
     }
+  }
+
+  isValidDates() {
+    const dataAula = this.form.get('dataAula')?.value;
+    const dataFim = this.dataFim;
+    const periodo = this.form.get('periodo')?.value;
+
+    if (dataAula && dataFim && periodo) {
+      const periodoInicio = new Date(periodo.dataInicio);
+      const periodoFim = new Date(periodo.dataFim);
+      const dataAulaValida = new Date(dataAula).getTime() >= periodoInicio.getTime() && new Date(dataAula).getTime() <= periodoFim.getTime();
+      const dataFimAula = new Date(dataFim).getTime() >= periodoInicio.getTime() && new Date(dataFim).getTime() <= periodoFim.getTime();
+      const dataFimValida = new Date(dataFim).getTime() >= new Date(dataAula).getTime();
+      
+      if (dataAulaValida && dataFimAula && dataFimValida) return true
+      else {
+        this.form.get('dataAula')?.setErrors({ 'invalidEndDate': true });
+        this.validExtraCalendar = false;
+        this.disableSemana = true;
+        return false;
+      }
+    } else return false
   }
 
   conditionCreateSave() {

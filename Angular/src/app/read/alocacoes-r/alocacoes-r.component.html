@@ -149,7 +149,7 @@
             </div>
             <div class="divInput">
                 <span class="p-float-label">
-                    <p-calendar #calendario [disabled]="disableDrop" [(ngModel)]="diasIntervalo" [ngModelOptions]="{standalone: true}" appendTo="body" selectionMode="multiple" dateFormat="dd/mm/yy" [readonlyInput]="true" id="itvData" class="form-control" ></p-calendar>
+                    <p-calendar #calendario [disabled]="disableDrop" [(ngModel)]="diasIntervalo" [ngModelOptions]="{standalone: true}" appendTo="body" selectionMode="multiple" dateFormat="dd/mm/yy" [readonlyInput]="true" id="itvData" class="form-control" (ngModelChange)="verificarDataFinal()" ></p-calendar>
                     <label for="itvData">Intervalo de dias</label>
                 </span>
             </div>

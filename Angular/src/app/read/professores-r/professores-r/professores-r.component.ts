@@ -23,6 +23,9 @@ import { InputSwitch, InputSwitchModule } from 'primeng/inputswitch';
 import { MessagesModule } from 'primeng/messages';
 import { FiltrarPesquisa } from '../../../models/share/filtrar-pesquisa.models';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { Coordenadoria } from '../../../models/coordenadoria.models';
+import { CoordenadoriaService } from '../../../service/coordenadoria.service';
+import { Dropdown, DropdownModule } from 'primeng/dropdown';
 
 @Component({
   selector: 'app-professores-r',
@@ -45,14 +48,16 @@ import { OverlayPanelModule } from 'primeng/overlaypanel';
     ConfirmPopupModule,
     InputSwitchModule,
     MessagesModule,
-    OverlayPanelModule
+    OverlayPanelModule,
+    DropdownModule
   ],
   templateUrl: './professores-r.component.html',
   styleUrls: ['./professores-r.component.scss'],
   providers: [
     ProfessorService,
     ConfirmationService,
-    MessageService
+    MessageService,
+    CoordenadoriaService
   ]
 })
 
@@ -62,6 +67,7 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
   @ViewChild('searchTable2') searchTable2!: ElementRef;
   @ViewChild('searchTable1') searchTable1!: ElementRef;
   @ViewChild('switch') switch!: InputSwitch;
+  @ViewChild('dropdown') dropdown!: Dropdown;
 
   professoresCadast: Professor[] = [];
   professoresEdit: Professor[] = [];
@@ -72,13 +78,17 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
   professoresFilterProf: Professor[] = [];
   professoresOrientador: Professor[] = [];
 
+  coordenadoriasArray: Coordenadoria[] = [];
+
   unsubscribe$!: Subscription;
+  unsubscribe$Cooda!: Subscription;
   form: FormGroup;
 
   ehTitulo: string = '';
   visible: boolean = false;
   editar: boolean = false;
   cadastrar: boolean = false;
+  switchCooda: boolean = false;
   
   messages!: Message[];
   mss: boolean = false;
@@ -92,6 +102,7 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
 
   constructor(
     private professorService: ProfessorService,
+    private coordaService: CoordenadoriaService,
     private router: Router,
     private formBuilder: FormBuilder,
     private confirmationService: ConfirmationService
@@ -101,7 +112,8 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
         nome: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
         matricula: [null, [Validators.required]],
         curso: [null, [Validators.required]],
-        ehCoordenador: [false, [Validators.required]]
+        ehCoordenador: [false, [Validators.required]],
+        // coordenadoria: [null]
       });
   }
 
@@ -134,7 +146,20 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
       },
       error: (err: any) => {
         this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Dados não encontrados.', life: 3000 },
+          { severity: 'error', summary: 'Erro', detail: 'Dados de professores não encontrados.', life: 3000 },
+        ];
+      }
+    });
+
+    this.unsubscribe$Cooda = this.coordaService.listar()
+    .subscribe({
+      next: (itens:any) => {
+        const data = itens;
+        this.coordenadoriasArray = data.sort((a:any, b:any) => (a.nome < b.nome) ? -1 : 1);
+      },
+      error: (err: any) => {
+        this.messages = [
+          { severity: 'error', summary: 'Erro', detail: 'Dados de coordenadorias não encontrados.', life: 3000 },
         ];
       }
     });
@@ -142,6 +167,7 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.unsubscribe$.unsubscribe();
+    this.unsubscribe$Cooda.unsubscribe();
   }
 
   showInfoDialog(value: Professor) {
@@ -161,9 +187,13 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
       nome: value.nome,
       matricula: value.matricula,
       curso: value.curso,
-      ehCoordenador: value.ehCoordenador
+      ehCoordenador: value.ehCoordenador,
+      // coordenadoria: value.coordenadoria
     });
     this.switch.writeValue(value.ehCoordenador);
+    // if(value.ehCoordenador) {
+      // this.dropdown.writeValue(value.coordenadoria)
+    // }
   }
 
   showDialog() {
@@ -261,6 +291,10 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
         }
       })
     }
+  }
+
+  onChangeSwitch() {
+    this.switchCooda = this.form.get('ehCoordenador')?.value;
   }
 
   onKeyDown(tipo: string, event: KeyboardEvent, searchTerm: string) {
