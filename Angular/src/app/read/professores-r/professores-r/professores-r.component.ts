@@ -213,6 +213,7 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
     this.visible = false;
     this.form.reset();
     this.switch.writeValue(null);
+    this.switchCooda = false;
   }
   
   limparFilter(tipo: string){
@@ -291,10 +292,6 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
         }
       })
     }
-  }
-
-  onChangeSwitch() {
-    this.switchCooda = this.form.get('ehCoordenador')?.value;
   }
 
   onKeyDown(tipo: string, event: KeyboardEvent, searchTerm: string) {
