@@ -496,6 +496,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     if (final) {
       this.dataFim = final;
     }
+    this.onDropdownChange();
   }
   
   onDateIniSelect() {
