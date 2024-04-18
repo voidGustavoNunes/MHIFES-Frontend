@@ -102,7 +102,7 @@ export class EventosRComponent implements OnInit, OnDestroy {
   visibleInfo: boolean = false;
   
   opcaoSemana: Semana[] = [];
-  diasIntervalo: Date[] = [];
+  diasIntervalo: Date[] | null = null;
   dataFim: Date | null = null;
 
   disableIntervalo: boolean = true;
@@ -314,9 +314,11 @@ export class EventosRComponent implements OnInit, OnDestroy {
         this.disableIntervalo = false;
       } else {
         this.disableIntervalo = true;
+        this.diasIntervalo = null;
       }
     } else {
       this.disableIntervalo = true;
+      this.diasIntervalo = null;
     }
   }
 
@@ -324,23 +326,25 @@ export class EventosRComponent implements OnInit, OnDestroy {
     let ini: Date = this.form.get('dataEvento')?.value;
     let final: Date | null = null;
     
-    this.diasIntervalo.sort((a, b) => a.getTime() - b.getTime());
+    if (this.diasIntervalo !== null) {
+      this.diasIntervalo.sort((a, b) => a.getTime() - b.getTime());
 
-    this.diasIntervalo.forEach(di => {
-      if (this.dataFim !== null && di > this.dataFim) {
-        final = di;
-    }
-      if(di < ini) {
-        this.form.patchValue({
-          dataEvento: di
-        })
+      this.diasIntervalo.forEach(di => {
+        if (this.dataFim !== null && di > this.dataFim) {
+          final = di;
+        }
+        if(di < ini) {
+          this.form.patchValue({
+            dataEvento: di
+          })
+        }
+      })
+
+      if (final) {
+        this.dataFim = final;
       }
-    })
-
-    if (final) {
-      this.dataFim = final;
+      this.onDropdownChange();
     }
-    this.onDropdownChange();
   }
 
   onDateIniSelect() {

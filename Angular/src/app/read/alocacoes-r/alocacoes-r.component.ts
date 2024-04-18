@@ -141,7 +141,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   
   opcaoSemana: Semana[] = [];
   selectedSemana!: Semana;
-  diasIntervalo: Date[] = [];
+  diasIntervalo: Date[] | null = null;
   dataFim!: Date;
   
   disableSemana: boolean = true;
@@ -470,9 +470,11 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
         this.disableIntervalo = false;
       } else {
         this.disableIntervalo = true;
+        this.diasIntervalo = null;
       }
     } else {
       this.disableIntervalo = true;
+      this.diasIntervalo = null;
     }
   }
 
@@ -480,23 +482,25 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     let ini: Date = this.form.get('dataAula')?.value;
     let final: Date | null = null;
     
-    this.diasIntervalo.sort((a, b) => a.getTime() - b.getTime());
+    if (this.diasIntervalo !== null) {
+      this.diasIntervalo.sort((a, b) => a.getTime() - b.getTime());
 
-    this.diasIntervalo.forEach(di => {
-      if (di > this.dataFim) {
-        final = di;
-    }
-      if(di < ini) {
-        this.form.patchValue({
-          dataAula: di
-        })
+      this.diasIntervalo.forEach(di => {
+        if (di > this.dataFim) {
+          final = di;
       }
-    })
+        if(di < ini) {
+          this.form.patchValue({
+            dataAula: di
+          })
+        }
+      })
 
-    if (final) {
-      this.dataFim = final;
+      if (final) {
+        this.dataFim = final;
+      }
+      this.onDropdownChange();
     }
-    this.onDropdownChange();
   }
   
   onDateIniSelect() {
