@@ -1,5 +1,5 @@
 <div class="caixa">
-    <h1>Períodos</h1>
+    <h1>Horários</h1>
 
     <div class="opcao">
         <a (click)="showDialog()" class="p-button botaoC">Cadastrar +</a>
@@ -22,7 +22,7 @@
     <div class="eqTable">
         <p-table
             #dt1
-            [value]="periodosData"
+            [value]="horariosData"
             styleClass="p-datatable-striped"
             [tableStyle]="{'min-width': '50rem'}"
             [paginator]="true"
@@ -33,29 +33,28 @@
         >
             <ng-template pTemplate="header">
                 <tr class="tbHeader">
-                    <th>Nome</th>
-                    <th>Período</th>
-                    <!-- <th></th> -->
+                    <th>Dia da semana</th>
+                    <th>Hora de início</th>
+                    <th>Hora de fim</th>
                     <th></th>
                 </tr>
             </ng-template>
-            <ng-template pTemplate="body" let-periodo>
+            <ng-template pTemplate="body" let-horario>
                 <tr class="tbBody">
-                    <td class="texto-limitado">{{periodo?.descricao }}</td>
-                    <td>{{periodo?.dataInicio | date: 'dd/MM/yyyy'}} - {{periodo?.dataFim | date: 'dd/MM/yyyy'}}</td>
-                    <!-- <td></td> -->
+                    <td>{{ formatSemanaStrTable(horario?.diaSemana) }}</td>
+                    <td>{{ formatarHora(horario?.horaInicio) }}</td>
+                    <td>{{ formatarHora(horario?.horaFim) }}</td>
                     <td>
-                        <button type="button" class="botaoInfo" (click)="showInfoDialog(periodo)" pButton>Info</button>
-                        <button type="button" class="botaoEdit" (click)="showEditDialog(periodo)" pButton>Editar</button>
+                        <button type="button" class="botaoEdit" (click)="showEditDialog(horario)" pButton>Editar</button>
                         <p-toast></p-toast>
                         <p-confirmPopup></p-confirmPopup>
-                        <button type="button" class="botaoDele" (click)="confirm2($event, periodo?.id)" severity="danger" pButton>Deletar</button>
+                        <button type="button" class="botaoDele" (click)="confirm2($event, horario?.id)" severity="danger" pButton>Deletar</button>
                     </td>
                 </tr>
             </ng-template>
             <ng-template pTemplate="emptymessage">
                 <tr>
-                    <td colspan="3">Não há períodos cadastrados.</td>
+                    <td colspan="3">Não há horários cadastrados.</td>
                 </tr>
             </ng-template>
         </p-table>
@@ -70,22 +69,22 @@
         <form id="meuFormulario" [formGroup]="form" (ngSubmit)="onSubmit()">
             <div class="divInput">
                 <span class="p-float-label">
-                    <p-calendar dateFormat="dd/mm/yy" id="inicioPer" class="form-control" formControlName="dataInicio" ></p-calendar>
-                    <label for="inicioPer">Data de início</label>
+                    <p-dropdown #dropdown appendTo="body" [options]="opcaoSemana" [(ngModel)]="selectedSemana" [ngModelOptions]="{standalone: true}" placeholder="Selecione um dia da semana" optionLabel="nome" inputId="float-week" (ngModelChange)="onDropdownChange()"></p-dropdown>
+                    <label for="float-week">Selecione o dia da semana</label>
                 </span>
-            </div>
-            <div class="divInput">
-                <span class="p-float-label">
-                    <p-calendar dateFormat="dd/mm/yy" id="fimPer" class="form-control" formControlName="dataFim" ></p-calendar>
-                    <label for="fimPer">Data final</label>
-                </span>
-                <div *ngIf="form.get('dataFim')?.invalid && form.get('dataFim')?.touched" class="validation-error">
-                    <p>A data final deve ser maior ou igual que a data de início.</p>
-                </div>
             </div>
             <div class="divInput labelFlex">
-                <label for="descEvent">Descrição</label>
-                <textarea pInputTextarea rows="5" cols="30" maxlength="5000" id="descEvent" class="form-control" formControlName="descricao" ></textarea>
+                <div>
+                    <label for="horinIni">Hora de início</label>
+                    <input pInputText type="time" id="horinIni" class="form-control" formControlName="horaInicio">
+                </div>
+                <div>
+                    <label for="horinFim">Hora final</label>
+                    <input pInputText type="time" id="horinFim" class="form-control" formControlName="horaFim">
+                    <div *ngIf="form.get('horaFim')?.invalid && form.get('horaFim')?.touched" class="validation-error">
+                        <p>Hora final deve ser maior que a hora de início</p>
+                    </div>
+                </div>
             </div>
             <div class="divBotao">
                 <button type="submit" class="botaoSalva" *ngIf="cadastrar" pButton>Salvar</button>
@@ -93,25 +92,6 @@
                 <button type="button" class="botaoCancela" (click)="hideDialog()" pButton>Cancelar</button>
             </div>
         </form>
-    </p-dialog>
-</div>
-
-<div class="card flex justify-content-center">
-    <p-dialog header="Info do Período" [(visible)]="visibleInfo" [breakpoints]="{ '960px': '75vw' }" [style]="{width: '50vw', 'z-index': '1102'}">
-        <div id="meuFormInfo">
-            <div class="divInput dtPeriodo">
-                <b>Data de início:</b> {{periodoInfo?.dataInicio | date: 'fullDate' : '' : 'pt-BR'}}
-            </div>
-            <div class="divInput dtPeriodo">
-                <b>Data de fim:</b> {{periodoInfo?.dataFim | date: 'fullDate' : '' : 'pt-BR'}}
-            </div>
-            <div class="divInput" style="white-space: pre-line;">
-                <b>Descrição:</b> {{periodoInfo?.descricao}}
-            </div>
-            <div class="divBotao">
-                <button type="button" class="botaoInfo" (click)="visibleInfo = false" pButton>Ok</button>
-            </div>
-        </div>
     </p-dialog>
 </div>
 

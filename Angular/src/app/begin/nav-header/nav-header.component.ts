@@ -97,6 +97,10 @@ export class NavHeaderComponent implements OnInit {
             routerLink:'disciplinas',
           },
           {
+            label: 'Horários',
+            routerLink:'horarios',
+          },
+          {
             label: 'Períodos',
             routerLink:'periodos',
           },

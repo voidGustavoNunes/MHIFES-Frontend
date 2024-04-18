@@ -3,7 +3,7 @@
     .footer-content{
         .footer-left{
             p{
-                font-size: .8rem;
+                font-size: .9rem;
             }
             .social-icons{
                 display: flex;
@@ -35,6 +35,7 @@
     }
     
     .footer-bottom{
+        font-size: .8rem;
         padding: 1rem 0;
         a{color: #256CF0;}
     }
@@ -44,10 +45,12 @@
     .footer-content{
         display: flex;
         justify-content: space-around;
-        row-gap: 3;
+        gap: 3rem;
         .footer-left{
+            width: 50%;
             align-self: center;
         }
+        .footer-right{width: 50%;}
     }
 }
 
@@ -55,6 +58,6 @@
     .footer-content{
         display: flex;
         flex-flow: column;
-        column-gap: 3;
+        gap: 3rem;
     }
 }

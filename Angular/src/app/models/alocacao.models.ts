@@ -4,12 +4,14 @@ import { Disciplina } from "./disciplina.models";
 import { Periodo } from "./periodo.models";
 import { Professor } from "./professor.models";
 import { Aluno } from "./aluno.models";
+import { Horario } from "./horario.models";
 
 export interface Alocacao {
   id: number;
   numAulas: number;
-  horaInicio: Time;
-  horaFinal: Time;
+  horario: Horario;
+  // horaInicio: Time;
+  // horaFinal: Time;
   turma: string;
   diaSemana: string;
   dataAula: Date;

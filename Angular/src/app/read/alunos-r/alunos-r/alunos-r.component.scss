@@ -180,7 +180,7 @@
 
 @media screen and (min-width: 686px) {
   .caixa{
-      margin: 0 6rem;
+      margin: 0 6rem 12rem;
       .opcao{
           display: flex;
           justify-content: space-between;
@@ -203,7 +203,7 @@
 
 @media screen and (max-width: 685px) {
   .caixa{
-      margin: 0 1rem;
+      margin: 0 1rem 12rem;
       .opcao{
           display: flex;
           flex-direction: column;

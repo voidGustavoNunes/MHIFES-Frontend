@@ -115,6 +115,18 @@
     #meuFormulario{
         margin-top: 3rem;
     }
+    .validation-error{
+        margin-top: -0.5rem;
+        margin-bottom: -.4375em;
+        p{
+            color: #dc3545;
+            margin-top: 1em;
+            border-left: 3px solid #dc3545;
+            padding-left: .2em;
+            text-align: start;
+            font-size: .8rem;
+        }
+    }
     .divInput{
         width: fit-content;
         margin: 0 auto 2rem;
@@ -204,7 +216,7 @@
 
 @media screen and (min-width: 686px) {
     .caixa{
-        margin: 0 6rem;
+        margin: 0 6rem 12rem;
         .opcao{
             display: flex;
             justify-content: space-between;
@@ -215,6 +227,10 @@
     .card{
         input{
             width: 40vw;
+        }
+        .validation-error{
+            min-width: 40vw;
+            max-width: 40vw;
         }
         .divBotao{
             display: flex;
@@ -232,7 +248,7 @@
 
 @media screen and (max-width: 685px) {
     .caixa{
-        margin: 0 1rem;
+        margin: 0 1rem 12rem;
         .opcao{
             display: flex;
             flex-direction: column;
@@ -247,6 +263,10 @@
     .card{
         input{
             width: 60vw;
+        }
+        .validation-error{
+            min-width: 60vw;
+            max-width: 60vw;
         }
         .divBotao{
             display: flex;

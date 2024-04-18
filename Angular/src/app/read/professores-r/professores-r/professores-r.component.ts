@@ -111,10 +111,10 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
         id: [null],
         nome: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
         matricula: [null, [Validators.required]],
-        curso: [null, [Validators.required]],
+        curso: [null],
         ehCoordenador: [false, [Validators.required]],
-        // coordenadoria: [null]
-      });
+        coordenadoria: [null]
+      }, { validator: this.peloMenosUmSelecionadoValidator });
   }
 
   ngOnInit() {
@@ -170,6 +170,17 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
     this.unsubscribe$Cooda.unsubscribe();
   }
 
+  peloMenosUmSelecionadoValidator(formGroup: FormGroup) {
+    const curso = formGroup.get('curso')?.value;
+    const coordenadoria = formGroup.get('coordenadoria')?.value;
+
+    if (!curso && !coordenadoria) {
+      return { peloMenosUmSelecionado: true };
+    }
+
+    return null;
+  }
+
   showInfoDialog(value: Professor) {
     this.visibleInfo = true;
     this.professorInfo = value;
@@ -188,12 +199,13 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
       matricula: value.matricula,
       curso: value.curso,
       ehCoordenador: value.ehCoordenador,
-      // coordenadoria: value.coordenadoria
+      coordenadoria: value.coordenadoria
     });
     this.switch.writeValue(value.ehCoordenador);
-    // if(value.ehCoordenador) {
-      // this.dropdown.writeValue(value.coordenadoria)
-    // }
+    if(value.ehCoordenador) {
+      this.switchCooda = true;
+      this.dropdown.writeValue(value.coordenadoria)
+    }
   }
 
   showDialog() {
@@ -206,14 +218,27 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
     this.visibleInfo = false;
     this.cadastrar = true;
     this.editar = false;
-    this.switch.writeValue(null);
+    this.switch.writeValue(false);
+    this.switchCooda = false;
   }
   
   hideDialog() {
     this.visible = false;
     this.form.reset();
-    this.switch.writeValue(null);
+    this.switch.writeValue(false);
     this.switchCooda = false;
+  }
+
+  patchForm() {
+    if(this.editar && !this.switchCooda) {
+      this.form.patchValue({
+        coordenadoria: null
+      })
+    } else if(this.editar && this.switchCooda) {
+      this.form.patchValue({
+        curso: null
+      })
+    }
   }
   
   limparFilter(tipo: string){
@@ -257,7 +282,7 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
   searchFilter2(tipo: string, term: string) {
     if(tipo == 'o') {
       this.professoresOrientador = this.professoresFilterOri.filter(el => {
-        if (el.curso.toLowerCase().includes(term.toLowerCase())) {
+        if (el.curso?.toLowerCase().includes(term.toLowerCase())) {
           return el;
         } else {
           return null;
@@ -265,7 +290,7 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
       })
     } else if(tipo == 'p') {
       this.professoresNaoOrienta = this.professoresFilterProf.filter(el => {
-        if (el.curso.toLowerCase().includes(term.toLowerCase())) {
+        if (el.curso?.toLowerCase().includes(term.toLowerCase())) {
           return el;
         } else {
           return null;
@@ -394,7 +419,6 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
   }
 
   onSubmit() {
-    console.log(this.form.get('ehCoordenador')?.value)
     if (this.form.valid && this.cadastrar) {
       this.professoresCadast = this.form.value;
       this.enviarFormSave();
