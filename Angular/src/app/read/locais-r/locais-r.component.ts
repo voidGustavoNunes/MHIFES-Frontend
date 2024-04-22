@@ -55,7 +55,7 @@ import { FiltrarPesquisa } from '../../models/share/filtrar-pesquisa.models';
     LocalService,
     EquipamentoService,
     ConfirmationService,
-    MessageService
+    MessageService,
   ]
 })
 export class LocaisRComponent implements OnInit, OnDestroy {

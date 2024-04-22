@@ -4,10 +4,17 @@ import { Horario } from "./horario.models";
 
 export interface Evento {
     id: number;
+    nome: string;
     dataEvento: Date;
     descricao: string;
-    horario: Horario;
-    // horarioInicio: Time;
-    // horarioFim: Time;
+    // horario: Horario;
+    horarioInicio: Time;
+    horarioFim: Time;
     local: Local;
+}
+
+export interface EventoHourData {
+    dataEvento: Date;
+    horarioInicio: Time;
+    horarioFim: Time;
 }

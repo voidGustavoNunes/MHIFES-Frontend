@@ -1,5 +1,6 @@
 <div class="card">
     <p-menubar class="menu" [model]="itemsLog" *ngIf="isSpecialPage">
+    <!-- <p-menubar class="menu" [model]="itemsLog" *ngIf="!perfil"> -->
         <ng-template pTemplate="start">
             <a routerLink="login" class="logo">
                 <img src="assets/img/logoIfes.svg" alt="Logo do IFES" width="150" height="64"/>
@@ -8,6 +9,7 @@
     </p-menubar>
 
     <p-menubar class="menu" [model]="itemsHom" *ngIf="!isSpecialPage">
+    <!-- <p-menubar class="menu" [model]="itemsHom" *ngIf="perfil"> -->
         <ng-template pTemplate="start">
             <a routerLink="login" class="logo">
                 <img src="assets/img/logoIfes.svg" alt="Logo do IFES" width="150" height="64"/>

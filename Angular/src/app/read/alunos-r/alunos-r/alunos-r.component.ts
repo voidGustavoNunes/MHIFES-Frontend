@@ -55,7 +55,7 @@ export class AlunosRComponent implements OnInit, OnDestroy {
   alunosData: Aluno[] = [];
   alunosFilter: Aluno[] = [];
   alunosCadast: Aluno[] = [];
-  alunosEdit: Aluno[] = [];
+  alunosEdit!: Aluno;
 
   unsubscribe$!: Subscription;
   form: FormGroup;

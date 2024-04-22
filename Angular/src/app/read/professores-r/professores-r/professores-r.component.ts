@@ -70,7 +70,7 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
   @ViewChild('dropdown') dropdown!: Dropdown;
 
   professoresCadast: Professor[] = [];
-  professoresEdit: Professor[] = [];
+  professoresEdit!: Professor;
   
   professoresFilterOri: Professor[] = [];
   professoresNaoOrienta: Professor[] = [];
@@ -110,7 +110,7 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
       this.form = this.formBuilder.group({
         id: [null],
         nome: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
-        matricula: [null, [Validators.required]],
+        matricula: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
         curso: [null],
         ehCoordenador: [false, [Validators.required]],
         coordenadoria: [null]

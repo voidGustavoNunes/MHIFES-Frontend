@@ -45,7 +45,7 @@ import { MessagesModule } from 'primeng/messages';
   providers: [
     DisciplinaService,
     ConfirmationService,
-    MessageService
+    MessageService,
   ]
 })
 export class DisciplinasRComponent implements OnInit, OnDestroy {

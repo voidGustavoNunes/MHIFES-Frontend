@@ -50,7 +50,7 @@ import { FiltrarPesquisa } from '../../models/share/filtrar-pesquisa.models';
   providers: [
     PeriodoService,
     ConfirmationService,
-    MessageService
+    MessageService,
   ]
 })
 export class PeriodosRComponent implements OnInit, OnDestroy {

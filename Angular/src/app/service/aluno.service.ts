@@ -21,7 +21,7 @@ export class AlunoService {
     return this.http.post(`${this.API}`, record);
   }
 
-  atualizar(id: number, record: Aluno[]): Observable<Object> {
+  atualizar(id: number, record: Aluno): Observable<Object> {
     return this.http.put(`${this.API}/${id}`, record);
   }
 

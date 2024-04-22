@@ -3,19 +3,31 @@
     <div class="card">
         <p>Seja bem-vindo ao MHIFES! Aqui, onde seu horário individual está sempre à vista, seja para a semana ou para o horário mais próximo.</p>
         <div class="rdButton">
-                <div class="flex align-items-center">
-                    <p-radioButton name="horario" value="Hora Atual" [(ngModel)]="ingredient" inputId="ingredient1"></p-radioButton>
-                    <label for="ingredient1" class="ml-2">Hora Atual</label>
-                </div>
-        
-                <div class="flex align-items-center">
-                    <p-radioButton name="horario" value="Semana" [(ngModel)]="ingredient" inputId="ingredient2"></p-radioButton>
-                    <label for="ingredient2" class="ml-2">Semana</label>
-                </div>
+            <div class="flex align-items-center" *ngFor="let horario of filterOptions" class="field-checkbox">
+                <p-radioButton  [inputId]="horario.id.toString()" [value]="horario" [(ngModel)]="selectedFilter" name="horario" inputId="ingredient1"></p-radioButton>
+                <label [for]="horario.id" class="ml-2">{{ horario.nome }}</label>
+            </div>
         </div>
             
-        <div class="eqTable">
-            <p-table [value]="horarioIndividualData" styleClass="p-datatable-striped" [tableStyle]="{'min-width': '50vw'}" >
+        <div class="eqTable" *ngIf="selectedFilter.id === 0">
+            <p-table styleClass="p-datatable-striped" [tableStyle]="{'min-width': '50vw'}" >
+                <ng-template pTemplate="header" let-columns>
+                    <tr class="tbHeader">
+                        <th>Horário</th>
+                        <th>{{ diaSemanaExibido }}</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body">
+                    <tr class="tbBody">
+                        <td>{{ formatarHora(alocaoMaisProxima.horarioInicio) }} - {{ formatarHora(alocaoMaisProxima.horarioFim) }}</td>
+                        <td>{{ alocaoMaisProxima.disciplina.nome }}</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+            
+        <div class="eqTable" *ngIf="selectedFilter.id === 1">
+            <p-table [value]="alocacoesArray" styleClass="p-datatable-striped" [tableStyle]="{'min-width': '50vw'}" >
                 <ng-template pTemplate="header" let-columns>
                     <tr class="tbHeader">
                         <th>Horário</th>
@@ -27,15 +39,14 @@
                         <th>Sáb</th>
                     </tr>
                 </ng-template>
-                <ng-template pTemplate="body" let-hora>
+                <ng-template pTemplate="body" let-aloca>
                     <tr class="tbBody">
-                        <td>{{hora.hora}}</td>
-                        <td>{{hora.seg}}</td>
-                        <td>{{hora.ter}}</td>
-                        <td>{{hora.qua}}</td>
-                        <td>{{hora.qui}}</td>
-                        <td>{{hora.sex}}</td>
-                        <td>{{hora.sab}}</td>
+                        <td class="larguraFixa">{{ formatarHora(aloca.horario.horaInicio) }} - {{ formatarHora(aloca.horario.horaFim) }}</td>
+                        <td *ngFor="let dia of diasDaSemana; let i = index">
+                            <ng-container *ngIf="exibirAlocacao(aloca, dia) && i !== 0">
+                            {{ aloca.disciplina.nome }}
+                            </ng-container>
+                        </td>
                     </tr>
                 </ng-template>
             </p-table>

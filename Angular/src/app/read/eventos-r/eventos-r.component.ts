@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Time } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
@@ -16,7 +16,7 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ScrollTopModule } from 'primeng/scrolltop';
 import { Calendar, CalendarModule } from 'primeng/calendar';
-import { Evento } from '../../models/evento.models';
+import { Evento, EventoHourData } from '../../models/evento.models';
 import { EventoService } from '../../service/evento.service';
 import { Local } from '../../models/local.models';
 import { LocalService } from '../../service/local.service';
@@ -31,6 +31,8 @@ import { registerLocaleData } from '@angular/common';
 import localePT from '@angular/common/locales/pt';
 import { DiaSemana, Horario } from '../../models/horario.models';
 import { HorarioService } from '../../service/horario.service';
+import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
+import { CheckboxModule } from 'primeng/checkbox';
 registerLocaleData(localePT);
 
 @Component({
@@ -57,7 +59,9 @@ registerLocaleData(localePT);
     InputMaskModule,
     InputSwitchModule,
     OverlayPanelModule,
-    MessagesModule
+    MessagesModule,
+    NgxMaskDirective,
+    CheckboxModule
   ],
   templateUrl: './eventos-r.component.html',
   styleUrl: './eventos-r.component.scss',
@@ -66,17 +70,16 @@ registerLocaleData(localePT);
     LocalService,
     HorarioService,
     ConfirmationService,
-    MessageService
+    MessageService,
+    provideNgxMask()
   ]
 })
 export class EventosRComponent implements OnInit, OnDestroy {
   @ViewChild('searchInput') inputSearch!: ElementRef;
-  @ViewChild('dropdownHora') dropdownHora!: Dropdown;
   @ViewChild('dropdownLocal') dropdownLocal!: Dropdown;
   @ViewChild('switch') switch!: InputSwitch;
   @ViewChild('calendarEdit') calendarEdit!: Calendar;
   @ViewChild('calendarExtra') calendarExtra!: Calendar;
-  @ViewChild('calendario') calendario!: Calendar;
 
   eventosData: Evento[] = [];
   eventosFilter: Evento[] = [];
@@ -101,20 +104,23 @@ export class EventosRComponent implements OnInit, OnDestroy {
   visibleEdit: boolean = false;
   visibleInfo: boolean = false;
   
-  opcaoSemana: Semana[] = [];
   diasIntervalo: Date[] | null = null;
-  dataFim: Date | null = null;
-
+  
   disableIntervalo: boolean = true;
   disableFinal: boolean = true;
   disableSemana: boolean = false;
-
+  
   filterOptions: FiltrarPesquisa[] = [];
   selectedFilter!: FiltrarPesquisa;
   txtFilter: string = 'Pesquisar evento';
-
+  
   messages!: Message[];
   mss: boolean = false;
+  
+  checkedReplica: boolean = false;
+  enableCheck: boolean = false;
+  datasHour: EventoHourData[] = [];
+  minDate!: Date;
 
   constructor(
     private eventService: EventoService,
@@ -126,30 +132,20 @@ export class EventosRComponent implements OnInit, OnDestroy {
     ) {
       this.form = this.formBuilder.group({
         id: [null],
+        nome: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
         dataEvento: [null, [Validators.required]],
         descricao: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(5000)]],
-        horario: [null, [Validators.required]],
+        horarioInicio: [null, [Validators.required]],
+        horarioFim: [null, [Validators.required]],
         local: [null, [Validators.required]]
-      });
+      }, { validator: this.verificarHoraFimMaiorQueInicio });
   }
 
   ngOnInit() {
-    this.opcaoSemana = [
-      { nome: 'Domingo', code: 0 },
-      { nome: 'Segunda-feira', code: 1 },
-      { nome: 'Terça-feira', code: 2 },
-      { nome: 'Quarta-feira', code: 3 },
-      { nome: 'Quinta-feira', code: 4 },
-      { nome: 'Sexta-feira', code: 5 },
-      { nome: 'Sábado', code: 6 }
-    ];
-
     this.filterOptions = [
-      {nome: 'Data do Evento', id: 0},
-      {nome: 'Descrição', id: 1},
-      {nome: 'Nome do local', id: 2},
-      {nome: 'Ano do Evento', id: 3},
-      {nome: 'Hora de início', id: 4}
+      {nome: 'Nome', id: 0},
+      {nome: 'Data do Evento', id: 1},
+      {nome: 'Hora de início', id: 2}
     ];
 
     this.unsubscribe$ = this.eventService.listar()
@@ -210,15 +206,14 @@ export class EventosRComponent implements OnInit, OnDestroy {
     this.unsubscribe$HR.unsubscribe();
   }
   
-  validarDatas() {
-    const dataEvento = this.form.get('dataEvento')?.value;
+  verificarHoraFimMaiorQueInicio(formGroup: FormGroup) {
+    const horaInicio = formGroup.get('horarioInicio')?.value;
+    const horaFim = formGroup.get('horarioFim')?.value;
 
-    if (dataEvento && this.dataFim && new Date(this.dataFim) < new Date(dataEvento)) {
-      this.form.get('dataEvento')?.setErrors({ 'invalidEndDate': true });
-      this.disableSemana = false;
+    if (horaInicio && horaFim && horaInicio >= horaFim) {
+      formGroup.get('horarioFim')?.setErrors({ 'horaFimMenorQueInicio': true });
     } else {
-      this.form.get('dataEvento')?.setErrors(null);
-      this.disableSemana = true;
+      formGroup.get('horarioFim')?.setErrors(null);
     }
   }
   
@@ -237,13 +232,14 @@ export class EventosRComponent implements OnInit, OnDestroy {
     this.editar = true;
     this.form.patchValue({
       id: value.id,
+      nome: value.nome,
       dataEvento: value.dataEvento,
       descricao: value.descricao,
-      horario: value.horario,
+      horarioInicio: value.horarioInicio,
+      horarioFim: value.horarioFim,
       local: value.local
     })
     this.dropdownLocal.writeValue(value.local);
-    this.dropdownHora.writeValue(value.horario);
 
     const eventoData = this.formatarDtStrDt(dtEv);
     this.calendarEdit.writeValue(eventoData);
@@ -258,13 +254,11 @@ export class EventosRComponent implements OnInit, OnDestroy {
     this.cadastrar = true;
     this.editar = false;
     this.dropdownLocal.writeValue(null);
-    this.dropdownHora.writeValue(null);
-    this.calendario.writeValue(null);
     this.calendarExtra.writeValue(null);
     this.switch.writeValue(null);
 
     this.diasIntervalo = [];
-    this.dataFim = null;
+    this.datasHour = [];
   }
   
   hideDialog() {
@@ -274,129 +268,69 @@ export class EventosRComponent implements OnInit, OnDestroy {
       this.visibleEdit = false;
     }
     this.form.reset();
-    this.dropdownHora.writeValue(null);
     this.dropdownLocal.writeValue(null);
-    this.calendario.writeValue(null);
     this.calendarEdit.writeValue(null);
     this.calendarExtra.writeValue(null);
-    this.dataFim = null;
     this.disableSemana = false;
   }
 
-  formatSemanaStr(semana: DiaSemana) {
-    let selectedSemana!: Semana;
-    if(semana.toString() == "DOMINGO") {
-      selectedSemana = this.opcaoSemana[0];
-    } else if(semana.toString() == "SEGUNDA") {
-      selectedSemana = this.opcaoSemana[1];
-    } else if(semana.toString() == "TERCA") {
-      selectedSemana = this.opcaoSemana[2];
-    } else if(semana.toString() == "QUARTA") {
-      selectedSemana = this.opcaoSemana[3];
-    } else if(semana.toString() == "QUINTA") {
-      selectedSemana = this.opcaoSemana[4];
-    } else if(semana.toString() == "SEXTA") {
-      selectedSemana = this.opcaoSemana[5];
-    } else if(semana.toString() == "SABADO") {
-      selectedSemana = this.opcaoSemana[6];
-    }
-
-    return selectedSemana;
-  }
-  
-  onDropdownChange() {
+  updateCheckboxState() {
+    let houI: Time = this.form.get('horarioInicio')?.value;
+    let houF: Time = this.form.get('horarioFim')?.value;
     let ini: Date = this.form.get('dataEvento')?.value;
-    let semana: Horario = this.form.get('horario')?.value;
-    if(ini && this.dataFim && semana) {
-      let selectedSemana: Semana = this.formatSemanaStr(semana.diaSemana);
-      if(selectedSemana) {
-        this.atualizarDiasSemana(selectedSemana.code);
-        this.disableIntervalo = false;
-      } else {
-        this.disableIntervalo = true;
-        this.diasIntervalo = null;
-      }
+
+    if(ini && houI && houF) {
+      this.enableCheck = true;
     } else {
-      this.disableIntervalo = true;
-      this.diasIntervalo = null;
+      this.enableCheck = false;
     }
   }
 
-  verificarDataFinal() {
-    let ini: Date = this.form.get('dataEvento')?.value;
-    let final: Date | null = null;
+  verificarDataHour() {
+    let houI: Time = this.form.get('horarioInicio')?.value;
+    let houF: Time = this.form.get('horarioFim')?.value;
     
-    if (this.diasIntervalo !== null) {
-      this.diasIntervalo.sort((a, b) => a.getTime() - b.getTime());
+    this.diasIntervalo?.sort((a:Date, b:Date) => {
+      const dateA = new Date(a);
+      const dateB = new Date(b);
+      return dateB.getTime() - dateA.getTime();
+    });
 
-      this.diasIntervalo.forEach(di => {
-        if (this.dataFim !== null && di > this.dataFim) {
-          final = di;
-        }
-        if(di < ini) {
-          this.form.patchValue({
-            dataEvento: di
-          })
-        }
-      })
+    this.diasIntervalo?.forEach(dtInt => {
+      const existe = this.datasHour.some(item => item.dataEvento === dtInt);
 
-      if (final) {
-        this.dataFim = final;
+      if (!existe) {
+        this.datasHour.push({dataEvento: dtInt, horarioInicio: houI, horarioFim: houF});
       }
-      this.onDropdownChange();
-    }
-  }
-
-  onDateIniSelect() {
-    let ini: Date = this.form.get('dataEvento')?.value;
-    let final: Date | null = this.dataFim;
+    })
+    this.datasHour = this.datasHour.filter(item => this.diasIntervalo?.includes(item.dataEvento));
     
-    if(ini && (final === undefined || final === null)) {
-      this.disableFinal = false;
-      this.disableSemana = true;
-      this.dataFim = ini;
-    } else if(ini && final) {
-      this.disableFinal = false;
-      this.disableSemana = true;
-    } else {
-      this.disableFinal = true;
-      this.disableSemana = false;
+    this.datasHour.sort((a:EventoHourData, b:EventoHourData) => {
+      const dateA = new Date(a.dataEvento);
+      const dateB = new Date(b.dataEvento);
+      return dateB.getTime() - dateA.getTime();
+    });
+  }
+
+  replicaIntervalo() {
+    // let houI: Time = this.form.get('horarioInicio')?.value;
+    // let houF: Time = this.form.get('horarioFim')?.value;
+    // if(houI && houF) {
+      // this.checkedReplica = !this.checkedReplica;
+      console.log(this.checkedReplica)
+    if(this.checkedReplica) {
+      let ini: Date = this.form.get('dataEvento')?.value;
+      this.minDate = new Date(ini);
+      this.minDate.setDate(ini.getDate() + 1);
+      this.minDate.setMonth(ini.getMonth());
+      this.minDate.setFullYear(ini.getFullYear());
+    }
+    if(!this.checkedReplica) {
+      this.diasIntervalo = [];
+      this.datasHour = [];
     }
   }
 
-  atualizarDiasSemana(code: number) {
-    let ini: Date = this.form.get('dataEvento')?.value;
-    let fim: Date | null = this.dataFim;
-
-    if(ini && fim) {
-      this.diasIntervalo = this.calcularDiasSemana(ini, fim, code);
-      this.calendario.writeValue(this.diasIntervalo);
-    }
-  }
-
-  calcularDiasSemana(dtIni: Date, dtFim: Date, diaSemana: number): Date[] {
-    let diasSemana: Date[] = [];
-    let dataTemp = new Date(dtIni);
-
-    dataTemp.setDate(dataTemp.getDate() + (diaSemana - dataTemp.getDay() + 7) % 7);
-
-    while (dataTemp <= dtFim) {
-      if (dataTemp >= dtIni && dataTemp <= dtFim) {
-        diasSemana.push(new Date(dataTemp));
-      }
-      dataTemp.setDate(dataTemp.getDate() + 7);
-    }
-
-    if (!diasSemana.some(dia => dia.getTime() === dtIni.getTime())) {
-      diasSemana.push(new Date(dtIni));
-    }
-    if (!diasSemana.some(dia => dia.getTime() === dtFim.getTime())) {
-      diasSemana.push(new Date(dtFim));
-    }
-
-    return diasSemana;
-  }
-  
   limparFilter(){
     const inputElement = this.inputSearch.nativeElement.value
     if (inputElement) {
@@ -407,9 +341,9 @@ export class EventosRComponent implements OnInit, OnDestroy {
   }
 
   updateMask() {
-    if (this.selectedFilter?.id == 0) {
+    if (this.selectedFilter?.id == 1) {
       this.txtFilter = '00/00/0000';
-    } else if (this.selectedFilter?.id == 4) {
+    } else if (this.selectedFilter?.id == 2) {
       this.txtFilter = '00:00';
     } else {
       this.txtFilter = 'Pesquisar evento';
@@ -417,6 +351,16 @@ export class EventosRComponent implements OnInit, OnDestroy {
   }
 
   searchFilter0(term: string) {
+    this.eventosData = this.eventosFilter.filter(evento => {
+      if (evento.nome.toLowerCase().includes(term.toLowerCase())) {
+        return evento;
+      } else {
+        return null;
+      }
+    })
+  }
+
+  searchFilter1(term: string) {
     const dateTerm = this.formatarDtStrDt(term);
     
     if (dateTerm instanceof Date && !isNaN(dateTerm.getTime())) {
@@ -438,49 +382,13 @@ export class EventosRComponent implements OnInit, OnDestroy {
     }
   }
 
-  searchFilter1(term: string) {
-    this.eventosData = this.eventosFilter.filter(evento => {
-      if (evento.descricao.toLowerCase().includes(term.toLowerCase())) {
-        return evento;
-      } else {
-        return null;
-      }
-    })
-  }
-
   searchFilter2(term: string) {
-    this.eventosData = this.eventosFilter.filter(evento => {
-      if (evento.local.nome.toLowerCase().includes(term.toLowerCase())) {
-        return evento;
-      } else {
-        return null;
-      }
-    })
-  }
-
-  searchFilter3(term: string) {
-    this.eventosData = this.eventosFilter.filter(evento => {
-      const searchTermAsNumber = parseInt(term);
-      if (!isNaN(searchTermAsNumber)) {
-        const anos = new Date(evento.dataEvento).getFullYear();
-        if (anos == searchTermAsNumber) {
-          return evento;
-        } else {
-          return null;
-        }
-      } else {
-        return null;
-      }
-    })
-  }
-
-  searchFilter4(term: string) {
     const compA = this.formatarTmStrTm(term);
     if(compA != null) {
       this.eventosData = this.eventosFilter.filter(evento => {
-        const compB = this.formatarTmStrTm(evento.horario.horaInicio);
+        const compB = this.formatarTmStrTm(evento.horarioInicio);
         if(compB != null) {
-          if (compA == compB) {
+          if (compA.horas === compB.horas && compA.minutos === compB.minutos) {
             return evento;
           } else {
             return null;
@@ -489,8 +397,6 @@ export class EventosRComponent implements OnInit, OnDestroy {
           return null;
         }
       })
-    } else {
-      return null;
     }
     return null;
   }
@@ -558,8 +464,6 @@ export class EventosRComponent implements OnInit, OnDestroy {
           if(this.selectedFilter.id == 0) this.searchFilter0(searchTerm);
           if(this.selectedFilter.id == 1) this.searchFilter1(searchTerm);
           if(this.selectedFilter.id == 2) this.searchFilter2(searchTerm);
-          if(this.selectedFilter.id == 3) this.searchFilter3(searchTerm);
-          if(this.selectedFilter.id == 4) this.searchFilter4(searchTerm);
         }
       }
     }
@@ -571,8 +475,6 @@ export class EventosRComponent implements OnInit, OnDestroy {
         if(this.selectedFilter.id == 0) this.searchFilter0(searchTerm);
         if(this.selectedFilter.id == 1) this.searchFilter1(searchTerm);
         if(this.selectedFilter.id == 2) this.searchFilter2(searchTerm);
-        if(this.selectedFilter.id == 3) this.searchFilter3(searchTerm);
-        if(this.selectedFilter.id == 4) this.searchFilter4(searchTerm);
       }
     }
   }
@@ -664,31 +566,28 @@ export class EventosRComponent implements OnInit, OnDestroy {
 
   conditionCreateSave() {
     let ini: Date = this.form.get('dataEvento')?.value;
-    if(this.diasIntervalo) {
+    if(ini && !this.checkedReplica) {
+      //  DATA INÍCIO
+      this.eventosCadast = this.form.value;
+      this.enviarFormSave();
+    } else if(ini && this.checkedReplica) {
       //  DATA INÍCIO
       this.eventosCadast = this.form.value;
       this.enviarFormSave();
       
       //  DATAS INTERVALO
-      // this.formatarDtIntervalo();
-      this.diasIntervalo.forEach((dt: Date) => {
-        if(dt?.getTime() != ini?.getTime() && dt?.getTime() != this.dataFim?.getTime()) {
+      this.datasHour.forEach((dt: EventoHourData) => {
+        if(dt?.dataEvento.getTime() != ini?.getTime()) {
           this.form.patchValue({
-            dataEvento: dt
+            dataEvento: dt.dataEvento,
+            horarioInicio: dt.horarioInicio,
+            horarioFim: dt.horarioFim
           });
           this.eventosCadast = this.form.value;
           this.enviarFormSave();
         }
       });
 
-      // DATA FIM
-      if(ini?.getTime() != this.dataFim?.getTime()) {
-        this.form.patchValue({
-          dataEvento: this.dataFim
-        });
-        this.eventosCadast = this.form.value;
-        this.enviarFormSave();
-      }
       this.mss = true;
     } else {
       this.messages = [

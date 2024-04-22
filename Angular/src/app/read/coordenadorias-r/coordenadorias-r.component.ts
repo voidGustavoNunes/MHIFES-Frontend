@@ -45,7 +45,7 @@ import { Coordenadoria } from '../../models/coordenadoria.models';
   providers: [
     CoordenadoriaService,
     ConfirmationService,
-    MessageService
+    MessageService,
   ]
 })
 export class CoordenadoriasRComponent implements OnInit, OnDestroy {

@@ -3,34 +3,47 @@ import { Component, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { MenubarModule } from 'primeng/menubar';
-import { filter } from 'rxjs';
+import { Subscription, filter } from 'rxjs';
+import { AuthService } from '../../_service/auth.service';
+import { Usuario } from '../../models/pessoa.models';
+import { HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-nav-header',
   standalone: true,
   imports: [
     MenubarModule,
-    CommonModule
+    CommonModule,
+    HttpClientModule,
   ],
   templateUrl: './nav-header.component.html',
-  styleUrl: './nav-header.component.scss'
+  styleUrl: './nav-header.component.scss',
+  providers: [
+  ]
 })
 export class NavHeaderComponent implements OnInit {
   itemsLog: MenuItem[] | undefined;
   itemsHom: MenuItem[] | undefined;
   isSpecialPage: boolean = false;
   specialKeywords: string[] = ['/login', '/registrar'];
+  
+  perfil: Usuario | null = null;
+  unsubscribe$!: Subscription;
 
-  constructor(private router: Router){
-
+  constructor(
+    private authServ: AuthService,
+    private router: Router
+  ) {
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(() => {
-          this.isSpecialPage = this.specialKeywords.some(keyword => this.router.url.includes(keyword));
-      });
+        this.isSpecialPage = this.specialKeywords.some(keyword => this.router.url.includes(keyword));
+    });
   }
 
   ngOnInit() {
+    // this.perfil = this.authServ.getPerfil();
+
     this.itemsLog = [
       {
         label: 'Meu Horário IFES',
@@ -97,10 +110,6 @@ export class NavHeaderComponent implements OnInit {
             routerLink:'disciplinas',
           },
           {
-            label: 'Horários',
-            routerLink:'horarios',
-          },
-          {
             label: 'Períodos',
             routerLink:'periodos',
           },
@@ -119,5 +128,11 @@ export class NavHeaderComponent implements OnInit {
         ]
       }
     ]
+    // this.removeLog();
+  }
+  
+  removeLog(){
+    this.authServ.fazerLogout();
+    this.ngOnInit();
   }
 }

@@ -24,8 +24,8 @@ import { FiltrarPesquisa } from '../../models/share/filtrar-pesquisa.models';
 import { Semana } from '../../models/share/semana.models';
 import { registerLocaleData } from '@angular/common';
 import localePT from '@angular/common/locales/pt';
-import { HorarioService } from '../../service/horario.service';
 import { DiaSemana, Horario } from '../../models/horario.models';
+import { HorarioService } from '../../service/horario.service';
 registerLocaleData(localePT);
 
 @Component({
@@ -58,7 +58,7 @@ registerLocaleData(localePT);
   providers: [
     HorarioService,
     ConfirmationService,
-    MessageService
+    MessageService,
   ]
 })
 export class HorariosRComponent implements OnInit, OnDestroy {
@@ -219,7 +219,7 @@ export class HorariosRComponent implements OnInit, OnDestroy {
       this.horariosData = this.horariosFilter.filter(hora => {
         const compB = this.formatarTmStrTm(hora.horaInicio);
         if(compB != null) {
-          if (compA == compB) {
+          if (compA.horas === compB.horas && compA.minutos === compB.minutos) {
             return hora;
           } else {
             return null;
@@ -228,8 +228,6 @@ export class HorariosRComponent implements OnInit, OnDestroy {
           return null;
         }
       })
-    } else {
-      return null;
     }
     return null;
   }

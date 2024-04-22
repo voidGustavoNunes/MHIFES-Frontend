@@ -63,9 +63,14 @@
                 text-align: center;
                 border-bottom: .1rem solid #B1CAFA;
             }
-            td:first-child {
+            .larguraFixa {
                 border-right: .1rem solid #B1CAFA;
+                width: 200px;
             }
+            td:not(.larguraFixa) {
+                width: calc((100% - 200px) / 6);
+            }
+  
         }
         .tbBody:hover{
             background-color: #E5E7EB;

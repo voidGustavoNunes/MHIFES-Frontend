@@ -26,6 +26,18 @@
         .formInput{
             margin: 1rem 0;
         }
+        .validation-error{
+            margin-top: -0.5rem;
+            margin-bottom: -.4375em;
+            p{
+                color: #dc3545;
+                margin-top: 1em;
+                border-left: 3px solid #dc3545;
+                padding-left: .2em;
+                text-align: start;
+                font-size: .8rem;
+            }
+        }
     }
 }
 
@@ -53,18 +65,24 @@
         color: #256CF0;
         text-transform: uppercase;
         letter-spacing: .1rem;
-        border: .1rem solid #256CF0;
+        border: none;
         border-radius: 2rem;
         box-shadow: 0 .2rem .2rem rgba(0, 0, 0, 0.26);
         margin-bottom: 1rem;
+    }
+    .p-card-footer .p-button:focus{
+        border: .05rem solid #256CF0;
     }
     .p-card-footer .p-button:active{
         box-shadow: none;
     }
     .p-inputtext{
         background-color: #BFE4FF;
-        border: .15rem solid #256CF0;
+        border: none;
         box-shadow: 0 .2rem .2rem rgba(0, 0, 0, 0.26);
+    }
+    .p-inputtext:focus{
+        border: .05rem solid #256CF0;
     }
     .p-input-icon{
         color: #256CF0;
@@ -83,9 +101,22 @@
         border-radius: .3rem .3rem 0 0;
         background-image: url("../../../assets/img/J4o.gif");
     }
+    .p-messages {
+        width: fit-content;
+        position: fixed;
+        top: 1.25rem;
+        right: 1.25rem;
+        z-index: 11000;
+    }
 }
 
 @media screen and (min-width: 686px) {
+    #meuFormulario{
+        .validation-error{
+            min-width: 20vw;
+            max-width: 20vw;
+        }
+    }
     :host ::ng-deep {
         p-card.p-element{
             width: 30%;
@@ -97,6 +128,12 @@
 }
 
 @media screen and (max-width: 685px) {
+    #meuFormulario{
+        .validation-error{
+            min-width: 40vw;
+            max-width: 40vw;
+        }
+    }
     :host ::ng-deep {
         p-card.p-element{
             width: 70%;

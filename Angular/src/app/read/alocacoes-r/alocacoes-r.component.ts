@@ -19,7 +19,7 @@ import { Calendar, CalendarModule } from 'primeng/calendar';
 import { MessagesModule } from 'primeng/messages';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { FiltrarPesquisa } from '../../models/share/filtrar-pesquisa.models';
-import { Alocacao } from '../../models/alocacao.models';
+import { Alocacao, AlocacaoHour } from '../../models/alocacao.models';
 import { AlocacaoService } from '../../service/alocacao.service';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { AlunoService } from '../../service/aluno.service';
@@ -80,7 +80,7 @@ registerLocaleData(localePT);
     LocalService,
     PeriodoService,
     DisciplinaService,
-    HorarioService
+    HorarioService,
   ]
 })
 export class AlocacoesRComponent implements OnInit, OnDestroy {
@@ -94,8 +94,6 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   @ViewChild('switch') switch!: InputSwitch;
   @ViewChild('calendar') calendar!: Calendar;
   
-  @ViewChild('calendarExtra') calendarExtra!: Calendar;
-  @ViewChild('dropdownExtra') dropdownExtra!: Dropdown;
   @ViewChild('calendarIntervalo') calendarIntervalo!: Calendar;
 
   alocacoesData: Alocacao[] = [];
@@ -140,18 +138,15 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   visibleInfo: boolean = false;
   
   opcaoSemana: Semana[] = [];
-  selectedSemana!: Semana;
+  selectedDiasSemana: Semana[] = [];
   diasIntervalo: Date[] | null = null;
-  dataFim!: Date;
   
-  disableSemana: boolean = true;
-  disableIntervalo: boolean = true;
-  disableSwit: boolean = true;
-  disableDateFinal: boolean = true;
+  enableDataAula: boolean = false;
+  disableDiaSemana: boolean = true;
 
-  validExtraCalendar: boolean = true;
-
-  dtAulaCalendar!: Date;
+  minDate!: Date;
+  maxDate!: Date;
+  alocacaoHour: AlocacaoHour[] = [];
 
   constructor(
     private alocService: AlocacaoService,
@@ -167,18 +162,16 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     ) {
       this.form = this.formBuilder.group({
         id: [null],
-        numAulas: [null, [Validators.required]],
-        horario: [null, [Validators.required]],
-        // horaFinal: [null, [Validators.required]],
+        horarioInicio: [null, [Validators.required]],
+        horarioFim: [null, [Validators.required]],
         turma: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(30)]],
-        diaSemana: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(30)]],
         dataAula: [null, [Validators.required]],
         local: [null, [Validators.required]],
         disciplina: [null, [Validators.required]],
         periodo: [null, [Validators.required]],
         professor: [null, [Validators.required]],
         alunos: this.formBuilder.array([], [Validators.required]),
-      });
+      }, { validator: this.verificarHoraFimMaiorQueInicio });
   }
 
   ngOnInit() {
@@ -325,26 +318,15 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     this.unsubscribe$Prof.unsubscribe();
     this.unsubscribe$HR.unsubscribe();
   }
+  
+  verificarHoraFimMaiorQueInicio(formGroup: FormGroup) {
+    const horaInicio = formGroup.get('horarioInicio')?.value;
+    const horaFim = formGroup.get('horarioFim')?.value;
 
-  validarDatas() {
-    const dataAula = this.form.get('dataAula')?.value;
-    const dataFim = this.dataFim;
-    const periodo = this.form.get('periodo')?.value;
-
-    if (dataAula && dataFim && periodo) {
-      const periodoInicio = new Date(periodo.dataInicio);
-      const periodoFim = new Date(periodo.dataFim);
-      const dataAulaValida = new Date(dataAula).getTime() >= periodoInicio.getTime() && new Date(dataAula).getTime() <= periodoFim.getTime();
-      const dataFimAula = new Date(dataFim).getTime() >= periodoInicio.getTime() && new Date(dataFim).getTime() <= periodoFim.getTime();
-      const dataFimValida = new Date(dataFim).getTime() >= new Date(dataAula).getTime();
-      
-      if (dataAulaValida && dataFimAula && dataFimValida) {
-        this.disableSemana = false;
-        this.validExtraCalendar = true;
-      } else {
-        this.disableSemana = true;
-        this.validExtraCalendar = false;
-      }
+    if (horaInicio && horaFim && horaInicio >= horaFim) {
+      formGroup.get('horarioFim')?.setErrors({ 'horaFimMenorQueInicio': true });
+    } else {
+      formGroup.get('horarioFim')?.setErrors(null);
     }
   }
 
@@ -381,10 +363,9 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     this.editar = true;
     this.form.patchValue({
       id: value.id,
-      numAulas: value.numAulas,
-      horario: value.horario,
+      horarioInicio: value.horarioInicio,
+      horarioFim: value.horarioFim,
       turma: value.turma,
-      diaSemana: value.diaSemana,
       dataAula: value.dataAula,
       local: value.local,
       disciplina: value.disciplina,
@@ -438,137 +419,115 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     if(this.visibleExtra) this.visibleExtra = false;
   }
 
-  formatSemanaStr(semana: DiaSemana) {
-    let selectedSemana!: Semana;
-    if(semana.toString() == "DOMINGO") {
-      selectedSemana = this.opcaoSemana[0];
-    } else if(semana.toString() == "SEGUNDA") {
-      selectedSemana = this.opcaoSemana[1];
-    } else if(semana.toString() == "TERCA") {
-      selectedSemana = this.opcaoSemana[2];
-    } else if(semana.toString() == "QUARTA") {
-      selectedSemana = this.opcaoSemana[3];
-    } else if(semana.toString() == "QUINTA") {
-      selectedSemana = this.opcaoSemana[4];
-    } else if(semana.toString() == "SEXTA") {
-      selectedSemana = this.opcaoSemana[5];
-    } else if(semana.toString() == "SABADO") {
-      selectedSemana = this.opcaoSemana[6];
-    }
-
-    return selectedSemana;
-  }
-
-  onDropdownChange() {
-    let ini: Date = this.form.get('dataAula')?.value;
-    let semana: Horario = this.form.get('horario')?.value;
-
-    if(ini && this.dataFim && semana) {
-      let selectedSemana: Semana = this.formatSemanaStr(semana.diaSemana);
-      if(selectedSemana) {
-        this.atualizarDiasSemana(selectedSemana.code);
-        this.disableIntervalo = false;
-      } else {
-        this.disableIntervalo = true;
-        this.diasIntervalo = null;
-      }
-    } else {
-      this.disableIntervalo = true;
-      this.diasIntervalo = null;
-    }
-  }
-
-  verificarDataFinal() {
-    let ini: Date = this.form.get('dataAula')?.value;
-    let final: Date | null = null;
+  calcularDiasSemana(dtIni: Date, dtFim: Date, diasSemana: number[]): Date[] {
+    let diasSemanaArray: Date[] = [];
     
-    if (this.diasIntervalo !== null) {
-      this.diasIntervalo.sort((a, b) => a.getTime() - b.getTime());
+    diasSemana.forEach(diaSemana => {
+        let dataTemp = new Date(dtIni);
 
-      this.diasIntervalo.forEach(di => {
-        if (di > this.dataFim) {
-          final = di;
-      }
-        if(di < ini) {
-          this.form.patchValue({
-            dataAula: di
-          })
+        dataTemp.setDate(dataTemp.getDate() + (diaSemana - dataTemp.getDay() + 7) % 7);
+
+        while (dataTemp <= dtFim) {
+            if (dataTemp >= dtIni && dataTemp <= dtFim) {
+                diasSemanaArray.push(new Date(dataTemp));
+            }
+            dataTemp.setDate(dataTemp.getDate() + 7);
         }
-      })
+    });
 
-      if (final) {
-        this.dataFim = final;
-      }
-      this.onDropdownChange();
+    if (!diasSemanaArray.some(dia => dia.getTime() === dtIni.getTime())) {
+        diasSemanaArray.push(new Date(dtIni));
     }
-  }
-  
-  onDateIniSelect() {
-    const dataAula = this.form.get('dataAula')?.value;
-    const dataFim = this.dataFim;
-    const periodo: Periodo = this.form.get('periodo')?.value;
+    if (!diasSemanaArray.some(dia => dia.getTime() === dtFim.getTime())) {
+        diasSemanaArray.push(new Date(dtFim));
+    }
 
-    if(dataAula && periodo && (dataFim === undefined || dataFim === null)) {
-      const periodoInicio = new Date(periodo.dataInicio);
-      const periodoFim = new Date(periodo.dataFim);
-      const dataAulaValida = new Date(dataAula) >= periodoInicio && new Date(dataAula) <= periodoFim;
-      
-      console.log(dataAulaValida)
-      if (dataAulaValida) {
-        this.form.get('dataAula')?.setErrors(null);
-        this.calendarExtra.writeValue(dataAula);
-        this.dataFim = dataAula;
-        this.disableDateFinal = false;
-      } else {
-        this.form.get('dataAula')?.setErrors({ 'invalidEndDate': true });
-        this.disableSwit = true;
-        this.calendarExtra.writeValue(null);
-        this.disableDateFinal = true;
-      }
-    }
-    
-    
-    // if(ini) {
-    //   this.disableSwit = false;
-    //   this.calendarExtra.writeValue(ini);
-    //   this.dataFim = ini;
-    // } else {
-    //   this.disableSwit = true;
-    //   this.calendarExtra.writeValue(null);
-    // }
+    diasSemanaArray.sort((a, b) => a.getTime() - b.getTime());
+
+    return diasSemanaArray;
   }
 
-  atualizarDiasSemana(code: number) {
+  atualizarDiasSemana(codes: number[]) {
     let ini: Date = this.form.get('dataAula')?.value;
-    let fim: Date = this.dataFim;
+    let periodo: Periodo = this.form.get('periodo')?.value;
 
-    if(ini && fim) {
-      this.diasIntervalo = this.calcularDiasSemana(ini, fim, code);
+    if(ini && periodo) {
+      const periodoFim = new Date(periodo.dataFim);
+      this.diasIntervalo = this.calcularDiasSemana(ini, periodoFim, codes);
       this.calendarIntervalo.writeValue(this.diasIntervalo);
     }
   }
 
-  calcularDiasSemana(dtIni: Date, dtFim: Date, diaSemana: number): Date[] {
-    let diasSemana: Date[] = [];
-    let dataTemp = new Date(dtIni);
+  onMultiselectChange() {
+    let ini: Date = this.form.get('dataAula')?.value;
+    let periodo: Periodo = this.form.get('periodo')?.value;
 
-    dataTemp.setDate(dataTemp.getDate() + (diaSemana - dataTemp.getDay() + 7) % 7);
+    if(ini && this.selectedDiasSemana && periodo) {
+      let codes: number[] = this.selectedDiasSemana.map(selD => selD.code);
+      this.selectedDiasSemana.forEach(selD => {
+        const existe = this.alocacaoHour.some(item => item.diaSemana === selD);
+        if (!existe) {
+          this.alocacaoHour.push({
+            diaSemana:selD, horaFinal:{hours:0,minutes:0}, horaInicio: {hours:0,minutes:0}
+          })
+        }
+      })
+      this.alocacaoHour = this.alocacaoHour.filter(item => this.selectedDiasSemana?.includes(item.diaSemana));
+      
+      this.atualizarDiasSemana(codes);
+      
+      const periodoFim = new Date(periodo.dataFim);
+      this.minDate = new Date(ini);
+      this.minDate.setDate(ini.getDate() + 1);
+      this.minDate.setMonth(ini.getMonth());
+      this.minDate.setFullYear(ini.getFullYear());
+      
+      this.maxDate = new Date(periodoFim);
+      this.maxDate.setDate(periodoFim.getDate());
+      this.maxDate.setMonth(periodoFim.getMonth());
+      this.maxDate.setFullYear(periodoFim.getFullYear());
+    } else {
+      this.diasIntervalo = null;
+    }
+  }
 
-    while (dataTemp <= dtFim) {
-      if (dataTemp >= dtIni && dataTemp <= dtFim) {
-        diasSemana.push(new Date(dataTemp));
+  verificarDataHour() {
+    this.diasIntervalo?.sort((a:Date, b:Date) => {
+      const dateA = new Date(a);
+      const dateB = new Date(b);
+      return dateB.getTime() - dateA.getTime();
+    });
+
+    this.onMultiselectChange();
+  }
+  
+  onDateIniSelect() {
+    const dataAula = this.form.get('dataAula')?.value;
+    const periodo: Periodo = this.form.get('periodo')?.value;
+
+    if(dataAula && periodo) {
+      const periodoInicio = new Date(periodo.dataInicio);
+      const periodoFim = new Date(periodo.dataFim);
+      const dataAulaValida = new Date(dataAula) >= periodoInicio && new Date(dataAula) <= periodoFim;
+      
+      if (dataAulaValida) {
+        this.form.get('dataAula')?.setErrors(null);
+        this.disableDiaSemana = false;
+      } else {
+        this.form.get('dataAula')?.setErrors({ 'invalidEndDate': true });
+        this.disableDiaSemana = true;
       }
-      dataTemp.setDate(dataTemp.getDate() + 7);
     }
+  }
 
-    if (!diasSemana.some(dia => dia.getTime() === dtIni.getTime())) {
-      diasSemana.push(new Date(dtIni));
+  updateDataAulaState() {
+    const periodo: Periodo = this.form.get('periodo')?.value;
+    if(periodo) {
+      this.enableDataAula = true;
+    } else {
+      this.enableDataAula = false;
     }
-    if (!diasSemana.some(dia => dia.getTime() === dtFim.getTime())) {
-      diasSemana.push(new Date(dtFim));
-    }
-
-    return diasSemana;
+    console.log(this.enableDataAula);
   }
   
   limparFilter(){
@@ -605,16 +564,6 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   searchFilter1(term: string) {
     this.alocacoesData = this.alocacoesFilter.filter(aloca => {
       if (aloca.turma.toLowerCase().includes(term.toLowerCase())) {
-        return aloca;
-      } else {
-        return null;
-      }
-    })
-  }
-
-  searchFilter2(term: string) {
-    this.alocacoesData = this.alocacoesFilter.filter(aloca => {
-      if (aloca.diaSemana.toLowerCase().includes(term.toLowerCase())) {
         return aloca;
       } else {
         return null;
@@ -668,9 +617,9 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     const compA = this.formatarTmStrTm(term);
     if(compA != null) {
       this.alocacoesData = this.alocacoesFilter.filter(aloca => {
-        const compB = this.formatarTmStrTm(aloca.horario.horaInicio);
+        const compB = this.formatarTmStrTm(aloca.horarioInicio);
         if(compB != null) {
-          if (compA == compB) {
+          if (compA.horas === compB.horas && compA.minutos === compB.minutos) {
             return aloca;
           } else {
             return null;
@@ -679,26 +628,8 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
           return null;
         }
       })
-    } else {
-      return null;
     }
     return null;
-  }
-
-  searchFilter8(term: string) {
-    this.alocacoesData = this.alocacoesFilter.filter(aloca => {
-      const searchTermAsNumber = parseInt(term);
-      if (!isNaN(searchTermAsNumber)) {
-        const numb = aloca.numAulas;
-        if (numb === searchTermAsNumber) {
-            return aloca;
-        } else {
-          return null;
-        }
-      } else {
-        return null;
-      }
-    });
   }
 
   searchFilter9(term: string) {
@@ -723,13 +654,13 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
         if(this.selectedFilter) {
           if(this.selectedFilter.id == 0) this.searchFilter0(searchTerm);
           if(this.selectedFilter.id == 1) this.searchFilter1(searchTerm);
-          if(this.selectedFilter.id == 2) this.searchFilter2(searchTerm);
+          // if(this.selectedFilter.id == 2) this.searchFilter2(searchTerm);
           if(this.selectedFilter.id == 3) this.searchFilter3(searchTerm);
           if(this.selectedFilter.id == 4) this.searchFilter4(searchTerm);
           if(this.selectedFilter.id == 5) this.searchFilter5(searchTerm);
           if(this.selectedFilter.id == 6) this.searchFilter6(searchTerm);
           if(this.selectedFilter.id == 7) this.searchFilter7(searchTerm);
-          if(this.selectedFilter.id == 8) this.searchFilter8(searchTerm);
+          // if(this.selectedFilter.id == 8) this.searchFilter8(searchTerm);
           if(this.selectedFilter.id == 9) this.searchFilter9(searchTerm);
         }
       }
@@ -741,13 +672,13 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       if(this.selectedFilter) {
         if(this.selectedFilter.id == 0) this.searchFilter0(searchTerm);
         if(this.selectedFilter.id == 1) this.searchFilter1(searchTerm);
-        if(this.selectedFilter.id == 2) this.searchFilter2(searchTerm);
+        // if(this.selectedFilter.id == 2) this.searchFilter2(searchTerm);
         if(this.selectedFilter.id == 3) this.searchFilter3(searchTerm);
         if(this.selectedFilter.id == 4) this.searchFilter4(searchTerm);
         if(this.selectedFilter.id == 5) this.searchFilter5(searchTerm);
         if(this.selectedFilter.id == 6) this.searchFilter6(searchTerm);
         if(this.selectedFilter.id == 7) this.searchFilter7(searchTerm);
-        if(this.selectedFilter.id == 8) this.searchFilter8(searchTerm);
+        // if(this.selectedFilter.id == 8) this.searchFilter8(searchTerm);
         if(this.selectedFilter.id == 9) this.searchFilter9(searchTerm);
       }
     }
@@ -883,8 +814,18 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
 
   onSubmit() {
       console.log(this.form.value)
+    const ini: Date = this.form.get('dataAula')?.value;
+    this.alocacaoHour.find(alocH => {
+      const diaDaSemana = this.obterDiaDaSemana(ini);
+      if(diaDaSemana == alocH.diaSemana.nome) {
+        this.form.patchValue({
+          horarioInicio: alocH.horaInicio,
+          horarioFim: alocH.horaFinal
+        });
+      }
+    })
 
-    if (this.form.valid && this.cadastrar && this.isValidDates()) {
+    if (this.form.valid && this.cadastrar) {
       this.conditionCreateSave();
       this.mss = false;
       this.visible = false;
@@ -904,26 +845,10 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     }
   }
 
-  isValidDates() {
-    const dataAula = this.form.get('dataAula')?.value;
-    const dataFim = this.dataFim;
-    const periodo = this.form.get('periodo')?.value;
-
-    if (dataAula && dataFim && periodo) {
-      const periodoInicio = new Date(periodo.dataInicio);
-      const periodoFim = new Date(periodo.dataFim);
-      const dataAulaValida = new Date(dataAula).getTime() >= periodoInicio.getTime() && new Date(dataAula).getTime() <= periodoFim.getTime();
-      const dataFimAula = new Date(dataFim).getTime() >= periodoInicio.getTime() && new Date(dataFim).getTime() <= periodoFim.getTime();
-      const dataFimValida = new Date(dataFim).getTime() >= new Date(dataAula).getTime();
-      
-      if (dataAulaValida && dataFimAula && dataFimValida) return true
-      else {
-        this.form.get('dataAula')?.setErrors({ 'invalidEndDate': true });
-        this.validExtraCalendar = false;
-        this.disableSemana = true;
-        return false;
-      }
-    } else return false
+  obterDiaDaSemana(date: Date): string {
+    const diasDaSemana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
+    const diaDaSemanaNumero = date.getDay();
+    return diasDaSemana[diaDaSemanaNumero];
   }
 
   conditionCreateSave() {
@@ -931,29 +856,26 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
 
     if(this.diasIntervalo) {
       //  DATA INÍCIO
-      this.alocacoesCadast = this.form.value;
-      this.enviarFormSave();
-      
-      //  DATAS INTERVALO
-      // this.formatarDtIntervalo();
-      this.diasIntervalo.forEach((dt: Date) => {
-        if(dt?.getTime() != ini?.getTime() && dt?.getTime() != this.dataFim?.getTime()) {
-          this.form.patchValue({
-            dataAula: dt
-          });
-          this.alocacoesCadast = this.form.value;
-          this.enviarFormSave();
-        }
-      });
-
-      // DATA FIM
-      if(ini?.getTime() != this.dataFim?.getTime()) {
-        this.form.patchValue({
-          dataAula: this.dataFim,
-        });
         this.alocacoesCadast = this.form.value;
         this.enviarFormSave();
-      }
+      
+      //  DATAS INTERVALO
+      this.diasIntervalo.forEach((dt: Date) => {
+        if(dt?.getTime() != ini?.getTime()) {
+          this.alocacaoHour.find(alocH => {
+            const diaDaSemana = this.obterDiaDaSemana(dt);
+            if(diaDaSemana == alocH.diaSemana.nome) {
+              this.form.patchValue({
+                dataAula: dt,
+                horarioInicio: alocH.horaInicio,
+                horarioFim: alocH.horaFinal
+              });
+              this.alocacoesCadast = this.form.value;
+              this.enviarFormSave();
+            }
+          })
+        }
+      });
       this.mss = true;
     } else {
       this.messages = [
@@ -961,34 +883,6 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       ];
     }
   }
-
-  // formatarDtIntervalo() {
-  //   const ini: Date = this.form.get('dataAula')?.value;
-  //   const fim: Date = this.dataFim;
-
-  //   if (typeof ini === 'string' && typeof fim === 'string') {
-  //     const iniFormat = this.formatarDtStrDt(ini);
-  //     const fimFormat = this.formatarDtStrDt(fim);
-  //     if ((iniFormat instanceof Date && !isNaN(iniFormat.getTime())) && (fimFormat instanceof Date && !isNaN(fimFormat.getTime()))) {
-        
-  //       this.diasIntervalo.forEach((dt: Date) => {
-  //         const tiparDT = dt;
-  //         if (typeof tiparDT === 'string') {
-  //           const tiparFormat = this.formatarDatas(tiparDT);
-  //           const dtFormat = this.formatarDtStrDt(tiparFormat);
-            
-  //           if(dtFormat?.getTime() != iniFormat.getTime() && dtFormat?.getTime() != fimFormat.getTime()) {
-  //             this.form.patchValue({
-  //               dataAula: dt
-  //             });
-  //             this.alocacoesCadast = this.form.value;
-  //             this.enviarFormSave();
-  //           }
-  //         }
-  //       });
-  //     }
-  //   }
-  // }
 
   deletarID(id: number) {
     this.alocService.excluir(id)

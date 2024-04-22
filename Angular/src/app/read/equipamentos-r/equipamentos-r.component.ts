@@ -45,7 +45,7 @@ import { MessagesModule } from 'primeng/messages';
   providers: [
     EquipamentoService,
     ConfirmationService,
-    MessageService
+    MessageService,
   ]
 })
 

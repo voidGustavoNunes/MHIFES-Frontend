@@ -10,15 +10,19 @@ import { FooterComponent } from './begin/footer/footer.component';
   imports: [
     RouterOutlet,
     NavHeaderComponent,
-    FooterComponent
+    FooterComponent,
   ],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  styleUrl: './app.component.scss',
+  providers: [
+  ]
 })
 export class AppComponent implements OnInit {
   title = 'Angular';
 
-  constructor(private primengConfig: PrimeNGConfig) {}
+  constructor(
+    private primengConfig: PrimeNGConfig
+  ) {}
 
   ngOnInit() {
     this.primengConfig.ripple = true;

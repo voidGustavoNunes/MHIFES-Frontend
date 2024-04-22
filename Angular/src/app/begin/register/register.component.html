@@ -4,30 +4,44 @@
         <ng-template pTemplate="header">
             <h2>Crie uma nova conta</h2>
         </ng-template>
-        
         <form id="meuFormulario" [formGroup]="form" (ngSubmit)="onSubmit()">
             <div class="formInput">
                 <p-iconField iconPosition="left">
                     <p-inputIcon styleClass="pi pi-user" />
-                    <input type="text" class="form-control" formControlName="user" placeholder="Nome de usuário" pInputText />
+                    <input type="text" class="form-control" formControlName="nomeUser" placeholder="Nome de usuário" pInputText />
                 </p-iconField>
+                <div *ngIf="form.get('nomeUser')?.invalid && errU" class="validation-error">
+                <!-- <div *ngIf="errU" class="validation-error"> -->
+                    <p>{{ mssU }}</p>
+                </div>
             </div>
-
             <div class="formInput">
                 <p-iconField iconPosition="left">
                     <p-inputIcon styleClass="pi pi-id-card" />
-                    <input type="text" class="form-control" formControlName="matricula" placeholder="Matrícula" pInputText />
+                    <input type="text" class="form-control" formControlName="matricula" placeholder="Matrícula" pInputText [minlength]="3" [maxlength]="50" />
                 </p-iconField>
+                <div *ngIf="form.get('matricula')?.invalid && errM" class="validation-error">
+                <!-- <div *ngIf="errM" class="validation-error"> -->
+                    <p>{{ mssM }}</p>
+                </div>
             </div>
-                
+        
             <div class="formInput">
-                <p-password class="form-control" formControlName="senha" placeholder="Senha" [toggleMask]="true"></p-password>
+                <p-password placeholder="Senha" class="form-control" formControlName="senha" [toggleMask]="true" [minlength]="6" [maxLength]="15"></p-password>
+                <div *ngIf="form.get('senha')?.invalid && errS" class="validation-error">
+                <!-- <div *ngIf="errS" class="validation-error"> -->
+                    <p>{{ mssS }}</p>
+                </div>
             </div>
         </form>
 
         <ng-template pTemplate="footer">
-            <p-button type="submit" label="Cadastrar" (click)="navigateToPage()"></p-button>
+            <p-button type="submit" label="Cadastrar" (onClick)="onSubmit()"></p-button>
             <a href="login" rel="noopener noreferrer" class="font-bold">Já possui uma conta?</a>
         </ng-template>
     </p-card>
+</div>
+
+<div class="card-service">
+    <p-messages [(value)]="messages" [showTransitionOptions]="'500ms'" [hideTransitionOptions]="'500ms'" [enableService]="false"></p-messages>
 </div>

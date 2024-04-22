@@ -131,6 +131,7 @@
             padding-left: .2em;
             text-align: start;
             font-size: .8rem;
+            width: 8rem;
         }
     }
     .divInput{
@@ -152,6 +153,11 @@
             border: .02rem solid #256CF0;
             outline: none;
         }
+    }
+    .divInput.labelHourFlex {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
     }
     .divBotao{
         width: fit-content;
@@ -254,21 +260,37 @@
                 margin-right: 5rem;
             }
         }
-        .divInput.labelFlex{
-            display: flex;
-            gap: 4vw;
-
-            input{width: 18vw;}
-            div{
-                width: 18vw;
-                display: flex;
-                flex-direction: column;
-            }
-            div p {
-                width: 10rem;
+        .divInput.labelFlex > .validation-error{
+            position: absolute;
+            bottom: -5rem;
+            left: 32vw;
+            p {
+                width: 7rem;
                 white-space: break-spaces;
             }
-              
+        }
+        .divInput.labelFlex {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 4vw;
+            position: relative;
+
+            div, input{
+                width: 18vw;
+            }
+            .flexGrid{
+                display: flex;
+                justify-content: center;
+                gap: 2vw;
+
+                div{
+                    width: 9vw;
+                    display: flex;
+                    flex-direction: column;
+                    input{width: 100%;}
+                }
+            }
         }
     }
     :host ::ng-deep {
@@ -279,7 +301,7 @@
             width: 40vw;
         }
         .divInput.labelFlex{
-            span.p-inputnumber.p-component, input#integeronly, .p-calendar input{width: 18vw;}
+            span.p-inputnumber.p-component, input#integeronly, .p-multiselect, .p-calendar input{width: 18vw;}
         }
     }
 }

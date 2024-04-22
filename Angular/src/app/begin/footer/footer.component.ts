@@ -3,9 +3,12 @@ import { Component, OnInit } from '@angular/core';
 @Component({
   selector: 'app-footer',
   standalone: true,
-  imports: [],
+  imports: [
+  ],
   templateUrl: './footer.component.html',
-  styleUrl: './footer.component.scss'
+  styleUrl: './footer.component.scss',
+  providers: [
+  ]
 })
 export class FooterComponent implements OnInit {
   anoAtual: any;

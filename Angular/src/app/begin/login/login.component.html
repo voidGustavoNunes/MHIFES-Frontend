@@ -11,17 +11,27 @@
             <div class="formInput">
                 <p-iconField iconPosition="left">
                         <p-inputIcon styleClass="pi pi-user" />
-                        <input type="text" class="form-control" formControlName="user" placeholder="Matrícula" pInputText />
+                        <input type="text" class="form-control" formControlName="matricula" placeholder="Matrícula" pInputText />
                     </p-iconField>
-                </div>
+                    <div *ngIf="form.get('matricula')?.invalid && errM" class="validation-error">
+                        <p>{{ mssM }}</p>
+                    </div>
+            </div>
                 
             <div class="formInput">
                 <p-password class="form-control" formControlName="senha" placeholder="Senha" [toggleMask]="true"></p-password>
+                <div *ngIf="form.get('senha')?.invalid && errS" class="validation-error">
+                        <p>{{ mssS }}</p>
+                    </div>
             </div>
         </form>
 
         <ng-template pTemplate="footer">
-            <p-button type="submit" label="Login" (click)="navigateToHome()"></p-button>
+            <p-button type="submit" label="Login" (onClick)="onSubmit()"></p-button>
         </ng-template>
     </p-card>
+</div>
+
+<div class="card-service">
+    <p-messages [(value)]="messages" [showTransitionOptions]="'500ms'" [hideTransitionOptions]="'500ms'" [enableService]="false"></p-messages>
 </div>
