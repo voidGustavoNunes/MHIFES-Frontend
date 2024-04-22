@@ -39,7 +39,6 @@ import { InputSwitch, InputSwitchModule } from 'primeng/inputswitch';
 import { registerLocaleData } from '@angular/common';
 import localePT from '@angular/common/locales/pt';
 import { DiaSemana, Horario } from '../../models/horario.models';
-import { HorarioService } from '../../service/horario.service';
 registerLocaleData(localePT);
 
 @Component({
@@ -80,7 +79,6 @@ registerLocaleData(localePT);
     LocalService,
     PeriodoService,
     DisciplinaService,
-    HorarioService,
   ]
 })
 export class AlocacoesRComponent implements OnInit, OnDestroy {
@@ -158,7 +156,6 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     private locService: LocalService,
     private periodService: PeriodoService,
     private professorService: ProfessorService,
-    private horasService: HorarioService
     ) {
       this.form = this.formBuilder.group({
         id: [null],
@@ -291,22 +288,6 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.unsubscribe$HR = this.horasService.listar()
-    .subscribe({
-      next: (itens:any) => {
-        const data = itens;
-        this.horariosArray = data.sort((a: Horario, b: Horario) => {
-          const timeA = a.horaInicio.toString();
-          const timeB = b.horaInicio.toString();
-          return timeA.localeCompare(timeB);
-        });
-      },
-      error: (err: any) => {
-        this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Dados de horários não encontrados.' },
-        ];
-      }
-    });
   }
 
   ngOnDestroy() {

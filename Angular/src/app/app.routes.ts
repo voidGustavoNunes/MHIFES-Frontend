@@ -11,7 +11,6 @@ import { EventosRComponent } from './read/eventos-r/eventos-r.component';
 import { LocaisRComponent } from './read/locais-r/locais-r.component';
 import { CoordenadoriasRComponent } from './read/coordenadorias-r/coordenadorias-r.component';
 import { AlocacoesRComponent } from './read/alocacoes-r/alocacoes-r.component';
-import { HorariosRComponent } from './read/horarios-r/horarios-r.component';
 import { LoggedGuard } from './_guard/logged.guard';
 // import { AuthGuard } from './_guard/auth.guard';
 

@@ -70,13 +70,13 @@
         <form id="meuFormulario" [formGroup]="form" (ngSubmit)="onSubmit()">
             <div class="divInput">
                 <span class="p-float-label">
-                    <p-calendar dateFormat="dd/mm/yy" id="inicioPer" class="form-control" formControlName="dataInicio" ></p-calendar>
+                    <p-calendar appendTo="body" dateFormat="dd/mm/yy" id="inicioPer" class="form-control" formControlName="dataInicio" ></p-calendar>
                     <label for="inicioPer">Data de início</label>
                 </span>
             </div>
             <div class="divInput">
                 <span class="p-float-label">
-                    <p-calendar dateFormat="dd/mm/yy" id="fimPer" class="form-control" formControlName="dataFim" ></p-calendar>
+                    <p-calendar appendTo="body" dateFormat="dd/mm/yy" id="fimPer" class="form-control" formControlName="dataFim" ></p-calendar>
                     <label for="fimPer">Data final</label>
                 </span>
                 <div *ngIf="form.get('dataFim')?.invalid && form.get('dataFim')?.touched" class="validation-error">

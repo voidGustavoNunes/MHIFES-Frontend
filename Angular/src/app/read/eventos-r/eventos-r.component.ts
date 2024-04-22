@@ -30,7 +30,6 @@ import { Semana } from '../../models/share/semana.models';
 import { registerLocaleData } from '@angular/common';
 import localePT from '@angular/common/locales/pt';
 import { DiaSemana, Horario } from '../../models/horario.models';
-import { HorarioService } from '../../service/horario.service';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 import { CheckboxModule } from 'primeng/checkbox';
 registerLocaleData(localePT);
@@ -68,7 +67,6 @@ registerLocaleData(localePT);
   providers: [
     EventoService,
     LocalService,
-    HorarioService,
     ConfirmationService,
     MessageService,
     provideNgxMask()
@@ -125,7 +123,6 @@ export class EventosRComponent implements OnInit, OnDestroy {
   constructor(
     private eventService: EventoService,
     private locService: LocalService,
-    private horasService: HorarioService,
     private router: Router,
     private formBuilder: FormBuilder,
     private confirmationService: ConfirmationService
@@ -178,23 +175,6 @@ export class EventosRComponent implements OnInit, OnDestroy {
       error: (err: any) => {
         this.messages = [
           { severity: 'error', summary: 'Erro', detail: 'Dados de locais não encontrados.' },
-        ];
-      }
-    });
-
-    this.unsubscribe$HR = this.horasService.listar()
-    .subscribe({
-      next: (itens:any) => {
-        const data = itens;
-        this.horariosArray = data.sort((a: Horario, b: Horario) => {
-          const timeA = a.horaInicio.toString();
-          const timeB = b.horaInicio.toString();
-          return timeA.localeCompare(timeB);
-        });
-      },
-      error: (err: any) => {
-        this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Dados de horários não encontrados.' },
         ];
       }
     });
