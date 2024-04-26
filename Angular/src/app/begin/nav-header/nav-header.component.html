@@ -1,19 +1,43 @@
 <div class="card">
-    <p-menubar class="menu" [model]="itemsLog" *ngIf="isSpecialPage">
+    <p-menubar class="menu" [model]="itemsLog" *ngIf="!isLogged()">
     <!-- <p-menubar class="menu" [model]="itemsLog" *ngIf="!perfil"> -->
         <ng-template pTemplate="start">
-            <a routerLink="login" class="logo">
+            <a routerLink="home" class="logo">
                 <img src="assets/img/logoIfes.svg" alt="Logo do IFES" width="150" height="64"/>
             </a>
         </ng-template>
     </p-menubar>
 
-    <p-menubar class="menu" [model]="itemsHom" *ngIf="!isSpecialPage">
-    <!-- <p-menubar class="menu" [model]="itemsHom" *ngIf="perfil"> -->
+    <p-menubar class="menu" [model]="itemsAdm" *ngIf="isLogged() && userService.roleMatch(['ADMIN'])">
         <ng-template pTemplate="start">
-            <a routerLink="login" class="logo">
+            <a routerLink="home" class="logo">
                 <img src="assets/img/logoIfes.svg" alt="Logo do IFES" width="150" height="64"/>
             </a>
+        </ng-template>
+        
+        <ng-template pTemplate="end" class="panel-user" *ngIf="getNameUser()">
+            <p-overlayPanel #op>
+                <a routerLink="home" rel="noopener noreferrer">Data logs</a>
+                <p-divider></p-divider>
+                <p-button (click)="logout()" label="Sair" [link]="true"></p-button>
+
+                <!-- <a rel="noopener noreferrer">Sair</a> -->
+            </p-overlayPanel>
+            <p-button (click)="op.toggle($event)" icon="pi pi-user" label="{{getNameUser()}}"></p-button>
+        </ng-template>
+    </p-menubar>
+    
+    <p-menubar class="menu" [model]="itemsUse" *ngIf="isLogged() && userService.roleMatch(['USER'])">
+        <ng-template pTemplate="start">
+            <a routerLink="home" class="logo">
+                <img src="assets/img/logoIfes.svg" alt="Logo do IFES" width="150" height="64"/>
+            </a>
+        </ng-template>
+
+        <ng-template pTemplate="end">
+            <!-- <p-avatar label="P" styleClass="mr-2" size="xlarge" shape="circle"></p-avatar> -->
+
+            <input type="text" pInputText placeholder="Search" class="w-full" />
         </ng-template>
     </p-menubar>
 </div>

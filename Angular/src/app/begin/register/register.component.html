@@ -8,29 +8,35 @@
             <div class="formInput">
                 <p-iconField iconPosition="left">
                     <p-inputIcon styleClass="pi pi-user" />
-                    <input type="text" class="form-control" formControlName="nomeUser" placeholder="Nome de usuário" pInputText />
+                    <input type="text" class="form-control" formControlName="login" placeholder="E-mail" pInputText />
                 </p-iconField>
-                <div *ngIf="form.get('nomeUser')?.invalid && errU" class="validation-error">
-                <!-- <div *ngIf="errU" class="validation-error"> -->
-                    <p>{{ mssU }}</p>
+                <div *ngIf="form.get('login')?.invalid && errL" class="validation-error">
+                    <p>{{ mssL }}</p>
                 </div>
             </div>
             <div class="formInput">
                 <p-iconField iconPosition="left">
                     <p-inputIcon styleClass="pi pi-id-card" />
-                    <input type="text" class="form-control" formControlName="matricula" placeholder="Matrícula" pInputText [minlength]="3" [maxlength]="50" />
+                    <input type="text" class="form-control" formControlName="nome" placeholder="Nome" pInputText />
                 </p-iconField>
-                <div *ngIf="form.get('matricula')?.invalid && errM" class="validation-error">
-                <!-- <div *ngIf="errM" class="validation-error"> -->
-                    <p>{{ mssM }}</p>
+                <div *ngIf="form.get('nome')?.invalid && errN" class="validation-error">
+                    <p>{{ mssN }}</p>
                 </div>
             </div>
         
             <div class="formInput">
-                <p-password placeholder="Senha" class="form-control" formControlName="senha" [toggleMask]="true" [minlength]="6" [maxLength]="15"></p-password>
-                <div *ngIf="form.get('senha')?.invalid && errS" class="validation-error">
+                <p-password placeholder="Senha" class="form-control" formControlName="password" [toggleMask]="true"></p-password>
+                <!-- <p-password placeholder="Role" class="form-control" formControlName="password" [toggleMask]="true" [minlength]="6" [maxLength]="15"></p-password> -->
+                <div *ngIf="form.get('password')?.invalid && errP" class="validation-error">
                 <!-- <div *ngIf="errS" class="validation-error"> -->
-                    <p>{{ mssS }}</p>
+                    <p>{{ mssP }}</p>
+                </div>
+            </div>
+            <div class="formInput">
+                <p-dropdown appendTo="body" formControlName="role" [options]="papeisRole" optionLabel="papel" placeholder="Selecione o papel do usuário"></p-dropdown>
+
+                <div *ngIf="form.get('role')?.invalid && errR" class="validation-error">
+                    <p>{{ mssR }}</p>
                 </div>
             </div>
         </form>

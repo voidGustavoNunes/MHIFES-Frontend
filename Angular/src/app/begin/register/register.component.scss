@@ -25,6 +25,12 @@
         flex-direction: column;
         .formInput{
             margin: 1rem 0;
+            
+            input{
+                background-color: #BFE4FF;
+                border: none;
+                box-shadow: 0 .2rem .2rem rgba(0, 0, 0, 0.26);
+            }
         }
         .validation-error{
             margin-top: -0.5rem;
@@ -76,12 +82,12 @@
     .p-card-footer .p-button:active{
         box-shadow: none;
     }
-    .p-inputtext{
+    input.p-inputtext.p-component.p-element.p-password-input, .p-dropdown{
         background-color: #BFE4FF;
         border: none;
         box-shadow: 0 .2rem .2rem rgba(0, 0, 0, 0.26);
     }
-    .p-inputtext:focus{
+    input.p-inputtext.p-component.p-element.p-password-input:focus, .p-dropdown:focus{
         border: .05rem solid #256CF0;
     }
     .p-input-icon{
@@ -110,36 +116,42 @@
     }
 }
 
-@media screen and (min-width: 686px) {
+@media screen and (min-width: 961px) {
     #meuFormulario{
         .validation-error{
             min-width: 20vw;
             max-width: 20vw;
         }
+        input{
+            width: 22vw;
+        }
     }
     :host ::ng-deep {
         p-card.p-element{
-            width: 30%;
+            width: 30vw;
         }
-        .p-inputtext{
-            width: 100%;
+        input.p-inputtext.p-component.p-element.p-password-input, .p-dropdown{
+            width: 22vw;
         }
     }
 }
 
-@media screen and (max-width: 685px) {
+@media screen and (max-width: 960px) {
     #meuFormulario{
         .validation-error{
             min-width: 40vw;
             max-width: 40vw;
         }
+        input{
+            width: 42vw;
+        }
     }
     :host ::ng-deep {
         p-card.p-element{
-            width: 70%;
+            width: 50vw;
         }
-        .p-inputtext{
-            width: 100%;
+        input.p-inputtext.p-component.p-element.p-password-input, .p-dropdown{
+            width: 42vw;
         }
     }
 }

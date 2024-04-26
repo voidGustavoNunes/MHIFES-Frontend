@@ -129,10 +129,10 @@
     }
     :host ::ng-deep {
         p-card.p-element{
-            width: 30%;
+            width: 30vw;
         }
         .p-inputtext{
-            width: 100%;
+            width: 22vw;
         }
     }
 }
@@ -146,10 +146,10 @@
     }
     :host ::ng-deep {
         p-card.p-element{
-            width: 60%;
+            width: 50vw;
         }
         .p-inputtext, .p-password-input{
-            width: 90%;
+            width: 42vw;
         }
         .p-input-icon-right > .p-icon-wrapper, .p-input-icon-right > i:last-of-type {
             right: 2.5rem;

@@ -4,50 +4,90 @@ import { NavigationEnd, Router } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { MenubarModule } from 'primeng/menubar';
 import { Subscription, filter } from 'rxjs';
-import { AuthService } from '../../_service/auth.service';
-import { Usuario } from '../../models/pessoa.models';
 import { HttpClientModule } from '@angular/common/http';
+import { LoginResponseDTO } from '../../models/authentication';
+import { UserAuthService } from '../../_services/user-auth.service';
+import { UsuarioService } from '../../_services/usuario.service';
+import { ButtonModule } from 'primeng/button';
+import { FormsModule } from '@angular/forms';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { DividerModule } from 'primeng/divider';
 
 @Component({
   selector: 'app-nav-header',
   standalone: true,
   imports: [
-    MenubarModule,
     CommonModule,
+    MenubarModule,
     HttpClientModule,
+    ButtonModule,
+    FormsModule,
+    OverlayPanelModule,
+    DividerModule
   ],
   templateUrl: './nav-header.component.html',
   styleUrl: './nav-header.component.scss',
   providers: [
+    UserAuthService,
+    UsuarioService
   ]
 })
 export class NavHeaderComponent implements OnInit {
   itemsLog: MenuItem[] | undefined;
-  itemsHom: MenuItem[] | undefined;
-  isSpecialPage: boolean = false;
-  specialKeywords: string[] = ['/login', '/registrar'];
+  itemsAdm: MenuItem[] | undefined;
+  itemsUse: MenuItem[] | undefined;
+  // isSpecialPage: boolean = false;
+  // specialKeywords: string[] = ['/login', '/registrar'];
   
-  perfil: Usuario | null = null;
   unsubscribe$!: Subscription;
 
+  userLogged!: LoginResponseDTO;
+
+  panelVisible: boolean = false;
+
+  itemsOptionsUser: MenuItem[] | undefined;
+
   constructor(
-    private authServ: AuthService,
+    private userAuthService: UserAuthService,
+    public userService: UsuarioService,
     private router: Router
   ) {
-    this.router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe(() => {
-        this.isSpecialPage = this.specialKeywords.some(keyword => this.router.url.includes(keyword));
-    });
+    // this.router.events
+    //   .pipe(filter(event => event instanceof NavigationEnd))
+    //   .subscribe(() => {
+    //     this.isSpecialPage = this.specialKeywords.some(keyword => this.router.url.includes(keyword));
+    // });
   }
 
   ngOnInit() {
-    // this.perfil = this.authServ.getPerfil();
+    this.itemsOptionsUser = [
+      {
+        label: this.getNameUser(),
+        // routerLink:'home',
+        // style: {
+        //   'font-size': '1.4rem',
+        //   'font-family': 'Grandstander Semi'
+        // },
+        items: [
+          {
+            label: 'Data logs',
+            routerLink:'home',
+          },
+          { 
+            separator: true 
+          },
+          {
+            label: 'Sair',
+            command: () => this.logout()
+          },
+        ]
+      }
+    ];
 
     this.itemsLog = [
       {
         label: 'Meu Horário IFES',
-        routerLink:'home',
+        // routerLink:'home',
         style: {
           'font-size': '1.4rem',
           'font-family': 'Grandstander Semi'
@@ -55,7 +95,7 @@ export class NavHeaderComponent implements OnInit {
       }
     ]
 
-    this.itemsHom = [
+    this.itemsAdm = [
       {
         label: 'Meu Horário IFES',
         style: {
@@ -128,11 +168,44 @@ export class NavHeaderComponent implements OnInit {
         ]
       }
     ]
-    // this.removeLog();
+
+    this.itemsUse = [
+      {
+        label: 'Meu Horário IFES',
+        style: {
+          'font-size': '1.4rem',
+          'margin-right': '2rem',
+          'font-family': 'Grandstander Semi'
+        }
+      },
+      {
+        label: 'Home',
+        routerLink:'home',
+        style: {
+          'margin-right': '.5rem',
+          'font-weight': '600'
+        }
+      }
+    ]
   }
-  
-  removeLog(){
-    this.authServ.fazerLogout();
-    this.ngOnInit();
+
+  isLogged() {
+    return this.userAuthService.isLoggedIn();
   }
+
+  logout() {
+    this.userAuthService.clear();
+    this.router.navigate(['/login']).then(() => {
+      window.location.reload();
+    });
+  }
+
+  getNameUser() {
+    return this.userAuthService.getNome();
+  }
+
+  togglePanel() {
+    this.panelVisible = !this.panelVisible;
+  }
+
 }

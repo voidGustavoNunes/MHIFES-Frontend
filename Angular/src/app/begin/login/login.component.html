@@ -11,16 +11,16 @@
             <div class="formInput">
                 <p-iconField iconPosition="left">
                         <p-inputIcon styleClass="pi pi-user" />
-                        <input type="text" class="form-control" formControlName="matricula" placeholder="Matrícula" pInputText />
+                        <input type="text" class="form-control" formControlName="login" placeholder="Login" pInputText />
                     </p-iconField>
-                    <div *ngIf="form.get('matricula')?.invalid && errM" class="validation-error">
+                    <div *ngIf="form.get('login')?.invalid && errM" class="validation-error">
                         <p>{{ mssM }}</p>
                     </div>
             </div>
                 
             <div class="formInput">
-                <p-password class="form-control" formControlName="senha" placeholder="Senha" [toggleMask]="true"></p-password>
-                <div *ngIf="form.get('senha')?.invalid && errS" class="validation-error">
+                <p-password class="form-control" formControlName="password" placeholder="Senha" [toggleMask]="true"></p-password>
+                <div *ngIf="form.get('password')?.invalid && errS" class="validation-error">
                         <p>{{ mssS }}</p>
                     </div>
             </div>

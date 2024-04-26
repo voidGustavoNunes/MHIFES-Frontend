@@ -11,35 +11,26 @@ import { EventosRComponent } from './read/eventos-r/eventos-r.component';
 import { LocaisRComponent } from './read/locais-r/locais-r.component';
 import { CoordenadoriasRComponent } from './read/coordenadorias-r/coordenadorias-r.component';
 import { AlocacoesRComponent } from './read/alocacoes-r/alocacoes-r.component';
-import { LoggedGuard } from './_guard/logged.guard';
-// import { AuthGuard } from './_guard/auth.guard';
+import { AuthGuard } from './_auth/auth.guard';
+import { ForbiddenComponent } from './begin/forbidden/forbidden.component';
+import { LoggedGuard } from './_auth/logged.guard';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'login', pathMatch: 'full' },
-    { path: 'login', component: LoginComponent },
-    // { path: 'login', component: LoginComponent, canActivate: [LoggedGuard] },
+    { path: 'login', component: LoginComponent, canActivate: [LoggedGuard] },
     
-    { path: 'home', component: HomeComponent },
-    { path: 'registrar', component: RegisterComponent },
-    { path: 'equipamentos', component: EquipamentosRComponent },
-    { path: 'disciplinas', component: DisciplinasRComponent },
-    { path: 'periodos', component: PeriodosRComponent },
-    { path: 'professores', component: ProfessoresRComponent },
-    { path: 'alunos', component: AlunosRComponent },
-    { path: 'coordenadorias', component: CoordenadoriasRComponent },
-    { path: 'eventos', component: EventosRComponent },
-    { path: 'locais', component: LocaisRComponent },
-    { path: 'alocacoes', component: AlocacoesRComponent },
+    { path: 'registrar', component: RegisterComponent, canActivate: [LoggedGuard] },
+
+    { path: 'home', component: HomeComponent, canActivate:[AuthGuard], data:{roles:["ADMIN", "USER"]} },
     
-    // { path: 'home', component: HomeComponent, canActivate: [AuthGuard] },
-    // { path: 'registrar', component: RegisterComponent, canActivate: [LoggedGuard] },
-    // { path: 'equipamentos', component: EquipamentosRComponent, canActivate: [AuthGuard], data: { tipoUsuarioPermitido: [1] } },
-    // { path: 'disciplinas', component: DisciplinasRComponent, canActivate: [AuthGuard], data: { tipoUsuarioPermitido: [1] } },
-    // { path: 'periodos', component: PeriodosRComponent, canActivate: [AuthGuard], data: { tipoUsuarioPermitido: [1] } },
-    // { path: 'professores', component: ProfessoresRComponent, canActivate: [AuthGuard], data: { tipoUsuarioPermitido: [1] } },
-    // { path: 'alunos', component: AlunosRComponent, canActivate: [AuthGuard], data: { tipoUsuarioPermitido: [1] } },
-    // { path: 'coordenadorias', component: CoordenadoriasRComponent, canActivate: [AuthGuard], data: { tipoUsuarioPermitido: [1] } },
-    // { path: 'eventos', component: EventosRComponent, canActivate: [AuthGuard], data: { tipoUsuarioPermitido: [2] } },
-    // { path: 'locais', component: LocaisRComponent, canActivate: [AuthGuard], data: { tipoUsuarioPermitido: [1] } },
-    // { path: 'alocacoes', component: AlocacoesRComponent, canActivate: [AuthGuard], data: { tipoUsuarioPermitido: [1] } },
+    { path: 'equipamentos', component: EquipamentosRComponent, canActivate:[AuthGuard], data:{roles:["ADMIN"]} },
+    { path: 'disciplinas', component: DisciplinasRComponent, canActivate:[AuthGuard], data:{roles:["ADMIN"]} },
+    { path: 'periodos', component: PeriodosRComponent, canActivate:[AuthGuard], data:{roles:["ADMIN"]} },
+    { path: 'professores', component: ProfessoresRComponent, canActivate:[AuthGuard], data:{roles:["ADMIN"]} },
+    { path: 'alunos', component: AlunosRComponent, canActivate:[AuthGuard], data:{roles:["ADMIN"]} },
+    { path: 'coordenadorias', component: CoordenadoriasRComponent, canActivate:[AuthGuard], data:{roles:["ADMIN"]} },
+    { path: 'eventos', component: EventosRComponent, canActivate:[AuthGuard], data:{roles:["ADMIN"]} },
+    { path: 'locais', component: LocaisRComponent, canActivate:[AuthGuard], data:{roles:["ADMIN"]} },
+    { path: 'alocacoes', component: AlocacoesRComponent, canActivate:[AuthGuard], data:{roles:["ADMIN"]} },
+    { path: 'forbidden', component: ForbiddenComponent, canActivate:[AuthGuard], data:{roles:["ADMIN"]} },
 ];

@@ -51,6 +51,16 @@
     // .p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-content:focus{
     //     background-color: rebeccapurple;
     // }
+    button.p-ripple.p-element.p-button.p-component {
+        background: none;
+    }
+    // .panel-user.p-button:focus{
+    //     border: .5rem solid #BFE4FF;
+    // }
+    .panel-user > .p-button.p-button-link {
+        height: 1rem;
+        color: black;
+    }
 }
 
 
