@@ -378,7 +378,7 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
     this.professorService.criar(this.professoresCadast).subscribe({
       next: (data: any) => {
         this.professoresCadast = data;
-        this.goToRouteSave();
+        // this.goToRouteSave();
         this.ngOnInit();
         this.messages = [
           { severity: 'success', summary: 'Sucesso', detail: 'Professor cadastrado com sucesso!', life: 3000 },
@@ -396,7 +396,7 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
     this.professorService.atualizar(id, this.professoresEdit).subscribe({
       next: (data: any) => {
         this.professoresEdit = data;
-        this.goToRouteEdit(id);
+        // this.goToRouteEdit(id);
         this.ngOnInit();
         this.messages = [
           { severity: 'success', summary: 'Sucesso', detail: 'Professor editado com sucesso!', life: 3000 },

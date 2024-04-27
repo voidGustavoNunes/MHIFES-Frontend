@@ -58,6 +58,8 @@
     .eqTable{
         margin: 4rem 0;
         border: .1rem solid #B1CAFA;
+        max-width: 79.25rem;
+        overflow-x: auto;
         
         .tbHeader{
             border-radius: .5rem 0;
@@ -225,6 +227,9 @@
     }
     .ng-trigger.ng-trigger-overlayAnimation.ng-tns-c3632051545-3.p-datepicker.p-component.ng-star-inserted {
         // margin-top: 380px;
+    }
+    .p-datatable-striped {
+        width: max-content;
     }
 }
 

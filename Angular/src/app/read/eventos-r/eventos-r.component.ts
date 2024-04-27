@@ -26,10 +26,8 @@ import { InputSwitch, InputSwitchModule } from 'primeng/inputswitch';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { MessagesModule } from 'primeng/messages';
 import { FiltrarPesquisa } from '../../models/share/filtrar-pesquisa.models';
-import { Semana } from '../../models/share/semana.models';
 import { registerLocaleData } from '@angular/common';
 import localePT from '@angular/common/locales/pt';
-import { DiaSemana, Horario } from '../../models/horario.models';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 import { CheckboxModule } from 'primeng/checkbox';
 registerLocaleData(localePT);
@@ -86,11 +84,9 @@ export class EventosRComponent implements OnInit, OnDestroy {
   eventoInfo!: Evento;
 
   locaisArray: Local[] = [];
-  horariosArray: Horario[] = [];
 
   unsubscribe$!: Subscription;
   unsubscribe$LA!: Subscription;
-  unsubscribe$HR!: Subscription;
 
   form: FormGroup;
 
@@ -183,7 +179,6 @@ export class EventosRComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.unsubscribe$.unsubscribe();
     this.unsubscribe$LA.unsubscribe();
-    this.unsubscribe$HR.unsubscribe();
   }
   
   verificarHoraFimMaiorQueInicio(formGroup: FormGroup) {
@@ -273,7 +268,7 @@ export class EventosRComponent implements OnInit, OnDestroy {
     this.diasIntervalo?.sort((a:Date, b:Date) => {
       const dateA = new Date(a);
       const dateB = new Date(b);
-      return dateB.getTime() - dateA.getTime();
+      return dateA.getTime() - dateB.getTime();
     });
 
     this.diasIntervalo?.forEach(dtInt => {
@@ -288,7 +283,7 @@ export class EventosRComponent implements OnInit, OnDestroy {
     this.datasHour.sort((a:EventoHourData, b:EventoHourData) => {
       const dateA = new Date(a.dataEvento);
       const dateB = new Date(b.dataEvento);
-      return dateB.getTime() - dateA.getTime();
+      return dateA.getTime() - dateB.getTime();
     });
   }
 
@@ -480,7 +475,7 @@ export class EventosRComponent implements OnInit, OnDestroy {
     this.eventService.criar(this.eventosCadast).subscribe({
       next: (data: any) => {
         this.eventosCadast = data;
-        this.goToRouteSave();
+        // this.goToRouteSave();
         this.ngOnInit();
         if(this.mss) {
           this.messages = [
@@ -500,7 +495,7 @@ export class EventosRComponent implements OnInit, OnDestroy {
     this.eventService.atualizar(id, this.eventosEdit).subscribe({
       next: (data: any) => {
         this.eventosEdit = data;
-        this.goToRouteEdit(id);
+        // this.goToRouteEdit(id);
         this.ngOnInit();
         this.messages = [
           { severity: 'success', summary: 'Sucesso', detail: 'Evento editado com sucesso!', life: 3000 },

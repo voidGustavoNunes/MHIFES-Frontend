@@ -11,7 +11,7 @@ import { MessagesModule } from 'primeng/messages';
 import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { ConfirmationService, Message, MessageService } from 'primeng/api';
-import { AutheticationDTO, LoginResponseDTO } from '../../models/authentication';
+import { AutheticationDTO, LoginResponseDTO } from '../../models/usuario';
 import { UsuarioService } from '../../_services/usuario.service';
 import { UserAuthService } from '../../_services/user-auth.service';
 
@@ -56,7 +56,7 @@ export class LoginComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private router: Router,
-    private userService: UsuarioService,
+    public userService: UsuarioService,
     private userAuthService: UserAuthService,
     ) {
       this.form = this.formBuilder.group({
@@ -70,6 +70,17 @@ export class LoginComponent implements OnInit {
   navigateToPage() {
     this.router.navigate(['/registrar']);
   }
+
+  isLogged() {
+    return this.userAuthService.isLoggedIn();
+  }
+  
+  onKeyDown(event: KeyboardEvent) {
+    if (event.key === "Enter") {
+      this.onSubmit();
+    }
+  }
+  
   
   enviarForm() {
     this.userService.login(this.login).subscribe({

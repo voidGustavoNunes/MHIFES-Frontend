@@ -8,7 +8,7 @@
             <div class="formInput">
                 <p-iconField iconPosition="left">
                     <p-inputIcon styleClass="pi pi-user" />
-                    <input type="text" class="form-control" formControlName="login" placeholder="E-mail" pInputText />
+                    <input type="text" class="form-control" formControlName="login" placeholder="E-mail" pInputText (keydown)="onKeyDown($event)" />
                 </p-iconField>
                 <div *ngIf="form.get('login')?.invalid && errL" class="validation-error">
                     <p>{{ mssL }}</p>
@@ -17,7 +17,7 @@
             <div class="formInput">
                 <p-iconField iconPosition="left">
                     <p-inputIcon styleClass="pi pi-id-card" />
-                    <input type="text" class="form-control" formControlName="nome" placeholder="Nome" pInputText />
+                    <input type="text" class="form-control" formControlName="nome" placeholder="Nome" pInputText (keydown)="onKeyDown($event)" />
                 </p-iconField>
                 <div *ngIf="form.get('nome')?.invalid && errN" class="validation-error">
                     <p>{{ mssN }}</p>
@@ -25,7 +25,7 @@
             </div>
         
             <div class="formInput">
-                <p-password placeholder="Senha" class="form-control" formControlName="password" [toggleMask]="true"></p-password>
+                <p-password placeholder="Senha" class="form-control" formControlName="password" [toggleMask]="true" (keydown)="onKeyDown($event)"></p-password>
                 <!-- <p-password placeholder="Role" class="form-control" formControlName="password" [toggleMask]="true" [minlength]="6" [maxLength]="15"></p-password> -->
                 <div *ngIf="form.get('password')?.invalid && errP" class="validation-error">
                 <!-- <div *ngIf="errS" class="validation-error"> -->
@@ -33,7 +33,7 @@
                 </div>
             </div>
             <div class="formInput">
-                <p-dropdown appendTo="body" formControlName="role" [options]="papeisRole" optionLabel="papel" placeholder="Selecione o papel do usuário"></p-dropdown>
+                <p-dropdown appendTo="body" formControlName="role" [options]="papeisRole" optionLabel="papel" placeholder="Selecione o papel do usuário" (keydown)="onKeyDown($event)"></p-dropdown>
 
                 <div *ngIf="form.get('role')?.invalid && errR" class="validation-error">
                     <p>{{ mssR }}</p>

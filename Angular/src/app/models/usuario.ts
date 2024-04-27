@@ -1,3 +1,11 @@
+export interface Usuario {
+    id: number;
+    login: string;
+    nome: string;
+    password: string;
+    role: UserRole;
+}
+
 export interface AutheticationDTO {
     login: string;
     password: string;
@@ -17,6 +25,7 @@ export enum UserRole {
 
 export interface LoginResponseDTO {
     token: string;
+    login: string;
     nome: string;
     role: UserRole;
 }

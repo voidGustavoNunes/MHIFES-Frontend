@@ -11,7 +11,7 @@ import { Router } from '@angular/router';
 import { ConfirmationService, Message, MessageService } from 'primeng/api';
 import { MessagesModule } from 'primeng/messages';
 import { HttpClientModule } from '@angular/common/http';
-import { RegisterDTO, UserRole } from '../../models/authentication';
+import { RegisterDTO, UserRole } from '../../models/usuario';
 import { UsuarioService } from '../../_services/usuario.service';
 import { DropdownModule } from 'primeng/dropdown';
 
@@ -76,6 +76,12 @@ export class RegisterComponent implements OnInit {
       { label: 'Administrador', papel: UserRole.ADMIN },
       { label: 'Usuário', papel: UserRole.USER }
     ]
+  }
+  
+  onKeyDown(event: KeyboardEvent) {
+    if (event.key === "Enter") {
+      this.onSubmit();
+    }
   }
 
   enviarForm() {
@@ -142,32 +148,6 @@ export class RegisterComponent implements OnInit {
         { severity: 'warn', summary: 'Atenção', detail: 'Informação inválida. Preencha os campos!', life: 3000 },
       ];
     }
-    // this.router.navigate(['login']);
   }
 
-  sendLogData() {
-    // console.log('verificando login user')
-    // this.authServ.verificarRegisterLogData(this.user);
-
-    // console.log('sev ', this.authServ.severity)
-    // if(this.authServ.severity == 1) {
-    //   this.form.reset();
-    //   this.messages = [
-    //     { severity: 'success', summary: 'Sucesso', detail: this.authServ.resposta, life: 5000 },
-    //   ];
-    //   setTimeout(() => {
-    //     this.router.navigate(['login']).then(() => {
-    //       window.location.reload();
-    //     });
-    //   }, 5000);
-    // } else if(this.authServ.severity == 2) {
-    //   this.messages = [
-    //     { severity: 'warn', summary: 'Atenção', detail: this.authServ.resposta, life: 3000 },
-    //   ];
-    // } else if(this.authServ.severity == 3) {
-    //   this.messages = [
-    //     { severity: 'error', summary: 'Erro', detail: this.authServ.resposta, life: 3000 },
-    //   ];
-    // }
-  }
 }

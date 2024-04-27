@@ -14,12 +14,13 @@ import { AlocacoesRComponent } from './read/alocacoes-r/alocacoes-r.component';
 import { AuthGuard } from './_auth/auth.guard';
 import { ForbiddenComponent } from './begin/forbidden/forbidden.component';
 import { LoggedGuard } from './_auth/logged.guard';
+import { LogsRComponent } from './read/logs-r/logs-r.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'login', pathMatch: 'full' },
     { path: 'login', component: LoginComponent, canActivate: [LoggedGuard] },
     
-    { path: 'registrar', component: RegisterComponent, canActivate: [LoggedGuard] },
+    { path: 'registrar', component: RegisterComponent, canActivate: [AuthGuard], data:{roles:["ADMIN"]} },
 
     { path: 'home', component: HomeComponent, canActivate:[AuthGuard], data:{roles:["ADMIN", "USER"]} },
     
@@ -33,4 +34,5 @@ export const routes: Routes = [
     { path: 'locais', component: LocaisRComponent, canActivate:[AuthGuard], data:{roles:["ADMIN"]} },
     { path: 'alocacoes', component: AlocacoesRComponent, canActivate:[AuthGuard], data:{roles:["ADMIN"]} },
     { path: 'forbidden', component: ForbiddenComponent, canActivate:[AuthGuard], data:{roles:["ADMIN"]} },
+    { path: 'logs', component: LogsRComponent, canActivate:[AuthGuard], data:{roles:["ADMIN"]} },
 ];

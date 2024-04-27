@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Alocacao } from '../models/alocacao.models';
+import { Log } from '../models/log.models';
 
 @Injectable()
 export class AlocacaoService {
@@ -27,5 +28,9 @@ export class AlocacaoService {
 
   excluir(id: number): Observable<Object> {
     return this.http.delete(`${this.API}/${id}`, {observe: 'response'});
+  }
+
+  buscarPorIdRegistro(id: number): Observable<Log[]> {
+    return this.http.get<Log[]>(`${this.API}/log/${id}`);
   }
 };

@@ -5,7 +5,7 @@ import { MenuItem } from 'primeng/api';
 import { MenubarModule } from 'primeng/menubar';
 import { Subscription, filter } from 'rxjs';
 import { HttpClientModule } from '@angular/common/http';
-import { LoginResponseDTO } from '../../models/authentication';
+import { LoginResponseDTO } from '../../models/usuario';
 import { UserAuthService } from '../../_services/user-auth.service';
 import { UsuarioService } from '../../_services/usuario.service';
 import { ButtonModule } from 'primeng/button';

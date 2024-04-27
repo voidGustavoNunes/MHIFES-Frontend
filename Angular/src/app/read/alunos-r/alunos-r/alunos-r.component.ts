@@ -192,7 +192,7 @@ export class AlunosRComponent implements OnInit, OnDestroy {
     this.alunService.criar(this.alunosCadast).subscribe({
       next: (data: any) => {
         this.alunosCadast = data;
-        this.goToRouteSave();
+        // this.goToRouteSave();
         this.ngOnInit();
         this.messages = [
           { severity: 'success', summary: 'Sucesso', detail: 'Aluno cadastrado com sucesso!', life: 3000 },
@@ -210,7 +210,7 @@ export class AlunosRComponent implements OnInit, OnDestroy {
     this.alunService.atualizar(id, this.alunosEdit).subscribe({
       next: (data: any) => {
         this.alunosEdit = data;
-        this.goToRouteEdit(id);
+        // this.goToRouteEdit(id);
         this.ngOnInit();
         this.messages = [
           { severity: 'success', summary: 'Sucesso', detail: 'Aluno editado com sucesso!', life: 3000 },

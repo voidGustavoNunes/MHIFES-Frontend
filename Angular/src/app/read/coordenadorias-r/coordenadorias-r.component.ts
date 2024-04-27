@@ -177,7 +177,7 @@ export class CoordenadoriasRComponent implements OnInit, OnDestroy {
     this.coordaService.criar(this.coordenadoriasCadast).subscribe({
       next: (data: any) => {
         this.coordenadoriasCadast = data;
-        this.goToRouteSave();
+        // this.goToRouteSave();
         this.ngOnInit();
         this.messages = [
           { severity: 'success', summary: 'Sucesso', detail: 'Coordenadoria cadastrada com sucesso!', life: 3000 },
@@ -195,7 +195,7 @@ export class CoordenadoriasRComponent implements OnInit, OnDestroy {
     this.coordaService.atualizar(id, this.coordenadoriasEdit).subscribe({
       next: (data: any) => {
         this.coordenadoriasEdit = data;
-        this.goToRouteEdit(id);
+        // this.goToRouteEdit(id);
         this.ngOnInit();
         this.messages = [
           { severity: 'success', summary: 'Sucesso', detail: 'Coordenadoria editada com sucesso!', life: 3000 },

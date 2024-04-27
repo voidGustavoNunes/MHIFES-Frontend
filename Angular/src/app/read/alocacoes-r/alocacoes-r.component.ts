@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Time } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
@@ -38,7 +38,9 @@ import { Semana } from '../../models/share/semana.models';
 import { InputSwitch, InputSwitchModule } from 'primeng/inputswitch';
 import { registerLocaleData } from '@angular/common';
 import localePT from '@angular/common/locales/pt';
-import { DiaSemana, Horario } from '../../models/horario.models';
+import { Log } from '../../models/log.models';
+import { AccordionModule } from 'primeng/accordion';
+import { DividerModule } from 'primeng/divider';
 registerLocaleData(localePT);
 
 @Component({
@@ -66,7 +68,9 @@ registerLocaleData(localePT);
     InputNumberModule,
     MultiSelectModule,
     DropdownModule,
-    InputSwitchModule
+    InputSwitchModule,
+    AccordionModule,
+    DividerModule
   ],
   templateUrl: './alocacoes-r.component.html',
   styleUrl: './alocacoes-r.component.scss',
@@ -106,7 +110,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   unsubscribe$Prof!: Subscription;
   unsubscribe$Per!: Subscription;
   unsubscribe$Loc!: Subscription;
-  unsubscribe$HR!: Subscription;
+  unsubscribe$Log!: Subscription;
 
   form: FormGroup;
 
@@ -127,7 +131,6 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   disciplinasArray: Disciplina[] = [];
   periodosArray: Periodo[] = [];
   alunosArray: Aluno[] = [];
-  horariosArray: Horario[] = [];
 
   selectedAlunos: Aluno[] = [];
   
@@ -141,10 +144,15 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   
   enableDataAula: boolean = false;
   disableDiaSemana: boolean = true;
-
+  
   minDate!: Date;
   maxDate!: Date;
   alocacaoHour: AlocacaoHour[] = [];
+  
+  logsData: Log[] = [];
+  visibleLog: boolean = false;
+
+  enableSelect: boolean = false;
 
   constructor(
     private alocService: AlocacaoService,
@@ -297,7 +305,6 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     this.unsubscribe$Loc.unsubscribe();
     this.unsubscribe$Per.unsubscribe();
     this.unsubscribe$Prof.unsubscribe();
-    this.unsubscribe$HR.unsubscribe();
   }
   
   verificarHoraFimMaiorQueInicio(formGroup: FormGroup) {
@@ -326,6 +333,23 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
 
     event.value.forEach((aluno: Aluno) => {
       this.addAluno(aluno);
+    });
+  }
+
+  showDialogLog(valueLog: Alocacao) {
+    this.visibleLog = true;
+    
+    this.unsubscribe$Log = this.alocService.buscarPorIdRegistro(valueLog.id)
+    .subscribe({
+      next: (itens:any) => {
+        const data = itens.sort((a:Log, b:Log) => (a.id > b.id) ? -1 : 1);
+        this.logsData = data;
+      },
+      error: (err: any) => {
+        this.messages = [
+          { severity: 'error', summary: 'Erro', detail: 'Logs de alocação não encontrados.', life: 3000 },
+        ];
+      }
     });
   }
 
@@ -380,6 +404,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     this.switch.writeValue(null);
     this.getAluno().clear();
     this.selectedAlunos = [];
+    this.alocacaoHour = [];
   }
   
   hideDialog() {
@@ -394,6 +419,8 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       this.visibleEdit = false;
       this.form.reset();
     }
+    this.visibleLog = false;
+    this.alocacaoHour = [];
   }
   
   onClickHide() {
@@ -442,19 +469,32 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   onMultiselectChange() {
     let ini: Date = this.form.get('dataAula')?.value;
     let periodo: Periodo = this.form.get('periodo')?.value;
+    let houI: Time = this.form.get('horarioInicio')?.value;
+    let houF: Time = this.form.get('horarioFim')?.value;
 
     if(ini && this.selectedDiasSemana && periodo) {
       let codes: number[] = this.selectedDiasSemana.map(selD => selD.code);
       this.selectedDiasSemana.forEach(selD => {
         const existe = this.alocacaoHour.some(item => item.diaSemana === selD);
+        
         if (!existe) {
           this.alocacaoHour.push({
-            diaSemana:selD, horaFinal:{hours:0,minutes:0}, horaInicio: {hours:0,minutes:0}
+            diaSemana:selD, horaFinal:houF, horaInicio:houI
           })
         }
       })
       this.alocacaoHour = this.alocacaoHour.filter(item => this.selectedDiasSemana?.includes(item.diaSemana));
       
+      this.alocacaoHour.find(alocH => {
+        const diaDaSemana = this.obterDiaDaSemana(ini);
+        if(diaDaSemana == alocH.diaSemana.nome) {
+          this.form.patchValue({
+            horarioInicio: alocH.horaInicio,
+            horarioFim: alocH.horaFinal
+          });
+        }
+      })
+
       this.atualizarDiasSemana(codes);
       
       const periodoFim = new Date(periodo.dataFim);
@@ -476,7 +516,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     this.diasIntervalo?.sort((a:Date, b:Date) => {
       const dateA = new Date(a);
       const dateB = new Date(b);
-      return dateB.getTime() - dateA.getTime();
+      return dateA.getTime() - dateB.getTime();
     });
 
     this.onMultiselectChange();
@@ -497,8 +537,24 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       } else {
         this.form.get('dataAula')?.setErrors({ 'invalidEndDate': true });
         this.disableDiaSemana = true;
+        this.alocacaoHour = [];
       }
     }
+    this.updateSelectState();
+  }
+
+  updateSelectState() {
+    let houI: Time = this.form.get('horarioInicio')?.value;
+    let houF: Time = this.form.get('horarioFim')?.value;
+    let ini: Date = this.form.get('dataAula')?.value;
+
+    if(ini && houI && houF) {
+      this.enableSelect = true;
+    } else {
+      this.enableSelect = false;
+      this.alocacaoHour = [];
+    }
+    console.log('selec ',this.enableSelect)
   }
 
   updateDataAulaState() {
@@ -508,7 +564,6 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     } else {
       this.enableDataAula = false;
     }
-    console.log(this.enableDataAula);
   }
   
   limparFilter(){
@@ -751,7 +806,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     this.alocService.criar(this.alocacoesCadast).subscribe({
       next: (data: any) => {
         this.alocacoesCadast = data;
-        this.goToRouteSave();
+        // this.goToRouteSave();
         this.ngOnInit();
         if(this.mss) {
           this.messages = [
@@ -771,7 +826,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     this.alocService.atualizar(id, this.alocacoesEdit).subscribe({
       next: (data: any) => {
         this.alocacoesEdit = data;
-        this.goToRouteEdit(id);
+        // this.goToRouteEdit(id);
         this.ngOnInit();
         this.messages = [
           { severity: 'success', summary: 'Sucesso', detail: 'Alocação editada com sucesso!', life: 3000 },
@@ -794,17 +849,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   }
 
   onSubmit() {
-      console.log(this.form.value)
-    const ini: Date = this.form.get('dataAula')?.value;
-    this.alocacaoHour.find(alocH => {
-      const diaDaSemana = this.obterDiaDaSemana(ini);
-      if(diaDaSemana == alocH.diaSemana.nome) {
-        this.form.patchValue({
-          horarioInicio: alocH.horaInicio,
-          horarioFim: alocH.horaFinal
-        });
-      }
-    })
+    console.log(this.form.value)
 
     if (this.form.valid && this.cadastrar) {
       this.conditionCreateSave();

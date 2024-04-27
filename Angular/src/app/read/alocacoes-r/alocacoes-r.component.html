@@ -50,6 +50,7 @@
                         {{ formatarHora(alocacaoInfo?.horarioFim) }}</td>
                     <!-- <td></td> -->
                     <td>
+                        <button type="button" class="botaoL" (click)="showDialogLog(alocacao)" pButton>Log</button>
                         <button type="button" class="botaoInfo" (click)="showInfoDialog(alocacao)" pButton>Info</button>
                         <button type="button" class="botaoEdit" (click)="showEditDialog(alocacao, formatarDatas(alocacao?.dataAula))" pButton>Editar</button>
                         <p-toast></p-toast>
@@ -65,7 +66,7 @@
             </ng-template>
         </p-table>
     </div>
-    
+verificar cadastro esta salvando sem igualdade no dia semana
     <p-scrollTop></p-scrollTop>
 </div>
 
@@ -142,19 +143,29 @@
             <div class="divInput labelFlex" *ngIf="enableDataAula">
                 <div>
                     <span class="p-float-label">
-                        <p-calendar dateFormat="dd/mm/yy" id="iniPer" class="form-control" formControlName="dataAula" (onSelect)="onDateIniSelect()" ></p-calendar>
-                        <label for="iniPer">Data de início</label>
+                        <p-calendar appendTo="body" dateFormat="dd/mm/yy" id="iniPer" class="form-control" formControlName="dataAula" (onSelect)="onDateIniSelect()" ></p-calendar>
+                        <label for="iniPer">Início da aula</label>
                     </span>
-                    <div *ngIf="form.get('dataAula')?.invalid && form.get('dataAula')?.touched" class="validation-error">
-                        <p>A data da aula deve estar dentre as datas do período.</p>
+                </div>
+                <div class="flexGrid">
+                    <div>
+                        <label for="horinIni">Início</label>
+                        <input pInputText type="time" id="horinIni" class="form-control" formControlName="horarioInicio" (change)="updateSelectState()">
+                    </div>
+                    <div>
+                        <label for="horinFim">Fim</label>
+                        <input pInputText type="time" id="horinFim=" class="form-control" formControlName="horarioFim" (change)="updateSelectState()">
+                        <div *ngIf="form.get('horarioFim')?.invalid && form.get('horarioFim')?.touched" class="validation-error">
+                            <p>Hora de fim deve ser maior que a hora de início</p>
+                        </div>
                     </div>
                 </div>
-                <div>
-                    <span class="p-float-label">
-                        <p-multiSelect #multiselect [disabled]="disableDiaSemana" appendTo="body" inputId="semanaDia" display="chip" [(ngModel)]="selectedDiasSemana" [ngModelOptions]="{standalone: true}" [options]="opcaoSemana" optionLabel="nome" (onChange)="onMultiselectChange()" ></p-multiSelect>
-                        <label for="semanaDia">Selecione os dias da semana</label>
-                    </span>
-                </div>
+            </div>
+            <div class="divInput" *ngIf="enableSelect">
+                <span class="p-float-label">
+                    <p-multiSelect #multiselect [disabled]="disableDiaSemana" appendTo="body" inputId="semanaDia" display="chip" [(ngModel)]="selectedDiasSemana" [ngModelOptions]="{standalone: true}" [options]="opcaoSemana" optionLabel="nome" (onChange)="onMultiselectChange()" ></p-multiSelect>
+                    <label for="semanaDia">Selecione os dias da semana</label>
+                </span>
             </div>
             <div class="replicaGrid" *ngIf="alocacaoHour.length > 0">
                 <div class="columnContainer" *ngFor="let replica of alocacaoHour; let i = index">
@@ -360,6 +371,40 @@
             <div class="divBotao replica">
                 <button type="button" class="botaoInfo" (click)="visibleInfo = false" pButton>Ok</button>
             </div>
+        </div>
+    </p-dialog>
+</div>
+
+<div class="card flex justify-content-center">
+    <p-dialog header="Logs de Alocações" [(visible)]="visibleLog" [modal]="true" [breakpoints]="{ '960px': '75vw' }" [style]="{width: '50vw', 'z-index': '1102'}">
+        <div class="cardLog" *ngIf="logsData.length > 0">
+            <p-accordion>
+                <p-accordionTab *ngFor="let log of logsData">
+                    <ng-template let="header" pTemplate="header" style="display: flex;">
+                        <!-- <p-divider layout="vertical"></p-divider> -->
+                        <div class="custom-header">
+                        <span>Cód. Log: {{ log.id }}</span>
+                        <span>Ação: {{ log.operacao }}</span>
+                        <span>Usuário: {{ log.usuario.nome }}</span>
+                        <span>Data: {{ log.data }} {{ log.hora }}</span>
+                        </div>
+                    </ng-template>
+                    <p>
+                    <b>Tipo do objeto: </b>{{ log.idRegistro }} 
+                    </p>
+                    <p style="white-space: pre-line;">
+                    <b>Descrição: </b>{{ log.descricao }} 
+                    </p>
+                </p-accordionTab>
+            </p-accordion>
+        </div>
+
+        <div class="cardLog" *ngIf="logsData.length <= 0">
+            <h3>Não há logs registrados.</h3>
+        </div>
+
+        <div class="divBotao replica">
+            <button type="button" class="botaoL" (click)="visibleLog = false" pButton>Ok</button>
         </div>
     </p-dialog>
 </div>

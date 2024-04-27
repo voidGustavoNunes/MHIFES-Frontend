@@ -1,0 +1,101 @@
+<div class="caixa">
+    <h1>Logs</h1>
+
+    <div class="opcao">
+        <div class="pesq">
+            <p-inputGroup>
+                <button type="button" pButton icon="pi pi-filter-slash" (click)="limparFilter()"></button>
+                <input #searchInput type="text" pInputText placeholder="Pesquisar log" (keydown)="onKeyDown($event, searchInput.value)" />
+                <button type="button" pButton icon="pi pi-search" (click)="filterField(searchInput.value)"></button>
+            </p-inputGroup>
+        </div>
+    </div>
+
+    <div class="cardLog" *ngIf="logsData.length > 0">
+        <p-accordion>
+            <p-accordionTab *ngFor="let log of logsData">
+                <ng-template let="header" pTemplate="header" style="display: flex;">
+                    <!-- <p-divider layout="vertical"></p-divider> -->
+                    <div class="custom-header">
+                      <span>Cód. Log: {{ log.id }}</span>
+                      <span>Ação: {{ log.operacao }}</span>
+                      <span>Usuário: {{ log.usuario.nome }}</span>
+                      <span>Data: {{ log.data }} {{ log.hora }}</span>
+                    </div>
+                  </ng-template>
+                <p>
+                   <b>Tipo do objeto: </b>{{ log.idRegistro }} 
+                </p>
+                <p style="white-space: pre-line;">
+                   <b>Descrição: </b>{{ log.descricao }} 
+                </p>
+            </p-accordionTab>
+        </p-accordion>
+    </div>
+
+    <div class="cardLog">
+        <p-accordion>
+            <p-accordionTab>
+                <ng-template let="header" pTemplate="header" style="display: flex;">
+                    <!-- <p-divider layout="vertical"></p-divider> -->
+                    <div class="custom-header">
+                      <span>Cód. Log: <b>{{ logsExample.id }}</b></span>
+                      <span>Ação: <b class="{{ getLogClass(logsExample.operacao) }}">{{ logsExample.operacao }}</b></span>
+                      <span>Usuário: <b>{{ logsExample.usuario.nome }}</b></span>
+                      <span>Data: <b>{{ logsExample.data | date: 'dd/MM/yyyy' }} {{ logsExample.hora }}</b></span>
+                    </div>
+                  </ng-template>
+                <p>
+                   <b>Tipo do objeto: </b>{{ logsExample.idRegistro }} 
+                </p>
+                <p style="white-space: pre-line;">
+                   <b>Descrição: </b>{{ logsExample.descricao }} 
+                </p>
+            </p-accordionTab>
+            <p-accordionTab>
+                <ng-template let="header" pTemplate="header" style="display: flex;">
+                    <!-- <p-divider layout="vertical"></p-divider> -->
+                    <div class="custom-header">
+                      <span>Cód. Log: <b>{{ logsExample.id }}</b></span>
+                      <span>Ação: <b>{{ logsExample.operacao }}</b></span>
+                      <span>Usuário: <b>{{ logsExample.usuario.nome }}</b></span>
+                      <span>Data: <b>{{ logsExample.data | date: 'dd/MM/yyyy' }} {{ logsExample.hora }}</b></span>
+                    </div>
+                  </ng-template>
+                <p>
+                   <b>Tipo do objeto: </b>{{ logsExample.idRegistro }} 
+                </p>
+                <p style="white-space: pre-line;">
+                   <b>Descrição: </b>{{ logsExample.descricao }} 
+                </p>
+            </p-accordionTab>
+            <p-accordionTab>
+                <ng-template let="header" pTemplate="header" style="display: flex;">
+                    <!-- <p-divider layout="vertical"></p-divider> -->
+                    <div class="custom-header">
+                      <span>Cód. Log: <b>{{ logsExample.id }}</b></span>
+                      <span>Ação: <b>{{ logsExample.operacao }}</b></span>
+                      <span>Usuário: <b>{{ logsExample.usuario.nome }}</b></span>
+                      <span>Data: <b>{{ logsExample.data | date: 'dd/MM/yyyy' }} {{ logsExample.hora }}</b></span>
+                    </div>
+                  </ng-template>
+                <p>
+                   <b>Tipo do objeto: </b>{{ logsExample.idRegistro }} 
+                </p>
+                <p style="white-space: pre-line;">
+                   <b>Descrição: </b>{{ logsExample.descricao }} 
+                </p>
+            </p-accordionTab>
+        </p-accordion>
+    </div>
+
+    <div class="cardLog" *ngIf="logsData.length <= 0">
+        <h3>Não há logs registrados.</h3>
+    </div>
+
+    <p-scrollTop></p-scrollTop>
+</div>
+
+<div class="card">
+    <p-messages [(value)]="messages" [showTransitionOptions]="'500ms'" [hideTransitionOptions]="'500ms'" [enableService]="false"></p-messages>
+</div>

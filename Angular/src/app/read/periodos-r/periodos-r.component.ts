@@ -309,7 +309,7 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
     this.periodService.criar(this.periodosCadast).subscribe({
       next: (data: any) => {
         this.periodosCadast = data;
-        this.goToRouteSave();
+        // this.goToRouteSave();
         this.ngOnInit();
         this.messages = [
           { severity: 'success', summary: 'Sucesso', detail: 'Perídodo cadastrado com sucesso!', life: 3000 },
@@ -327,7 +327,7 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
     this.periodService.atualizar(id, this.periodosEdit).subscribe({
       next: (data: any) => {
         this.periodosEdit = data;
-        this.goToRouteEdit(id);
+        // this.goToRouteEdit(id);
         this.ngOnInit();
         this.messages = [
           { severity: 'success', summary: 'Sucesso', detail: 'Perídodo editado com sucesso!', life: 3000 },

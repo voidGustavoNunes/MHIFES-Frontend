@@ -377,7 +377,7 @@ export class LocaisRComponent implements OnInit, OnDestroy {
     this.locService.criar(this.locaisCadast).subscribe({
       next: (data: any) => {
         this.locaisCadast = data;
-        this.goToRouteSave();
+        // this.goToRouteSave();
         this.ngOnInit();
         this.messages = [
           { severity: 'success', summary: 'Sucesso', detail: 'Local cadastrado com sucesso!', life: 3000 },
@@ -395,7 +395,7 @@ export class LocaisRComponent implements OnInit, OnDestroy {
     this.locService.atualizar(id, this.locaisEdit).subscribe({
       next: (data: any) => {
         this.locaisEdit = data;
-        this.goToRouteEdit(id);
+        // this.goToRouteEdit(id);
         this.ngOnInit();
         this.messages = [
           { severity: 'success', summary: 'Sucesso', detail: 'Local editado com sucesso!', life: 3000 },

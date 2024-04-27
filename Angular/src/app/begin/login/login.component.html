@@ -2,24 +2,26 @@
     <div class="background"></div>
     <p-card>
         <ng-template pTemplate="header">
-            <p>Ainda não tem conta?</p>
-            <p-button label="Cadastre-se" (click)="navigateToPage()"></p-button>
+            <div *ngIf="isLogged() && userService.roleMatch(['ADMIN'])">
+                <p>Ainda não tem conta?</p>
+                <p-button label="Cadastre-se" (click)="navigateToPage()"></p-button>
+            </div>
             <h2>Bem vindo ao <b>MHIFES</b></h2>
         </ng-template>
         
         <form id="meuFormulario" [formGroup]="form" (ngSubmit)="onSubmit()">
             <div class="formInput">
                 <p-iconField iconPosition="left">
-                        <p-inputIcon styleClass="pi pi-user" />
-                        <input type="text" class="form-control" formControlName="login" placeholder="Login" pInputText />
-                    </p-iconField>
-                    <div *ngIf="form.get('login')?.invalid && errM" class="validation-error">
-                        <p>{{ mssM }}</p>
-                    </div>
+                    <p-inputIcon styleClass="pi pi-user" />
+                    <input type="text" class="form-control" formControlName="login" placeholder="Login" pInputText (keydown)="onKeyDown($event)" />
+                </p-iconField>
+                <div *ngIf="form.get('login')?.invalid && errM" class="validation-error">
+                    <p>{{ mssM }}</p>
+                </div>
             </div>
                 
             <div class="formInput">
-                <p-password class="form-control" formControlName="password" placeholder="Senha" [toggleMask]="true"></p-password>
+                <p-password class="form-control" formControlName="password" placeholder="Senha" [toggleMask]="true" (keydown)="onKeyDown($event)"></p-password>
                 <div *ngIf="form.get('password')?.invalid && errS" class="validation-error">
                         <p>{{ mssS }}</p>
                     </div>

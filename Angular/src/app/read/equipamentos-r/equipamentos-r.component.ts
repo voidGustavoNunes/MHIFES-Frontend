@@ -178,7 +178,7 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
     this.equipService.criar(this.equipamentosCadast).subscribe({
       next: (data: any) => {
         this.equipamentosCadast = data;
-        this.goToRouteSave();
+        // this.goToRouteSave();
         this.ngOnInit();
         this.messages = [
           { severity: 'success', summary: 'Sucesso', detail: 'Equipamento cadastrado com sucesso!', life: 3000 },
@@ -196,7 +196,7 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
     this.equipService.atualizar(id, this.equipamentosEdit).subscribe({
       next: (data: any) => {
         this.equipamentosEdit = data;
-        this.goToRouteEdit(id);
+        // this.goToRouteEdit(id);
         this.ngOnInit();
         this.messages = [
           { severity: 'success', summary: 'Sucesso', detail: 'Equipamento editado com sucesso!', life: 3000 },

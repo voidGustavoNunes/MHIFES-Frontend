@@ -17,11 +17,9 @@
         
         <ng-template pTemplate="end" class="panel-user" *ngIf="getNameUser()">
             <p-overlayPanel #op>
-                <a routerLink="home" rel="noopener noreferrer">Data logs</a>
+                <a routerLink="logs" rel="noopener noreferrer">Data logs</a>
                 <p-divider></p-divider>
                 <p-button (click)="logout()" label="Sair" [link]="true"></p-button>
-
-                <!-- <a rel="noopener noreferrer">Sair</a> -->
             </p-overlayPanel>
             <p-button (click)="op.toggle($event)" icon="pi pi-user" label="{{getNameUser()}}"></p-button>
         </ng-template>
@@ -34,10 +32,11 @@
             </a>
         </ng-template>
 
-        <ng-template pTemplate="end">
-            <!-- <p-avatar label="P" styleClass="mr-2" size="xlarge" shape="circle"></p-avatar> -->
-
-            <input type="text" pInputText placeholder="Search" class="w-full" />
+        <ng-template pTemplate="end" class="panel-user" *ngIf="getNameUser()">
+            <p-overlayPanel #op>
+                <p-button (click)="logout()" label="Sair" [link]="true"></p-button>
+            </p-overlayPanel>
+            <p-button (click)="op.toggle($event)" icon="pi pi-user" label="{{getNameUser()}}"></p-button>
         </ng-template>
     </p-menubar>
 </div>

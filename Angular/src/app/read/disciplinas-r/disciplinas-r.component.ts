@@ -177,7 +177,7 @@ export class DisciplinasRComponent implements OnInit, OnDestroy {
     this.disciService.criar(this.disciplinasCadast).subscribe({
       next: (data: any) => {
         this.disciplinasCadast = data;
-        this.goToRouteSave();
+        // this.goToRouteSave();
         this.ngOnInit();
         this.messages = [
           { severity: 'success', summary: 'Sucesso', detail: 'Disciplina cadastrada com sucesso!', life: 3000 },
@@ -195,7 +195,7 @@ export class DisciplinasRComponent implements OnInit, OnDestroy {
     this.disciService.atualizar(id, this.disciplinasEdit).subscribe({
       next: (data: any) => {
         this.disciplinasEdit = data;
-        this.goToRouteEdit(id);
+        // this.goToRouteEdit(id);
         this.ngOnInit();
         this.messages = [
           { severity: 'success', summary: 'Sucesso', detail: 'Disciplina editada com sucesso!', life: 3000 },
