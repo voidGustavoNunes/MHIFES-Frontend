@@ -131,7 +131,10 @@ export class NavHeaderComponent implements OnInit {
             label: 'Coordenadorias',
             routerLink:'coordenadorias',
           },
-
+          {
+            label: 'Usuários',
+            routerLink:'registrar',
+          },
         ]
       },
       {
@@ -152,6 +155,10 @@ export class NavHeaderComponent implements OnInit {
           {
             label: 'Períodos',
             routerLink:'periodos',
+          },
+          {
+            label: 'Horários',
+            routerLink:'horarios',
           },
           {
             label: 'Locais',

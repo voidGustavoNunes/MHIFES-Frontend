@@ -18,6 +18,9 @@ import { ScrollTopModule } from 'primeng/scrolltop';
 import { AlunoService } from '../../../service/aluno.service';
 import { Aluno } from '../../../models/aluno.models';
 import { MessagesModule } from 'primeng/messages';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
+import { FiltrarPesquisa } from '../../../models/share/filtrar-pesquisa.models';
 
 @Component({
   selector: 'app-alunos-r',
@@ -38,14 +41,17 @@ import { MessagesModule } from 'primeng/messages';
     ToastModule,
     ScrollTopModule,
     ConfirmPopupModule,
-    MessagesModule
+    MessagesModule,
+    OverlayPanelModule,
+    NgxMaskDirective,
   ],
   templateUrl: './alunos-r.component.html',
   styleUrl: './alunos-r.component.scss',
   providers: [
     AlunoService,
     ConfirmationService,
-    MessageService
+    MessageService,
+    provideNgxMask()
   ]
 })
 
@@ -70,6 +76,9 @@ export class AlunosRComponent implements OnInit, OnDestroy {
   
   alunoInfo!: Aluno;
   visibleInfo: boolean = false;
+  
+  filterOptions: FiltrarPesquisa[] = [];
+  selectedFilter!: FiltrarPesquisa;
 
   constructor(
     private alunService: AlunoService,
@@ -86,6 +95,11 @@ export class AlunosRComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.filterOptions = [
+      {nome: 'Nome', id: 0},
+      {nome: 'Matrícula', id: 1}
+    ];
+
     this.unsubscribe$ = this.alunService.listar()
     .subscribe({
       next: (itens:any) => {
@@ -144,10 +158,11 @@ export class AlunosRComponent implements OnInit, OnDestroy {
     if (inputElement) {
       this.inputSearch.nativeElement.value = '';
     }
+    this.selectedFilter = {} as FiltrarPesquisa;
     this.alunosData = this.alunosFilter;
   }
 
-  searchFilterWord(term: string) {
+  searchFilter0(term: string) {
     this.alunosData = this.alunosFilter.filter(el => {
       if (el.nome.toLowerCase().includes(term.toLowerCase())) {
         return el;
@@ -157,17 +172,28 @@ export class AlunosRComponent implements OnInit, OnDestroy {
     })
   }
 
+  searchFilter1(term: string) {
+    this.alunosData = this.alunosFilter.filter(el => {
+      if (el.matricula.toLowerCase().includes(term.toLowerCase())) {
+        return el;
+      } else {
+        return null;
+      }
+    })
+  }
+
   onKeyDown(event: KeyboardEvent, searchTerm: string) {
     if (event.key === "Enter") {
-      if (searchTerm != null || searchTerm != '') {
-        this.searchFilterWord(searchTerm);
-      }
+      this.filterField(searchTerm);
     }
   }
 
   filterField(searchTerm: string) {
     if (searchTerm != null || searchTerm != '') {
-      this.searchFilterWord(searchTerm);
+      if(this.selectedFilter) {
+        if(this.selectedFilter.id == 0) this.searchFilter0(searchTerm);
+        if(this.selectedFilter.id == 1) this.searchFilter1(searchTerm);
+      }
     }
   }
 

@@ -120,8 +120,7 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.filterOptions = [
       {nome: 'Nome', id: 0},
-      {nome: 'Matrícula', id: 1},
-      {nome: 'Curso', id: 2},
+      {nome: 'Matrícula', id: 1}
     ];
 
     this.unsubscribe$ = this.professorService.listar()
@@ -259,46 +258,6 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
     }
   }
 
-  searchFilter1(tipo: string, term: string) {
-    if(tipo == 'o') {
-      this.professoresOrientador = this.professoresFilterOri.filter(el => {
-        if (el.matricula.toString().toLowerCase().includes(term.toLowerCase())) {
-          return el;
-        } else {
-          return null;
-        }
-      })
-    } else if(tipo == 'p') {
-      this.professoresNaoOrienta = this.professoresFilterProf.filter(el => {
-        if (el.matricula.toString().toLowerCase().includes(term.toLowerCase())) {
-          return el;
-        } else {
-          return null;
-        }
-      })
-    }
-  }
-
-  searchFilter2(tipo: string, term: string) {
-    if(tipo == 'o') {
-      this.professoresOrientador = this.professoresFilterOri.filter(el => {
-        if (el.curso?.toLowerCase().includes(term.toLowerCase())) {
-          return el;
-        } else {
-          return null;
-        }
-      })
-    } else if(tipo == 'p') {
-      this.professoresNaoOrienta = this.professoresFilterProf.filter(el => {
-        if (el.curso?.toLowerCase().includes(term.toLowerCase())) {
-          return el;
-        } else {
-          return null;
-        }
-      })
-    }
-  }
-
   searchFilter0(tipo: string, term: string) {
     if(tipo == 'o') {
       this.professoresOrientador = this.professoresFilterOri.filter(el => {
@@ -319,23 +278,29 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
     }
   }
 
+  searchFilter1(tipo: string, term: string) {
+    if(tipo == 'o') {
+      this.professoresOrientador = this.professoresFilterOri.filter(el => {
+        if (el.matricula.toString().toLowerCase().includes(term.toLowerCase())) {
+          return el;
+        } else {
+          return null;
+        }
+      })
+    } else if(tipo == 'p') {
+      this.professoresNaoOrienta = this.professoresFilterProf.filter(el => {
+        if (el.matricula.toString().toLowerCase().includes(term.toLowerCase())) {
+          return el;
+        } else {
+          return null;
+        }
+      })
+    }
+  }
+
   onKeyDown(tipo: string, event: KeyboardEvent, searchTerm: string) {
     if (event.key === "Enter") {
-      if (searchTerm != null || searchTerm != '') {
-        if(tipo == 'o') {
-          if(this.selectedFilterOri) {
-            if(this.selectedFilterOri.id == 0) this.searchFilter0(tipo, searchTerm);
-            if(this.selectedFilterOri.id == 1) this.searchFilter1(tipo, searchTerm);
-            if(this.selectedFilterOri.id == 2) this.searchFilter2(tipo, searchTerm);
-          }
-        } else if(tipo == 'p') {
-          if(this.selectedFilterProf) {
-            if(this.selectedFilterProf.id == 0) this.searchFilter0(tipo, searchTerm);
-            if(this.selectedFilterProf.id == 1) this.searchFilter1(tipo, searchTerm);
-            if(this.selectedFilterProf.id == 2) this.searchFilter2(tipo, searchTerm);
-          }
-        }
-      }
+      this.filterField(tipo, searchTerm);
     }
   }
   
@@ -345,13 +310,11 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
         if(this.selectedFilterOri) {
           if(this.selectedFilterOri.id == 0) this.searchFilter0(tipo, searchTerm);
           if(this.selectedFilterOri.id == 1) this.searchFilter1(tipo, searchTerm);
-          if(this.selectedFilterOri.id == 2) this.searchFilter2(tipo, searchTerm);
         }
       } else if(tipo == 'p') {
         if(this.selectedFilterProf) {
           if(this.selectedFilterProf.id == 0) this.searchFilter0(tipo, searchTerm);
           if(this.selectedFilterProf.id == 1) this.searchFilter1(tipo, searchTerm);
-          if(this.selectedFilterProf.id == 2) this.searchFilter2(tipo, searchTerm);
         }
       }
     }

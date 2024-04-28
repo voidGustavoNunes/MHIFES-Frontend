@@ -1,11 +1,9 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
-import { PeriodoService } from '../../service/periodo.service';
-import { CommonModule } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { Periodo } from '../../models/periodo.models';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
+import { HttpClientModule } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputGroupModule } from 'primeng/inputgroup';
@@ -17,21 +15,20 @@ import { ConfirmationService, Message, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ScrollTopModule } from 'primeng/scrolltop';
-import { CalendarModule } from 'primeng/calendar';
 import { MessagesModule } from 'primeng/messages';
+import { Horario } from '../../models/horario.models';
+import { HorarioService } from '../../service/horario.service';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
-import { FiltrarPesquisa } from '../../models/share/filtrar-pesquisa.models';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
+import { FiltrarPesquisa } from '../../models/share/filtrar-pesquisa.models';
 
 @Component({
-  selector: 'app-periodos-r',
+  selector: 'app-horarios-r',
   standalone: true,
   imports: [
     CommonModule,
     HttpClientModule,
     RouterModule,
-    ReactiveFormsModule,
-    FormsModule,
     ButtonModule,
     InputTextModule,
     InputGroupModule,
@@ -39,33 +36,31 @@ import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
     TableModule,
     DialogModule,
     PaginatorModule,
+    ReactiveFormsModule,
+    FormsModule,
     ToastModule,
     ScrollTopModule,
     ConfirmPopupModule,
-    CalendarModule,
     MessagesModule,
     OverlayPanelModule,
     NgxMaskDirective
   ],
-  templateUrl: './periodos-r.component.html',
-  styleUrl: './periodos-r.component.scss',
+  templateUrl: './horarios-r.component.html',
+  styleUrl: './horarios-r.component.scss',
   providers: [
-    PeriodoService,
     ConfirmationService,
     MessageService,
+    HorarioService,
     provideNgxMask()
   ]
 })
-export class PeriodosRComponent implements OnInit, OnDestroy {
+export class HorariosRComponent implements OnInit, OnDestroy {
   @ViewChild('searchInput') inputSearch!: ElementRef;
 
-  periodosData: Periodo[] = [];
-  periodosFilter: Periodo[] = [];
-  periodosCadast: Periodo[] = [];
-  periodosEdit: Periodo[] = [];
-
-  periodoInfo!: Periodo;
-  visibleInfo: boolean = false;
+  horariosData: Horario[] = [];
+  horariosFilter: Horario[] = [];
+  horariosCadast: Horario[] = [];
+  horariosEdit: Horario[] = [];
 
   unsubscribe$!: Subscription;
   form: FormGroup;
@@ -76,47 +71,36 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
   cadastrar: boolean = false;
   
   messages!: Message[];
-  mss: boolean = false;
   
   filterOptions: FiltrarPesquisa[] = [];
   selectedFilter!: FiltrarPesquisa;
-  txtFilter: string = 'Pesquisar período';
+  txtFilter: string = 'Pesquisar horário';
 
   constructor(
-    private periodService: PeriodoService,
+    private hourService: HorarioService,
     private router: Router,
     private formBuilder: FormBuilder,
     private confirmationService: ConfirmationService
     ) {
       this.form = this.formBuilder.group({
         id: [null],
-        nome: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
-        dataInicio: [null, [Validators.required]],
-        dataFim: [null, [Validators.required]]
-      }, { validator: this.validarDatas });
+        horaInicio: [null, [Validators.required]],
+        horaFim: [null, [Validators.required]]
+      }, { validator: this.verificarHoraFimMaiorQueInicio });
   }
 
   ngOnInit() {
-
     this.filterOptions = [
-      {nome: 'Nome', id: 0},
-      {nome: 'Data de Início', id: 1},
-      {nome: 'Ano do Período', id: 2}
+      {nome: 'Hora de início', id: 0},
+      {nome: 'Hora de fim', id: 1},
     ];
 
-    this.unsubscribe$ = this.periodService.listar()
+    this.unsubscribe$ = this.hourService.listar()
     .subscribe({
       next: (itens:any) => {
         const data = itens;
-        
-        data.sort((a: Periodo, b: Periodo) => {
-          const dateA = new Date(a.dataInicio);
-          const dateB = new Date(b.dataInicio);
-          return dateB.getTime() - dateA.getTime();
-        });
-        
-        this.periodosData = data;
-        this.periodosFilter = this.periodosData;
+        this.horariosData = data.sort((a:Horario, b:Horario) => (a.horaInicio < b.horaInicio) ? -1 : 1);
+        this.horariosFilter = this.horariosData;
       },
       error: (err: any) => {
         this.messages = [
@@ -129,45 +113,35 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.unsubscribe$.unsubscribe();
   }
+  
+  verificarHoraFimMaiorQueInicio(formGroup: FormGroup) {
+    const horaInicio = formGroup.get('horaInicio')?.value;
+    const horaFim = formGroup.get('horaFim')?.value;
 
-  validarDatas(formGroup: FormGroup) {
-    const dataInicio = formGroup.get('dataInicio')?.value;
-    const dataFim = formGroup.get('dataFim')?.value;
-
-    if (dataInicio && dataFim && new Date(dataFim) < new Date(dataInicio)) {
-      formGroup.get('dataFim')?.setErrors({ 'invalidEndDate': true });
+    if (horaInicio && horaFim && horaInicio >= horaFim) {
+      formGroup.get('horaFim')?.setErrors({ 'horaFimMenorQueInicio': true });
     } else {
-      formGroup.get('dataFim')?.setErrors(null);
+      formGroup.get('horaFim')?.setErrors(null);
     }
   }
 
-  showEditDialog(value: Periodo) {
+  showEditDialog(value: Horario) {
     this.form.reset();
-    this.ehTitulo = 'Atualizar Período'
+    this.ehTitulo = 'Atualizar Horário'
     this.visible = true;
-    this.visibleInfo = false;
     this.cadastrar = false;
     this.editar = true;
     this.form.setValue({
       id: value.id,
-      dataInicio: value.dataInicio,
-      dataFim: value.dataFim,
-      nome: value.nome
+      horaInicio: value.horaInicio,
+      horaFim: value.horaFim
     })
-    this.form.controls['dataFim'].setValue(new Date(value.dataFim));
-    this.form.controls['dataInicio'].setValue(new Date(value.dataInicio));
-  }
-
-  showInfoDialog(value: Periodo) {
-    this.visibleInfo = true;
-    this.periodoInfo = value;
   }
 
   showDialog() {
     this.form.reset();
-    this.ehTitulo = 'Cadastrar Período';
+    this.ehTitulo = 'Cadastrar Horário';
     this.visible = true;
-    this.visibleInfo = false;
     this.cadastrar = true;
     this.editar = false;
   }
@@ -183,31 +157,17 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
       this.inputSearch.nativeElement.value = '';
     }
     this.selectedFilter = {} as FiltrarPesquisa;
-    this.periodosData = this.periodosFilter;
+    this.horariosData = this.horariosFilter;
   }
 
   searchFilter0(term: string) {
-    this.periodosData = this.periodosFilter.filter(prd => {
-      if (prd.nome.toLowerCase().includes(term.toLowerCase())) {
-        return prd;
-      } else {
-        return null;
-      }
-    })
-  }
-
-  searchFilter1(term: string) {
-    const dateTerm = this.formatarDtStrDt(term);
-    
-    if (dateTerm instanceof Date && !isNaN(dateTerm.getTime())) {
-      this.periodosData = this.periodosFilter.filter(prd => {
-        const tiparDT = prd.dataInicio;
-        if (typeof tiparDT === 'string') {
-          const tiparFormat = this.formatarDatas(tiparDT);
-          const searchTerm = this.formatarDtStrDt(tiparFormat);
-          
-          if (dateTerm.getTime() === searchTerm?.getTime()) {
-            return prd;
+    const compA = this.formatarTmStrTm(term);
+    if(compA != null) {
+      this.horariosData = this.horariosFilter.filter(hour => {
+        const compB = this.formatarTmStrTm(hour.horaInicio);
+        if(compB != null) {
+          if (compA.horas === compB.horas && compA.minutos === compB.minutos) {
+            return hour;
           } else {
             return null;
           }
@@ -216,22 +176,26 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
         }
       })
     }
+    return null;
   }
 
-  searchFilter2(term: string) {
-    this.periodosData = this.periodosFilter.filter(el => {
-      const searchTermAsNumber = parseInt(term);
-      if (!isNaN(searchTermAsNumber)) {
-        const ano = new Date(el.dataInicio).getFullYear();
-        if (ano === searchTermAsNumber) {
-          return el;
+  searchFilter1(term: string) {
+    const compA = this.formatarTmStrTm(term);
+    if(compA != null) {
+      this.horariosData = this.horariosFilter.filter(hour => {
+        const compB = this.formatarTmStrTm(hour.horaFim);
+        if(compB != null) {
+          if (compA.horas === compB.horas && compA.minutos === compB.minutos) {
+            return hour;
+          } else {
+            return null;
+          }
         } else {
           return null;
         }
-      } else {
-        return null;
-      }
-    })
+      })
+    }
+    return null;
   }
 
   onKeyDown(event: KeyboardEvent, searchTerm: string) {
@@ -239,50 +203,44 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
       this.filterField(searchTerm);
     }
   }
-  
+
   filterField(searchTerm: string) {
     if (searchTerm != null || searchTerm != '') {
-      if(this.selectedFilter) {
-        if(this.selectedFilter.id == 0) this.searchFilter0(searchTerm);
-        if(this.selectedFilter.id == 1) this.searchFilter1(searchTerm);
-        if(this.selectedFilter.id == 2) this.searchFilter2(searchTerm);
-      }
+      this.searchFilter0(searchTerm);
+      this.searchFilter1(searchTerm);
     }
   }
 
   updateMask() {
-    if (this.selectedFilter?.id == 1) {
-      this.txtFilter = '00/00/0000';
-    } else if (this.selectedFilter?.id == 2) {
-      this.txtFilter = '0000';
+    if (this.selectedFilter?.id == 0 || this.selectedFilter?.id == 1) {
+      this.txtFilter = '00:00';
     } else {
-      this.txtFilter = 'Pesquisar período';
+      this.txtFilter = 'Pesquisar horário';
     }
   }
 
-  formatarDatas(date: string) {
-    const partes = date.split('-');
-    const ano = parseInt(partes[0], 10);
-    const mes = parseInt(partes[1], 10) - 1;
-    const dia = parseInt(partes[2], 10);
+  formatarHora(tempo: any) {
+    if (typeof tempo === 'string') {
+      const partes = tempo.split(':');
+      const horas = partes[0];
+      const minutos = partes[1];
 
-    const data = new Date(ano, mes, dia);
-
-    const diaFormatado = ('0' + data.getDate()).slice(-2);
-    const mesFormatado = ('0' + (data.getMonth() + 1)).slice(-2);
-    const anoFormatado = data.getFullYear();
-
-    return `${diaFormatado}/${mesFormatado}/${anoFormatado}`;
+      return `${horas}h ${minutos}min`;
+    }
+    return null;
   }
 
-  formatarDtStrDt(date: string) {
-    if(date) {
-      const partes = date.split('/');
-      const ano = parseInt(partes[0], 10);
-      const mes = parseInt(partes[1], 10) - 1;
-      const dia = parseInt(partes[2], 10);
-
-      return new Date(dia, mes, ano);
+  formatarTmStrTm(tempo: any) {
+    if(tempo) {
+      const partes = tempo.split(':');
+      const horas =  parseInt(partes[0], 10);
+      const minutos =  parseInt(partes[1], 10) - 1;
+      
+      if (!isNaN(horas) && !isNaN(minutos) && horas >= 0 && horas <= 23 && minutos >= 0 && minutos <= 59) {
+        return { horas, minutos };
+      } else {
+        return null;
+      }
     } else {
       return null;
     }
@@ -306,13 +264,13 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
   }
 
   enviarFormSave() {
-    this.periodService.criar(this.periodosCadast).subscribe({
+    this.hourService.criar(this.horariosCadast).subscribe({
       next: (data: any) => {
-        this.periodosCadast = data;
+        this.horariosCadast = data;
         // this.goToRouteSave();
         this.ngOnInit();
         this.messages = [
-          { severity: 'success', summary: 'Sucesso', detail: 'Perídodo cadastrado com sucesso!', life: 3000 },
+          { severity: 'success', summary: 'Sucesso', detail: 'Horário cadastrado com sucesso!', life: 3000 },
         ];
       },
       error: (err: any) => {
@@ -324,13 +282,13 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
   }
 
   enviarFormEdit(id: number) {
-    this.periodService.atualizar(id, this.periodosEdit).subscribe({
+    this.hourService.atualizar(id, this.horariosEdit).subscribe({
       next: (data: any) => {
-        this.periodosEdit = data;
+        this.horariosEdit = data;
         // this.goToRouteEdit(id);
         this.ngOnInit();
         this.messages = [
-          { severity: 'success', summary: 'Sucesso', detail: 'Perídodo editado com sucesso!', life: 3000 },
+          { severity: 'success', summary: 'Sucesso', detail: 'Horário editado com sucesso!', life: 3000 },
         ];
       },
       error: (err: any) => {
@@ -341,24 +299,16 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
     });
   }
 
-  goToRouteSave() {
-    this.router.navigate(['api/periodos']);
-  }
-
-  goToRouteEdit(id: number) {
-    this.router.navigate(['api/periodos', id]);
-  }
-
   onSubmit() {
     if (this.form.valid && this.cadastrar) {
-      this.periodosCadast = this.form.value;
-      this.enviarFormSave();
+      this.horariosCadast = this.form.value;
+      this.enviarFormSave()
       this.visible = false;
       this.form.reset();
       this.ngOnInit();
       // window.location.reload();
     } else if (this.form.valid && this.editar) {
-      this.periodosEdit = this.form.value;
+      this.horariosEdit = this.form.value;
       this.enviarFormEdit(this.form.get('id')?.value);
       this.visible = false;
       this.form.reset();
@@ -372,14 +322,13 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
   }
 
   deletarID(id: number) {
-    this.periodService.excluir(id)
+    this.hourService.excluir(id)
     .subscribe({
       next: (data: any) => {
         this.messages = [
           { severity: 'success', summary: 'Sucesso', detail: 'Registro deletado com sucesso!', life: 3000 },
         ];
         this.ngOnInit();
-        // window.location.reload();
       },
       error: (err: any) => {
         if (err.status) {
@@ -396,4 +345,3 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
   }
 
 }
-

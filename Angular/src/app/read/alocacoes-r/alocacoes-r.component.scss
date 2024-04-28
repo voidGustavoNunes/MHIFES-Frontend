@@ -245,6 +245,7 @@
     }
     .p-datatable-striped {
         width: max-content;
+min-width: 79.25rem;
     }
 
     // LOG DIALOG
@@ -296,37 +297,37 @@
                 margin-right: 5rem;
             }
         }
-        .divInput.labelFlex > .validation-error{
-            position: absolute;
-            bottom: -5rem;
-            left: 32vw;
-            p {
-                width: 7rem;
-                white-space: break-spaces;
-            }
-        }
+        // .divInput.labelFlex > .validation-error{
+        //     position: absolute;
+        //     bottom: -5rem;
+        //     left: 32vw;
+        //     p {
+        //         width: 7rem;
+        //         white-space: break-spaces;
+        //     }
+        // }
         .divInput.labelFlex {
             display: flex;
-            align-items: flex-end;
+            align-items: center;
             justify-content: center;
             gap: 4vw;
-            position: relative;
+            // position: relative;
 
             div, input{
                 width: 18vw;
             }
-            .flexGrid{
-                display: flex;
-                justify-content: center;
-                gap: 2vw;
+            // .flexGrid{
+            //     display: flex;
+            //     justify-content: center;
+            //     gap: 2vw;
 
-                div{
-                    width: 9vw;
-                    display: flex;
-                    flex-direction: column;
-                    input{width: 100%;}
-                }
-            }
+            //     div{
+            //         width: 9vw;
+            //         display: flex;
+            //         flex-direction: column;
+            //         input{width: 100%;}
+            //     }
+            // }
         }
     }
     :host ::ng-deep {
@@ -337,7 +338,7 @@
             width: 40vw;
         }
         .divInput.labelFlex{
-            span.p-inputnumber.p-component, input#integeronly, .p-multiselect, .p-calendar input{width: 18vw;}
+            span.p-inputnumber.p-component, input#integeronly, .p-multiselect, .p-dropdown, .p-calendar input{width: 18vw;}
         }
     }
 }

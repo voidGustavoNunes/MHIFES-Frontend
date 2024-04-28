@@ -30,6 +30,8 @@ import { registerLocaleData } from '@angular/common';
 import localePT from '@angular/common/locales/pt';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 import { CheckboxModule } from 'primeng/checkbox';
+import { HorarioService } from '../../service/horario.service';
+import { Horario } from '../../models/horario.models';
 registerLocaleData(localePT);
 
 @Component({
@@ -67,12 +69,14 @@ registerLocaleData(localePT);
     LocalService,
     ConfirmationService,
     MessageService,
-    provideNgxMask()
+    provideNgxMask(),
+    HorarioService
   ]
 })
 export class EventosRComponent implements OnInit, OnDestroy {
   @ViewChild('searchInput') inputSearch!: ElementRef;
   @ViewChild('dropdownLocal') dropdownLocal!: Dropdown;
+  @ViewChild('dropdownHour') dropdownHour!: Dropdown;
   @ViewChild('switch') switch!: InputSwitch;
   @ViewChild('calendarEdit') calendarEdit!: Calendar;
   @ViewChild('calendarExtra') calendarExtra!: Calendar;
@@ -84,9 +88,11 @@ export class EventosRComponent implements OnInit, OnDestroy {
   eventoInfo!: Evento;
 
   locaisArray: Local[] = [];
+  horariosArray: Horario[] = [];
 
   unsubscribe$!: Subscription;
   unsubscribe$LA!: Subscription;
+  unsubscribe$Hor!: Subscription;
 
   form: FormGroup;
 
@@ -121,17 +127,18 @@ export class EventosRComponent implements OnInit, OnDestroy {
     private locService: LocalService,
     private router: Router,
     private formBuilder: FormBuilder,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private hourService: HorarioService,
     ) {
       this.form = this.formBuilder.group({
         id: [null],
         nome: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
         dataEvento: [null, [Validators.required]],
         descricao: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(5000)]],
-        horarioInicio: [null, [Validators.required]],
-        horarioFim: [null, [Validators.required]],
+        horario: [null, [Validators.required]],
         local: [null, [Validators.required]]
-      }, { validator: this.verificarHoraFimMaiorQueInicio });
+      })
+      // , { validator: this.verificarHoraFimMaiorQueInicio });
   }
 
   ngOnInit() {
@@ -174,23 +181,37 @@ export class EventosRComponent implements OnInit, OnDestroy {
         ];
       }
     });
+
+    this.unsubscribe$Hor = this.hourService.listar()
+    .subscribe({
+      next: (itens:any) => {
+        const data = itens;
+        this.horariosArray = data.sort((a:any, b:any) => (a.id > b.id) ? -1 : 1);
+      },
+      error: (err: any) => {
+        this.messages = [
+          { severity: 'error', summary: 'Erro', detail: 'Dados de horários não encontrados.' },
+        ];
+      }
+    });
   }
 
   ngOnDestroy() {
     this.unsubscribe$.unsubscribe();
     this.unsubscribe$LA.unsubscribe();
+    this.unsubscribe$Hor.unsubscribe();
   }
   
-  verificarHoraFimMaiorQueInicio(formGroup: FormGroup) {
-    const horaInicio = formGroup.get('horarioInicio')?.value;
-    const horaFim = formGroup.get('horarioFim')?.value;
+  // verificarHoraFimMaiorQueInicio(formGroup: FormGroup) {
+  //   const horaInicio = formGroup.get('horarioInicio')?.value;
+  //   const horaFim = formGroup.get('horarioFim')?.value;
 
-    if (horaInicio && horaFim && horaInicio >= horaFim) {
-      formGroup.get('horarioFim')?.setErrors({ 'horaFimMenorQueInicio': true });
-    } else {
-      formGroup.get('horarioFim')?.setErrors(null);
-    }
-  }
+  //   if (horaInicio && horaFim && horaInicio >= horaFim) {
+  //     formGroup.get('horarioFim')?.setErrors({ 'horaFimMenorQueInicio': true });
+  //   } else {
+  //     formGroup.get('horarioFim')?.setErrors(null);
+  //   }
+  // }
   
   showInfoDialog(value: Evento) {
     this.visibleInfo = true;
@@ -210,11 +231,11 @@ export class EventosRComponent implements OnInit, OnDestroy {
       nome: value.nome,
       dataEvento: value.dataEvento,
       descricao: value.descricao,
-      horarioInicio: value.horarioInicio,
-      horarioFim: value.horarioFim,
+      horario: value.horario,
       local: value.local
     })
     this.dropdownLocal.writeValue(value.local);
+    this.dropdownHour.writeValue(value.horario);
 
     const eventoData = this.formatarDtStrDt(dtEv);
     this.calendarEdit.writeValue(eventoData);
@@ -250,11 +271,10 @@ export class EventosRComponent implements OnInit, OnDestroy {
   }
 
   updateCheckboxState() {
-    let houI: Time = this.form.get('horarioInicio')?.value;
-    let houF: Time = this.form.get('horarioFim')?.value;
+    let hora: Horario = this.form.get('horario')?.value;
     let ini: Date = this.form.get('dataEvento')?.value;
 
-    if(ini && houI && houF) {
+    if(ini && hora) {
       this.enableCheck = true;
     } else {
       this.enableCheck = false;
@@ -262,8 +282,7 @@ export class EventosRComponent implements OnInit, OnDestroy {
   }
 
   verificarDataHour() {
-    let houI: Time = this.form.get('horarioInicio')?.value;
-    let houF: Time = this.form.get('horarioFim')?.value;
+    let hora: Horario = this.form.get('horario')?.value;
     
     this.diasIntervalo?.sort((a:Date, b:Date) => {
       const dateA = new Date(a);
@@ -275,7 +294,7 @@ export class EventosRComponent implements OnInit, OnDestroy {
       const existe = this.datasHour.some(item => item.dataEvento === dtInt);
 
       if (!existe) {
-        this.datasHour.push({dataEvento: dtInt, horarioInicio: houI, horarioFim: houF});
+        this.datasHour.push({dataEvento: dtInt, horario: hora});
       }
     })
     this.datasHour = this.datasHour.filter(item => this.diasIntervalo?.includes(item.dataEvento));
@@ -357,24 +376,24 @@ export class EventosRComponent implements OnInit, OnDestroy {
     }
   }
 
-  searchFilter2(term: string) {
-    const compA = this.formatarTmStrTm(term);
-    if(compA != null) {
-      this.eventosData = this.eventosFilter.filter(evento => {
-        const compB = this.formatarTmStrTm(evento.horarioInicio);
-        if(compB != null) {
-          if (compA.horas === compB.horas && compA.minutos === compB.minutos) {
-            return evento;
-          } else {
-            return null;
-          }
-        } else {
-          return null;
-        }
-      })
-    }
-    return null;
-  }
+  // searchFilter2(term: string) {
+  //   const compA = this.formatarTmStrTm(term);
+  //   if(compA != null) {
+  //     this.eventosData = this.eventosFilter.filter(evento => {
+  //       const compB = this.formatarTmStrTm(evento.horarioInicio);
+  //       if(compB != null) {
+  //         if (compA.horas === compB.horas && compA.minutos === compB.minutos) {
+  //           return evento;
+  //         } else {
+  //           return null;
+  //         }
+  //       } else {
+  //         return null;
+  //       }
+  //     })
+  //   }
+  //   return null;
+  // }
 
   formatarDatas(date: string) {
     const partes = date.split('-');
@@ -434,13 +453,7 @@ export class EventosRComponent implements OnInit, OnDestroy {
 
   onKeyDown(event: KeyboardEvent, searchTerm: string) {
     if (event.key === "Enter") {
-      if (searchTerm != null || searchTerm != '') {
-        if(this.selectedFilter) {
-          if(this.selectedFilter.id == 0) this.searchFilter0(searchTerm);
-          if(this.selectedFilter.id == 1) this.searchFilter1(searchTerm);
-          if(this.selectedFilter.id == 2) this.searchFilter2(searchTerm);
-        }
-      }
+      this.filterField(searchTerm);
     }
   }
   
@@ -449,7 +462,7 @@ export class EventosRComponent implements OnInit, OnDestroy {
       if(this.selectedFilter) {
         if(this.selectedFilter.id == 0) this.searchFilter0(searchTerm);
         if(this.selectedFilter.id == 1) this.searchFilter1(searchTerm);
-        if(this.selectedFilter.id == 2) this.searchFilter2(searchTerm);
+        // if(this.selectedFilter.id == 2) this.searchFilter2(searchTerm);
       }
     }
   }
@@ -555,15 +568,14 @@ export class EventosRComponent implements OnInit, OnDestroy {
         if(dt?.dataEvento.getTime() != ini?.getTime()) {
           this.form.patchValue({
             dataEvento: dt.dataEvento,
-            horarioInicio: dt.horarioInicio,
-            horarioFim: dt.horarioFim
+            horario: dt.horario
           });
+          // this.mss = true;
           this.eventosCadast = this.form.value;
           this.enviarFormSave();
         }
       });
 
-      this.mss = true;
     } else {
       this.messages = [
         { severity: 'warn', summary: 'Atenção', detail: 'Informação inválida. Preencha os campos!', life: 3000 },

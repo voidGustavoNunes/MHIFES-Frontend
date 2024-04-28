@@ -13,7 +13,7 @@
             </p-overlayPanel>
             <p-inputGroup>
                 <button type="button" pButton (click)="op.toggle($event)" icon="pi pi-filter-fill"></button>
-                <input #searchInput type="text" pInputText [placeholder]="txtFilter" (keydown)="onKeyDown($event, searchInput.value)" />
+                <input #searchInput type="text" pInputText [mask]="selectedFilter?.id === 3 ? '00:00' : null" [placeholder]="txtFilter" (keydown)="onKeyDown($event, searchInput.value)" />
                 <button type="button" pButton icon="pi pi-search" (click)="filterField(searchInput.value)"></button>
             </p-inputGroup>
         </div>
@@ -46,8 +46,8 @@
                     <td>{{alocacao?.local.nome}}</td>
                     <td>{{alocacao?.disciplina.nome}}</td>
                     <td>
-                        {{ formatarHora(alocacaoInfo?.horarioInicio) }} - 
-                        {{ formatarHora(alocacaoInfo?.horarioFim) }}</td>
+                        <!-- {{ formatarHora(alocacaoInfo?.horarioInicio) }} - 
+                        {{ formatarHora(alocacaoInfo?.horarioFim) }}</td> -->
                     <!-- <td></td> -->
                     <td>
                         <button type="button" class="botaoL" (click)="showDialogLog(alocacao)" pButton>Log</button>
@@ -67,6 +67,7 @@
         </p-table>
     </div>
 verificar cadastro esta salvando sem igualdade no dia semana
+como verificar se ultimo diasintervalor para mss ser true
     <p-scrollTop></p-scrollTop>
 </div>
 
@@ -147,18 +148,20 @@ verificar cadastro esta salvando sem igualdade no dia semana
                         <label for="iniPer">Início da aula</label>
                     </span>
                 </div>
-                <div class="flexGrid">
-                    <div>
-                        <label for="horinIni">Início</label>
-                        <input pInputText type="time" id="horinIni" class="form-control" formControlName="horarioInicio" (change)="updateSelectState()">
-                    </div>
-                    <div>
-                        <label for="horinFim">Fim</label>
-                        <input pInputText type="time" id="horinFim=" class="form-control" formControlName="horarioFim" (change)="updateSelectState()">
-                        <div *ngIf="form.get('horarioFim')?.invalid && form.get('horarioFim')?.touched" class="validation-error">
-                            <p>Hora de fim deve ser maior que a hora de início</p>
-                        </div>
-                    </div>
+                <div>
+                    <span class="p-float-label">
+                        <p-dropdown #dropdownHour appendTo="body" [options]="horariosArray" placeholder="Selecione o horário" inputId="horAloc" class="form-control" formControlName="horario" (change)="updateSelectState()">
+                            <ng-template let-hourData pTemplate="selectedItem">
+                                <div>{{ hourData.horaInicio }} - {{ hourData.horaFim }}</div>
+                            </ng-template>
+                            <ng-template let-hourData pTemplate="item">
+                                <div class="flex align-items-center gap-2">
+                                <div>{{ hourData.horaInicio }} - {{ hourData.horaFim }}</div>
+                                </div>
+                            </ng-template>
+                        </p-dropdown>
+                        <label for="horAloc">Horário</label>
+                    </span>
                 </div>
             </div>
             <div class="divInput" *ngIf="enableSelect">
@@ -173,18 +176,20 @@ verificar cadastro esta salvando sem igualdade no dia semana
                         <div>
                             <input pInputText [disabled]="true" [(ngModel)]="replica.diaSemana.nome" [ngModelOptions]="{standalone: true}" />
                         </div>
-                        <div class="flexGrid">
-                            <div>
-                                <label for="horinIni">Início</label>
-                                <input pInputText type="time" id="horinIni{{i}}" [(ngModel)]="replica.horaInicio" [ngModelOptions]="{standalone: true}">
-                            </div>
-                            <div>
-                                <label for="horinFim">Fim</label>
-                                <input pInputText type="time" id="horinFim{{i}}" [(ngModel)]="replica.horaFinal" [ngModelOptions]="{standalone: true}">
-                            </div>
-                        </div>
-                        <div *ngIf="replica.horaFinal < replica.horaInicio" class="validation-error">
-                            <p>Hora de fim deve ser maior que a hora de início</p>
+                        <div>
+                            <span class="p-float-label">
+                                <p-dropdown #dropdownHour appendTo="body" [options]="horariosArray" placeholder="Selecione o horário" inputId="horAloc{{i}}" [(ngModel)]="replica.horario" [ngModelOptions]="{standalone: true}">
+                                    <ng-template let-hourData pTemplate="selectedItem">
+                                        <div>{{ hourData.horaInicio }} - {{ hourData.horaFim }}</div>
+                                    </ng-template>
+                                    <ng-template let-hourData pTemplate="item">
+                                        <div class="flex align-items-center gap-2">
+                                        <div>{{ hourData.horaInicio }} - {{ hourData.horaFim }}</div>
+                                        </div>
+                                    </ng-template>
+                                </p-dropdown>
+                                <label for="horAloc{{i}}">Horário</label>
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -304,16 +309,20 @@ verificar cadastro esta salvando sem igualdade no dia semana
                     <label for="fimPer">Data da aula</label>
                 </span>
             </div>
-            <div class="divInput labelHourFlex">
-                <label for="horinIni">Hora de Início</label>
-                <input pInputText type="time" id="horinIni" class="form-control" formControlName="horarioInicio">
-            </div>
-            <div class="divInput labelHourFlex">
-                    <label for="horinFim">Hora de Fim</label>
-                    <input pInputText type="time" id="horinFim" class="form-control" formControlName="horarioFim">
-                <div *ngIf="form.get('horarioFim')?.invalid && form.get('horarioFim')?.touched" class="validation-error">
-                    <p>Hora de fim deve ser maior que a hora de início</p>
-                </div>
+            <div class="divInput">
+                <span class="p-float-label">
+                    <p-dropdown #dropdownHour appendTo="body" [options]="horariosArray" placeholder="Selecione o horário" inputId="horAloc" class="form-control" formControlName="horario">
+                        <ng-template let-hourData pTemplate="selectedItem">
+                            <div>{{ hourData.horaInicio }} - {{ hourData.horaFim }}</div>
+                        </ng-template>
+                        <ng-template let-hourData pTemplate="item">
+                            <div class="flex align-items-center gap-2">
+                            <div>{{ hourData.horaInicio }} - {{ hourData.horaFim }}</div>
+                            </div>
+                        </ng-template>
+                    </p-dropdown>
+                    <label for="horAloc">Horário</label>
+                </span>
             </div>
             <div class="divInput">
                 <span class="p-float-label">
@@ -349,13 +358,9 @@ verificar cadastro esta salvando sem igualdade no dia semana
             <div class="divInput">
                 <b>Disciplina: </b> {{alocacaoInfo?.disciplina?.nome}}
             </div>
-            <div class="divInput flexContainer">
-                <div>
-                    <b>Hora de início: </b> {{ formatarHora(alocacaoInfo?.horarioInicio) }}
-                </div>
-                <div class="lastDiv">
-                    <b>Hora de fim: </b> {{ formatarHora(alocacaoInfo?.horarioFim) }}
-                </div>
+            <div class="divInput">
+                <b>Horário: </b> {{ alocacaoInfo?.horario }}
+                <!-- <b>Horário: </b> {{ formatarHora(alocacaoInfo?.horarioInicio) }} -->
             </div>
             <div class="divInput dtAlocacao flexContainer">
                 <div>

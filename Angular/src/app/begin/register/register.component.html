@@ -3,6 +3,7 @@
     <p-card>
         <ng-template pTemplate="header">
             <h2>Crie uma nova conta</h2>
+            falta definir dropdown userrole
         </ng-template>
         <form id="meuFormulario" [formGroup]="form" (ngSubmit)="onSubmit()">
             <div class="formInput">
@@ -33,7 +34,20 @@
                 </div>
             </div>
             <div class="formInput">
-                <p-dropdown appendTo="body" formControlName="role" [options]="papeisRole" optionLabel="papel" placeholder="Selecione o papel do usuário" (keydown)="onKeyDown($event)"></p-dropdown>
+                
+                <!-- <p-dropdown appendTo="body" [options]="disciplinasArray" optionLabel="nome" [filter]="true" filterBy="nome" [showClear]="true" placeholder="Selecione uma disciplina" inputId="discEvent" class="form-control" formControlName="disciplina">
+                    <ng-template pTemplate="selectedItem" let-selectedOption>
+                        <div class="flex align-items-center gap-2">
+                            <div>{{ selectedOption?.nome }}</div>
+                        </div>
+                    </ng-template>
+                    <ng-template let-disciplinaData pTemplate="item">
+                        <div class="flex align-items-center gap-2">
+                            <div>{{ disciplinaData.nome }}</div>
+                        </div>
+                    </ng-template>
+                </p-dropdown> -->
+                <p-dropdown appendTo="body" formControlName="role" [options]="papeisRole" optionLabel="nome" placeholder="Selecione o papel do usuário" (keydown)="onKeyDown($event)"></p-dropdown>
 
                 <div *ngIf="form.get('role')?.invalid && errR" class="validation-error">
                     <p>{{ mssR }}</p>
@@ -43,7 +57,7 @@
 
         <ng-template pTemplate="footer">
             <p-button type="submit" label="Cadastrar" (onClick)="onSubmit()"></p-button>
-            <a href="login" rel="noopener noreferrer" class="font-bold">Já possui uma conta?</a>
+            <!-- <a href="login" rel="noopener noreferrer" class="font-bold">Já possui uma conta?</a> -->
         </ng-template>
     </p-card>
 </div>

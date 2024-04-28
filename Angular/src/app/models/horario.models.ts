@@ -2,7 +2,7 @@ import { Time } from "@angular/common";
 
 export interface Horario {
     id: number;
-    diaSemana: DiaSemana;
+    // diaSemana: DiaSemana;
     horaInicio: Time;
     horaFim: Time;
 }

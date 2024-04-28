@@ -71,6 +71,7 @@
 
     .p-accordion.p-component {
         width: max-content;
+// min-width: 79.25rem;
     }
     .custom-header {
         display: flex;
@@ -98,8 +99,8 @@
                 border-radius: .3rem;
             }
             .default-log {
-                background: red;
-                color: red;
+                background: #A2FF7F;
+                color: #1E8805;
                 padding: .5rem;
                 border-radius: .3rem;
             }

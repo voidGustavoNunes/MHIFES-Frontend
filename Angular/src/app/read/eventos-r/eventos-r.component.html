@@ -61,7 +61,7 @@
             </ng-template>
         </p-table>
     </div>
-    
+    mesmo caso do mss true do intervalo ultimo para ser true
     <p-scrollTop></p-scrollTop>
 </div>
 
@@ -82,18 +82,20 @@
                         <label for="iniData">Data do evento</label>
                     </span>
                 </div>
-                <div class="flexGrid">
-                    <div>
-                        <label for="horinIni">Início</label>
-                        <input pInputText type="time" id="horinIni" class="form-control" formControlName="horarioInicio" (change)="updateCheckboxState()">
-                    </div>
-                    <div>
-                        <label for="horinFim">Fim</label>
-                        <input pInputText type="time" id="horinFim" class="form-control" formControlName="horarioFim" (change)="updateCheckboxState()">
-                    </div>
-                </div>
-                <div *ngIf="form.get('horarioFim')?.invalid && form.get('horarioFim')?.touched" class="validation-error">
-                    <p>Hora de fim deve ser maior que a hora de início</p>
+                <div>
+                    <span class="p-float-label">
+                        <p-dropdown #dropdownHour appendTo="body" [options]="horariosArray" placeholder="Selecione o horário" inputId="horAloc" class="form-control" formControlName="horario" (change)="updateCheckboxState()">
+                            <ng-template let-hourData pTemplate="selectedItem">
+                                <div>{{ hourData.horaInicio }} - {{ hourData.horaFim }}</div>
+                            </ng-template>
+                            <ng-template let-hourData pTemplate="item">
+                                <div class="flex align-items-center gap-2">
+                                <div>{{ hourData.horaInicio }} - {{ hourData.horaFim }}</div>
+                                </div>
+                            </ng-template>
+                        </p-dropdown>
+                        <label for="horAloc">Horário</label>
+                    </span>
                 </div>
             </div>
             <div class="divInput" *ngIf="enableCheck">
@@ -108,26 +110,26 @@
             <div class="replicaGrid" *ngIf="datasHour.length > 0">
                 <div class="columnContainer" *ngFor="let replica of datasHour; let i = index">
                     <div class="divInput labelFlex">
-                        <ng-container>
                         <div>
                             <p-calendar appendTo="body" [disabled]="true" dateFormat="dd/mm/yy" [readonlyInput]="true" [(ngModel)]="replica.dataEvento" [ngModelOptions]="{standalone: true}" ></p-calendar>
                         </div>
-                        <div class="flexGrid">
-                            <div>
-                                <label for="horinIni">Início</label>
-                                <input pInputText type="time" id="horinIni{{i}}" [(ngModel)]="replica.horarioInicio" [ngModelOptions]="{standalone: true}">
-                            </div>
-                            <div>
-                                <label for="horinFim">Fim</label>
-                                <input pInputText type="time" id="horinFim{{i}}" [(ngModel)]="replica.horarioFim" [ngModelOptions]="{standalone: true}">
-                            </div>
+                        <div>
+                            <span class="p-float-label">
+                                <p-dropdown #dropdownHour appendTo="body" [options]="horariosArray" placeholder="Selecione o horário" inputId="horAloc{{i}}" [(ngModel)]="replica.horario" [ngModelOptions]="{standalone: true}">
+                                    <ng-template let-hourData pTemplate="selectedItem">
+                                        <div>{{ hourData.horaInicio }} - {{ hourData.horaFim }}</div>
+                                    </ng-template>
+                                    <ng-template let-hourData pTemplate="item">
+                                        <div class="flex align-items-center gap-2">
+                                        <div>{{ hourData.horaInicio }} - {{ hourData.horaFim }}</div>
+                                        </div>
+                                    </ng-template>
+                                </p-dropdown>
+                                <label for="horAloc{{i}}">Horário</label>
+                            </span>
                         </div>
-                        <div *ngIf="replica.horarioFim < replica.horarioInicio" class="validation-error">
-                            <p>Hora de fim deve ser maior que a hora de início</p>
-                        </div>
-                        </ng-container>
                     </div>
-                 </div>
+                </div>
             </div>
             <div class="divInput labelDescFlex">
                 <label for="descEvent">Descrição</label>
@@ -174,16 +176,20 @@
                     <label for="iniData">Data do Evento</label>
                 </span>
             </div>
-            <div class="divInput labelHourFlex">
-                <label for="horinIni">Hora de Início</label>
-                <input pInputText type="time" id="horinIni" class="form-control" formControlName="horarioInicio">
-            </div>
-            <div class="divInput labelHourFlex">
-                    <label for="horinFim">Hora de Fim</label>
-                    <input pInputText type="time" id="horinFim" class="form-control" formControlName="horarioFim">
-                <div *ngIf="form.get('horarioFim')?.invalid && form.get('horarioFim')?.touched" class="validation-error">
-                    <p>Hora de fim deve ser maior que a hora de início</p>
-                </div>
+            <div class="divInput">
+                <span class="p-float-label">
+                    <p-dropdown #dropdownHour appendTo="body" [options]="horariosArray" placeholder="Selecione o horário" inputId="horAloc" class="form-control" formControlName="horario">
+                        <ng-template let-hourData pTemplate="selectedItem">
+                            <div>{{ hourData.horaInicio }} - {{ hourData.horaFim }}</div>
+                        </ng-template>
+                        <ng-template let-hourData pTemplate="item">
+                            <div class="flex align-items-center gap-2">
+                            <div>{{ hourData.horaInicio }} - {{ hourData.horaFim }}</div>
+                            </div>
+                        </ng-template>
+                    </p-dropdown>
+                    <label for="horAloc">Horário</label>
+                </span>
             </div>
             <div class="divInput labelDescFlex">
                 <label for="descEvent">Descrição</label>
@@ -223,13 +229,9 @@
             <div class="divInput dtEvento">
                 <b>Data do evento:</b> {{eventoInfo?.dataEvento | date: 'fullDate' : '' : 'pt-BR'}}
             </div>
-            <div class="divInput flexContainer">
-                <div>
-                    <b>Hora de início:</b> {{ formatarHora(eventoInfo?.horarioInicio) }}
-                </div>
-                <div class="lastDiv">
-                    <b>Hora de fim:</b> {{ formatarHora(eventoInfo?.horarioFim) }}
-                </div>
+            <div class="divInput">
+                <b>Horário:</b> {{ eventoInfo?.horario }}
+                <!-- <b>Horário:</b> {{ formatarHora(eventoInfo?.horarioInicio) }} -->
             </div>
             <div class="divInput">
                 <b>Local do evento:</b> {{eventoInfo?.local?.nome}}

@@ -13,7 +13,7 @@
             </p-overlayPanel>
             <p-inputGroup>
                 <button type="button" pButton (click)="op.toggle($event)" icon="pi pi-filter-fill"></button>
-                <input #searchInput type="text" pInputText [placeholder]="txtFilter" (keydown)="onKeyDown($event, searchInput.value)" />
+                <input #searchInput type="text" pInputText [mask]="selectedFilter?.id === 1 ? '00/00/0000' : selectedFilter?.id === 2 ? '0000' : null" [placeholder]="txtFilter" (keydown)="onKeyDown($event, searchInput.value)" />
                 <button type="button" pButton icon="pi pi-search" (click)="filterField(searchInput.value)"></button>
             </p-inputGroup>
         </div>
@@ -70,6 +70,12 @@
         <form id="meuFormulario" [formGroup]="form" (ngSubmit)="onSubmit()">
             <div class="divInput">
                 <span class="p-float-label">
+                    <input pInputText id="nomeEquip" class="form-control" formControlName="nome" />
+                    <label for="nomeEquip">Nome do período</label>
+                </span>
+            </div>
+            <div class="divInput">
+                <span class="p-float-label">
                     <p-calendar appendTo="body" dateFormat="dd/mm/yy" id="inicioPer" class="form-control" formControlName="dataInicio" ></p-calendar>
                     <label for="inicioPer">Data de início</label>
                 </span>
@@ -83,10 +89,6 @@
                     <p>A data final deve ser maior ou igual que a data de início.</p>
                 </div>
             </div>
-            <div class="divInput labelFlex">
-                <label for="descEvent">Descrição</label>
-                <textarea pInputTextarea rows="5" cols="30" maxlength="5000" id="descEvent" class="form-control" formControlName="descricao" ></textarea>
-            </div>
             <div class="divBotao">
                 <button type="submit" class="botaoSalva" *ngIf="cadastrar" pButton>Salvar</button>
                 <button type="submit" class="botaoEdit" *ngIf="editar" pButton>Atualizar</button>
@@ -99,14 +101,14 @@
 <div class="card flex justify-content-center">
     <p-dialog header="Info do Período" [(visible)]="visibleInfo" [breakpoints]="{ '960px': '75vw' }" [style]="{width: '50vw', 'z-index': '1102'}">
         <div id="meuFormInfo">
+            <div class="divInput" style="white-space: pre-line;">
+                <b>Nome:</b> {{periodoInfo?.nome}}
+            </div>
             <div class="divInput dtPeriodo">
                 <b>Data de início:</b> {{periodoInfo?.dataInicio | date: 'fullDate' : '' : 'pt-BR'}}
             </div>
             <div class="divInput dtPeriodo">
                 <b>Data de fim:</b> {{periodoInfo?.dataFim | date: 'fullDate' : '' : 'pt-BR'}}
-            </div>
-            <div class="divInput" style="white-space: pre-line;">
-                <b>Descrição:</b> {{periodoInfo?.descricao}}
             </div>
             <div class="divBotao">
                 <button type="button" class="botaoInfo" (click)="visibleInfo = false" pButton>Ok</button>

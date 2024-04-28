@@ -249,6 +249,7 @@
     }
     .p-datatable-striped {
         width: max-content;
+min-width: 79.25rem;
     }
 
     // .ng-trigger.ng-trigger-overlayAnimation.ng-tns-c3632051545-2.p-datepicker.p-component.ng-star-inserted {
@@ -290,37 +291,37 @@
                 margin-right: 0;
             }
         }
-        .divInput.labelFlex > .validation-error{
-            position: absolute;
-            bottom: -5rem;
-            left: 32vw;
-            p {
-                width: 7rem;
-                white-space: break-spaces;
-            }
-        }
+        // .divInput.labelFlex > .validation-error{
+        //     position: absolute;
+        //     bottom: -5rem;
+        //     left: 32vw;
+        //     p {
+        //         width: 7rem;
+        //         white-space: break-spaces;
+        //     }
+        // }
         .divInput.labelFlex {
             display: flex;
-            align-items: flex-end;
+            align-items: center;
             justify-content: center;
             gap: 4vw;
-            position: relative;
+            // position: relative;
 
             div{
                 width: 18vw;
             }
-            .flexGrid{
-                display: flex;
-                justify-content: center;
-                gap: 2vw;
+            // .flexGrid{
+            //     display: flex;
+            //     justify-content: center;
+            //     gap: 2vw;
 
-                div{
-                    width: 9vw;
-                    display: flex;
-                    flex-direction: column;
-                    input{width: 100%;}
-                }
-            }
+            //     div{
+            //         width: 9vw;
+            //         display: flex;
+            //         flex-direction: column;
+            //         input{width: 100%;}
+            //     }
+            // }
         }
     }
     :host ::ng-deep {
@@ -331,7 +332,7 @@
             width: 40vw;
         }
         .divInput.labelFlex{
-            .p-calendar input{width: 18vw;}
+            .p-calendar input, .p-dropdown{width: 18vw;}
         }
     }
 }
@@ -383,11 +384,11 @@
             flex-direction: column;
             gap: 1rem;
             margin: 1.7rem 1rem;
-            .flexGrid{
-                display: flex;
-                flex-direction: column;
-                gap: 1rem;
-            }
+            // .flexGrid{
+            //     display: flex;
+            //     flex-direction: column;
+            //     gap: 1rem;
+            // }
         }
     }
     :host ::ng-deep {

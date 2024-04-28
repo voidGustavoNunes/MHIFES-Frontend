@@ -41,6 +41,9 @@ import localePT from '@angular/common/locales/pt';
 import { Log } from '../../models/log.models';
 import { AccordionModule } from 'primeng/accordion';
 import { DividerModule } from 'primeng/divider';
+import { Horario } from '../../models/horario.models';
+import { HorarioService } from '../../service/horario.service';
+import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 registerLocaleData(localePT);
 
 @Component({
@@ -70,7 +73,8 @@ registerLocaleData(localePT);
     DropdownModule,
     InputSwitchModule,
     AccordionModule,
-    DividerModule
+    DividerModule,
+    NgxMaskDirective
   ],
   templateUrl: './alocacoes-r.component.html',
   styleUrl: './alocacoes-r.component.scss',
@@ -83,6 +87,8 @@ registerLocaleData(localePT);
     LocalService,
     PeriodoService,
     DisciplinaService,
+    HorarioService,
+    provideNgxMask()
   ]
 })
 export class AlocacoesRComponent implements OnInit, OnDestroy {
@@ -92,7 +98,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   @ViewChild('dropdownPeriodo') dropdownPeriodo!: Dropdown;
   @ViewChild('dropdownLocal') dropdownLocal!: Dropdown;
   @ViewChild('dropdownProf') dropdownProf!: Dropdown;
-  @ViewChild('dropdownHora') dropdownHora!: Dropdown;
+  @ViewChild('dropdownHour') dropdownHour!: Dropdown;
   @ViewChild('switch') switch!: InputSwitch;
   @ViewChild('calendar') calendar!: Calendar;
   
@@ -110,6 +116,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   unsubscribe$Prof!: Subscription;
   unsubscribe$Per!: Subscription;
   unsubscribe$Loc!: Subscription;
+  unsubscribe$Hor!: Subscription;
   unsubscribe$Log!: Subscription;
 
   form: FormGroup;
@@ -131,6 +138,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   disciplinasArray: Disciplina[] = [];
   periodosArray: Periodo[] = [];
   alunosArray: Aluno[] = [];
+  horariosArray: Horario[] = [];
 
   selectedAlunos: Aluno[] = [];
   
@@ -164,11 +172,13 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     private locService: LocalService,
     private periodService: PeriodoService,
     private professorService: ProfessorService,
+    private hourService: HorarioService,
     ) {
       this.form = this.formBuilder.group({
         id: [null],
-        horarioInicio: [null, [Validators.required]],
-        horarioFim: [null, [Validators.required]],
+        horario: [null, [Validators.required]],
+        // horarioInicio: [null, [Validators.required]],
+        // horarioFim: [null, [Validators.required]],
         turma: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(30)]],
         dataAula: [null, [Validators.required]],
         local: [null, [Validators.required]],
@@ -176,7 +186,8 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
         periodo: [null, [Validators.required]],
         professor: [null, [Validators.required]],
         alunos: this.formBuilder.array([], [Validators.required]),
-      }, { validator: this.verificarHoraFimMaiorQueInicio });
+      })
+      // , { validator: this.verificarHoraFimMaiorQueInicio });
   }
 
   ngOnInit() {
@@ -191,16 +202,10 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     ];
 
     this.filterOptions = [
-      {nome: 'Data da aula', id: 0},
-      {nome: 'Turma', id: 1},
-      {nome: 'Dia da semana', id: 2},
-      {nome: 'Nome da Disciplina', id: 3},
-      {nome: 'Nome do Local', id: 4},
-      {nome: 'Nome do Professor', id: 5},
-      {nome: 'Nome do Aluno', id: 6},
-      {nome: 'Hora de início', id: 7},
-      {nome: 'Número de aulas', id: 8},
-      {nome: 'Ano da aula', id: 9}
+      {nome: 'Nome do Professor', id: 0},
+      {nome: 'Nome do Local', id: 1},
+      {nome: 'Nome da Disciplina', id: 2},
+      {nome: 'Hora de início', id: 3},
     ];
 
     this.unsubscribe$ = this.alocService.listar()
@@ -296,6 +301,19 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       }
     });
 
+    this.unsubscribe$Hor = this.hourService.listar()
+    .subscribe({
+      next: (itens:any) => {
+        const data = itens.sort((a:any, b:any) => (a.id > b.id) ? -1 : 1);
+        this.horariosArray = data;
+      },
+      error: (err: any) => {
+        this.messages = [
+          { severity: 'error', summary: 'Erro', detail: 'Dados de horários não encontrados.', life: 3000 },
+        ];
+      }
+    });
+
   }
 
   ngOnDestroy() {
@@ -305,18 +323,20 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     this.unsubscribe$Loc.unsubscribe();
     this.unsubscribe$Per.unsubscribe();
     this.unsubscribe$Prof.unsubscribe();
+    // this.unsubscribe$Log.unsubscribe();
+    this.unsubscribe$Hor.unsubscribe();
   }
   
-  verificarHoraFimMaiorQueInicio(formGroup: FormGroup) {
-    const horaInicio = formGroup.get('horarioInicio')?.value;
-    const horaFim = formGroup.get('horarioFim')?.value;
+  // verificarHoraFimMaiorQueInicio(formGroup: FormGroup) {
+  //   const horaInicio = formGroup.get('horarioInicio')?.value;
+  //   const horaFim = formGroup.get('horarioFim')?.value;
 
-    if (horaInicio && horaFim && horaInicio >= horaFim) {
-      formGroup.get('horarioFim')?.setErrors({ 'horaFimMenorQueInicio': true });
-    } else {
-      formGroup.get('horarioFim')?.setErrors(null);
-    }
-  }
+  //   if (horaInicio && horaFim && horaInicio >= horaFim) {
+  //     formGroup.get('horarioFim')?.setErrors({ 'horaFimMenorQueInicio': true });
+  //   } else {
+  //     formGroup.get('horarioFim')?.setErrors(null);
+  //   }
+  // }
 
   getAluno(): FormArray {
     return this.form.get('alunos') as FormArray;
@@ -324,12 +344,10 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
 
   addAluno(aluno: Aluno) {
     this.getAluno().push(new FormControl(aluno));
-    // console.log('add => ',this.getAluno())
   }
 
   onAlunosChange(event: any) {
     this.getAluno().clear();
-    // console.log('clear => ',this.getAluno())
 
     event.value.forEach((aluno: Aluno) => {
       this.addAluno(aluno);
@@ -368,8 +386,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     this.editar = true;
     this.form.patchValue({
       id: value.id,
-      horarioInicio: value.horarioInicio,
-      horarioFim: value.horarioFim,
+      horario: value.horario,
       turma: value.turma,
       dataAula: value.dataAula,
       local: value.local,
@@ -387,6 +404,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     this.dropdownLocal.writeValue(value.local);
     this.dropdownProf.writeValue(value.professor);
     this.multiselect.writeValue(value.alunos);
+    this.dropdownHour.writeValue(value.horario);
 
     this.selectedAlunos = value.alunos;
     value.alunos.forEach(aln => {
@@ -469,17 +487,16 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   onMultiselectChange() {
     let ini: Date = this.form.get('dataAula')?.value;
     let periodo: Periodo = this.form.get('periodo')?.value;
-    let houI: Time = this.form.get('horarioInicio')?.value;
-    let houF: Time = this.form.get('horarioFim')?.value;
+    let hora: Horario = this.form.get('horario')?.value;
 
-    if(ini && this.selectedDiasSemana && periodo) {
+    if(ini && this.selectedDiasSemana && periodo && hora) {
       let codes: number[] = this.selectedDiasSemana.map(selD => selD.code);
       this.selectedDiasSemana.forEach(selD => {
         const existe = this.alocacaoHour.some(item => item.diaSemana === selD);
         
         if (!existe) {
           this.alocacaoHour.push({
-            diaSemana:selD, horaFinal:houF, horaInicio:houI
+            diaSemana:selD, horario:hora
           })
         }
       })
@@ -489,8 +506,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
         const diaDaSemana = this.obterDiaDaSemana(ini);
         if(diaDaSemana == alocH.diaSemana.nome) {
           this.form.patchValue({
-            horarioInicio: alocH.horaInicio,
-            horarioFim: alocH.horaFinal
+            horario: alocH.horario,
           });
         }
       })
@@ -544,17 +560,15 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   }
 
   updateSelectState() {
-    let houI: Time = this.form.get('horarioInicio')?.value;
-    let houF: Time = this.form.get('horarioFim')?.value;
+    let hora: Horario = this.form.get('horario')?.value;
     let ini: Date = this.form.get('dataAula')?.value;
 
-    if(ini && houI && houF) {
+    if(ini && hora) {
       this.enableSelect = true;
     } else {
       this.enableSelect = false;
       this.alocacaoHour = [];
     }
-    console.log('selec ',this.enableSelect)
   }
 
   updateDataAulaState() {
@@ -576,58 +590,6 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   }
 
   searchFilter0(term: string) {
-    const dateTerm = this.formatarDtStrDt(term);
-    
-    if (dateTerm instanceof Date && !isNaN(dateTerm.getTime())) {
-      this.alocacoesData = this.alocacoesFilter.filter(aloca => {
-        const tiparDT = aloca.dataAula;
-        if (typeof tiparDT === 'string') {
-          const tiparFormat = this.formatarDatas(tiparDT);
-          const searchTerm = this.formatarDtStrDt(tiparFormat);
-          
-          if (dateTerm.getTime() === searchTerm?.getTime()) {
-            return aloca;
-          } else {
-            return null;
-          }
-        } else {
-          return null;
-        }
-      })
-    }
-  }
-
-  searchFilter1(term: string) {
-    this.alocacoesData = this.alocacoesFilter.filter(aloca => {
-      if (aloca.turma.toLowerCase().includes(term.toLowerCase())) {
-        return aloca;
-      } else {
-        return null;
-      }
-    })
-  }
-
-  searchFilter3(term: string) {
-    this.alocacoesData = this.alocacoesFilter.filter(aloca => {
-      if (aloca.disciplina.nome.toLowerCase().includes(term.toLowerCase())) {
-        return aloca;
-      } else {
-        return null;
-      }
-    })
-  }
-
-  searchFilter4(term: string) {
-    this.alocacoesData = this.alocacoesFilter.filter(aloca => {
-      if (aloca.local.nome.toLowerCase().includes(term.toLowerCase())) {
-        return aloca;
-      } else {
-        return null;
-      }
-    })
-  }
-
-  searchFilter5(term: string) {
     this.alocacoesData = this.alocacoesFilter.filter(aloca => {
       if (aloca.professor.nome.toLowerCase().includes(term.toLowerCase())) {
         return aloca;
@@ -637,23 +599,31 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     })
   }
 
-  searchFilter6(term: string) {
+  searchFilter1(term: string) {
     this.alocacoesData = this.alocacoesFilter.filter(aloca => {
-      aloca.alunos.filter(aln => {
-        if ( aln.nome.toLowerCase().includes(term.toLowerCase()) ) {
-            return aloca;
-        } else {
-          return null;
-        }
-      })
-    });
+      if (aloca.local.nome.toLowerCase().includes(term.toLowerCase())) {
+        return aloca;
+      } else {
+        return null;
+      }
+    })
   }
 
-  searchFilter7(term: string) {
+  searchFilter2(term: string) {
+    this.alocacoesData = this.alocacoesFilter.filter(aloca => {
+      if (aloca.disciplina.nome.toLowerCase().includes(term.toLowerCase())) {
+        return aloca;
+      } else {
+        return null;
+      }
+    })
+  }
+
+  searchFilter3(term: string) {
     const compA = this.formatarTmStrTm(term);
     if(compA != null) {
       this.alocacoesData = this.alocacoesFilter.filter(aloca => {
-        const compB = this.formatarTmStrTm(aloca.horarioInicio);
+        const compB = this.formatarTmStrTm(aloca.horario.horaInicio);
         if(compB != null) {
           if (compA.horas === compB.horas && compA.minutos === compB.minutos) {
             return aloca;
@@ -668,38 +638,9 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     return null;
   }
 
-  searchFilter9(term: string) {
-    this.alocacoesData = this.alocacoesFilter.filter(aloca => {
-      const searchTermAsNumber = parseInt(term);
-      if (!isNaN(searchTermAsNumber)) {
-        const ano = new Date(aloca.dataAula).getFullYear();
-        if (ano === searchTermAsNumber) {
-          return aloca;
-        } else {
-          return null;
-        }
-      } else {
-        return null;
-      }
-    })
-  }
-
   onKeyDown(event: KeyboardEvent, searchTerm: string) {
     if (event.key === "Enter") {
-      if (searchTerm != null || searchTerm != '') {
-        if(this.selectedFilter) {
-          if(this.selectedFilter.id == 0) this.searchFilter0(searchTerm);
-          if(this.selectedFilter.id == 1) this.searchFilter1(searchTerm);
-          // if(this.selectedFilter.id == 2) this.searchFilter2(searchTerm);
-          if(this.selectedFilter.id == 3) this.searchFilter3(searchTerm);
-          if(this.selectedFilter.id == 4) this.searchFilter4(searchTerm);
-          if(this.selectedFilter.id == 5) this.searchFilter5(searchTerm);
-          if(this.selectedFilter.id == 6) this.searchFilter6(searchTerm);
-          if(this.selectedFilter.id == 7) this.searchFilter7(searchTerm);
-          // if(this.selectedFilter.id == 8) this.searchFilter8(searchTerm);
-          if(this.selectedFilter.id == 9) this.searchFilter9(searchTerm);
-        }
-      }
+      this.filterField(searchTerm);
     }
   }
   
@@ -708,14 +649,8 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       if(this.selectedFilter) {
         if(this.selectedFilter.id == 0) this.searchFilter0(searchTerm);
         if(this.selectedFilter.id == 1) this.searchFilter1(searchTerm);
-        // if(this.selectedFilter.id == 2) this.searchFilter2(searchTerm);
+        if(this.selectedFilter.id == 2) this.searchFilter2(searchTerm);
         if(this.selectedFilter.id == 3) this.searchFilter3(searchTerm);
-        if(this.selectedFilter.id == 4) this.searchFilter4(searchTerm);
-        if(this.selectedFilter.id == 5) this.searchFilter5(searchTerm);
-        if(this.selectedFilter.id == 6) this.searchFilter6(searchTerm);
-        if(this.selectedFilter.id == 7) this.searchFilter7(searchTerm);
-        // if(this.selectedFilter.id == 8) this.searchFilter8(searchTerm);
-        if(this.selectedFilter.id == 9) this.searchFilter9(searchTerm);
       }
     }
   }
@@ -776,9 +711,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   }
 
   updateMask() {
-    if (this.selectedFilter?.id == 0) {
-      this.txtFilter = '00/00/0000';
-    } else if (this.selectedFilter?.id == 7) {
+    if (this.selectedFilter?.id == 3) {
       this.txtFilter = '00:00';
     } else {
       this.txtFilter = 'Pesquisar alocação';
@@ -840,14 +773,6 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     });
   }
 
-  goToRouteSave() {
-    this.router.navigate(['api/alocacoes']);
-  }
-
-  goToRouteEdit(id: number) {
-    this.router.navigate(['api/alocacoes', id]);
-  }
-
   onSubmit() {
     console.log(this.form.value)
 
@@ -893,16 +818,15 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
             if(diaDaSemana == alocH.diaSemana.nome) {
               this.form.patchValue({
                 dataAula: dt,
-                horarioInicio: alocH.horaInicio,
-                horarioFim: alocH.horaFinal
+                horario: alocH.horario
               });
+              // this.mss = true;
               this.alocacoesCadast = this.form.value;
               this.enviarFormSave();
             }
           })
         }
       });
-      this.mss = true;
     } else {
       this.messages = [
         { severity: 'warn', summary: 'Atenção', detail: 'Informação inválida. Preencha os campos!', life: 3000 },

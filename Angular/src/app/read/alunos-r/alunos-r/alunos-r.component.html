@@ -5,8 +5,14 @@
       <a (click)="showDialog()" class="p-button botaoC">Cadastrar +</a>
 
       <div class="pesq">
+        <p-overlayPanel #op>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: .5rem;">
+                <p-dropdown [options]="filterOptions" [(ngModel)]="selectedFilter" optionLabel="nome" [showClear]="true" placeholder="Selecione um filtro"></p-dropdown>
+                <p-button label="Limpar filtro" severity="warning" (click)="limparFilter()"></p-button>
+            </div>
+        </p-overlayPanel>
           <p-inputGroup>
-              <button type="button" pButton icon="pi pi-filter-slash" (click)="limparFilter()"></button>
+              <button type="button" pButton icon="pi pi-filter-fill" (click)="op.toggle($event)"></button>
               <input #searchInput type="text" pInputText placeholder="Pesquisar aluno" (keydown)="onKeyDown($event, searchInput.value)" />
               <button type="button" pButton icon="pi pi-search" (click)="filterField(searchInput.value)"></button>
           </p-inputGroup>

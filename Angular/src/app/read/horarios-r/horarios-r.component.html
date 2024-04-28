@@ -1,0 +1,90 @@
+<div class="caixa">
+    <h1>Horários</h1>
+
+    <div class="opcao">
+        <a (click)="showDialog()" class="p-button botaoC">Cadastrar +</a>
+        
+        <div class="pesq">
+            <p-overlayPanel #op>
+                <div style="display: flex; flex-direction: column; align-items: center; gap: .5rem;">
+                    <p-dropdown [options]="filterOptions" [(ngModel)]="selectedFilter" optionLabel="nome" [showClear]="true" (ngModelChange)="updateMask()" placeholder="Selecione um filtro"></p-dropdown>
+                    <p-button label="Limpar filtro" severity="warning" (click)="limparFilter()"></p-button>
+                </div>
+            </p-overlayPanel>
+            <p-inputGroup>
+                <button type="button" pButton icon="pi pi-filter-fill" (click)="op.toggle($event)"></button>
+                <input #searchInput type="text" [mask]="selectedFilter?.id === 0 ? '00:00' : selectedFilter?.id === 1 ? '00:00' : null" pInputText [placeholder]="txtFilter" (keydown)="onKeyDown($event, searchInput.value)" />
+                <button type="button" pButton icon="pi pi-search" (click)="filterField(searchInput.value)"></button>
+            </p-inputGroup>
+        </div>
+    </div>
+
+    <div class="eqTable">
+        <p-table
+            #dt1
+            [value]="horariosData"
+            styleClass="p-datatable-striped"
+            [tableStyle]="{'min-width': '50rem'}"
+            [paginator]="true"
+            [rows]="10"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Mostrando do {first} ao {last} de {totalRecords} registros"
+            [rowsPerPageOptions]="[10, 20, 40]"
+        >
+            <ng-template pTemplate="header">
+                <tr class="tbHeader">
+                    <th>Hora de início</th>
+                    <th>Hora de fim</th>
+                    <th></th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-hour>
+                <tr class="tbBody">
+                    <td>{{hour?.horaInicio}}</td>
+                    <td>{{hour?.horaFim}}</td>
+                    <td>
+                        <button type="button" class="botaoEdit" (click)="showEditDialog(hour)" pButton>Editar</button>
+                        <p-toast></p-toast>
+                        <p-confirmPopup></p-confirmPopup>
+                        <button type="button" class="botaoDele" (click)="confirm2($event, hour?.id)" severity="danger" pButton>Deletar</button>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="3">Não há horários cadastrados.</td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+    
+    <p-scrollTop></p-scrollTop>
+</div>
+
+
+<div class="card flex justify-content-center">
+    <p-dialog class="pHeader" [header]=ehTitulo [(visible)]="visible" [modal]="true" [breakpoints]="{ '960px': '75vw' }" [style]="{ width: '50vw' }" [draggable]="false" [resizable]="false">
+        <form id="meuFormulario" [formGroup]="form" (ngSubmit)="onSubmit()">
+            <div class="divInput labelFlex">
+                <label for="horinIni">Hora de início</label>
+                <input pInputText type="time" id="horinIni" class="form-control" formControlName="horaInicio" >
+            </div>
+            <div class="divInput labelFlex">
+                <label for="horinFim">Hora de fim</label>
+                <input pInputText type="time" id="horinFim=" class="form-control" formControlName="horaFim" >
+                <div *ngIf="form.get('horaFim')?.invalid && form.get('horaFim')?.touched" class="validation-error">
+                    <p>Hora de fim deve ser maior que a hora de início</p>
+                </div>
+            </div>
+            <div class="divBotao">
+                <button type="submit" class="botaoSalva" *ngIf="cadastrar" pButton>Salvar</button>
+                <button type="submit" class="botaoEdit" *ngIf="editar" pButton>Atualizar</button>
+                <button type="button" class="botaoCancela" (click)="hideDialog()" pButton>Cancelar</button>
+            </div>
+        </form>
+    </p-dialog>
+</div>
+
+<div class="card">
+    <p-messages [(value)]="messages" [showTransitionOptions]="'500ms'" [hideTransitionOptions]="'500ms'" [enableService]="false"></p-messages>
+</div>

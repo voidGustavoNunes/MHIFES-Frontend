@@ -111,7 +111,7 @@ export class LocaisRComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.filterOptions = [
       {nome: 'Nome do local', id: 0},
-      {nome: 'Nome do equipamento', id: 1}
+      {nome: 'Capacidade', id: 1}
     ];
 
     this.unsubscribe$ = this.locService.listar()
@@ -325,25 +325,20 @@ export class LocaisRComponent implements OnInit, OnDestroy {
   }
 
   searchFilter1(term: string) {
+    const searchTermAsNumber = parseInt(term);
+
     this.locaisData = this.locaisFilter.filter(local => {
-      local.localEquipamentos?.filter(equip =>{
-        if (equip.equipamento?.nome.toLowerCase().includes(term.toLowerCase())) {
-          return local;
-        } else {
-          return null;
-        }
-      })
+      if (!isNaN(searchTermAsNumber) && local?.capacidade == searchTermAsNumber) {
+        return local;
+      } else {
+        return null;
+      }
     })
   }
 
   onKeyDown(event: KeyboardEvent, searchTerm: string) {
     if (event.key === "Enter") {
-      if (searchTerm != null || searchTerm != '') {
-        if(this.selectedFilter) {
-          if(this.selectedFilter.id == 0) this.searchFilter0(searchTerm);
-          if(this.selectedFilter.id == 1) this.searchFilter1(searchTerm);
-        }
-      }
+      this.filterField(searchTerm);
     }
   }
 

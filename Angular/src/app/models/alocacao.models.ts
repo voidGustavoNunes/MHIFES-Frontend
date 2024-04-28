@@ -10,9 +10,9 @@ import { Semana } from "./share/semana.models";
 export interface Alocacao {
   id: number;
   // numAulas: number;
-  // horario: Horario;
-  horarioInicio: Time;
-  horarioFim: Time;
+  horario: Horario;
+  // horarioInicio: Time;
+  // horarioFim: Time;
   turma: string;
   dataAula: Date;
   local: Local;
@@ -25,6 +25,7 @@ export interface Alocacao {
 
 export interface AlocacaoHour {
   diaSemana: Semana;
-  horaInicio: Time;
-  horaFinal: Time;
+  horario: Horario;
+  // horaInicio: Time;
+  // horaFinal: Time;
 }
