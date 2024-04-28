@@ -1,27 +1,15 @@
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Disciplina } from '../../models/disciplina.models';
-import { Subscription } from 'rxjs';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
-import { HttpClientModule } from '@angular/common/http';
 import { CommonModule, registerLocaleData } from '@angular/common';
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { InputGroupModule } from 'primeng/inputgroup';
-import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
-import { TableModule } from 'primeng/table';
-import { PaginatorModule } from 'primeng/paginator';
-import { DialogModule } from 'primeng/dialog';
+import { HttpClientModule } from '@angular/common/http';
+import localePT from '@angular/common/locales/pt';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
 import { ConfirmationService, Message, MessageService } from 'primeng/api';
-import { ToastModule } from 'primeng/toast';
-import { ConfirmPopupModule } from 'primeng/confirmpopup';
-import { ScrollTopModule } from 'primeng/scrolltop';
-import { MessagesModule } from 'primeng/messages';
-import { AccordionModule } from 'primeng/accordion';
-import { DividerModule } from 'primeng/divider';
+import { Subscription } from 'rxjs';
+
 import { Log, Operacao } from '../../models/log.models';
 import { UserRole } from '../../models/usuario';
-import localePT from '@angular/common/locales/pt';
+import { PrimeNgImportsModule } from '../../shared/prime-ng-imports/prime-ng-imports.module';
+
 registerLocaleData(localePT);
 
 @Component({
@@ -31,21 +19,7 @@ registerLocaleData(localePT);
     CommonModule,
     HttpClientModule,
     RouterModule,
-    ButtonModule,
-    InputTextModule,
-    InputGroupModule,
-    InputGroupAddonModule,
-    TableModule,
-    DialogModule,
-    PaginatorModule,
-    ReactiveFormsModule,
-    FormsModule,
-    ToastModule,
-    ScrollTopModule,
-    ConfirmPopupModule,
-    MessagesModule,
-    AccordionModule,
-    DividerModule
+    PrimeNgImportsModule
   ],
   templateUrl: './logs-r.component.html',
   styleUrl: './logs-r.component.scss',
@@ -59,9 +33,9 @@ export class LogsRComponent implements OnInit, OnDestroy {
 
   logsData: Log[] = [];
   logsFilter: Log[] = [];
-  
+
   unsubscribe$!: Subscription;
-  
+
   messages!: Message[];
   visible: boolean = false;
 
@@ -70,28 +44,24 @@ export class LogsRComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private confirmationService: ConfirmationService
-    ) {
+  ) {
   }
 
   ngOnInit() {
 
     this.logsExample = {
+      id: 1,
+      data: new Date(),
+      descricao: "Mussum Ipsum, cacilds vidis litro abertis.  Manduma pindureta quium dia nois paga. Mauris nec dolor in eros commodo tempor. Aenean aliquam molestie leo, vitae iaculis nisl. Vehicula non. Ut sed ex eros. Vivamus sit amet nibh non tellus tristique interdum. Aenean aliquam molestie leo, vitae iaculis nisl.\nQuem manda na minha terra sou euzis! Suco de cevadiss deixa as pessoas mais interessantis. Negão é teu passadis, eu sou faxa pretis. Si num tem leite então bota uma pinga aí cumpadi!\nDetraxit consequat et quo num tendi nada. Interessantiss quisso pudia ce receita de bolis, mais bolis eu num gostis. Paisis, filhis, espiritis santis. Eu nunca mais boto a boca num copo de cachaça, agora eu só uso canudis!",
+      operacao: Operacao.ALTERACAO,
+      idRegistro: 1,
+      usuario: {
         id: 1,
-        data: new Date(),
-        hora: {
-          "hours": 10,
-          "minutes": 20,
-      },
-        descricao: "Mussum Ipsum, cacilds vidis litro abertis.  Manduma pindureta quium dia nois paga. Mauris nec dolor in eros commodo tempor. Aenean aliquam molestie leo, vitae iaculis nisl. Vehicula non. Ut sed ex eros. Vivamus sit amet nibh non tellus tristique interdum. Aenean aliquam molestie leo, vitae iaculis nisl.\nQuem manda na minha terra sou euzis! Suco de cevadiss deixa as pessoas mais interessantis. Negão é teu passadis, eu sou faxa pretis. Si num tem leite então bota uma pinga aí cumpadi!\nDetraxit consequat et quo num tendi nada. Interessantiss quisso pudia ce receita de bolis, mais bolis eu num gostis. Paisis, filhis, espiritis santis. Eu nunca mais boto a boca num copo de cachaça, agora eu só uso canudis!",
-        operacao: Operacao.ALTERACAO,
-        idRegistro: 1,
-        usuario: {
-          id: 1,
-          login: "admin@2024",
-          nome: "Admin",
-          password: "123456",
-          role: UserRole.ADMIN
-        }
+        login: "admin@2024",
+        nome: "Admin",
+        password: "123456",
+        role: UserRole.ADMIN
+      }
     }
   }
 
@@ -102,12 +72,12 @@ export class LogsRComponent implements OnInit, OnDestroy {
   showDialog() {
     this.visible = true;
   }
-  
+
   hideDialog() {
     this.visible = false;
   }
-  
-  limparFilter(){
+
+  limparFilter() {
     const inputElement = this.inputSearch.nativeElement.value
     if (inputElement) {
       this.inputSearch.nativeElement.value = '';
@@ -154,14 +124,40 @@ export class LogsRComponent implements OnInit, OnDestroy {
   }
   getLogClass(operacao: Operacao): string {
     switch (operacao.toString()) {
-      case 'ALTERAÇÃO':
+      case 'ALTERACAO':
         return 'update-log';
-      case 'INCLUSÃO':
+      case 'INCLUSAO':
         return 'incluse-log';
-      case 'EXCLUSÃO':
+      case 'EXCLUSAO':
         return 'delete-log';
       default:
         return 'default-log';
+    }
+  }
+
+  getSeverity(operacao: Operacao) {
+    switch (operacao.toString()) {
+      case 'ALTERACAO':
+        return 'warning';
+      case 'INCLUSAO':
+        return 'success';
+      case 'EXCLUSAO':
+        return 'danger';
+      default:
+        return null;
+    }
+  }
+
+  getIcons(operacao: Operacao) {
+    switch (operacao.toString()) {
+      case 'ALTERACAO':
+        return 'pi pi-pencil';
+      case 'INCLUSAO':
+        return 'pi pi-save';
+      case 'EXCLUSAO':
+        return 'pi pi-trash';
+      default:
+        return null;
     }
   }
 
