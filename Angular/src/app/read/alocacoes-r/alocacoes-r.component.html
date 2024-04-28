@@ -3,7 +3,7 @@
 
     <div class="opcao">
         <a (click)="showDialog()" class="p-button botaoC">Cadastrar +</a>
-        
+
         <div class="pesq">
             <p-overlayPanel #op>
                 <div style="display: flex; flex-direction: column; align-items: center; gap: .5rem;">
@@ -46,8 +46,8 @@
                     <td>{{alocacao?.local.nome}}</td>
                     <td>{{alocacao?.disciplina.nome}}</td>
                     <td>
-                        <!-- {{ formatarHora(alocacaoInfo?.horarioInicio) }} - 
-                        {{ formatarHora(alocacaoInfo?.horarioFim) }}</td> -->
+                        {{ formatarHora(alocacaoInfo?.horarioInicio) }} -
+                        {{ formatarHora(alocacaoInfo?.horarioFim) }}</td>
                     <!-- <td></td> -->
                     <td>
                         <button type="button" class="botaoL" (click)="showDialogLog(alocacao)" pButton>Log</button>
@@ -389,16 +389,16 @@ como verificar se ultimo diasintervalor para mss ser true
                         <!-- <p-divider layout="vertical"></p-divider> -->
                         <div class="custom-header">
                         <span>Cód. Log: {{ log.id }}</span>
-                        <span>Ação: {{ log.operacao }}</span>
+                        <span>Ação: <p-tag [severity]="getSeverity(log.operacao)" [icon]="getIcons(log.operacao)" value="{{ log.operacao }}"></p-tag></span>
                         <span>Usuário: {{ log.usuario.nome }}</span>
-                        <span>Data: {{ log.data }} {{ log.hora }}</span>
+                        <span>Data: {{ log.data | date: 'dd/MM/yyyy HH:mm:ss'}}</span>
                         </div>
                     </ng-template>
                     <p>
-                    <b>Tipo do objeto: </b>{{ log.idRegistro }} 
+                    <b>Tipo do objeto: </b>{{ log.idRegistro }}
                     </p>
                     <p style="white-space: pre-line;">
-                    <b>Descrição: </b>{{ log.descricao }} 
+                    <b>Descrição: </b>{{ log.descricao }}
                     </p>
                 </p-accordionTab>
             </p-accordion>

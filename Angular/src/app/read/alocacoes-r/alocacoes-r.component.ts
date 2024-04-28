@@ -1,49 +1,44 @@
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
-import { CommonModule, Time } from '@angular/common';
+import { CommonModule, registerLocaleData, Time } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
-import { FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Subscription } from 'rxjs';
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { InputGroupModule } from 'primeng/inputgroup';
-import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
-import { TableModule } from 'primeng/table';
-import { PaginatorModule } from 'primeng/paginator';
-import { DialogModule } from 'primeng/dialog';
+import localePT from '@angular/common/locales/pt';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {
+  FormArray,
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
 import { ConfirmationService, Message, MessageService } from 'primeng/api';
-import { ToastModule } from 'primeng/toast';
-import { ConfirmPopupModule } from 'primeng/confirmpopup';
-import { ScrollTopModule } from 'primeng/scrolltop';
-import { Calendar, CalendarModule } from 'primeng/calendar';
-import { MessagesModule } from 'primeng/messages';
-import { OverlayPanelModule } from 'primeng/overlaypanel';
-import { FiltrarPesquisa } from '../../models/share/filtrar-pesquisa.models';
+import { Calendar } from 'primeng/calendar';
+import { Dropdown } from 'primeng/dropdown';
+import { InputSwitch } from 'primeng/inputswitch';
+import { MultiSelect } from 'primeng/multiselect';
+import { Subscription } from 'rxjs';
+
 import { Alocacao, AlocacaoHour } from '../../models/alocacao.models';
+import { Aluno } from '../../models/aluno.models';
+import { Disciplina } from '../../models/disciplina.models';
+import { Local } from '../../models/local.models';
+import { Log, Operacao } from '../../models/log.models';
+import { Periodo } from '../../models/periodo.models';
+import { Professor } from '../../models/professor.models';
+import { FiltrarPesquisa } from '../../models/share/filtrar-pesquisa.models';
 import { AlocacaoService } from '../../service/alocacao.service';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { AlunoService } from '../../service/aluno.service';
-import { ProfessorService } from '../../service/professor.service';
+import { DisciplinaService } from '../../service/disciplina.service';
 import { LocalService } from '../../service/local.service';
 import { PeriodoService } from '../../service/periodo.service';
-import { DisciplinaService } from '../../service/disciplina.service';
-import { Aluno } from '../../models/aluno.models';
-import { Professor } from '../../models/professor.models';
-import { Local } from '../../models/local.models';
-import { Disciplina } from '../../models/disciplina.models';
-import { Periodo } from '../../models/periodo.models';
-import { MultiSelect, MultiSelectModule } from 'primeng/multiselect';
-import { Dropdown, DropdownModule } from 'primeng/dropdown';
 import { Semana } from '../../models/share/semana.models';
-import { InputSwitch, InputSwitchModule } from 'primeng/inputswitch';
-import { registerLocaleData } from '@angular/common';
-import localePT from '@angular/common/locales/pt';
-import { Log } from '../../models/log.models';
-import { AccordionModule } from 'primeng/accordion';
-import { DividerModule } from 'primeng/divider';
 import { Horario } from '../../models/horario.models';
 import { HorarioService } from '../../service/horario.service';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
+import { ProfessorService } from '../../service/professor.service';
+import { PrimeNgImportsModule } from '../../shared/prime-ng-imports/prime-ng-imports.module';
+
 registerLocaleData(localePT);
 
 @Component({
@@ -55,25 +50,7 @@ registerLocaleData(localePT);
     RouterModule,
     ReactiveFormsModule,
     FormsModule,
-    ButtonModule,
-    InputTextModule,
-    InputGroupModule,
-    InputGroupAddonModule,
-    TableModule,
-    DialogModule,
-    PaginatorModule,
-    ToastModule,
-    ScrollTopModule,
-    ConfirmPopupModule,
-    CalendarModule,
-    MessagesModule,
-    OverlayPanelModule,
-    InputNumberModule,
-    MultiSelectModule,
-    DropdownModule,
-    InputSwitchModule,
-    AccordionModule,
-    DividerModule,
+    PrimeNgImportsModule,
     NgxMaskDirective
   ],
   templateUrl: './alocacoes-r.component.html',
@@ -101,7 +78,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   @ViewChild('dropdownHour') dropdownHour!: Dropdown;
   @ViewChild('switch') switch!: InputSwitch;
   @ViewChild('calendar') calendar!: Calendar;
-  
+
   @ViewChild('calendarIntervalo') calendarIntervalo!: Calendar;
 
   alocacoesData: Alocacao[] = [];
@@ -125,10 +102,10 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   visible: boolean = false;
   editar: boolean = false;
   cadastrar: boolean = false;
-  
+
   messages!: Message[];
   mss: boolean = false;
-  
+
   filterOptions: FiltrarPesquisa[] = [];
   selectedFilter!: FiltrarPesquisa;
   txtFilter: string = 'Pesquisar alocação';
@@ -141,22 +118,22 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   horariosArray: Horario[] = [];
 
   selectedAlunos: Aluno[] = [];
-  
+
   visibleExtra: boolean = false;
   visibleEdit: boolean = false;
   visibleInfo: boolean = false;
-  
+
   opcaoSemana: Semana[] = [];
   selectedDiasSemana: Semana[] = [];
   diasIntervalo: Date[] | null = null;
-  
+
   enableDataAula: boolean = false;
   disableDiaSemana: boolean = true;
-  
+
   minDate!: Date;
   maxDate!: Date;
   alocacaoHour: AlocacaoHour[] = [];
-  
+
   logsData: Log[] = [];
   visibleLog: boolean = false;
 
@@ -212,13 +189,13 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     .subscribe({
       next: (itens:any) => {
         const data = itens;
-        
+
         data.sort((a: Alocacao, b: Alocacao) => {
           const dateA = new Date(a.dataAula);
           const dateB = new Date(b.dataAula);
           return dateB.getTime() - dateA.getTime();
         });
-        
+
         this.alocacoesData = data;
         this.alocacoesFilter = this.alocacoesData;
       },
@@ -228,7 +205,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
         ];
       }
     });
-    
+
     this.unsubscribe$Aln = this.alunService.listar()
     .subscribe({
       next: (itens:any) => {
@@ -241,7 +218,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
         ];
       }
     });
-    
+
     this.unsubscribe$Disc = this.disciService.listar()
     .subscribe({
       next: (itens:any) => {
@@ -254,7 +231,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
         ];
       }
     });
-    
+
     this.unsubscribe$Loc = this.locService.listar()
     .subscribe({
       next: (itens:any) => {
@@ -267,18 +244,18 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
         ];
       }
     });
-    
+
     this.unsubscribe$Per = this.periodService.listar()
     .subscribe({
       next: (itens:any) => {
         const data = itens;
-        
+
         data.sort((a: Periodo, b: Periodo) => {
           const dateA = new Date(a.dataInicio);
           const dateB = new Date(b.dataInicio);
           return dateB.getTime() - dateA.getTime();
         });
-        
+
         this.periodosArray = data;
       },
       error: (err: any) => {
@@ -356,7 +333,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
 
   showDialogLog(valueLog: Alocacao) {
     this.visibleLog = true;
-    
+
     this.unsubscribe$Log = this.alocService.buscarPorIdRegistro(valueLog.id)
     .subscribe({
       next: (itens:any) => {
@@ -397,7 +374,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     })
 
     const eventoData = this.formatarDtStrDt(dtEv);
-    
+
     this.calendar.writeValue(eventoData);
     this.dropdownDisc.writeValue(value.disciplina);
     this.dropdownPeriodo.writeValue(value.periodo);
@@ -424,7 +401,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     this.selectedAlunos = [];
     this.alocacaoHour = [];
   }
-  
+
   hideDialog() {
     if(this.cadastrar) {
       if(this.visibleExtra) {
@@ -440,14 +417,14 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     this.visibleLog = false;
     this.alocacaoHour = [];
   }
-  
+
   onClickHide() {
     if(this.visibleExtra) this.visibleExtra = false;
   }
 
   calcularDiasSemana(dtIni: Date, dtFim: Date, diasSemana: number[]): Date[] {
     let diasSemanaArray: Date[] = [];
-    
+
     diasSemana.forEach(diaSemana => {
         let dataTemp = new Date(dtIni);
 
@@ -493,7 +470,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       let codes: number[] = this.selectedDiasSemana.map(selD => selD.code);
       this.selectedDiasSemana.forEach(selD => {
         const existe = this.alocacaoHour.some(item => item.diaSemana === selD);
-        
+
         if (!existe) {
           this.alocacaoHour.push({
             diaSemana:selD, horario:hora
@@ -501,7 +478,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
         }
       })
       this.alocacaoHour = this.alocacaoHour.filter(item => this.selectedDiasSemana?.includes(item.diaSemana));
-      
+
       this.alocacaoHour.find(alocH => {
         const diaDaSemana = this.obterDiaDaSemana(ini);
         if(diaDaSemana == alocH.diaSemana.nome) {
@@ -512,13 +489,13 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       })
 
       this.atualizarDiasSemana(codes);
-      
+
       const periodoFim = new Date(periodo.dataFim);
       this.minDate = new Date(ini);
       this.minDate.setDate(ini.getDate() + 1);
       this.minDate.setMonth(ini.getMonth());
       this.minDate.setFullYear(ini.getFullYear());
-      
+
       this.maxDate = new Date(periodoFim);
       this.maxDate.setDate(periodoFim.getDate());
       this.maxDate.setMonth(periodoFim.getMonth());
@@ -537,7 +514,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
 
     this.onMultiselectChange();
   }
-  
+
   onDateIniSelect() {
     const dataAula = this.form.get('dataAula')?.value;
     const periodo: Periodo = this.form.get('periodo')?.value;
@@ -546,7 +523,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       const periodoInicio = new Date(periodo.dataInicio);
       const periodoFim = new Date(periodo.dataFim);
       const dataAulaValida = new Date(dataAula) >= periodoInicio && new Date(dataAula) <= periodoFim;
-      
+
       if (dataAulaValida) {
         this.form.get('dataAula')?.setErrors(null);
         this.disableDiaSemana = false;
@@ -579,7 +556,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       this.enableDataAula = false;
     }
   }
-  
+
   limparFilter(){
     const inputElement = this.inputSearch.nativeElement.value
     if (inputElement) {
@@ -643,7 +620,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       this.filterField(searchTerm);
     }
   }
-  
+
   filterField(searchTerm: string) {
     if (searchTerm != null || searchTerm != '') {
       if(this.selectedFilter) {
@@ -688,7 +665,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       const partes = tempo.split(':');
       const horas =  parseInt(partes[0], 10);
       const minutos =  parseInt(partes[1], 10) - 1;
-      
+
       if (!isNaN(horas) && !isNaN(minutos) && horas >= 0 && horas <= 23 && minutos >= 0 && minutos <= 59) {
         return { horas, minutos };
       } else {
@@ -802,6 +779,32 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     return diasDaSemana[diaDaSemanaNumero];
   }
 
+  getSeverity(operacao: Operacao) {
+    switch (operacao.toString()) {
+      case 'ALTERACAO':
+        return 'warning';
+      case 'INCLUSAO':
+        return 'success';
+      case 'EXCLUSAO':
+        return 'danger';
+      default:
+        return 'sucess';
+    }
+  }
+
+  getIcons(operacao: Operacao) {
+    switch (operacao.toString()) {
+      case 'ALTERACAO':
+        return 'pi pi-pencil';
+      case 'INCLUSAO':
+        return 'pi pi-save';
+      case 'EXCLUSAO':
+        return 'pi pi-trash';
+      default:
+        return 'pi pi-save';
+    }
+  }
+
   conditionCreateSave() {
     const ini: Date = this.form.get('dataAula')?.value;
 
@@ -809,7 +812,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       //  DATA INÍCIO
         this.alocacoesCadast = this.form.value;
         this.enviarFormSave();
-      
+
       //  DATAS INTERVALO
       this.diasIntervalo.forEach((dt: Date) => {
         if(dt?.getTime() != ini?.getTime()) {
