@@ -70,17 +70,17 @@
       <form id="meuFormulario" [formGroup]="form" (ngSubmit)="onSubmit()">
           <div class="divInput">
               <span class="p-float-label">
-                  <input pInputText id="nomeAlun" class="form-control" formControlName="nome" />
+                  <input pInputText id="nomeAlun" class="form-control" formControlName="nome" maxlength="150" />
                   <label for="nomeAlun">Nome do aluno</label>
               </span>
               <br>
               <span class="p-float-label">
-                <input pInputText id="matriculaAlun" class="form-control" formControlName="matricula" />
+                <input pInputText id="matriculaAlun" class="form-control" formControlName="matricula" maxlength="150" />
                 <label for="matriculaAlun">Matrícula</label>
             </span>
             <br>
             <span class="p-float-label">
-              <input pInputText id="cursoAlun" class="form-control" formControlName="curso" />
+              <input pInputText id="cursoAlun" class="form-control" formControlName="curso" maxlength="150" />
               <label for="cursoAlun">Curso</label>
           </span>
           <br>

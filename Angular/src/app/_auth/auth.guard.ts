@@ -21,10 +21,14 @@ export class AuthGuard implements CanActivate {
     state: RouterStateSnapshot
   ): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
     if (this.userAuthService.getToken() !== null) {
-      const role = route.data["role"] as string;
+      // const role = route.data["role"] as string;
+      // const roles = route.data["roles"] as string[];
+      const roles = route.data['roles'] as Array<string>;
       
-      if(role) {
-        const match = this.userService.roleMatch(role);
+      if (roles) {
+        const match = this.userService.roleMatch(roles);
+      // if(role) {
+      //   const match = this.userService.roleMatch(role);
         
         if(match) {
           return true;
@@ -36,7 +40,7 @@ export class AuthGuard implements CanActivate {
       return true;
     }
 
-    this.router.navigate(['/login']);
+    this.router.navigate(['/home']);
     return false;
   }
 }

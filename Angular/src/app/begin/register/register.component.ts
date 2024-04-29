@@ -57,7 +57,8 @@ export class RegisterComponent implements OnInit {
   user!: RegisterDTO;
 
   // papeisRole: { label: string, papel: UserRole }[] = [];
-  papeisRole: UserRole[] = [UserRole.ADMIN, UserRole.USER];
+  papeisRole: { label: string, value: UserRole }[] = [];
+  selectedRole!: { label: string, value: UserRole };
 
   constructor(
     private formBuilder: FormBuilder,
@@ -73,11 +74,24 @@ export class RegisterComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.papeisRole = [
+      // { label: 'Admin', value: UserRole.ADMIN },
+      { label: 'User', value: UserRole.USER }
+    ];
   }
   
   onKeyDown(event: KeyboardEvent) {
     if (event.key === "Enter") {
       this.onSubmit();
+    }
+  }
+
+  onSelectDrop() {
+    console.log(this.selectedRole)
+    if (this.selectedRole.label === 'User') {
+      this.form.patchValue({
+        role: "USER"
+      });
     }
   }
 
@@ -89,6 +103,7 @@ export class RegisterComponent implements OnInit {
         this.messages = [
           { severity: 'success', summary: 'Sucesso', detail: 'Usuário registrado com sucesso!', life: 3000 },
         ];
+        this.form.reset();
         // setTimeout(() => {
         //   this.router.navigate(['login']).then(() => {
         //     window.location.reload();

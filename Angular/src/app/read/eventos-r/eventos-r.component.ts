@@ -152,13 +152,13 @@ export class EventosRComponent implements OnInit, OnDestroy {
     .subscribe({
       next: (itens:any) => {
         const data = itens;
-        this.eventosData = data;
         
         data.sort((a: Evento, b: Evento) => {
           const dateA = new Date(a.dataEvento);
           const dateB = new Date(b.dataEvento);
           return dateB.getTime() - dateA.getTime();
         });
+        this.eventosData = data;
         
         this.eventosFilter = this.eventosData;
       },
@@ -212,6 +212,12 @@ export class EventosRComponent implements OnInit, OnDestroy {
   //     formGroup.get('horarioFim')?.setErrors(null);
   //   }
   // }
+
+  setMinDate(): void {
+    const today = new Date();
+    const fiveYearsAgo = new Date(today.getFullYear() - 5, today.getMonth(), today.getDate());
+    this.minDate = fiveYearsAgo;
+  }
   
   showInfoDialog(value: Evento) {
     this.visibleInfo = true;
@@ -255,6 +261,7 @@ export class EventosRComponent implements OnInit, OnDestroy {
 
     this.diasIntervalo = [];
     this.datasHour = [];
+    this.setMinDate();
   }
   
   hideDialog() {
@@ -424,15 +431,11 @@ export class EventosRComponent implements OnInit, OnDestroy {
   }
 
   formatarHora(tempo: any) {
-    if (typeof tempo === 'string') {
       const partes = tempo.split(':');
       const horas = partes[0];
       const minutos = partes[1];
-      const segundos = partes[2];
 
       return `${horas}h ${minutos}min`;
-    }
-    return null;
   }
 
   formatarTmStrTm(tempo: any) {
@@ -489,12 +492,13 @@ export class EventosRComponent implements OnInit, OnDestroy {
       next: (data: any) => {
         this.eventosCadast = data;
         // this.goToRouteSave();
-        this.ngOnInit();
+        console.log('envio ',this.mss)
         if(this.mss) {
           this.messages = [
             { severity: 'success', summary: 'Sucesso', detail: 'Evento cadastrado com sucesso!', life: 3000 },
           ];
         }
+        this.ngOnInit();
       },
       error: (err: any) => {
         this.messages = [
@@ -509,10 +513,10 @@ export class EventosRComponent implements OnInit, OnDestroy {
       next: (data: any) => {
         this.eventosEdit = data;
         // this.goToRouteEdit(id);
-        this.ngOnInit();
         this.messages = [
           { severity: 'success', summary: 'Sucesso', detail: 'Evento editado com sucesso!', life: 3000 },
         ];
+        this.ngOnInit();
       },
       error: (err: any) => {
         this.messages = [
@@ -520,14 +524,6 @@ export class EventosRComponent implements OnInit, OnDestroy {
         ];
       }
     });
-  }
-
-  goToRouteSave() {
-    this.router.navigate(['api/eventos']);
-  }
-
-  goToRouteEdit(id: number) {
-    this.router.navigate(['api/eventos', id]);
   }
 
   onSubmit() {
@@ -554,32 +550,36 @@ export class EventosRComponent implements OnInit, OnDestroy {
 
   conditionCreateSave() {
     let ini: Date = this.form.get('dataEvento')?.value;
-    if(ini && !this.checkedReplica) {
+    if(!this.checkedReplica) {
       //  DATA INÍCIO
       this.eventosCadast = this.form.value;
+      this.mss = true;
+      console.log('antes ',this.mss)
       this.enviarFormSave();
-    } else if(ini && this.checkedReplica) {
+    } else if(this.checkedReplica) {
       //  DATA INÍCIO
       this.eventosCadast = this.form.value;
       this.enviarFormSave();
       
       //  DATAS INTERVALO
+      const ultimoDiaIntervalo = new Date(this.datasHour[this.datasHour.length - 1].dataEvento);
+
       this.datasHour.forEach((dt: EventoHourData) => {
-        if(dt?.dataEvento.getTime() != ini?.getTime()) {
+        if(dt.dataEvento.getTime() != ini?.getTime()) {
           this.form.patchValue({
             dataEvento: dt.dataEvento,
             horario: dt.horario
           });
-          // this.mss = true;
+          console.log('ult ',ultimoDiaIntervalo)
+          console.log('verd ',dt.dataEvento)
+          console.log('if ',new Date(dt.dataEvento).getTime() == ultimoDiaIntervalo.getTime())
+          if (new Date(dt.dataEvento).getTime() == ultimoDiaIntervalo.getTime()) {
+            this.mss = true;
+          }
           this.eventosCadast = this.form.value;
           this.enviarFormSave();
         }
       });
-
-    } else {
-      this.messages = [
-        { severity: 'warn', summary: 'Atenção', detail: 'Informação inválida. Preencha os campos!', life: 3000 },
-      ];
     }
   }
   

@@ -138,19 +138,19 @@
             </div>
             <div class="divInput">
                 <span class="p-float-label">
-                    <input pInputText id="nomeProfessor" class="form-control" formControlName="nome" />
+                    <input pInputText id="nomeProfessor" class="form-control" formControlName="nome" maxlength="150" />
                     <label for="nomeProfessor">Nome do professor</label>
                 </span>
             </div>
             <div class="divInput">
                 <span class="p-float-label">
-                    <input pInputText id="matricula" class="form-control" formControlName="matricula" />
+                    <input pInputText id="matricula" class="form-control" formControlName="matricula" maxlength="150" />
                     <label for="matricula">Matrícula</label>
                 </span>
             </div>
             <div class="divInput" *ngIf="!switchCooda">
                 <span class="p-float-label">
-                    <input pInputText id="curso" class="form-control" formControlName="curso" />
+                    <input pInputText id="curso" class="form-control" formControlName="curso" maxlength="150" />
                     <label for="curso">Curso</label>
                 </span>
                 <div *ngIf="form.hasError('peloMenosUmSelecionado') && form.get('curso')?.touched" class="validation-error">

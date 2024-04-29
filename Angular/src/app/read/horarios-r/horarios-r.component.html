@@ -40,8 +40,8 @@
             </ng-template>
             <ng-template pTemplate="body" let-hour>
                 <tr class="tbBody">
-                    <td>{{hour?.horaInicio}}</td>
-                    <td>{{hour?.horaFim}}</td>
+                    <td>{{ formatarHora(hour?.horaInicio) }}</td>
+                    <td>{{ formatarHora(hour?.horaFim) }}</td>
                     <td>
                         <button type="button" class="botaoEdit" (click)="showEditDialog(hour)" pButton>Editar</button>
                         <p-toast></p-toast>

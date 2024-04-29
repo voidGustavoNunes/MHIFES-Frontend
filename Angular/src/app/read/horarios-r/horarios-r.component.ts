@@ -220,14 +220,11 @@ export class HorariosRComponent implements OnInit, OnDestroy {
   }
 
   formatarHora(tempo: any) {
-    if (typeof tempo === 'string') {
       const partes = tempo.split(':');
       const horas = partes[0];
       const minutos = partes[1];
 
       return `${horas}h ${minutos}min`;
-    }
-    return null;
   }
 
   formatarTmStrTm(tempo: any) {

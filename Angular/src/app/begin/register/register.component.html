@@ -3,7 +3,6 @@
     <p-card>
         <ng-template pTemplate="header">
             <h2>Crie uma nova conta</h2>
-            falta definir dropdown userrole
         </ng-template>
         <form id="meuFormulario" [formGroup]="form" (ngSubmit)="onSubmit()">
             <div class="formInput">
@@ -47,7 +46,7 @@
                         </div>
                     </ng-template>
                 </p-dropdown> -->
-                <p-dropdown appendTo="body" formControlName="role" [options]="papeisRole" optionLabel="nome" placeholder="Selecione o papel do usuário" (keydown)="onKeyDown($event)"></p-dropdown>
+                <p-dropdown appendTo="body" [(ngModel)]="selectedRole" [ngModelOptions]="{standalone: true}" [options]="papeisRole" optionLabel="label" placeholder="Selecione o papel do usuário" (ngModelChange)="onSelectDrop()" ></p-dropdown>
 
                 <div *ngIf="form.get('role')?.invalid && errR" class="validation-error">
                     <p>{{ mssR }}</p>

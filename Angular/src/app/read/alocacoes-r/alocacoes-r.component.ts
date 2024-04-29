@@ -125,13 +125,15 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
 
   opcaoSemana: Semana[] = [];
   selectedDiasSemana: Semana[] = [];
-  diasIntervalo: Date[] | null = null;
+  diasIntervalo: Date[] = [];
 
   enableDataAula: boolean = false;
   disableDiaSemana: boolean = true;
 
   minDate!: Date;
   maxDate!: Date;
+  minDateAula!: Date;
+  maxDateAula!: Date;
   alocacaoHour: AlocacaoHour[] = [];
 
   logsData: Log[] = [];
@@ -189,14 +191,14 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     .subscribe({
       next: (itens:any) => {
         const data = itens;
-
+        
         data.sort((a: Alocacao, b: Alocacao) => {
           const dateA = new Date(a.dataAula);
           const dateB = new Date(b.dataAula);
           return dateB.getTime() - dateA.getTime();
         });
-
         this.alocacoesData = data;
+
         this.alocacoesFilter = this.alocacoesData;
       },
       error: (err: any) => {
@@ -479,30 +481,36 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       })
       this.alocacaoHour = this.alocacaoHour.filter(item => this.selectedDiasSemana?.includes(item.diaSemana));
 
-      this.alocacaoHour.find(alocH => {
-        const diaDaSemana = this.obterDiaDaSemana(ini);
-        if(diaDaSemana == alocH.diaSemana.nome) {
-          this.form.patchValue({
-            horario: alocH.horario,
-          });
-        }
-      })
-
       this.atualizarDiasSemana(codes);
 
-      const periodoFim = new Date(periodo.dataFim);
       this.minDate = new Date(ini);
-      this.minDate.setDate(ini.getDate() + 1);
-      this.minDate.setMonth(ini.getMonth());
-      this.minDate.setFullYear(ini.getFullYear());
+      this.minDate.setDate(this.minDate.getDate() + 1);
+      this.minDate.setMonth(this.minDate.getMonth());
+      this.minDate.setFullYear(this.minDate.getFullYear());
 
-      this.maxDate = new Date(periodoFim);
-      this.maxDate.setDate(periodoFim.getDate());
-      this.maxDate.setMonth(periodoFim.getMonth());
-      this.maxDate.setFullYear(periodoFim.getFullYear());
+      this.maxDate = new Date(periodo.dataFim);
+      this.maxDate.setDate(this.maxDate.getDate());
+      this.maxDate.setMonth(this.maxDate.getMonth());
+      this.maxDate.setFullYear(this.maxDate.getFullYear());
+
     } else {
-      this.diasIntervalo = null;
+      this.diasIntervalo = [];
     }
+  }
+
+  onChangeHourIni() {
+    let ini: Date = this.form.get('dataAula')?.value;
+
+    this.alocacaoHour.find(alocH => {
+      const diaDaSemana = this.obterDiaDaSemana(ini);
+      if(diaDaSemana == alocH.diaSemana.nome) {
+        this.form.patchValue({
+          horario: alocH.horario,
+        });
+        console.log('mudou', alocH.horario)
+        this.dropdownHour.writeValue(alocH.horario)
+      }
+    })
   }
 
   verificarDataHour() {
@@ -527,10 +535,16 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       if (dataAulaValida) {
         this.form.get('dataAula')?.setErrors(null);
         this.disableDiaSemana = false;
+        if(this.alocacaoHour.length > 0) {
+          this.alocacaoHour = [];
+          this.diasIntervalo = [];
+          this.selectedDiasSemana = [];
+        }
       } else {
         this.form.get('dataAula')?.setErrors({ 'invalidEndDate': true });
         this.disableDiaSemana = true;
         this.alocacaoHour = [];
+        this.diasIntervalo = [];
       }
     }
     this.updateSelectState();
@@ -550,7 +564,17 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
 
   updateDataAulaState() {
     const periodo: Periodo = this.form.get('periodo')?.value;
-    if(periodo) {
+    if(periodo && periodo.dataInicio && periodo.dataFim) {
+      this.minDateAula = new Date(periodo.dataInicio);
+      this.minDateAula.setDate(this.minDateAula.getDate() + 1);
+      this.minDateAula.setMonth(this.minDateAula.getMonth());
+      this.minDateAula.setFullYear(this.minDateAula.getFullYear());
+
+      this.maxDateAula = new Date(periodo.dataFim);
+      this.maxDateAula.setDate(this.maxDateAula.getDate());
+      this.maxDateAula.setMonth(this.maxDateAula.getMonth());
+      this.maxDateAula.setFullYear(this.maxDateAula.getFullYear());
+
       this.enableDataAula = true;
     } else {
       this.enableDataAula = false;
@@ -677,14 +701,11 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   }
 
   formatarHora(tempo: any) {
-    if (typeof tempo === 'string') {
-      const partes = tempo.split(':');
-      const horas = partes[0];
-      const minutos = partes[1];
-
-      return `${horas}h ${minutos}min`;
-    }
-    return null;
+    const partes = tempo.split(':');
+    const horas = partes[0];
+    const minutos = partes[1];
+    
+    return `${horas}h ${minutos}min`;
   }
 
   updateMask() {
@@ -814,16 +835,23 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
         this.enviarFormSave();
 
       //  DATAS INTERVALO
+      const ultimoDiaIntervalo = new Date(this.diasIntervalo[this.diasIntervalo.length - 1]);
+
       this.diasIntervalo.forEach((dt: Date) => {
-        if(dt?.getTime() != ini?.getTime()) {
+        if(dt.getTime() != ini?.getTime()) {
           this.alocacaoHour.find(alocH => {
             const diaDaSemana = this.obterDiaDaSemana(dt);
+            console.log('dia ',diaDaSemana)
+            console.log('aloh ',alocH.diaSemana.nome)
+            console.log('hor ',alocH.horario)
             if(diaDaSemana == alocH.diaSemana.nome) {
               this.form.patchValue({
                 dataAula: dt,
                 horario: alocH.horario
               });
-              // this.mss = true;
+              if (new Date(dt).getTime() === ultimoDiaIntervalo.getTime()) {
+                this.mss = true;
+              }
               this.alocacoesCadast = this.form.value;
               this.enviarFormSave();
             }

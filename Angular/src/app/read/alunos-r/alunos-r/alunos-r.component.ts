@@ -90,7 +90,7 @@ export class AlunosRComponent implements OnInit, OnDestroy {
         id: [null],
         nome: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
         matricula: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
-        curso: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(50)]]
+        curso: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]]
       });
   }
 

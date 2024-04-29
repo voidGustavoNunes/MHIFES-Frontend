@@ -61,7 +61,7 @@
         <form id="meuFormulario" [formGroup]="form" (ngSubmit)="onSubmit()">
             <div class="divInput">
                 <span class="p-float-label">
-                    <input pInputText id="nomeEquip" class="form-control" formControlName="nome" />
+                    <input pInputText id="nomeEquip" class="form-control" formControlName="nome" maxlength="150" />
                     <label for="nomeEquip">Nome da disciplina</label>
                 </span>
             </div>

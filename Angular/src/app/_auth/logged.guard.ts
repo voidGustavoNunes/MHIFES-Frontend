@@ -18,8 +18,8 @@ export class LoggedGuard implements CanActivate {
     state: RouterStateSnapshot
   ): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
     if (this.userAuthService.isLoggedIn()) {
-        this.router.navigate(['/home']);
-        return false;
+      this.router.navigate(['/home']);
+      return false;
     }
     return true;
   }

@@ -50,7 +50,7 @@ export class NavHeaderComponent implements OnInit {
   constructor(
     private userAuthService: UserAuthService,
     public userService: UsuarioService,
-    private router: Router
+    public router: Router
   ) {
     // this.router.events
     //   .pipe(filter(event => event instanceof NavigationEnd))
@@ -60,29 +60,6 @@ export class NavHeaderComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.itemsOptionsUser = [
-      {
-        label: this.getNameUser(),
-        // routerLink:'home',
-        // style: {
-        //   'font-size': '1.4rem',
-        //   'font-family': 'Grandstander Semi'
-        // },
-        items: [
-          {
-            label: 'Data logs',
-            routerLink:'home',
-          },
-          { 
-            separator: true 
-          },
-          {
-            label: 'Sair',
-            command: () => this.logout()
-          },
-        ]
-      }
-    ];
 
     this.itemsLog = [
       {
@@ -202,13 +179,14 @@ export class NavHeaderComponent implements OnInit {
 
   logout() {
     this.userAuthService.clear();
-    this.router.navigate(['/login']).then(() => {
+    this.router.navigate(['/home']).then(() => {
       window.location.reload();
     });
   }
 
   getNameUser() {
-    return this.userAuthService.getNome();
+    if(this.userAuthService.getNome()) return this.userAuthService.getNome();
+    return '';
   }
 
   togglePanel() {

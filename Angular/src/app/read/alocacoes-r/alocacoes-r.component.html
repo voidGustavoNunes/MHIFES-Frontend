@@ -45,10 +45,7 @@
                     <td>{{alocacao?.professor.nome}}</td>
                     <td>{{alocacao?.local.nome}}</td>
                     <td>{{alocacao?.disciplina.nome}}</td>
-                    <td>
-                        {{ formatarHora(alocacaoInfo?.horarioInicio) }} -
-                        {{ formatarHora(alocacaoInfo?.horarioFim) }}</td>
-                    <!-- <td></td> -->
+                    <td>{{ formatarHora(alocacao?.horario?.horaInicio) }} - {{ formatarHora(alocacao?.horario?.horaFim) }}</td>
                     <td>
                         <button type="button" class="botaoL" (click)="showDialogLog(alocacao)" pButton>Log</button>
                         <button type="button" class="botaoInfo" (click)="showInfoDialog(alocacao)" pButton>Info</button>
@@ -66,8 +63,6 @@
             </ng-template>
         </p-table>
     </div>
-verificar cadastro esta salvando sem igualdade no dia semana
-como verificar se ultimo diasintervalor para mss ser true
     <p-scrollTop></p-scrollTop>
 </div>
 
@@ -130,11 +125,11 @@ como verificar se ultimo diasintervalor para mss ser true
                 <span class="p-float-label">
                     <p-dropdown #dropdownPeriodo appendTo="body" [options]="periodosArray" placeholder="Selecione um período" inputId="perdAloc" class="form-control" formControlName="periodo" (onChange)="updateDataAulaState()">
                         <ng-template let-periodoData pTemplate="selectedItem">
-                            <div>{{ periodoData.dataInicio | date: 'dd/MM/yyyy' }} - {{ periodoData.dataFim | date: 'dd/MM/yyyy' }}</div>
+                            <div>{{periodoData.nome}} : {{ periodoData.dataInicio | date: 'dd/MM/yyyy' }} - {{ periodoData.dataFim | date: 'dd/MM/yyyy' }}</div>
                           </ng-template>
                           <ng-template let-periodoData pTemplate="item">
                             <div class="flex align-items-center gap-2">
-                              <div>{{ periodoData.dataInicio | date: 'dd/MM/yyyy' }} - {{ periodoData.dataFim | date: 'dd/MM/yyyy' }}</div>
+                              <div>{{periodoData.nome}} : {{ periodoData.dataInicio | date: 'dd/MM/yyyy' }} - {{ periodoData.dataFim | date: 'dd/MM/yyyy' }}</div>
                             </div>
                           </ng-template>
                     </p-dropdown>
@@ -144,19 +139,19 @@ como verificar se ultimo diasintervalor para mss ser true
             <div class="divInput labelFlex" *ngIf="enableDataAula">
                 <div>
                     <span class="p-float-label">
-                        <p-calendar appendTo="body" dateFormat="dd/mm/yy" id="iniPer" class="form-control" formControlName="dataAula" (onSelect)="onDateIniSelect()" ></p-calendar>
+                        <p-calendar appendTo="body" dateFormat="dd/mm/yy" id="iniPer" class="form-control" formControlName="dataAula" (onSelect)="onDateIniSelect()" [minDate]="minDateAula" [maxDate]="maxDateAula" ></p-calendar>
                         <label for="iniPer">Início da aula</label>
                     </span>
                 </div>
                 <div>
                     <span class="p-float-label">
-                        <p-dropdown #dropdownHour appendTo="body" [options]="horariosArray" placeholder="Selecione o horário" inputId="horAloc" class="form-control" formControlName="horario" (change)="updateSelectState()">
+                        <p-dropdown #dropdownHour appendTo="body" [options]="horariosArray" placeholder="Selecione o horário" inputId="horAloc" class="form-control" formControlName="horario" (onChange)="updateSelectState()">
                             <ng-template let-hourData pTemplate="selectedItem">
-                                <div>{{ hourData.horaInicio }} - {{ hourData.horaFim }}</div>
+                                <div>{{ formatarHora(hourData.horaInicio) }} - {{ formatarHora(hourData.horaFim) }}</div>
                             </ng-template>
                             <ng-template let-hourData pTemplate="item">
                                 <div class="flex align-items-center gap-2">
-                                <div>{{ hourData.horaInicio }} - {{ hourData.horaFim }}</div>
+                                <div>{{ formatarHora(hourData.horaInicio) }} - {{ formatarHora(hourData.horaFim) }}</div>
                                 </div>
                             </ng-template>
                         </p-dropdown>
@@ -178,13 +173,13 @@ como verificar se ultimo diasintervalor para mss ser true
                         </div>
                         <div>
                             <span class="p-float-label">
-                                <p-dropdown #dropdownHour appendTo="body" [options]="horariosArray" placeholder="Selecione o horário" inputId="horAloc{{i}}" [(ngModel)]="replica.horario" [ngModelOptions]="{standalone: true}">
+                                <p-dropdown #dropdownHour appendTo="body" [options]="horariosArray" placeholder="Selecione o horário" inputId="horAloc{{i}}" [(ngModel)]="replica.horario" [ngModelOptions]="{standalone: true}" (ngModelChange)="onChangeHourIni()">
                                     <ng-template let-hourData pTemplate="selectedItem">
-                                        <div>{{ hourData.horaInicio }} - {{ hourData.horaFim }}</div>
+                                        <div>{{ formatarHora(hourData.horaInicio) }} - {{ formatarHora(hourData.horaFim) }}</div>
                                     </ng-template>
                                     <ng-template let-hourData pTemplate="item">
                                         <div class="flex align-items-center gap-2">
-                                        <div>{{ hourData.horaInicio }} - {{ hourData.horaFim }}</div>
+                                        <div>{{ formatarHora(hourData.horaInicio) }} - {{ formatarHora(hourData.horaFim) }}</div>
                                         </div>
                                     </ng-template>
                                 </p-dropdown>
@@ -202,7 +197,7 @@ como verificar se ultimo diasintervalor para mss ser true
             </div>
             <div class="divInput">
                 <span class="p-float-label">
-                    <input pInputText maxlength="10" id="turmaAloc" class="form-control" formControlName="turma" />
+                    <input pInputText maxlength="30" id="turmaAloc" class="form-control" formControlName="turma" />
                     <label for="turmaAloc">Turma</label>
                 </span>
             </div>
@@ -292,11 +287,11 @@ como verificar se ultimo diasintervalor para mss ser true
                 <span class="p-float-label">
                     <p-dropdown #dropdownPeriodo appendTo="body" [options]="periodosArray" placeholder="Selecione um período" inputId="perdEvent" class="form-control" formControlName="periodo">
                         <ng-template let-periodoData pTemplate="selectedItem">
-                            <div>{{ periodoData.dataInicio | date: 'dd/MM/yyyy' }} - {{ periodoData.dataFim | date: 'dd/MM/yyyy' }}</div>
+                            <div>{{periodoData.nome}} : {{ periodoData.dataInicio | date: 'dd/MM/yyyy' }} - {{ periodoData.dataFim | date: 'dd/MM/yyyy' }}</div>
                           </ng-template>
                           <ng-template let-periodoData pTemplate="item">
                             <div class="flex align-items-center gap-2">
-                              <div>{{ periodoData.dataInicio | date: 'dd/MM/yyyy' }} - {{ periodoData.dataFim | date: 'dd/MM/yyyy' }}</div>
+                              <div>{{periodoData.nome}} : {{ periodoData.dataInicio | date: 'dd/MM/yyyy' }} - {{ periodoData.dataFim | date: 'dd/MM/yyyy' }}</div>
                             </div>
                           </ng-template>
                     </p-dropdown>
@@ -313,11 +308,11 @@ como verificar se ultimo diasintervalor para mss ser true
                 <span class="p-float-label">
                     <p-dropdown #dropdownHour appendTo="body" [options]="horariosArray" placeholder="Selecione o horário" inputId="horAloc" class="form-control" formControlName="horario">
                         <ng-template let-hourData pTemplate="selectedItem">
-                            <div>{{ hourData.horaInicio }} - {{ hourData.horaFim }}</div>
+                            <div>{{ formatarHora(hourData.horaInicio) }} - {{ formatarHora(hourData.horaFim) }}</div>
                         </ng-template>
                         <ng-template let-hourData pTemplate="item">
                             <div class="flex align-items-center gap-2">
-                            <div>{{ hourData.horaInicio }} - {{ hourData.horaFim }}</div>
+                            <div>{{ formatarHora(hourData.horaInicio) }} - {{ formatarHora(hourData.horaFim) }}</div>
                             </div>
                         </ng-template>
                     </p-dropdown>
@@ -359,7 +354,7 @@ como verificar se ultimo diasintervalor para mss ser true
                 <b>Disciplina: </b> {{alocacaoInfo?.disciplina?.nome}}
             </div>
             <div class="divInput">
-                <b>Horário: </b> {{ alocacaoInfo?.horario }}
+                <b>Horário: </b> {{ alocacaoInfo?.horario?.horaInicio }} - {{ alocacaoInfo?.horario?.horaFim }}
                 <!-- <b>Horário: </b> {{ formatarHora(alocacaoInfo?.horarioInicio) }} -->
             </div>
             <div class="divInput dtAlocacao flexContainer">

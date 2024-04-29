@@ -6,7 +6,6 @@ import { CommonModule, Time } from '@angular/common';
 import { PaginatorModule } from 'primeng/paginator';
 import { FiltrarPesquisa } from '../../models/share/filtrar-pesquisa.models';
 import { Alocacao } from '../../models/alocacao.models';
-import { AlocacaoService } from '../../service/alocacao.service';
 import { ConfirmationService, Message, MessageService } from 'primeng/api';
 import { Subscription } from 'rxjs';
 import { DiaSemana, Horario } from '../../models/horario.models';
@@ -28,7 +27,6 @@ import { HttpClientModule } from '@angular/common/http';
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
   providers: [
-    AlocacaoService,
     ConfirmationService,
     MessageService,
   ]
@@ -51,7 +49,6 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   constructor(
     private formBuilder: FormBuilder,
-    private alocService: AlocacaoService,
     ) {
       this.form = this.formBuilder.group({
         user: [null],
@@ -287,30 +284,30 @@ export class HomeComponent implements OnInit, OnDestroy {
       // },
     ]
     
-    this.unsubscribe$ = this.alocService.listar()
-    .subscribe({
-      next: (itens:any) => {
-        const data = itens;
+    // this.unsubscribe$ = this.alocService.listar()
+    // .subscribe({
+    //   next: (itens:any) => {
+    //     const data = itens;
         
-        data.sort((a: Alocacao, b: Alocacao) => {
-          const dateA = new Date(a.dataAula);
-          const dateB = new Date(b.dataAula);
-          return dateB.getTime() - dateA.getTime();
-        });
+    //     data.sort((a: Alocacao, b: Alocacao) => {
+    //       const dateA = new Date(a.dataAula);
+    //       const dateB = new Date(b.dataAula);
+    //       return dateB.getTime() - dateA.getTime();
+    //     });
         
-        // this.alocacoesArray = data;
-      },
-      error: (err: any) => {
-        this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Dados de alocações não encontrados.', life: 3000 },
-        ];
-      }
-    });
+    //     // this.alocacoesArray = data;
+    //   },
+    //   error: (err: any) => {
+    //     this.messages = [
+    //       { severity: 'error', summary: 'Erro', detail: 'Dados de alocações não encontrados.', life: 3000 },
+    //     ];
+    //   }
+    // });
     this.obterContentProx();
   }
   
   ngOnDestroy() {
-    this.unsubscribe$.unsubscribe();
+    // this.unsubscribe$.unsubscribe();
   }
 
   obterContentProx() {

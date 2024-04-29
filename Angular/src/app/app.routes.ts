@@ -18,12 +18,12 @@ import { LogsRComponent } from './read/logs-r/logs-r.component';
 import { HorariosRComponent } from './read/horarios-r/horarios-r.component';
 
 export const routes: Routes = [
-    { path: '', redirectTo: 'login', pathMatch: 'full' },
+    { path: '', redirectTo: 'home', pathMatch: 'full' },
+    { path: 'home', component: HomeComponent },
+    
     { path: 'login', component: LoginComponent, canActivate: [LoggedGuard] },
     
     { path: 'registrar', component: RegisterComponent, canActivate: [AuthGuard], data:{roles:["ADMIN"]} },
-
-    { path: 'home', component: HomeComponent, canActivate:[AuthGuard], data:{roles:["ADMIN", "USER"]} },
     
     { path: 'equipamentos', component: EquipamentosRComponent, canActivate:[AuthGuard], data:{roles:["ADMIN"]} },
     { path: 'disciplinas', component: DisciplinasRComponent, canActivate:[AuthGuard], data:{roles:["ADMIN"]} },

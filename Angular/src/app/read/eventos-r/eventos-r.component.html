@@ -61,7 +61,6 @@
             </ng-template>
         </p-table>
     </div>
-    mesmo caso do mss true do intervalo ultimo para ser true
     <p-scrollTop></p-scrollTop>
 </div>
 
@@ -71,7 +70,7 @@
         <form id="meuFormulario" [formGroup]="form" (ngSubmit)="onSubmit()">
             <div class="divInput">
                 <span class="p-float-label">
-                    <input pInputText id="nomeEvent" class="form-control" formControlName="nome" />
+                    <input pInputText id="nomeEvent" class="form-control" formControlName="nome" maxlength="50" />
                     <label for="nomeEvent">Nome do evento</label>
                 </span>
             </div>
@@ -84,13 +83,13 @@
                 </div>
                 <div>
                     <span class="p-float-label">
-                        <p-dropdown #dropdownHour appendTo="body" [options]="horariosArray" placeholder="Selecione o horário" inputId="horAloc" class="form-control" formControlName="horario" (change)="updateCheckboxState()">
+                        <p-dropdown #dropdownHour appendTo="body" [options]="horariosArray" placeholder="Selecione o horário" inputId="horAloc" class="form-control" formControlName="horario" (onChange)="updateCheckboxState()">
                             <ng-template let-hourData pTemplate="selectedItem">
-                                <div>{{ hourData.horaInicio }} - {{ hourData.horaFim }}</div>
+                                <div>{{ formatarHora(hourData.horaInicio) }} - {{ formatarHora(hourData.horaFim) }}</div>
                             </ng-template>
                             <ng-template let-hourData pTemplate="item">
                                 <div class="flex align-items-center gap-2">
-                                <div>{{ hourData.horaInicio }} - {{ hourData.horaFim }}</div>
+                                <div>{{ formatarHora(hourData.horaInicio) }} - {{ formatarHora(hourData.horaFim) }}</div>
                                 </div>
                             </ng-template>
                         </p-dropdown>
@@ -117,11 +116,11 @@
                             <span class="p-float-label">
                                 <p-dropdown #dropdownHour appendTo="body" [options]="horariosArray" placeholder="Selecione o horário" inputId="horAloc{{i}}" [(ngModel)]="replica.horario" [ngModelOptions]="{standalone: true}">
                                     <ng-template let-hourData pTemplate="selectedItem">
-                                        <div>{{ hourData.horaInicio }} - {{ hourData.horaFim }}</div>
+                                        <div>{{ formatarHora(hourData.horaInicio) }} - {{ formatarHora(hourData.horaFim) }}</div>
                                     </ng-template>
                                     <ng-template let-hourData pTemplate="item">
                                         <div class="flex align-items-center gap-2">
-                                        <div>{{ hourData.horaInicio }} - {{ hourData.horaFim }}</div>
+                                        <div>{{ formatarHora(hourData.horaInicio) }} - {{ formatarHora(hourData.horaFim) }}</div>
                                         </div>
                                     </ng-template>
                                 </p-dropdown>
@@ -166,7 +165,7 @@
         <form id="meuFormulario" [formGroup]="form" (ngSubmit)="onSubmit()">
             <div class="divInput">
                 <span class="p-float-label">
-                    <input pInputText id="nomeEvent" class="form-control" formControlName="nome" />
+                    <input pInputText id="nomeEvent" class="form-control" formControlName="nome" maxlength="50" />
                     <label for="nomeEvent">Nome do evento</label>
                 </span>
             </div>
@@ -180,11 +179,11 @@
                 <span class="p-float-label">
                     <p-dropdown #dropdownHour appendTo="body" [options]="horariosArray" placeholder="Selecione o horário" inputId="horAloc" class="form-control" formControlName="horario">
                         <ng-template let-hourData pTemplate="selectedItem">
-                            <div>{{ hourData.horaInicio }} - {{ hourData.horaFim }}</div>
+                            <div>{{ formatarHora(hourData.horaInicio) }} - {{ formatarHora(hourData.horaFim) }}</div>
                         </ng-template>
                         <ng-template let-hourData pTemplate="item">
                             <div class="flex align-items-center gap-2">
-                            <div>{{ hourData.horaInicio }} - {{ hourData.horaFim }}</div>
+                            <div>{{ formatarHora(hourData.horaInicio) }} - {{ formatarHora(hourData.horaFim) }}</div>
                             </div>
                         </ng-template>
                     </p-dropdown>

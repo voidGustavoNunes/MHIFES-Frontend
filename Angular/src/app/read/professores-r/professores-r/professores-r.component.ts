@@ -111,7 +111,7 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
         id: [null],
         nome: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
         matricula: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
-        curso: [null],
+        curso: [null, [Validators.minLength(3), Validators.maxLength(150)]],
         ehCoordenador: [false, [Validators.required]],
         coordenadoria: [null]
       }, { validator: this.peloMenosUmSelecionadoValidator });

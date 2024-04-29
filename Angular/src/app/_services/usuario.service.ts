@@ -26,7 +26,7 @@ export class UsuarioService {
     return this.http.post<RegisterDTO>(`${this.API}/register`, record, {headers: this.requestHeader});
   }
 
-  roleMatch(allowedRoles: any): boolean {
+  roleMatch(allowedRoles: any[]): boolean {
     let isMatch = false;
     const userRole: any = this.userAuthService.getRole();
 

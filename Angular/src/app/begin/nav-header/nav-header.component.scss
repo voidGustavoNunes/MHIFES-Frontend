@@ -10,6 +10,14 @@
         // margin-left: 1rem;
         // background-color: #00208F;
         text-transform: uppercase;
+
+        .log-in{
+            a{
+                text-decoration: none;
+                color: #256CF0;
+                background-color: #BFE4FF;
+            }
+        }
     }
 }
 
@@ -62,15 +70,29 @@
     button.p-ripple.p-element.p-button.p-component:focus {
         border: 1px solid #3B82F6;
     }
-    // .panel-user.p-button:focus{
-    //     border: .5rem solid #BFE4FF;
-    // }
-    // .panel-user > .p-button.p-button-link {
-    //     height: 1rem;
-    //     color: black;
-    // }
-}
 
+    .p-menubar-end button.p-ripple.p-element.p-button.p-component.p-button-link{
+        text-decoration: none;
+        color: #256CF0;
+        background-color: #BFE4FF;
+        padding: .8rem;
+        text-transform: capitalize;
+        border-radius: .4rem;
+        font-weight: 700;
+        margin-right: 1rem;
+        box-shadow: 0 .2rem .2rem rgba(0, 0, 0, 0.6);
+        border: none;
+    }
+    .p-menubar-end button.p-ripple.p-element.p-button.p-component.p-button-link:active{
+        box-shadow: none;
+        // box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
+        transform: translateY(2px);
+        transition: transform 0.1s ease;
+      }
+    .p-menubar-end button.p-ripple.p-element.p-button.p-component.p-button-link:focus{
+        border: none;
+    }
+}
 
 @media screen and (max-width: 960px) {
     :host ::ng-deep {

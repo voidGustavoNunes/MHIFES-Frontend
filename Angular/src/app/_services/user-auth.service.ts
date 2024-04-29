@@ -41,7 +41,6 @@ export class UserAuthService {
 
     public getNome(): string {
         // if (typeof window !== 'undefined' && window.localStorage) {
-            // return JSON.parse(localStorage.getItem("userName") ?? '');
             return localStorage.getItem("nome") ?? '';
         // }
         // return '';

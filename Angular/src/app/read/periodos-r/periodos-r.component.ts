@@ -81,6 +81,8 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
   filterOptions: FiltrarPesquisa[] = [];
   selectedFilter!: FiltrarPesquisa;
   txtFilter: string = 'Pesquisar período';
+  
+  minDate!: Date;
 
   constructor(
     private periodService: PeriodoService,
@@ -130,6 +132,21 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
     this.unsubscribe$.unsubscribe();
   }
 
+  onMinDate() {
+    let ini: Date = this.form.get('dataInicio')?.value;
+
+    this.minDate = new Date(ini);
+    this.minDate.setDate(ini.getDate() + 1);
+    this.minDate.setMonth(ini.getMonth());
+    this.minDate.setFullYear(ini.getFullYear());
+  }
+
+  setMinDate() {
+    const today = new Date();
+    const fiveYearsAgo = new Date(today.getFullYear() - 5, today.getMonth(), today.getDate());
+    this.minDate = fiveYearsAgo;
+  }
+
   validarDatas(formGroup: FormGroup) {
     const dataInicio = formGroup.get('dataInicio')?.value;
     const dataFim = formGroup.get('dataFim')?.value;
@@ -170,6 +187,7 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
     this.visibleInfo = false;
     this.cadastrar = true;
     this.editar = false;
+    this.setMinDate();
   }
   
   hideDialog() {
@@ -339,14 +357,6 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
         ];
       }
     });
-  }
-
-  goToRouteSave() {
-    this.router.navigate(['api/periodos']);
-  }
-
-  goToRouteEdit(id: number) {
-    this.router.navigate(['api/periodos', id]);
   }
 
   onSubmit() {
