@@ -111,9 +111,9 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
         id: [null],
         nome: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
         matricula: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
-        curso: [null, [Validators.minLength(3), Validators.maxLength(150)]],
+        // curso: [null, [Validators.minLength(3), Validators.maxLength(150)]],
         ehCoordenador: [false, [Validators.required]],
-        coordenadoria: [null]
+        coordenadoria: [null, [Validators.required]]
       }, { validator: this.peloMenosUmSelecionadoValidator });
   }
 
@@ -196,15 +196,15 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
       id: value.id,
       nome: value.nome,
       matricula: value.matricula,
-      curso: value.curso,
+      // curso: value.curso,
       ehCoordenador: value.ehCoordenador,
       coordenadoria: value.coordenadoria
     });
     this.switch.writeValue(value.ehCoordenador);
-    if(value.ehCoordenador) {
+    // if(value.ehCoordenador) {
       this.switchCooda = true;
       this.dropdown.writeValue(value.coordenadoria)
-    }
+    // }
   }
 
   showDialog() {

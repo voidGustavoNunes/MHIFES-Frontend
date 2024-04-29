@@ -38,6 +38,7 @@ import { HorarioService } from '../../service/horario.service';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 import { ProfessorService } from '../../service/professor.service';
 import { PrimeNgImportsModule } from '../../shared/prime-ng-imports/prime-ng-imports.module';
+import { UserRole } from '../../models/usuario';
 
 registerLocaleData(localePT);
 
@@ -140,6 +141,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   visibleLog: boolean = false;
 
   enableSelect: boolean = false;
+  logsExample!: Log[];
 
   constructor(
     private alocService: AlocacaoService,
@@ -293,6 +295,50 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       }
     });
 
+    this.logsExample = [
+      {
+        id: 1,
+        data: new Date(),
+        descricao: "Mussum Ipsum, cacilds vidis litro abertis.  Manduma pindureta quium dia nois paga. Mauris nec dolor in eros commodo tempor. Aenean aliquam molestie leo, vitae iaculis nisl. Vehicula non. Ut sed ex eros. Vivamus sit amet nibh non tellus tristique interdum. Aenean aliquam molestie leo, vitae iaculis nisl.\nQuem manda na minha terra sou euzis! Suco de cevadiss deixa as pessoas mais interessantis. Negão é teu passadis, eu sou faxa pretis. Si num tem leite então bota uma pinga aí cumpadi!\nDetraxit consequat et quo num tendi nada. Interessantiss quisso pudia ce receita de bolis, mais bolis eu num gostis. Paisis, filhis, espiritis santis. Eu nunca mais boto a boca num copo de cachaça, agora eu só uso canudis!",
+        operacao: Operacao.ALTERACAO,
+        idRegistro: 1,
+        usuario: {
+          id: 1,
+          login: "admin@2024",
+          nome: "Admin",
+          password: "123456",
+          role: UserRole.ADMIN
+        }
+      },
+      {
+        id: 1,
+        data: new Date(),
+        descricao: "Mussum Ipsum, cacilds vidis litro abertis.  Manduma pindureta quium dia nois paga. Mauris nec dolor in eros commodo tempor. Aenean aliquam molestie leo, vitae iaculis nisl. Vehicula non. Ut sed ex eros. Vivamus sit amet nibh non tellus tristique interdum. Aenean aliquam molestie leo, vitae iaculis nisl.\nQuem manda na minha terra sou euzis! Suco de cevadiss deixa as pessoas mais interessantis. Negão é teu passadis, eu sou faxa pretis. Si num tem leite então bota uma pinga aí cumpadi!\nDetraxit consequat et quo num tendi nada. Interessantiss quisso pudia ce receita de bolis, mais bolis eu num gostis. Paisis, filhis, espiritis santis. Eu nunca mais boto a boca num copo de cachaça, agora eu só uso canudis!",
+        operacao: Operacao.INCLUSAO,
+        idRegistro: 1,
+        usuario: {
+          id: 1,
+          login: "admin@2024",
+          nome: "Admin",
+          password: "123456",
+          role: UserRole.ADMIN
+        }
+      },
+      {
+        id: 1,
+        data: new Date(),
+        descricao: "Mussum Ipsum, cacilds vidis litro abertis.  Manduma pindureta quium dia nois paga. Mauris nec dolor in eros commodo tempor. Aenean aliquam molestie leo, vitae iaculis nisl. Vehicula non. Ut sed ex eros. Vivamus sit amet nibh non tellus tristique interdum. Aenean aliquam molestie leo, vitae iaculis nisl.\nQuem manda na minha terra sou euzis! Suco de cevadiss deixa as pessoas mais interessantis. Negão é teu passadis, eu sou faxa pretis. Si num tem leite então bota uma pinga aí cumpadi!\nDetraxit consequat et quo num tendi nada. Interessantiss quisso pudia ce receita de bolis, mais bolis eu num gostis. Paisis, filhis, espiritis santis. Eu nunca mais boto a boca num copo de cachaça, agora eu só uso canudis!",
+        operacao: Operacao.EXCLUSAO,
+        idRegistro: 1,
+        usuario: {
+          id: 1,
+          login: "admin@2024",
+          nome: "Admin",
+          password: "123456",
+          role: UserRole.ADMIN
+        }
+      }
+    ]
   }
 
   ngOnDestroy() {
@@ -805,11 +851,11 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       case 'ALTERACAO':
         return 'warning';
       case 'INCLUSAO':
-        return 'success';
+        return 'info';
       case 'EXCLUSAO':
         return 'danger';
       default:
-        return 'sucess';
+        return 'success';
     }
   }
 
@@ -887,5 +933,10 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       }
   });
   }
+
+  jsonForObject(descricao: string): any {
+    console.log(JSON.parse(descricao));
+    return JSON.parse(descricao);
+    }
 
 }

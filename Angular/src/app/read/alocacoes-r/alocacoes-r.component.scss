@@ -123,6 +123,27 @@
 .card{
     .cardLog{
         margin-top: 2rem;
+        .p-accordion-header-link {
+            display: flex;
+            flex-direction: row-reverse;
+            align-items: stretch;
+            justify-content: space-evenly;
+        }
+        .p-accordion .p-accordion-content {
+            max-width: 61.80375rem;
+        }
+        .p-accordion-header-link:has(.severity-warning), .p-accordion .p-accordion-content:has(.severity-warning) {
+            border-left: 5px solid #F97316;
+        }
+        .p-accordion-header-link:has(.severity-info), .p-accordion .p-accordion-content:has(.severity-info) {
+            border-left: 5px solid #0EA5E9;
+        }
+        .p-accordion-header-link:has(.severity-danger), .p-accordion .p-accordion-content:has(.severity-danger) {
+            border-left: 5px solid #EF4444;
+        }
+        .p-accordion-header-link:has(.severity-success), .p-accordion .p-accordion-content:has(.severity-success) {
+            border-left: 5px solid #22C55E;
+        }
     }
     #meuFormInfo{
         .divInput{

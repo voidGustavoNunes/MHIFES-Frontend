@@ -63,6 +63,7 @@
             </ng-template>
         </p-table>
     </div>
+    terminar de estilizar logs
     <p-scrollTop></p-scrollTop>
 </div>
 
@@ -384,9 +385,9 @@
                         <!-- <p-divider layout="vertical"></p-divider> -->
                         <div class="custom-header">
                         <span>Cód. Log: {{ log.id }}</span>
-                        <span>Ação: <p-tag [severity]="getSeverity(log.operacao)" [icon]="getIcons(log.operacao)" value="{{ log.operacao }}"></p-tag></span>
+                        <span>Ação: <p-tag class="{{ 'severity-'+getSeverity(log.operacao)}}" [severity]="getSeverity(log.operacao)" [icon]="getIcons(log.operacao)" value="{{ log.operacao }}"></p-tag></span>
                         <span>Usuário: {{ log.usuario.nome }}</span>
-                        <span>Data: {{ log.data | date: 'dd/MM/yyyy HH:mm:ss'}}</span>
+                        <span>Data: {{ log.data | date : 'short' : '' : 'pt-BR'}}</span>
                         </div>
                     </ng-template>
                     <p>
@@ -394,10 +395,33 @@
                     </p>
                     <p style="white-space: pre-line;">
                     <b>Descrição: </b>{{ log.descricao }}
+                    <!-- <b>Descrição: </b>{{ jsonForObject(log.descricao) }} -->
                     </p>
                 </p-accordionTab>
             </p-accordion>
         </div>
+        
+    <div class="cardLog">
+        <p-accordion>
+            <p-accordionTab *ngFor="let logsExample of logsExample">
+                <ng-template let="header" pTemplate="header" style="display: flex;">
+                    <!-- <p-divider layout="vertical"></p-divider> -->
+                    <div class="custom-header">
+                      <span>Cód. Log: <b>{{ logsExample.id }}</b></span>
+                      <span>Ação: <p-tag class="{{ 'severity-'+getSeverity(logsExample.operacao)}}" severity="{{getSeverity(logsExample.operacao)}}" icon="{{getIcons(logsExample.operacao)}}" value="{{ logsExample.operacao }}"></p-tag></span>
+                      <span>Usuário: <b>{{ logsExample.usuario.nome }}</b></span>
+                      <span>Data: <b>{{ logsExample.data | date : 'short' : '' : 'pt-BR' }}</b></span>
+                    </div>
+                  </ng-template>
+                <p>
+                   <b>Tipo do objeto: </b>{{ logsExample.idRegistro }}
+                </p>
+                <p style="white-space: pre-line;">
+                   <b>Descrição: </b>{{ logsExample.descricao }}
+                </p>
+            </p-accordionTab>
+        </p-accordion>
+    </div>
 
         <div class="cardLog" *ngIf="logsData.length <= 0">
             <h3>Não há logs registrados.</h3>

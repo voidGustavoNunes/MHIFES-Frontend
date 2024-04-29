@@ -133,7 +133,8 @@
     <p-dialog class="pHeader" [header]=ehTitulo [(visible)]="visible" [modal]="true" [breakpoints]="{ '960px': '75vw' }" [style]="{ width: '50vw' }" [draggable]="false" [resizable]="false">
         <form id="meuFormulario" [formGroup]="form" (ngSubmit)="onSubmit()">
             <div class="divInput pSwtich">
-                <p-inputSwitch #switch id="coordProf" class="form-control" formControlName="ehCoordenador" (click)="switchCooda = !switchCooda; patchForm()" ></p-inputSwitch>
+                <p-inputSwitch #switch id="coordProf" class="form-control" formControlName="ehCoordenador" (click)="switchCooda = !switchCooda" ></p-inputSwitch>
+                <!-- <p-inputSwitch #switch id="coordProf" class="form-control" formControlName="ehCoordenador" (click)="switchCooda = !switchCooda; patchForm()" ></p-inputSwitch> -->
                 <label for="coordProf">É coordenador?</label>
             </div>
             <div class="divInput">
@@ -148,7 +149,7 @@
                     <label for="matricula">Matrícula</label>
                 </span>
             </div>
-            <div class="divInput" *ngIf="!switchCooda">
+            <!-- <div class="divInput" *ngIf="!switchCooda">
                 <span class="p-float-label">
                     <input pInputText id="curso" class="form-control" formControlName="curso" maxlength="150" />
                     <label for="curso">Curso</label>
@@ -156,8 +157,9 @@
                 <div *ngIf="form.hasError('peloMenosUmSelecionado') && form.get('curso')?.touched" class="validation-error">
                     <p>Informação inválida! Preencha o campo.</p>
                 </div>
-            </div>
-            <div class="divInput" *ngIf="switchCooda">
+            </div> -->
+            <!-- <div class="divInput" *ngIf="switchCooda"> -->
+            <div class="divInput">
                 <span class="p-float-label">
                     <p-dropdown #dropdown appendTo="body" [options]="coordenadoriasArray" optionLabel="nome" [filter]="true" filterBy="nome" [showClear]="true" placeholder="Selecione a coordenadoria" inputId="coodaProf" class="form-control" formControlName="coordenadoria">
                         <ng-template pTemplate="selectedItem" let-selectedOption>
@@ -195,9 +197,9 @@
             <div class="divInput">
                 <b>Matrícula:</b> {{professorInfo?.matricula}}
             </div>
-            <div class="divInput" *ngIf="!professorInfo?.ehCoordenador">
+            <!-- <div class="divInput" *ngIf="!professorInfo?.ehCoordenador">
                 <b>Curso:</b> {{professorInfo?.curso}}
-            </div>
+            </div> -->
             <div class="divInput" *ngIf="professorInfo?.ehCoordenador">
                 <b>Coordenadoria:</b> {{professorInfo?.coordenadoria?.nome}}
             </div>
