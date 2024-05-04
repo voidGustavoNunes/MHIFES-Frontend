@@ -1,6 +1,6 @@
 <div class="caixa">
     <h1 *ngIf="professoresOrientador.length <= 0">Professores</h1>
-    <h1 *ngIf="professoresOrientador.length > 0">Professores & Orientadores</h1>
+    <h1 *ngIf="professoresOrientador.length > 0">Professores & Coordenadores</h1>
 
     <div class="opcao">
         <a (click)="showDialog()" class="p-button botaoC">Cadastrar +</a>
@@ -23,7 +23,7 @@
             [globalFilterFields]="['nome', 'matricula', 'curso']"
         >
             <ng-template pTemplate="caption">
-                <h3>Orientadores</h3>
+                <h3>Coordenadores</h3>
                 <div class="pesq">
                     <p-overlayPanel #op>
                         <div style="display: flex; flex-direction: column; align-items: center; gap: .5rem;">
@@ -33,7 +33,7 @@
                     </p-overlayPanel>
                     <p-inputGroup>
                         <button type="button" pButton (click)="op.toggle($event)" icon="pi pi-filter-fill"></button>
-                        <input #searchInputOri type="text" pInputText placeholder="Pesquisar orientador" (keydown)="onKeyDown('o',$event, searchInputOri.value)" />
+                        <input #searchInputOri type="text" pInputText placeholder="Pesquisar coordenador" (keydown)="onKeyDown('o',$event, searchInputOri.value)" />
                         <button type="button" pButton icon="pi pi-search" (click)="filterField('o',searchInputOri.value)"></button>
                     </p-inputGroup>
                 </div>
@@ -41,16 +41,16 @@
             <ng-template pTemplate="header">
                 <tr class="tbHeader">
                     <th>Nome</th>
+                    <th>Sigla</th>
                     <th>Matrícula</th>
-                    <!-- <th>Curso</th> -->
                     <th></th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-professor>
                 <tr class="tbBody">
                     <td>{{professor?.nome}}</td>
+                    <td>{{professor?.sigla}}</td>
                     <td>{{professor?.matricula}}</td>
-                    <!-- <td>{{professor?.curso}}</td> -->
                     <td>
                         <button type="button" class="botaoInfo" (click)="showInfoDialog(professor)" pButton>Info</button>
                         <button type="button" class="botaoEdit" (click)="showEditDialog(professor)" pButton>Editar</button>
@@ -165,26 +165,6 @@
                 </div>
             </div> -->
             <!-- <div class="divInput" *ngIf="switchCooda"> -->
-            <div class="divInput">
-                <span class="p-float-label">
-                    <p-dropdown #dropdown appendTo="body" [options]="coordenadoriasArray" optionLabel="nome" [filter]="true" filterBy="nome" [showClear]="true" placeholder="Selecione a coordenadoria" inputId="coodaProf" class="form-control" formControlName="coordenadoria">
-                        <ng-template pTemplate="selectedItem" let-selectedOption>
-                            <div class="flex align-items-center gap-2">
-                                <div>{{ selectedOption?.nome }}</div>
-                            </div>
-                        </ng-template>
-                        <ng-template let-coordenadoriaData pTemplate="item">
-                            <div class="flex align-items-center gap-2">
-                                <div>{{ coordenadoriaData.nome }}</div>
-                            </div>
-                        </ng-template>
-                    </p-dropdown>
-                    <label for="coodaProf">Coordenadoria</label>
-                </span>
-                <div *ngIf="form.hasError('peloMenosUmSelecionado') && form.get('coordenadoria')?.touched" class="validation-error">
-                    <p>Informação inválida! Selecione a coordenadoria.</p>
-                </div>
-            </div>
             <div class="divBotao">
                 <button type="submit" class="botaoSalva" *ngIf="cadastrar" pButton>Salvar</button>
                 <button type="submit" class="botaoEdit" *ngIf="editar" pButton>Atualizar</button>
@@ -209,10 +189,6 @@
             <!-- <div class="divInput" *ngIf="!professorInfo?.ehCoordenador">
                 <b>Curso:</b> {{professorInfo?.curso}}
             </div> -->
-            <div class="divInput">
-            <!-- <div class="divInput" *ngIf="professorInfo?.ehCoordenador"> -->
-                <b>Coordenadoria:</b> {{professorInfo?.coordenadoria?.nome}}
-            </div>
             <div class="divBotao">
                 <button type="button" class="botaoInfo" (click)="visibleInfo = false" pButton>Ok</button>
             </div>

@@ -28,14 +28,14 @@
             <ng-template pTemplate="header">
                 <tr class="tbHeader">
                     <th>Nome</th>
-                    <!-- <th></th> -->
+                    <th>Coordenador</th>
                     <th></th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-coordenadoria>
                 <tr class="tbBody">
                     <td>{{coordenadoria?.nome}}</td>
-                    <!-- <td></td> -->
+                    <td>{{coordenadoria?.coordenador?.nome}}</td>
                     <td>
                         <button type="button" class="botaoEdit" (click)="showEditDialog(coordenadoria)" pButton>Editar</button>
                         <p-toast></p-toast>
@@ -63,6 +63,23 @@
                 <span class="p-float-label">
                     <input pInputText id="nomeEquip" class="form-control" formControlName="nome" maxlength="150" />
                     <label for="nomeEquip">Nome da coordenadoria</label>
+                </span>
+            </div>
+            <div class="divInput">
+                <span class="p-float-label">
+                    <p-dropdown #dropdown appendTo="body" [options]="coordenadoresArray" optionLabel="nome" [filter]="true" filterBy="nome" [showClear]="true" placeholder="Selecione a coordenadoria" inputId="coodaProf" class="form-control" formControlName="coordenador">
+                        <ng-template pTemplate="selectedItem" let-selectedOption>
+                            <div class="flex align-items-center gap-2">
+                                <div>{{ selectedOption?.nome }}</div>
+                            </div>
+                        </ng-template>
+                        <ng-template let-coordenadorData pTemplate="item">
+                            <div class="flex align-items-center gap-2">
+                                <div>{{ coordenadorData.nome }}</div>
+                            </div>
+                        </ng-template>
+                    </p-dropdown>
+                    <label for="coodaProf">Coordenador</label>
                 </span>
             </div>
             <div class="divBotao">

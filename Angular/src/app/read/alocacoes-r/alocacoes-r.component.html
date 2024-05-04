@@ -191,9 +191,14 @@
                 </div>
             </div>
             <div class="divInput" *ngIf="selectedDiasSemana.length > 0">
+                <p-inputSwitch [(ngModel)]="enableCalendar" [ngModelOptions]="{standalone: true}" (ngModelChange)="onSwitchChange()" />
+            </div>
+            <div class="divInput" *ngIf="selectedDiasSemana.length > 0 && enableCalendar">
                 <span class="p-float-label">
-                    <p-calendar #calendarIntervalo [(ngModel)]="diasIntervalo" [ngModelOptions]="{standalone: true}" appendTo="body" selectionMode="multiple" dateFormat="dd/mm/yy" [readonlyInput]="true" id="itvData" class="form-control" (ngModelChange)="verificarDataHour()" [minDate]="minDate" [maxDate]="maxDate" ></p-calendar>
-                    <label for="itvData">Intervalo de dias</label>
+                    <!-- <p-calendar #calendarIntervalo [(ngModel)]="diasIntervalo" [ngModelOptions]="{standalone: true}" appendTo="body" selectionMode="multiple" dateFormat="dd/mm/yy" [readonlyInput]="true" id="itvData" (ngModelChange)="verificarDataHour()" [minDate]="minDate" [maxDate]="maxDate" ></p-calendar> -->
+                    
+                    <p-calendar #calendarIntervalo appendTo="body" selectionMode="multiple" class="max-w-full" [(ngModel)]="diasIntervalo" [ngModelOptions]="{standalone: true}" id="itvData" (ngModelChange)="verificarDataHour()" [minDate]="minDate" [maxDate]="maxDate" [inline]="true" [showWeek]="true" />
+                    <!-- <label for="itvData">Intervalo de dias</label> -->
                 </span>
             </div>
             <div class="divInput">

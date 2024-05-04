@@ -23,8 +23,6 @@ import { InputSwitch, InputSwitchModule } from 'primeng/inputswitch';
 import { MessagesModule } from 'primeng/messages';
 import { FiltrarPesquisa } from '../../../models/share/filtrar-pesquisa.models';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
-import { Coordenadoria } from '../../../models/coordenadoria.models';
-import { CoordenadoriaService } from '../../../service/coordenadoria.service';
 import { Dropdown, DropdownModule } from 'primeng/dropdown';
 
 @Component({
@@ -57,7 +55,6 @@ import { Dropdown, DropdownModule } from 'primeng/dropdown';
     ProfessorService,
     ConfirmationService,
     MessageService,
-    CoordenadoriaService
   ]
 })
 
@@ -77,8 +74,6 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
   
   professoresFilterProf: Professor[] = [];
   professoresOrientador: Professor[] = [];
-
-  coordenadoriasArray: Coordenadoria[] = [];
 
   unsubscribe$!: Subscription;
   unsubscribe$Cooda!: Subscription;
@@ -102,7 +97,6 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
 
   constructor(
     private professorService: ProfessorService,
-    private coordaService: CoordenadoriaService,
     private router: Router,
     private formBuilder: FormBuilder,
     private confirmationService: ConfirmationService
@@ -113,8 +107,7 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
         matricula: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
         sigla: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
         ehCoordenador: [false, [Validators.required]],
-        coordenadoria: [null, [Validators.required]]
-      }, { validator: this.peloMenosUmSelecionadoValidator });
+      });
   }
 
   ngOnInit() {
@@ -150,35 +143,10 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
         ];
       }
     });
-
-    this.unsubscribe$Cooda = this.coordaService.listar()
-    .subscribe({
-      next: (itens:any) => {
-        const data = itens;
-        this.coordenadoriasArray = data.sort((a:any, b:any) => (a.nome < b.nome) ? -1 : 1);
-      },
-      error: (err: any) => {
-        this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Dados de coordenadorias não encontrados.', life: 3000 },
-        ];
-      }
-    });
   }
 
   ngOnDestroy() {
     this.unsubscribe$.unsubscribe();
-    this.unsubscribe$Cooda.unsubscribe();
-  }
-
-  peloMenosUmSelecionadoValidator(formGroup: FormGroup) {
-    const curso = formGroup.get('curso')?.value;
-    const coordenadoria = formGroup.get('coordenadoria')?.value;
-
-    if (!curso && !coordenadoria) {
-      return { peloMenosUmSelecionado: true };
-    }
-
-    return null;
   }
 
   showInfoDialog(value: Professor) {
@@ -199,12 +167,11 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
       matricula: value.matricula,
       sigla: value.sigla,
       ehCoordenador: value.ehCoordenador,
-      coordenadoria: value.coordenadoria
     });
     this.switch.writeValue(value.ehCoordenador);
     // if(value.ehCoordenador) {
       // this.switchCooda = true;
-      this.dropdown.writeValue(value.coordenadoria)
+      // this.dropdown.writeValue(value.coordenadoria)
     // }
   }
 
@@ -229,18 +196,6 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
     this.switchCooda = false;
   }
 
-  patchForm() {
-    if(this.editar && !this.switchCooda) {
-      this.form.patchValue({
-        coordenadoria: null
-      })
-    } else if(this.editar && this.switchCooda) {
-      this.form.patchValue({
-        curso: null
-      })
-    }
-  }
-  
   limparFilter(tipo: string){
     if(tipo == 'o') {
       const inputElement = this.inputSearchOri.nativeElement.value
@@ -355,12 +310,18 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
   enviarFormSave() {
     this.professorService.criar(this.professoresCadast).subscribe({
       next: (data: any) => {
-        this.professoresCadast = data;
         // this.goToRouteSave();
-        this.ngOnInit();
-        this.messages = [
-          { severity: 'success', summary: 'Sucesso', detail: 'Professor cadastrado com sucesso!', life: 3000 },
-        ];
+        if (data.status === 'success') {
+          this.professoresCadast = data;
+          this.messages = [
+            { severity: 'success', summary: 'Sucesso', detail: 'Professor cadastrado com sucesso!', life: 3000 },
+          ];
+          this.ngOnInit();
+        } else {
+          this.messages = [
+            { severity: 'error', summary: 'Erro', detail: 'Matrícula já existente!', life: 3000 },
+          ];
+        }
       },
       error: (err: any) => {
         this.messages = [

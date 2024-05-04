@@ -77,7 +77,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   @ViewChild('dropdownLocal') dropdownLocal!: Dropdown;
   @ViewChild('dropdownProf') dropdownProf!: Dropdown;
   @ViewChild('dropdownHour') dropdownHour!: Dropdown;
-  @ViewChild('switch') switch!: InputSwitch;
+  // @ViewChild('switch') switch!: InputSwitch;
   @ViewChild('calendar') calendar!: Calendar;
 
   @ViewChild('calendarIntervalo') calendarIntervalo!: Calendar;
@@ -120,7 +120,6 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
 
   selectedAlunos: Aluno[] = [];
 
-  visibleExtra: boolean = false;
   visibleEdit: boolean = false;
   visibleInfo: boolean = false;
 
@@ -142,6 +141,8 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
 
   enableSelect: boolean = false;
   logsExample!: Log[];
+
+  enableCalendar: boolean = false;
 
   constructor(
     private alocService: AlocacaoService,
@@ -449,7 +450,6 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     this.visibleInfo = false;
     this.cadastrar = true;
     this.editar = false;
-    this.switch.writeValue(null);
     this.getAluno().clear();
     this.selectedAlunos = [];
     this.alocacaoHour = [];
@@ -457,22 +457,14 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
 
   hideDialog() {
     if(this.cadastrar) {
-      if(this.visibleExtra) {
-        this.visibleExtra = false;
-      }
       this.visible = false;
       this.form.reset();
-      this.switch.writeValue(null);
     } else if(this.editar) {
       this.visibleEdit = false;
       this.form.reset();
     }
     this.visibleLog = false;
     this.alocacaoHour = [];
-  }
-
-  onClickHide() {
-    if(this.visibleExtra) this.visibleExtra = false;
   }
 
   calcularDiasSemana(dtIni: Date, dtFim: Date, diasSemana: number[]): Date[] {
@@ -505,7 +497,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
 
   atualizarDiasSemana(codes: number[]) {
     let ini: Date = this.form.get('dataAula')?.value;
-    let periodo: Periodo = this.form.get('periodo')?.value;
+    let periodo: Periodo = this.form.get('periodoDisciplina.periodo')?.value;
 
     if(ini && periodo) {
       const periodoFim = new Date(periodo.dataFim);
@@ -516,7 +508,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
 
   onMultiselectChange() {
     let ini: Date = this.form.get('dataAula')?.value;
-    let periodo: Periodo = this.form.get('periodo')?.value;
+    let periodo: Periodo = this.form.get('periodoDisciplina.periodo')?.value;
     let hora: Horario = this.form.get('horario')?.value;
 
     if(ini && this.selectedDiasSemana && periodo && hora) {
@@ -564,6 +556,10 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     })
   }
 
+  onSwitchChange() {
+    this.enableCalendar = !this.enableCalendar;
+  }
+
   verificarDataHour() {
     this.diasIntervalo?.sort((a:Date, b:Date) => {
       const dateA = new Date(a);
@@ -576,7 +572,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
 
   onDateIniSelect() {
     const dataAula = this.form.get('dataAula')?.value;
-    const periodo: Periodo = this.form.get('periodo')?.value;
+    const periodo: Periodo = this.form.get('periodoDisciplina.periodo')?.value;
 
     if(dataAula && periodo) {
       const periodoInicio = new Date(periodo.dataInicio);
@@ -614,7 +610,8 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   }
 
   updateDataAulaState() {
-    const periodo: Periodo = this.form.get('periodo')?.value;
+    const periodo: Periodo = this.form.get('periodoDisciplina.periodo')?.value;
+    console.log(periodo)
     if(periodo && periodo.dataInicio && periodo.dataFim) {
       this.minDateAula = new Date(periodo.dataInicio);
       this.minDateAula.setDate(this.minDateAula.getDate() + 1);
@@ -829,7 +826,6 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       this.conditionCreateSave();
       this.mss = false;
       this.visible = false;
-      this.visibleExtra = false;
       this.form.reset();
       this.ngOnInit();
     } else if (this.form.valid && this.editar) {

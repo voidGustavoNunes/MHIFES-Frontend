@@ -18,6 +18,9 @@ import { ScrollTopModule } from 'primeng/scrolltop';
 import { MessagesModule } from 'primeng/messages';
 import { CoordenadoriaService } from '../../service/coordenadoria.service';
 import { Coordenadoria } from '../../models/coordenadoria.models';
+import { ProfessorService } from '../../service/professor.service';
+import { Professor } from '../../models/professor.models';
+import { DropdownModule } from 'primeng/dropdown';
 
 @Component({
   selector: 'app-coordenadorias-r',
@@ -38,7 +41,8 @@ import { Coordenadoria } from '../../models/coordenadoria.models';
     ToastModule,
     ScrollTopModule,
     ConfirmPopupModule,
-    MessagesModule
+    MessagesModule,
+    DropdownModule
   ],
   templateUrl: './coordenadorias-r.component.html',
   styleUrl: './coordenadorias-r.component.scss',
@@ -46,6 +50,7 @@ import { Coordenadoria } from '../../models/coordenadoria.models';
     CoordenadoriaService,
     ConfirmationService,
     MessageService,
+    ProfessorService
   ]
 })
 export class CoordenadoriasRComponent implements OnInit, OnDestroy {
@@ -57,6 +62,7 @@ export class CoordenadoriasRComponent implements OnInit, OnDestroy {
   coordenadoriasEdit!: Coordenadoria;
 
   unsubscribe$!: Subscription;
+  unsubscribe$Prof!: Subscription;
   form: FormGroup;
 
   ehTitulo: string = '';
@@ -67,15 +73,19 @@ export class CoordenadoriasRComponent implements OnInit, OnDestroy {
   messages!: Message[];
   mss: boolean = false;
 
+  coordenadoresArray: Professor[] = [];
+
   constructor(
     private coordaService: CoordenadoriaService,
     private router: Router,
     private formBuilder: FormBuilder,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private professorService: ProfessorService
     ) {
       this.form = this.formBuilder.group({
         id: [null],
-        nome: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]]
+        nome: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
+        coordenador: [null, [Validators.required]]
       });
   }
 
@@ -89,7 +99,25 @@ export class CoordenadoriasRComponent implements OnInit, OnDestroy {
       },
       error: (err: any) => {
         this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Dados não encontrados.', life: 3000 },
+          { severity: 'error', summary: 'Erro', detail: 'Dados de coordenadorias não encontrados.', life: 3000 },
+        ];
+      }
+    });
+
+    this.unsubscribe$Prof = this.professorService.listar()
+    .subscribe({
+      next: (itens:any) => {
+        const data = itens.sort((a:any, b:any) => (a.nome < b.nome) ? -1 : 1);
+
+        data.forEach((prf: Professor) => {
+          if(prf.ehCoordenador) {
+            this.coordenadoresArray.push(prf);
+          }
+        })
+      },
+      error: (err: any) => {
+        this.messages = [
+          { severity: 'error', summary: 'Erro', detail: 'Dados de professores não encontrados.', life: 3000 },
         ];
       }
     });
@@ -97,6 +125,7 @@ export class CoordenadoriasRComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.unsubscribe$.unsubscribe();
+    this.unsubscribe$Prof.unsubscribe();
   }
 
   showEditDialog(value: Coordenadoria) {
@@ -107,7 +136,8 @@ export class CoordenadoriasRComponent implements OnInit, OnDestroy {
     this.editar = true;
     this.form.setValue({
       id: value.id,
-      nome: value.nome
+      nome: value.nome,
+      coordenador: value.coordenador
     })
   }
 

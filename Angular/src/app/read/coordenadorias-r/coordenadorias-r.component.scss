@@ -168,7 +168,10 @@
     }
     .p-datatable-striped {
         width: max-content;
-min-width: 79.25rem;
+        min-width: 79.25rem;
+    }
+    .card .p-dropdown{
+        background-color: #BFE4FF;
     }
 }
 
@@ -191,6 +194,11 @@ min-width: 79.25rem;
             .botaoSalva, .botaoEdit{
                 margin-right: 5rem;
             }
+        }
+    }
+    :host ::ng-deep {
+        .card .p-dropdown{
+            width: 40vw;
         }
     }
 }
@@ -219,6 +227,11 @@ min-width: 79.25rem;
             .botaoSalva, .botaoEdit{
                 margin-bottom: 1rem;
             }
+        }
+    }
+    :host ::ng-deep {
+        .card .p-dropdown{
+            width: 60vw;
         }
     }
 }

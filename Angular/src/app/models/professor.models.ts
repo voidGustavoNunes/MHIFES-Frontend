@@ -6,8 +6,8 @@ export interface Professor {
   matricula: string;
   sigla: string;
   ehCoordenador: boolean;
-  coordenadoria: Coordenadoria;
   nomeUser?: string;
   senha?: string;
+  // coordenadoria: Coordenadoria;
   // curso?: string; // mudar futuramente para quando formos mapear os cursos
 }
