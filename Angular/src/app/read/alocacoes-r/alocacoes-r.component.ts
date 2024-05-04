@@ -370,7 +370,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   // }
 
   getAluno(): FormArray {
-    return this.form.get('alunos') as FormArray;
+    return this.form.get('periodoDisciplina.alunos') as FormArray;
   }
 
   addAluno(aluno: Aluno) {

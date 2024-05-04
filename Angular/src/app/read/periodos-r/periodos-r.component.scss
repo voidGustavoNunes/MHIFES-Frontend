@@ -212,7 +212,7 @@
         color: white;
         letter-spacing: .1rem;
     }
-    .p-calendar input{
+    .p-calendar input, .p-inputnumber-input{
         background-color: #BFE4FF;
     }
     .p-messages {
@@ -260,7 +260,7 @@ min-width: 79.25rem;
         }
     }
     :host ::ng-deep {
-        .p-calendar input{
+        .p-calendar input, .p-inputnumber-input{
             width: 40vw;
         }
     }
@@ -297,7 +297,7 @@ min-width: 79.25rem;
         }
     }
     :host ::ng-deep {
-        .p-calendar input{
+        .p-calendar input, .p-inputnumber-input{
             width: 60vw;
         }
     }
