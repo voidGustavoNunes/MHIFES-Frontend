@@ -1,7 +1,10 @@
 export interface Periodo {
     id: number;
-    nome: string;
+    ano: number;
+    semestre: number;
     dataInicio: Date;
     dataFim: Date;
+    // periodoDisciplinas: Array<PeriodoDisciplinas>;
+    // nome: string;
     // descricao: string;
 }

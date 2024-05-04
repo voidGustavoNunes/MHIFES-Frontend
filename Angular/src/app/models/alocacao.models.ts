@@ -9,17 +9,19 @@ import { Semana } from "./share/semana.models";
 
 export interface Alocacao {
   id: number;
-  // numAulas: number;
   horario: Horario;
-  // horarioInicio: Time;
-  // horarioFim: Time;
   turma: string;
   dataAula: Date;
   local: Local;
-  disciplina: Disciplina;
-  periodo: Periodo;
+  periodoDisciplina: PeriodoDisciplina;
   professor: Professor;
-  alunos: Array<Aluno>;
+  // numAulas: number;
+  // horarioInicio: Time;
+  // horarioFim: Time;
+  // dataAula: Date;
+  // disciplina: Disciplina;
+  // periodo: Periodo;
+  // alunos: Array<Aluno>;
 }
 
 
@@ -28,4 +30,11 @@ export interface AlocacaoHour {
   horario: Horario;
   // horaInicio: Time;
   // horaFinal: Time;
+}
+
+export interface PeriodoDisciplina {
+  id: number;
+  periodo: Periodo;
+  disciplina: Disciplina;
+  alunos: Array<Aluno>;
 }

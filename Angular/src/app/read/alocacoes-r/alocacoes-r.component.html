@@ -44,7 +44,7 @@
                 <tr class="tbBody">
                     <td>{{alocacao?.professor.nome}}</td>
                     <td>{{alocacao?.local.nome}}</td>
-                    <td>{{alocacao?.disciplina.nome}}</td>
+                    <td>{{alocacao?.periodoDisciplina?.disciplina.nome}}</td>
                     <td>{{ formatarHora(alocacao?.horario?.horaInicio) }} - {{ formatarHora(alocacao?.horario?.horaFim) }}</td>
                     <td>
                         <button type="button" class="botaoL" (click)="showDialogLog(alocacao)" pButton>Log</button>
@@ -63,7 +63,7 @@
             </ng-template>
         </p-table>
     </div>
-    terminar de estilizar logs
+    <!-- terminar de estilizar logs -->
     <p-scrollTop></p-scrollTop>
 </div>
 
@@ -71,7 +71,7 @@
 <div class="card flex justify-content-center">
     <p-dialog class="pHeader" [header]=ehTitulo [(visible)]="visible" [modal]="true" [breakpoints]="{ '960px': '75vw' }" [style]="{ width: '50vw' }" [draggable]="false" [resizable]="false">
         <form id="meuFormulario" [formGroup]="form" (ngSubmit)="onSubmit()">
-            <div class="divInput">
+            <div class="divInput" formGroupName="periodoDisciplina">
                 <span class="p-float-label">
                     <p-dropdown #dropdownDisc appendTo="body" [options]="disciplinasArray" optionLabel="nome" [filter]="true" filterBy="nome" [showClear]="true" placeholder="Selecione uma disciplina" inputId="discEvent" class="form-control" formControlName="disciplina">
                         <ng-template pTemplate="selectedItem" let-selectedOption>
@@ -122,15 +122,15 @@
                     <label for="localAloc">Local</label>
                 </span>
             </div>
-            <div class="divInput">
+            <div class="divInput" formGroupName="periodoDisciplina">
                 <span class="p-float-label">
                     <p-dropdown #dropdownPeriodo appendTo="body" [options]="periodosArray" placeholder="Selecione um período" inputId="perdAloc" class="form-control" formControlName="periodo" (onChange)="updateDataAulaState()">
                         <ng-template let-periodoData pTemplate="selectedItem">
-                            <div>{{periodoData.nome}} : {{ periodoData.dataInicio | date: 'dd/MM/yyyy' }} - {{ periodoData.dataFim | date: 'dd/MM/yyyy' }}</div>
+                            <div>{{periodoData?.ano}}/{{periodoData?.semestre}} : {{ periodoData.dataInicio | date: 'dd/MM/yyyy' }} - {{ periodoData.dataFim | date: 'dd/MM/yyyy' }}</div>
                           </ng-template>
                           <ng-template let-periodoData pTemplate="item">
                             <div class="flex align-items-center gap-2">
-                              <div>{{periodoData.nome}} : {{ periodoData.dataInicio | date: 'dd/MM/yyyy' }} - {{ periodoData.dataFim | date: 'dd/MM/yyyy' }}</div>
+                              <div>{{periodoData?.ano}}/{{periodoData?.semestre}} : {{ periodoData.dataInicio | date: 'dd/MM/yyyy' }} - {{ periodoData.dataFim | date: 'dd/MM/yyyy' }}</div>
                             </div>
                           </ng-template>
                     </p-dropdown>
@@ -202,7 +202,7 @@
                     <label for="turmaAloc">Turma</label>
                 </span>
             </div>
-            <div class="divInput">
+            <div class="divInput" formGroupName="periodoDisciplina">
                 <span class="p-float-label" formArrayName="alunos">
                     <p-multiSelect #multiselect appendTo="body" inputId="alunoAloc" display="chip" [(ngModel)]="selectedAlunos" [ngModelOptions]="{standalone: true}" [options]="alunosArray" optionLabel="nome" (onChange)="onAlunosChange($event)" ></p-multiSelect>
                     <label for="alunoAloc">Selecione os alunos</label>
@@ -234,7 +234,7 @@
     <p-dialog class="pHeader" [header]=ehTitulo [(visible)]="visibleEdit" [modal]="true" [breakpoints]="{ '960px': '75vw' }" [style]="{ width: '50vw' }" [draggable]="false" [resizable]="false">
         <form id="meuFormulario" [formGroup]="form" (ngSubmit)="onSubmit()">
             <div class="divInput">
-                <span class="p-float-label">
+                <span class="p-float-label" formGroupName="periodoDisciplina">
                     <p-dropdown #dropdownDisc appendTo="body" [options]="disciplinasArray" optionLabel="nome" [filter]="true" filterBy="nome" [showClear]="true" placeholder="Selecione uma disciplina" inputId="discEvent" class="form-control" formControlName="disciplina">
                         <ng-template pTemplate="selectedItem" let-selectedOption>
                             <div class="flex align-items-center gap-2">
@@ -284,15 +284,15 @@
                     <label for="localAloc">Local</label>
                 </span>
             </div>
-            <div class="divInput">
+            <div class="divInput" formGroupName="periodoDisciplina">
                 <span class="p-float-label">
                     <p-dropdown #dropdownPeriodo appendTo="body" [options]="periodosArray" placeholder="Selecione um período" inputId="perdEvent" class="form-control" formControlName="periodo">
                         <ng-template let-periodoData pTemplate="selectedItem">
-                            <div>{{periodoData.nome}} : {{ periodoData.dataInicio | date: 'dd/MM/yyyy' }} - {{ periodoData.dataFim | date: 'dd/MM/yyyy' }}</div>
+                            <div>{{periodoData?.ano}}/{{periodoData?.semestre}} : {{ periodoData.dataInicio | date: 'dd/MM/yyyy' }} - {{ periodoData.dataFim | date: 'dd/MM/yyyy' }}</div>
                           </ng-template>
                           <ng-template let-periodoData pTemplate="item">
                             <div class="flex align-items-center gap-2">
-                              <div>{{periodoData.nome}} : {{ periodoData.dataInicio | date: 'dd/MM/yyyy' }} - {{ periodoData.dataFim | date: 'dd/MM/yyyy' }}</div>
+                              <div>{{periodoData?.ano}}/{{periodoData?.semestre}} : {{ periodoData.dataInicio | date: 'dd/MM/yyyy' }} - {{ periodoData.dataFim | date: 'dd/MM/yyyy' }}</div>
                             </div>
                           </ng-template>
                     </p-dropdown>
@@ -326,7 +326,7 @@
                     <label for="turmaAloc">Turma</label>
                 </span>
             </div>
-            <div class="divInput">
+            <div class="divInput" formGroupName="periodoDisciplina">
                 <span class="p-float-label" formArrayName="alunos">
                     <p-multiSelect #multiselect appendTo="body" inputId="alunoAloc" display="chip" [(ngModel)]="selectedAlunos" [ngModelOptions]="{standalone: true}" [options]="alunosArray" optionLabel="nome" (ngModelChange)="onAlunosChange($event)" ></p-multiSelect>
                     <label for="alunoAloc">Selecione os alunos</label>
@@ -352,7 +352,7 @@
                 </div>
             </div>
             <div class="divInput">
-                <b>Disciplina: </b> {{alocacaoInfo?.disciplina?.nome}}
+                <b>Disciplina: </b> {{alocacaoInfo?.periodoDisciplina?.disciplina?.nome}}
             </div>
             <div class="divInput">
                 <b>Horário: </b> {{ alocacaoInfo?.horario?.horaInicio }} - {{ alocacaoInfo?.horario?.horaFim }}
@@ -367,7 +367,7 @@
                 </div>
             </div>
             <div class="divInput dtAlocacao">
-                <b>Período: </b> {{ alocacaoInfo?.periodo?.dataInicio | date: 'fullDate' : '' : 'pt-BR' }}<b> - </b>{{ alocacaoInfo?.periodo?.dataFim | date: 'fullDate' : '' : 'pt-BR' }}
+                <b>Período: </b> {{ alocacaoInfo?.periodoDisciplina?.periodo?.dataInicio | date: 'fullDate' : '' : 'pt-BR' }}<b> - </b>{{ alocacaoInfo?.periodoDisciplina?.periodo?.dataFim | date: 'fullDate' : '' : 'pt-BR' }}
             </div>
             <div class="divBotao replica">
                 <button type="button" class="botaoInfo" (click)="visibleInfo = false" pButton>Ok</button>
@@ -385,7 +385,7 @@
                         <!-- <p-divider layout="vertical"></p-divider> -->
                         <div class="custom-header">
                         <span>Cód. Log: {{ log.id }}</span>
-                        <span>Ação: <p-tag class="{{ 'severity-'+getSeverity(log.operacao)}}" [severity]="getSeverity(log.operacao)" [icon]="getIcons(log.operacao)" value="{{ log.operacao }}"></p-tag></span>
+                        <span>Ação: <p-tag class="severity-{{ +getSeverity(log.operacao)}}" [severity]="getSeverity(log.operacao)" [icon]="getIcons(log.operacao)" value="{{ log.operacao }}"></p-tag></span>
                         <span>Usuário: {{ log.usuario.nome }}</span>
                         <span>Data: {{ log.data | date : 'short' : '' : 'pt-BR'}}</span>
                         </div>
@@ -401,11 +401,11 @@
             </p-accordion>
         </div>
         
-    <div class="cardLog">
+    <!-- <div class="cardLog">
         <p-accordion>
             <p-accordionTab *ngFor="let logsExample of logsExample">
                 <ng-template let="header" pTemplate="header" style="display: flex;">
-                    <!-- <p-divider layout="vertical"></p-divider> -->
+                    <p-divider layout="vertical"></p-divider>
                     <div class="custom-header">
                       <span>Cód. Log: <b>{{ logsExample.id }}</b></span>
                       <span>Ação: <p-tag class="{{ 'severity-'+getSeverity(logsExample.operacao)}}" severity="{{getSeverity(logsExample.operacao)}}" icon="{{getIcons(logsExample.operacao)}}" value="{{ logsExample.operacao }}"></p-tag></span>
@@ -421,7 +421,7 @@
                 </p>
             </p-accordionTab>
         </p-accordion>
-    </div>
+    </div> -->
 
         <div class="cardLog" *ngIf="logsData.length <= 0">
             <h3>Não há logs registrados.</h3>

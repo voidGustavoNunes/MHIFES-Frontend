@@ -1,55 +1,69 @@
-import { Injectable } from "@angular/core";
+import { DOCUMENT } from "@angular/common";
+import { Inject, Injectable } from "@angular/core";
+import { Router } from "@angular/router";
 
 @Injectable()
 export class UserAuthService {
-
-    constructor() { }
+    private localStorage!: any;
+    
+    constructor(private router: Router,
+        @Inject(DOCUMENT) private document: Document
+        ) {
+            this.localStorage = this.document.defaultView?.localStorage;
+         }
 
     public setRole(roles: string) {
-        // if (typeof window !== 'undefined' && window.localStorage) {
-            localStorage.setItem("role", JSON.stringify(roles));
-        // }
+        if (localStorage) {
+            this.localStorage.setItem("role", JSON.stringify(roles));
+            // sessionStorage.setItem("role", JSON.stringify(roles));
+        }
     }
 
     public getRole(): string {
-        // if (typeof window !== 'undefined' && window.localStorage) {
-            // return JSON.parse(localStorage.getItem("role") ?? '');
-            const storedRole = localStorage.getItem("role");
+        if (localStorage) {
+            const storedRole = this.localStorage.getItem("role");
+        // const storedRole = sessionStorage.getItem("role");
         return storedRole ? JSON.parse(storedRole) : '';
-        // }
-        // return '';
+    }
+        return '';
     }
 
     public setToken(jwtToken: string) {
-        // if (typeof window !== 'undefined' && window.localStorage) {
-            localStorage.setItem("jwtToken", jwtToken);
-        // }
+        if (localStorage) {
+            this.localStorage.setItem("jwtToken", jwtToken);
+            // sessionStorage.setItem("jwtToken", jwtToken);
+        }
     }
 
     public getToken(): string {
-        // if (typeof window !== 'undefined' && window.localStorage) {
-            return localStorage.getItem("jwtToken") ?? '';
-        // }
-        // return '';
+        if (localStorage) {
+            return this.localStorage.getItem("jwtToken") ?? '';
+            // return sessionStorage.getItem("jwtToken") ?? '';
+        }
+        return '';
     }
 
     public setNome(user: string) {
-        // if (typeof window !== 'undefined' && window.localStorage) {
-            localStorage.setItem("nome", user);
-        // }
+        if (localStorage) {
+            this.localStorage.setItem("nome", user);
+            // sessionStorage.setItem("nome", user);
+        }
     }
 
     public getNome(): string {
-        // if (typeof window !== 'undefined' && window.localStorage) {
-            return localStorage.getItem("nome") ?? '';
-        // }
-        // return '';
+        if (localStorage) {
+                return this.localStorage.getItem("nome") ?? '';
+            // return sessionStorage.getItem("nome") ?? '';
+        }
+        return '';
     }
 
     public clear() {
-        // if (typeof window !== 'undefined' && window.localStorage) {
-            localStorage.clear();
-        // }
+        this.localStorage.clear();
+        // sessionStorage.clear();
+        this.router.navigate(['/home']).then(() => {
+          window.location.reload();
+        });
     }
 
     public isLoggedIn() {

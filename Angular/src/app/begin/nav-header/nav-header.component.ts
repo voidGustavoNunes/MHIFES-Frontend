@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, Inject, OnDestroy, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { MenubarModule } from 'primeng/menubar';
@@ -29,10 +29,12 @@ import { DividerModule } from 'primeng/divider';
   styleUrl: './nav-header.component.scss',
   providers: [
     UserAuthService,
-    UsuarioService
+    UsuarioService,
+    // Window,
+    // { provide: Window, useValue: window }
   ]
 })
-export class NavHeaderComponent implements OnInit {
+export class NavHeaderComponent implements OnInit, OnDestroy {
   itemsLog: MenuItem[] | undefined;
   itemsAdm: MenuItem[] | undefined;
   itemsUse: MenuItem[] | undefined;
@@ -50,7 +52,9 @@ export class NavHeaderComponent implements OnInit {
   constructor(
     private userAuthService: UserAuthService,
     public userService: UsuarioService,
-    public router: Router
+    public router: Router,
+    // @Inject(Window) private window: Window
+    // private window: Window
   ) {
     // this.router.events
     //   .pipe(filter(event => event instanceof NavigationEnd))
@@ -171,7 +175,19 @@ export class NavHeaderComponent implements OnInit {
         }
       }
     ]
+    
+    // this.window.addEventListener('beforeunload', () => {
+    //   this.logout();
+    // });
   }
+  
+  ngOnDestroy(): void {
+  }
+  
+  // @HostListener('window:beforeunload')
+  // onBeforeUnload(): void {
+  //   this.logout();
+  // }
 
   isLogged() {
     return this.userAuthService.isLoggedIn();
@@ -179,9 +195,6 @@ export class NavHeaderComponent implements OnInit {
 
   logout() {
     this.userAuthService.clear();
-    this.router.navigate(['/home']).then(() => {
-      window.location.reload();
-    });
   }
 
   getNameUser() {

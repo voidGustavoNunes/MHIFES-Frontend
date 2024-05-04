@@ -18,6 +18,8 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ScrollTopModule } from 'primeng/scrolltop';
 import { MessagesModule } from 'primeng/messages';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { FiltrarPesquisa } from '../../models/share/filtrar-pesquisa.models';
 
 @Component({
   selector: 'app-disciplinas-r',
@@ -38,7 +40,8 @@ import { MessagesModule } from 'primeng/messages';
     ToastModule,
     ScrollTopModule,
     ConfirmPopupModule,
-    MessagesModule
+    MessagesModule,
+    OverlayPanelModule
   ],
   templateUrl: './disciplinas-r.component.html',
   styleUrl: './disciplinas-r.component.scss',
@@ -66,6 +69,9 @@ export class DisciplinasRComponent implements OnInit, OnDestroy {
   
   messages!: Message[];
   mss: boolean = false;
+  
+  filterOptions: FiltrarPesquisa[] = [];
+  selectedFilter!: FiltrarPesquisa;
 
   constructor(
     private disciService: DisciplinaService,
@@ -75,11 +81,17 @@ export class DisciplinasRComponent implements OnInit, OnDestroy {
     ) {
       this.form = this.formBuilder.group({
         id: [null],
-        nome: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]]
+        nome: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
+        sigla: [null, [Validators.required, Validators.maxLength(10)]]
       });
   }
 
   ngOnInit() {
+    this.filterOptions = [
+      {nome: 'Nome', id: 0},
+      {nome: 'Sigla', id: 1}
+    ];
+
     this.unsubscribe$ = this.disciService.listar()
     .subscribe({
       next: (itens:any) => {
@@ -107,7 +119,8 @@ export class DisciplinasRComponent implements OnInit, OnDestroy {
     this.editar = true;
     this.form.setValue({
       id: value.id,
-      nome: value.nome
+      nome: value.nome,
+      sigla: value.sigla
     })
   }
 
@@ -132,7 +145,7 @@ export class DisciplinasRComponent implements OnInit, OnDestroy {
     this.disciplinasData = this.dicisplinasFilter;
   }
 
-  searchFilterWord(term: string) {
+  searchFilterWord0(term: string) {
     this.disciplinasData = this.dicisplinasFilter.filter(el => {
       if (el.nome.toLowerCase().includes(term.toLowerCase())) {
         return el;
@@ -142,17 +155,28 @@ export class DisciplinasRComponent implements OnInit, OnDestroy {
     })
   }
 
+  searchFilterWord1(term: string) {
+    this.disciplinasData = this.dicisplinasFilter.filter(el => {
+      if (el.sigla.toLowerCase().includes(term.toLowerCase())) {
+        return el;
+      } else {
+        return null;
+      }
+    })
+  }
+
   onKeyDown(event: KeyboardEvent, searchTerm: string) {
     if (event.key === "Enter") {
-      if (searchTerm != null || searchTerm != '') {
-        this.searchFilterWord(searchTerm);
-      }
+      this.filterField(searchTerm);
     }
   }
 
   filterField(searchTerm: string) {
     if (searchTerm != null || searchTerm != '') {
-      this.searchFilterWord(searchTerm);
+      if(this.selectedFilter) {
+        if(this.selectedFilter.id == 0) this.searchFilterWord0(searchTerm);
+        if(this.selectedFilter.id == 1) this.searchFilterWord1(searchTerm);
+      }
     }
   }
 
@@ -207,14 +231,6 @@ export class DisciplinasRComponent implements OnInit, OnDestroy {
         ];
       }
     });
-  }
-
-  goToRouteSave() {
-    this.router.navigate(['api/disciplinas']);
-  }
-
-  goToRouteEdit(id: number) {
-    this.router.navigate(['api/disciplinas', id]);
   }
 
   onSubmit() {

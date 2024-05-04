@@ -111,7 +111,7 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
         id: [null],
         nome: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
         matricula: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
-        // curso: [null, [Validators.minLength(3), Validators.maxLength(150)]],
+        sigla: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
         ehCoordenador: [false, [Validators.required]],
         coordenadoria: [null, [Validators.required]]
       }, { validator: this.peloMenosUmSelecionadoValidator });
@@ -120,7 +120,8 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.filterOptions = [
       {nome: 'Nome', id: 0},
-      {nome: 'Matrícula', id: 1}
+      {nome: 'Sigla', id: 1},
+      {nome: 'Matrícula', id: 2}
     ];
 
     this.unsubscribe$ = this.professorService.listar()
@@ -196,13 +197,13 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
       id: value.id,
       nome: value.nome,
       matricula: value.matricula,
-      // curso: value.curso,
+      sigla: value.sigla,
       ehCoordenador: value.ehCoordenador,
       coordenadoria: value.coordenadoria
     });
     this.switch.writeValue(value.ehCoordenador);
     // if(value.ehCoordenador) {
-      this.switchCooda = true;
+      // this.switchCooda = true;
       this.dropdown.writeValue(value.coordenadoria)
     // }
   }
@@ -281,6 +282,26 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
   searchFilter1(tipo: string, term: string) {
     if(tipo == 'o') {
       this.professoresOrientador = this.professoresFilterOri.filter(el => {
+        if (el.sigla.toLowerCase().includes(term.toLowerCase())) {
+          return el;
+        } else {
+          return null;
+        }
+      })
+    } else if(tipo == 'p') {
+      this.professoresNaoOrienta = this.professoresFilterProf.filter(el => {
+        if (el.sigla.toLowerCase().includes(term.toLowerCase())) {
+          return el;
+        } else {
+          return null;
+        }
+      })
+    }
+  }
+
+  searchFilter2(tipo: string, term: string) {
+    if(tipo == 'o') {
+      this.professoresOrientador = this.professoresFilterOri.filter(el => {
         if (el.matricula.toString().toLowerCase().includes(term.toLowerCase())) {
           return el;
         } else {
@@ -306,17 +327,11 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
   
   filterField(tipo: string, searchTerm: string) {
     if (searchTerm != null || searchTerm != '') {
-      if(tipo == 'o') {
         if(this.selectedFilterOri) {
           if(this.selectedFilterOri.id == 0) this.searchFilter0(tipo, searchTerm);
           if(this.selectedFilterOri.id == 1) this.searchFilter1(tipo, searchTerm);
+          if(this.selectedFilterProf.id == 2) this.searchFilter2(tipo, searchTerm);
         }
-      } else if(tipo == 'p') {
-        if(this.selectedFilterProf) {
-          if(this.selectedFilterProf.id == 0) this.searchFilter0(tipo, searchTerm);
-          if(this.selectedFilterProf.id == 1) this.searchFilter1(tipo, searchTerm);
-        }
-      }
     }
   }
 
@@ -371,14 +386,6 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
         ];
       }
     });
-  }
-
-  goToRouteSave() {
-    this.router.navigate(['api/professores']);
-  }
-
-  goToRouteEdit(id: number) {
-    this.router.navigate(['api/professores', id]);
   }
 
   onSubmit() {

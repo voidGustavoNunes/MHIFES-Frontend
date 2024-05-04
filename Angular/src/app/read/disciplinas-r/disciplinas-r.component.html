@@ -5,8 +5,14 @@
         <a (click)="showDialog()" class="p-button botaoC">Cadastrar +</a>
         
         <div class="pesq">
+            <p-overlayPanel #op>
+                <div style="display: flex; flex-direction: column; align-items: center; gap: .5rem;">
+                    <p-dropdown [options]="filterOptions" [(ngModel)]="selectedFilter" optionLabel="nome" [showClear]="true" placeholder="Selecione um filtro"></p-dropdown>
+                    <p-button label="Limpar filtro" severity="warning" (click)="limparFilter()"></p-button>
+                </div>
+            </p-overlayPanel>
             <p-inputGroup>
-                <button type="button" pButton icon="pi pi-filter-slash" (click)="limparFilter()"></button>
+                <button type="button" pButton (click)="op.toggle($event)" icon="pi pi-filter-fill"></button>
                 <input #searchInput type="text" pInputText placeholder="Pesquisar disciplina" (keydown)="onKeyDown($event, searchInput.value)" />
                 <button type="button" pButton icon="pi pi-search" (click)="filterField(searchInput.value)"></button>
             </p-inputGroup>
@@ -28,14 +34,14 @@
             <ng-template pTemplate="header">
                 <tr class="tbHeader">
                     <th>Nome</th>
-                    <!-- <th></th> -->
+                    <th>Sigla</th>
                     <th></th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-disciplina>
                 <tr class="tbBody">
                     <td>{{disciplina?.nome}}</td>
-                    <!-- <td></td> -->
+                    <td>{{disciplina?.sigla}}</td>
                     <td>
                         <button type="button" class="botaoEdit" (click)="showEditDialog(disciplina)" pButton>Editar</button>
                         <p-toast></p-toast>
@@ -63,6 +69,12 @@
                 <span class="p-float-label">
                     <input pInputText id="nomeEquip" class="form-control" formControlName="nome" maxlength="150" />
                     <label for="nomeEquip">Nome da disciplina</label>
+                </span>
+            </div>
+            <div class="divInput">
+                <span class="p-float-label">
+                    <input pInputText id="siglaDisc" class="form-control" formControlName="sigla" maxlength="50" />
+                    <label for="siglaDisc">Sigla do nome</label>
                 </span>
             </div>
             <div class="divBotao">

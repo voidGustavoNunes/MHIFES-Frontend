@@ -22,6 +22,8 @@ import { MessagesModule } from 'primeng/messages';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { FiltrarPesquisa } from '../../models/share/filtrar-pesquisa.models';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { FloatLabelModule } from 'primeng/floatlabel';
 
 @Component({
   selector: 'app-periodos-r',
@@ -45,7 +47,9 @@ import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
     CalendarModule,
     MessagesModule,
     OverlayPanelModule,
-    NgxMaskDirective
+    NgxMaskDirective,
+    InputNumberModule,
+    FloatLabelModule
   ],
   templateUrl: './periodos-r.component.html',
   styleUrl: './periodos-r.component.scss',
@@ -84,6 +88,9 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
   
   minDate!: Date;
 
+  minAno!: number;
+  maxAno!: number;
+
   constructor(
     private periodService: PeriodoService,
     private router: Router,
@@ -92,18 +99,22 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
     ) {
       this.form = this.formBuilder.group({
         id: [null],
-        nome: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
+        ano: [null, [Validators.required]],
+        semestre: [null, [Validators.required]],
         dataInicio: [null, [Validators.required]],
         dataFim: [null, [Validators.required]]
       }, { validator: this.validarDatas });
+
+      const date = new Date();
+      this.minAno = date.getFullYear() - 10;
+      this.maxAno = date.getFullYear() + 5;
   }
 
   ngOnInit() {
 
     this.filterOptions = [
-      {nome: 'Nome', id: 0},
-      {nome: 'Data de Início', id: 1},
-      {nome: 'Ano do Período', id: 2}
+      {nome: 'Data de Início', id: 0},
+      {nome: 'Ano', id: 1}
     ];
 
     this.unsubscribe$ = this.periodService.listar()
@@ -167,9 +178,10 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
     this.editar = true;
     this.form.setValue({
       id: value.id,
+      ano: value.ano,
+      semestre: value.semestre,
       dataInicio: value.dataInicio,
       dataFim: value.dataFim,
-      nome: value.nome
     })
     this.form.controls['dataFim'].setValue(new Date(value.dataFim));
     this.form.controls['dataInicio'].setValue(new Date(value.dataInicio));
@@ -205,16 +217,6 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
   }
 
   searchFilter0(term: string) {
-    this.periodosData = this.periodosFilter.filter(prd => {
-      if (prd.nome.toLowerCase().includes(term.toLowerCase())) {
-        return prd;
-      } else {
-        return null;
-      }
-    })
-  }
-
-  searchFilter1(term: string) {
     const dateTerm = this.formatarDtStrDt(term);
     
     if (dateTerm instanceof Date && !isNaN(dateTerm.getTime())) {
@@ -236,11 +238,11 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
     }
   }
 
-  searchFilter2(term: string) {
+  searchFilter1(term: string) {
     this.periodosData = this.periodosFilter.filter(el => {
       const searchTermAsNumber = parseInt(term);
       if (!isNaN(searchTermAsNumber)) {
-        const ano = new Date(el.dataInicio).getFullYear();
+        const ano = el.ano;
         if (ano === searchTermAsNumber) {
           return el;
         } else {
@@ -263,15 +265,14 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
       if(this.selectedFilter) {
         if(this.selectedFilter.id == 0) this.searchFilter0(searchTerm);
         if(this.selectedFilter.id == 1) this.searchFilter1(searchTerm);
-        if(this.selectedFilter.id == 2) this.searchFilter2(searchTerm);
       }
     }
   }
 
   updateMask() {
-    if (this.selectedFilter?.id == 1) {
+    if (this.selectedFilter?.id == 0) {
       this.txtFilter = '00/00/0000';
-    } else if (this.selectedFilter?.id == 2) {
+    } else if (this.selectedFilter?.id == 1) {
       this.txtFilter = '0000';
     } else {
       this.txtFilter = 'Pesquisar período';

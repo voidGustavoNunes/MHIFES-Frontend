@@ -99,16 +99,16 @@
             <ng-template pTemplate="header">
                 <tr class="tbHeader">
                     <th>Nome</th>
+                    <th>Sigla</th>
                     <th>Matrícula</th>
-                    <!-- <th>Curso</th> -->
                     <th></th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-professor>
                 <tr class="tbBody">
                     <td>{{professor?.nome}}</td>
+                    <td>{{professor?.sigla}}</td>
                     <td>{{professor?.matricula}}</td>
-                    <!-- <td>{{professor?.curso}}</td> -->
                     <td>
                         <button type="button" class="botaoInfo" (click)="showInfoDialog(professor)" pButton>Info</button>
                         <button type="button" class="botaoEdit" (click)="showEditDialog(professor)" pButton>Editar</button>
@@ -141,6 +141,12 @@
                 <span class="p-float-label">
                     <input pInputText id="nomeProfessor" class="form-control" formControlName="nome" maxlength="150" />
                     <label for="nomeProfessor">Nome do professor</label>
+                </span>
+            </div>
+            <div class="divInput">
+                <span class="p-float-label">
+                    <input pInputText id="siglaProfessor" class="form-control" formControlName="sigla" maxlength="50" />
+                    <label for="siglaProfessor">Sigla do nome</label>
                 </span>
             </div>
             <div class="divInput">
@@ -193,6 +199,9 @@
         <div id="meuFormInfo">
             <div class="divInput">
                 <b>Nome do professor:</b> {{professorInfo?.nome}}
+            </div>
+            <div class="divInput">
+                <b>Sigla do nome:</b> {{professorInfo?.sigla}}
             </div>
             <div class="divInput">
                 <b>Matrícula:</b> {{professorInfo?.matricula}}

@@ -158,15 +158,15 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       this.form = this.formBuilder.group({
         id: [null],
         horario: [null, [Validators.required]],
-        // horarioInicio: [null, [Validators.required]],
-        // horarioFim: [null, [Validators.required]],
         turma: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(30)]],
         dataAula: [null, [Validators.required]],
         local: [null, [Validators.required]],
-        disciplina: [null, [Validators.required]],
-        periodo: [null, [Validators.required]],
         professor: [null, [Validators.required]],
-        alunos: this.formBuilder.array([], [Validators.required]),
+        periodoDisciplina: this.formBuilder.group({
+          disciplina: [null, [Validators.required]],
+          periodo: [null, [Validators.required]],
+          alunos: this.formBuilder.array([], [Validators.required])
+        })
       })
       // , { validator: this.verificarHoraFimMaiorQueInicio });
   }
@@ -199,7 +199,13 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
           const dateB = new Date(b.dataAula);
           return dateB.getTime() - dateA.getTime();
         });
+        // data.sort((a: Alocacao, b: Alocacao) => {
+        //   const dateB = new Date(b.periodoDisciplina?.periodo?.dataInicio);
+        //   const dateA = new Date(a.periodoDisciplina?.periodo?.dataInicio);
+        //   return dateB.getTime() - dateA.getTime();
+        // });
         this.alocacoesData = data;
+        console.log(this.alocacoesData[0]?.periodoDisciplina)
 
         this.alocacoesFilter = this.alocacoesData;
       },
@@ -399,6 +405,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   showInfoDialog(valueInfo: Alocacao) {
     this.visibleInfo = true;
     this.alocacaoInfo = valueInfo;
+    console.log(this.alocacaoInfo?.periodoDisciplina?.periodo?.dataInicio)
   }
 
   showEditDialog(value: Alocacao, dtEv: string) {
@@ -415,24 +422,22 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       turma: value.turma,
       dataAula: value.dataAula,
       local: value.local,
-      disciplina: value.disciplina,
-      periodo: value.periodo,
       professor: value.professor,
-      alunos: value.alunos,
+      periodoDisciplina: value.periodoDisciplina,
     })
 
     const eventoData = this.formatarDtStrDt(dtEv);
 
     this.calendar.writeValue(eventoData);
-    this.dropdownDisc.writeValue(value.disciplina);
-    this.dropdownPeriodo.writeValue(value.periodo);
+    this.dropdownDisc.writeValue(value.periodoDisciplina.disciplina);
+    this.dropdownPeriodo.writeValue(value.periodoDisciplina.periodo);
     this.dropdownLocal.writeValue(value.local);
     this.dropdownProf.writeValue(value.professor);
-    this.multiselect.writeValue(value.alunos);
+    this.multiselect.writeValue(value.periodoDisciplina.alunos);
     this.dropdownHour.writeValue(value.horario);
 
-    this.selectedAlunos = value.alunos;
-    value.alunos.forEach(aln => {
+    this.selectedAlunos = value.periodoDisciplina.alunos;
+    value.periodoDisciplina.alunos.forEach(aln => {
       this.addAluno(aln);
     })
   }
@@ -657,13 +662,13 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   }
 
   searchFilter2(term: string) {
-    this.alocacoesData = this.alocacoesFilter.filter(aloca => {
-      if (aloca.disciplina.nome.toLowerCase().includes(term.toLowerCase())) {
-        return aloca;
-      } else {
-        return null;
-      }
-    })
+    // this.alocacoesData = this.alocacoesFilter.filter(aloca => {
+    //   if (aloca.disciplina.nome.toLowerCase().includes(term.toLowerCase())) {
+    //     return aloca;
+    //   } else {
+    //     return null;
+    //   }
+    // })
   }
 
   searchFilter3(term: string) {

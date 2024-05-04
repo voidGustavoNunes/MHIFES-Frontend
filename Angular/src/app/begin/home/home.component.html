@@ -20,7 +20,7 @@
                 <ng-template pTemplate="body">
                     <tr class="tbBody">
                         <!-- <td>{{ formatarHora(alocaoMaisProxima.horarioInicio) }} - {{ formatarHora(alocaoMaisProxima.horarioFim) }}</td> -->
-                        <td>{{ alocaoMaisProxima.disciplina.nome }}</td>
+                        <!-- <td>{{ alocaoMaisProxima.disciplina.nome }}</td> -->
                     </tr>
                 </ng-template>
             </p-table>
@@ -41,12 +41,12 @@
                 </ng-template>
                 <ng-template pTemplate="body" let-aloca>
                     <tr class="tbBody">
-                        <td class="larguraFixa">{{ formatarHora(aloca.horario.horaInicio) }} - {{ formatarHora(aloca.horario.horaFim) }}</td>
-                        <td *ngFor="let dia of diasDaSemana; let i = index">
+                        <!-- <td class="larguraFixa">{{ formatarHora(aloca.horario.horaInicio) }} - {{ formatarHora(aloca.horario.horaFim) }}</td> -->
+                        <!-- <td *ngFor="let dia of diasDaSemana; let i = index">
                             <ng-container *ngIf="exibirAlocacao(aloca, dia) && i !== 0">
                             {{ aloca.disciplina.nome }}
                             </ng-container>
-                        </td>
+                        </td> -->
                     </tr>
                 </ng-template>
             </p-table>

@@ -33,18 +33,16 @@
         >
             <ng-template pTemplate="header">
                 <tr class="tbHeader">
-                    <th>Nome</th>
+                    <th>Intervalo</th>
                     <th>Período</th>
-                    <!-- <th></th> -->
                     <th></th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-periodo>
                 <tr class="tbBody">
                     <!-- <td class="texto-limitado">{{periodo?.descricao }}</td> -->
-                    <td>{{periodo?.nome }}</td>
                     <td>{{periodo?.dataInicio | date: 'dd/MM/yyyy'}} - {{periodo?.dataFim | date: 'dd/MM/yyyy'}}</td>
-                    <!-- <td></td> -->
+                    <td>{{periodo?.ano}}/{{periodo?.semestre}}</td>
                     <td>
                         <button type="button" class="botaoInfo" (click)="showInfoDialog(periodo)" pButton>Info</button>
                         <button type="button" class="botaoEdit" (click)="showEditDialog(periodo)" pButton>Editar</button>
@@ -71,8 +69,18 @@
         <form id="meuFormulario" [formGroup]="form" (ngSubmit)="onSubmit()">
             <div class="divInput">
                 <span class="p-float-label">
-                    <input pInputText id="nomeEquip" class="form-control" formControlName="nome" maxlength="150" />
-                    <label for="nomeEquip">Nome do período</label>
+                    <input type="number" id="anoPer" class="form-control" formControlName="ano" [min]="minAno" [max]="maxAno" [mask]="'0000'" />
+                    <label for="anoPer">Ano do período</label>
+                </span>
+                <!-- <p-floatLabel>
+                    <p-inputNumber inputId="integeronly" id="anoPer" class="form-control" formControlName="ano" [min]="minAno" [max]="maxAno" [mask]="'0000'" />
+                    <label for="anoPer">Ano do período</label>
+                </p-floatLabel> -->
+            </div>
+            <div class="divInput">
+                <span class="p-float-label">
+                    <input type="number" id="semPer" class="form-control" formControlName="semestre" maxlength="1" [mask]="'0'" />
+                    <label for="semPer">Semestre</label>
                 </span>
             </div>
             <div class="divInput">
@@ -103,7 +111,7 @@
     <p-dialog header="Info do Período" [(visible)]="visibleInfo" [breakpoints]="{ '960px': '75vw' }" [style]="{width: '50vw', 'z-index': '1102'}">
         <div id="meuFormInfo">
             <div class="divInput" style="white-space: pre-line;">
-                <b>Nome:</b> {{periodoInfo?.nome}}
+                <b>Período:</b> {{periodoInfo?.ano}}/{{periodoInfo?.semestre}}
             </div>
             <div class="divInput dtPeriodo">
                 <b>Data de início:</b> {{periodoInfo?.dataInicio | date: 'fullDate' : '' : 'pt-BR'}}
