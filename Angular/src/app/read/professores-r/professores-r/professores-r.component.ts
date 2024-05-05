@@ -113,7 +113,7 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
         matricula: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
         sigla: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
         ehCoordenador: [false, [Validators.required]],
-        coordenadoria: [null, [Validators.required]],
+        coordenadoria: [null],
       });
   }
 
