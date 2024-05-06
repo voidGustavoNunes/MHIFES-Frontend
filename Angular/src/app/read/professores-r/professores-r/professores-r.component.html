@@ -204,7 +204,7 @@
                 <b>Matrícula:</b> {{professorInfo?.matricula}}
             </div>
             <div class="divInput" *ngIf="!professorInfo?.ehCoordenador">
-                <b>Coordenadoria:</b> {{professorInfo?.coordenadoria}}
+                <b>Coordenadoria:</b> {{professorInfo?.coordenadoria?.nome}}
             </div>
             <div class="divBotao">
                 <button type="button" class="botaoInfo" (click)="visibleInfo = false" pButton>Ok</button>

@@ -888,13 +888,12 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
         if(dt.getTime() != ini?.getTime()) {
           this.alocacaoHour.find(alocH => {
             const diaDaSemana = this.obterDiaDaSemana(dt);
-            console.log('dia ',diaDaSemana)
-            console.log('aloh ',alocH.diaSemana.nome)
-            console.log('hor ',alocH.horario)
+            let size = this.alocacoesCadast.length - 1;
             if(diaDaSemana == alocH.diaSemana.nome) {
               this.form.patchValue({
-                dataAula: dt,
-                horario: alocH.horario
+                dataAula: dt, 
+                horario: alocH.horario,
+                periodoDisciplina: this.alocacoesCadast.at(size)?.periodoDisciplina
               });
               if (new Date(dt).getTime() === ultimoDiaIntervalo.getTime()) {
                 this.mss = true;
