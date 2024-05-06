@@ -433,17 +433,17 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
 }
 
 onRFIDEnter() {
-  if (this.rfidValue.length === 10) { // Se 10 números foram digitados
+  if (this.rfidValue.length === 10) {
     const matriculaControl = this.form.get('matricula');
-    if (matriculaControl) { // Verificar se o controle de matrícula existe
-      matriculaControl.setValue(this.rfidValue); // Definir o valor da matrícula com o valor do RFID
+    if (matriculaControl) {
+      matriculaControl.setValue(this.rfidValue);
     }
-    this.rfidDialogVisible = false; // Fechar a janela de leitura RFID
+    this.rfidDialogVisible = false;
   }
 }
 
 closeRFIDDialog() {
-  this.rfidDialogVisible = false; // Define a visibilidade do diálogo como falso para fechar a janela
+  this.rfidDialogVisible = false;
 }
 
 }
