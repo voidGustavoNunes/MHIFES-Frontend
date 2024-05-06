@@ -1,224 +1,245 @@
 <div class="caixa">
-    <h1>Alocações</h1>
+  <h1>Alocações</h1>
 
-    <div class="opcao">
-        <a (click)="showDialog()" class="p-button botaoC">Cadastrar +</a>
+  <div class="opcao">
+    <a (click)="showDialog()" class="p-button botaoC">Cadastrar +</a>
 
-        <div class="pesq">
-            <p-overlayPanel #op>
-                <div style="display: flex; flex-direction: column; align-items: center; gap: .5rem;">
-                    <p-dropdown [options]="filterOptions" [(ngModel)]="selectedFilter" optionLabel="nome" [showClear]="true" (ngModelChange)="updateMask()" placeholder="Selecione um filtro"></p-dropdown>
-                    <p-button label="Limpar filtro" severity="warning" (click)="limparFilter()"></p-button>
-                </div>
-            </p-overlayPanel>
-            <p-inputGroup>
-                <button type="button" pButton (click)="op.toggle($event)" icon="pi pi-filter-fill"></button>
-                <input #searchInput type="text" pInputText [mask]="selectedFilter?.id === 3 ? '00:00' : null" [placeholder]="txtFilter" (keydown)="onKeyDown($event, searchInput.value)" />
-                <button type="button" pButton icon="pi pi-search" (click)="filterField(searchInput.value)"></button>
-            </p-inputGroup>
+    <div class="pesq">
+      <p-overlayPanel #op>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: .5rem;">
+          <p-dropdown [options]="filterOptions" [(ngModel)]="selectedFilter" optionLabel="nome" [showClear]="true"
+            (ngModelChange)="updateMask()" placeholder="Selecione um filtro"></p-dropdown>
+          <p-button label="Limpar filtro" severity="warning" (click)="limparFilter()"></p-button>
         </div>
+      </p-overlayPanel>
+      <p-inputGroup>
+        <button type="button" pButton (click)="op.toggle($event)" icon="pi pi-filter-fill"></button>
+        <input #searchInput type="text" pInputText [mask]="selectedFilter?.id === 3 ? '00:00' : null"
+          [placeholder]="txtFilter" (keydown)="onKeyDown($event, searchInput.value)" />
+        <button type="button" pButton icon="pi pi-search" (click)="filterField(searchInput.value)"></button>
+      </p-inputGroup>
     </div>
+  </div>
 
-    <div class="eqTable">
-        <p-table
-            #dt1
-            [value]="alocacoesData"
-            styleClass="p-datatable-striped"
-            [tableStyle]="{'min-width': '50rem'}"
-            [paginator]="true"
-            [rows]="10"
-            [showCurrentPageReport]="true"
-            currentPageReportTemplate="Mostrando do {first} ao {last} de {totalRecords} registros"
-            [rowsPerPageOptions]="[10, 20, 40]"
-        >
-            <ng-template pTemplate="header">
-                <tr class="tbHeader">
-                    <th>Professor</th>
-                    <th>Local</th>
-                    <th>Disciplina</th>
-                    <th>Horário</th>
-                    <th></th>
-                </tr>
-            </ng-template>
-            <ng-template pTemplate="body" let-alocacao>
-                <tr class="tbBody">
-                    <td>{{alocacao?.professor.nome}}</td>
-                    <td>{{alocacao?.local.nome}}</td>
-                    <td>{{alocacao?.periodoDisciplina?.disciplina.nome}}</td>
-                    <td>{{ formatarHora(alocacao?.horario?.horaInicio) }} - {{ formatarHora(alocacao?.horario?.horaFim) }}</td>
-                    <td>
-                        <button type="button" class="botaoL" (click)="showDialogLog(alocacao)" pButton>Log</button>
-                        <button type="button" class="botaoInfo" (click)="showInfoDialog(alocacao)" pButton>Info</button>
-                        <button type="button" class="botaoEdit" (click)="showEditDialog(alocacao, formatarDatas(alocacao?.dataAula))" pButton>Editar</button>
-                        <p-toast></p-toast>
-                        <p-confirmPopup></p-confirmPopup>
-                        <button type="button" class="botaoDele" (click)="confirm2($event, alocacao?.id)" severity="danger" pButton>Deletar</button>
-                    </td>
-                </tr>
-            </ng-template>
-            <ng-template pTemplate="emptymessage">
-                <tr>
-                    <td colspan="3">Não há alocações cadastradas.</td>
-                </tr>
-            </ng-template>
-        </p-table>
-    </div>
-    <!-- terminar de estilizar logs -->
-    <p-scrollTop></p-scrollTop>
+  <div class="eqTable">
+    <p-table #dt1 [value]="alocacoesData" styleClass="p-datatable-striped" [tableStyle]="{'min-width': '50rem'}"
+      [paginator]="true" [rows]="10" [showCurrentPageReport]="true"
+      currentPageReportTemplate="Mostrando do {first} ao {last} de {totalRecords} registros"
+      [rowsPerPageOptions]="[10, 20, 40]">
+      <ng-template pTemplate="header">
+        <tr class="tbHeader">
+          <th>Professor</th>
+          <th>Local</th>
+          <th>Disciplina</th>
+          <th>Horário</th>
+          <th></th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-alocacao>
+        <tr class="tbBody">
+          <td>{{alocacao?.professor.nome}}</td>
+          <td>{{alocacao?.local.nome}}</td>
+          <td>{{alocacao?.periodoDisciplina?.disciplina.nome}}</td>
+          <td>{{ formatarHora(alocacao?.horario?.horaInicio) }} - {{ formatarHora(alocacao?.horario?.horaFim) }}</td>
+          <td>
+            <button type="button" class="botaoL" (click)="showDialogLog(alocacao)" pButton>Log</button>
+            <button type="button" class="botaoInfo" (click)="showInfoDialog(alocacao)" pButton>Info</button>
+            <button type="button" class="botaoEdit"
+              (click)="showEditDialog(alocacao, formatarDatas(alocacao?.dataAula))" pButton>Editar</button>
+            <p-toast></p-toast>
+            <p-confirmPopup></p-confirmPopup>
+            <button type="button" class="botaoDele" (click)="confirm2($event, alocacao?.id)" severity="danger"
+              pButton>Deletar</button>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="3">Não há alocações cadastradas.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+  <!-- terminar de estilizar logs -->
+  <p-scrollTop></p-scrollTop>
 </div>
 
 
 <div class="card flex justify-content-center">
-    <p-dialog class="pHeader" [header]=ehTitulo [(visible)]="visible" [modal]="true" [breakpoints]="{ '960px': '75vw' }" [style]="{ width: '50vw' }" [draggable]="false" [resizable]="false">
-        <form id="meuFormulario" [formGroup]="form" (ngSubmit)="onSubmit()">
-            <div class="divInput" formGroupName="periodoDisciplina">
-                <span class="p-float-label">
-                    <p-dropdown #dropdownDisc appendTo="body" [options]="disciplinasArray" optionLabel="nome" [filter]="true" filterBy="nome" [showClear]="true" placeholder="Selecione uma disciplina" inputId="discEvent" class="form-control" formControlName="disciplina">
-                        <ng-template pTemplate="selectedItem" let-selectedOption>
-                            <div class="flex align-items-center gap-2">
-                                <div>{{ selectedOption?.nome }}</div>
-                            </div>
-                        </ng-template>
-                        <ng-template let-disciplinaData pTemplate="item">
-                            <div class="flex align-items-center gap-2">
-                                <div>{{ disciplinaData.nome }}</div>
-                            </div>
-                        </ng-template>
-                    </p-dropdown>
-                    <label for="discEvent">Disciplina</label>
-                </span>
-            </div>
-            <div class="divInput">
-                <span class="p-float-label">
-                    <p-dropdown #dropdownProf appendTo="body" [options]="professoresArray" optionLabel="nome" [filter]="true" filterBy="nome" [showClear]="true" placeholder="Selecione um professor" inputId="profAloc" class="form-control" formControlName="professor">
-                        <ng-template pTemplate="selectedItem" let-selectedOption>
-                            <div class="flex align-items-center gap-2">
-                                <div>{{ selectedOption?.nome }}</div>
-                            </div>
-                        </ng-template>
-                        <ng-template let-professorData pTemplate="item">
-                            <div class="flex align-items-center gap-2">
-                                <div>{{ professorData.nome }}</div>
-                            </div>
-                        </ng-template>
-                    </p-dropdown>
-                    <label for="localEvent">Professor</label>
-                </span>
-            </div>
-            <div class="divInput">
-                <span class="p-float-label">
-                    <p-dropdown #dropdownLocal appendTo="body" [options]="locaisArray" optionLabel="nome" [filter]="true" filterBy="nome" [showClear]="true" placeholder="Selecione um local" inputId="localAloc" class="form-control" formControlName="local">
-                        <ng-template pTemplate="selectedItem" let-selectedOption>
-                            <div class="flex align-items-center gap-2">
-                                <div>{{ selectedOption?.nome }}</div>
-                            </div>
-                        </ng-template>
-                        <ng-template let-localData pTemplate="item">
-                            <div class="flex align-items-center gap-2">
-                                <div>{{ localData.nome }}</div>
-                            </div>
-                        </ng-template>
-                    </p-dropdown>
-                    <label for="localAloc">Local</label>
-                </span>
-            </div>
-            <div class="divInput" formGroupName="periodoDisciplina">
-                <span class="p-float-label">
-                    <p-dropdown #dropdownPeriodo appendTo="body" [options]="periodosArray" placeholder="Selecione um período" inputId="perdAloc" class="form-control" formControlName="periodo" (onChange)="updateDataAulaState()">
-                        <ng-template let-periodoData pTemplate="selectedItem">
-                            <div>{{periodoData?.ano}}/{{periodoData?.semestre}} : {{ periodoData.dataInicio | date: 'dd/MM/yyyy' }} - {{ periodoData.dataFim | date: 'dd/MM/yyyy' }}</div>
-                          </ng-template>
-                          <ng-template let-periodoData pTemplate="item">
-                            <div class="flex align-items-center gap-2">
-                              <div>{{periodoData?.ano}}/{{periodoData?.semestre}} : {{ periodoData.dataInicio | date: 'dd/MM/yyyy' }} - {{ periodoData.dataFim | date: 'dd/MM/yyyy' }}</div>
-                            </div>
-                          </ng-template>
-                    </p-dropdown>
-                    <label for="perdAloc">Período</label>
-                </span>
-            </div>
-            <div class="divInput labelFlex" *ngIf="enableDataAula">
-                <div>
-                    <span class="p-float-label">
-                        <p-calendar appendTo="body" dateFormat="dd/mm/yy" id="iniPer" class="form-control" formControlName="dataAula" (onSelect)="onDateIniSelect()" [minDate]="minDateAula" [maxDate]="maxDateAula" ></p-calendar>
-                        <label for="iniPer">Início da aula</label>
-                    </span>
+  <p-dialog class="pHeader" [header]=ehTitulo [(visible)]="visible" [modal]="true" [breakpoints]="{ '960px': '75vw' }"
+    [style]="{ width: '50vw' }" [draggable]="false" [resizable]="false">
+    <form id="meuFormulario" [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="divInput" formGroupName="periodoDisciplina">
+        <span class="p-float-label">
+          <p-dropdown #dropdownDisc appendTo="body" [options]="disciplinasArray" optionLabel="nome" [filter]="true"
+            filterBy="nome" [showClear]="true" placeholder="Selecione uma disciplina" inputId="discEvent"
+            class="form-control" formControlName="disciplina">
+            <ng-template pTemplate="selectedItem" let-selectedOption>
+              <div class="flex align-items-center gap-2">
+                <div>{{ selectedOption?.nome }}</div>
+              </div>
+            </ng-template>
+            <ng-template let-disciplinaData pTemplate="item">
+              <div class="flex align-items-center gap-2">
+                <div>{{ disciplinaData.nome }}</div>
+              </div>
+            </ng-template>
+          </p-dropdown>
+          <label for="discEvent">Disciplina</label>
+        </span>
+      </div>
+      <div class="divInput">
+        <span class="p-float-label">
+          <p-dropdown #dropdownProf appendTo="body" [options]="professoresArray" optionLabel="nome" [filter]="true"
+            filterBy="nome" [showClear]="true" placeholder="Selecione um professor" inputId="profAloc"
+            class="form-control" formControlName="professor">
+            <ng-template pTemplate="selectedItem" let-selectedOption>
+              <div class="flex align-items-center gap-2">
+                <div>{{ selectedOption?.nome }}</div>
+              </div>
+            </ng-template>
+            <ng-template let-professorData pTemplate="item">
+              <div class="flex align-items-center gap-2">
+                <div>{{ professorData.nome }}</div>
+              </div>
+            </ng-template>
+          </p-dropdown>
+          <label for="localEvent">Professor</label>
+        </span>
+      </div>
+      <div class="divInput">
+        <span class="p-float-label">
+          <p-dropdown #dropdownLocal appendTo="body" [options]="locaisArray" optionLabel="nome" [filter]="true"
+            filterBy="nome" [showClear]="true" placeholder="Selecione um local" inputId="localAloc" class="form-control"
+            formControlName="local">
+            <ng-template pTemplate="selectedItem" let-selectedOption>
+              <div class="flex align-items-center gap-2">
+                <div>{{ selectedOption?.nome }}</div>
+              </div>
+            </ng-template>
+            <ng-template let-localData pTemplate="item">
+              <div class="flex align-items-center gap-2">
+                <div>{{ localData.nome }}</div>
+              </div>
+            </ng-template>
+          </p-dropdown>
+          <label for="localAloc">Local</label>
+        </span>
+      </div>
+      <div class="divInput" formGroupName="periodoDisciplina">
+        <span class="p-float-label">
+          <p-dropdown #dropdownPeriodo appendTo="body" [options]="periodosArray" placeholder="Selecione um período"
+            inputId="perdAloc" class="form-control" formControlName="periodo" (onChange)="updateDataAulaState()">
+            <ng-template let-periodoData pTemplate="selectedItem">
+              <div>{{periodoData?.ano}}/{{periodoData?.semestre}} : {{ periodoData.dataInicio | date: 'dd/MM/yyyy' }} -
+                {{ periodoData.dataFim | date: 'dd/MM/yyyy' }}</div>
+            </ng-template>
+            <ng-template let-periodoData pTemplate="item">
+              <div class="flex align-items-center gap-2">
+                <div>{{periodoData?.ano}}/{{periodoData?.semestre}} : {{ periodoData.dataInicio | date: 'dd/MM/yyyy' }}
+                  - {{ periodoData.dataFim | date: 'dd/MM/yyyy' }}</div>
+              </div>
+            </ng-template>
+          </p-dropdown>
+          <label for="perdAloc">Período</label>
+        </span>
+      </div>
+      <div class="divInput labelFlex" *ngIf="enableDataAula">
+        <div>
+          <span class="p-float-label">
+            <p-calendar appendTo="body" dateFormat="dd/mm/yy" id="iniPer" class="form-control"
+              formControlName="dataAula" (onSelect)="onDateIniSelect()" [minDate]="minDateAula"
+              [maxDate]="maxDateAula"></p-calendar>
+            <label for="iniPer">Início da aula</label>
+          </span>
+        </div>
+        <div>
+          <span class="p-float-label">
+            <p-dropdown #dropdownHour appendTo="body" [options]="horariosArray" placeholder="Selecione o horário"
+              inputId="horAloc" class="form-control" formControlName="horario" (onChange)="updateSelectState()">
+              <ng-template let-hourData pTemplate="selectedItem">
+                <div>{{ formatarHora(hourData.horaInicio) }} - {{ formatarHora(hourData.horaFim) }}</div>
+              </ng-template>
+              <ng-template let-hourData pTemplate="item">
+                <div class="flex align-items-center gap-2">
+                  <div>{{ formatarHora(hourData.horaInicio) }} - {{ formatarHora(hourData.horaFim) }}</div>
                 </div>
-                <div>
-                    <span class="p-float-label">
-                        <p-dropdown #dropdownHour appendTo="body" [options]="horariosArray" placeholder="Selecione o horário" inputId="horAloc" class="form-control" formControlName="horario" (onChange)="updateSelectState()">
-                            <ng-template let-hourData pTemplate="selectedItem">
-                                <div>{{ formatarHora(hourData.horaInicio) }} - {{ formatarHora(hourData.horaFim) }}</div>
-                            </ng-template>
-                            <ng-template let-hourData pTemplate="item">
-                                <div class="flex align-items-center gap-2">
-                                <div>{{ formatarHora(hourData.horaInicio) }} - {{ formatarHora(hourData.horaFim) }}</div>
-                                </div>
-                            </ng-template>
-                        </p-dropdown>
-                        <label for="horAloc">Horário</label>
-                    </span>
-                </div>
+              </ng-template>
+            </p-dropdown>
+            <label for="horAloc">Horário</label>
+          </span>
+        </div>
+      </div>
+      <div class="divInput" *ngIf="enableSelect">
+        <span class="p-float-label">
+          <p-multiSelect #multiselect [disabled]="disableDiaSemana" appendTo="body" inputId="semanaDia" display="chip"
+            [(ngModel)]="selectedDiasSemana" [ngModelOptions]="{standalone: true}" [options]="opcaoSemana"
+            optionLabel="nome" (onChange)="onMultiselectChange()"></p-multiSelect>
+          <label for="semanaDia">Selecione os dias da semana</label>
+        </span>
+      </div>
+      <div class="replicaGrid" *ngIf="alocacaoHour.length > 0">
+        <div class="columnContainer" *ngFor="let replica of alocacaoHour; let i = index">
+          <div class="divInput labelFlex">
+            <div>
+              <input pInputText [disabled]="true" [(ngModel)]="replica.diaSemana.nome"
+                [ngModelOptions]="{standalone: true}" />
             </div>
-            <div class="divInput" *ngIf="enableSelect">
-                <span class="p-float-label">
-                    <p-multiSelect #multiselect [disabled]="disableDiaSemana" appendTo="body" inputId="semanaDia" display="chip" [(ngModel)]="selectedDiasSemana" [ngModelOptions]="{standalone: true}" [options]="opcaoSemana" optionLabel="nome" (onChange)="onMultiselectChange()" ></p-multiSelect>
-                    <label for="semanaDia">Selecione os dias da semana</label>
-                </span>
-            </div>
-            <div class="replicaGrid" *ngIf="alocacaoHour.length > 0">
-                <div class="columnContainer" *ngFor="let replica of alocacaoHour; let i = index">
-                    <div class="divInput labelFlex">
-                        <div>
-                            <input pInputText [disabled]="true" [(ngModel)]="replica.diaSemana.nome" [ngModelOptions]="{standalone: true}" />
-                        </div>
-                        <div>
-                            <span class="p-float-label">
-                                <p-dropdown #dropdownHour appendTo="body" [options]="horariosArray" placeholder="Selecione o horário" inputId="horAloc{{i}}" [(ngModel)]="replica.horario" [ngModelOptions]="{standalone: true}" (ngModelChange)="onChangeHourIni()">
-                                    <ng-template let-hourData pTemplate="selectedItem">
-                                        <div>{{ formatarHora(hourData.horaInicio) }} - {{ formatarHora(hourData.horaFim) }}</div>
-                                    </ng-template>
-                                    <ng-template let-hourData pTemplate="item">
-                                        <div class="flex align-items-center gap-2">
-                                        <div>{{ formatarHora(hourData.horaInicio) }} - {{ formatarHora(hourData.horaFim) }}</div>
-                                        </div>
-                                    </ng-template>
-                                </p-dropdown>
-                                <label for="horAloc{{i}}">Horário</label>
-                            </span>
-                        </div>
+            <div>
+              <span class="p-float-label">
+                <p-dropdown #dropdownHour appendTo="body" [options]="horariosArray" placeholder="Selecione o horário"
+                  inputId="horAloc{{i}}" [(ngModel)]="replica.horario" [ngModelOptions]="{standalone: true}"
+                  (ngModelChange)="onChangeHourIni()">
+                  <ng-template let-hourData pTemplate="selectedItem">
+                    <div>{{ formatarHora(hourData.horaInicio) }} - {{ formatarHora(hourData.horaFim) }}</div>
+                  </ng-template>
+                  <ng-template let-hourData pTemplate="item">
+                    <div class="flex align-items-center gap-2">
+                      <div>{{ formatarHora(hourData.horaInicio) }} - {{ formatarHora(hourData.horaFim) }}</div>
                     </div>
-                </div>
+                  </ng-template>
+                </p-dropdown>
+                <label for="horAloc{{i}}">Horário</label>
+              </span>
             </div>
-            <div class="divInput" *ngIf="selectedDiasSemana.length > 0">
-                <p-inputSwitch [(ngModel)]="enableCalendar" [ngModelOptions]="{standalone: true}" (ngModelChange)="onSwitchChange()" />
-            </div>
-            <div class="divInput" *ngIf="selectedDiasSemana.length > 0 && enableCalendar">
-                <span class="p-float-label">
-                    <!-- <p-calendar #calendarIntervalo [(ngModel)]="diasIntervalo" [ngModelOptions]="{standalone: true}" appendTo="body" selectionMode="multiple" dateFormat="dd/mm/yy" [readonlyInput]="true" id="itvData" (ngModelChange)="verificarDataHour()" [minDate]="minDate" [maxDate]="maxDate" ></p-calendar> -->
+          </div>
+        </div>
+      </div>
+      <div class="divInput" *ngIf="selectedDiasSemana.length > 0">
+        <p-inputSwitch [(ngModel)]="enableCalendar" [ngModelOptions]="{standalone: true}"
+          (ngModelChange)="onSwitchChange()" />
+      </div>
+      <div class="divInput" *ngIf="selectedDiasSemana.length > 0 && enableCalendar">
+        <span class="p-float-label">
+          <!-- <p-calendar #calendarIntervalo [(ngModel)]="diasIntervalo" [ngModelOptions]="{standalone: true}" appendTo="body" selectionMode="multiple" dateFormat="dd/mm/yy" [readonlyInput]="true" id="itvData" (ngModelChange)="verificarDataHour()" [minDate]="minDate" [maxDate]="maxDate" ></p-calendar> -->
 
-                    <p-calendar #calendarIntervalo appendTo="body" selectionMode="multiple" class="max-w-full" [(ngModel)]="diasIntervalo" [ngModelOptions]="{standalone: true}" id="itvData" (ngModelChange)="verificarDataHour()" [minDate]="minDate" [maxDate]="maxDate" [inline]="true" [showWeek]="true" />
-                    <!-- <label for="itvData">Intervalo de dias</label> -->
-                </span>
-            </div>
-            <div class="divInput">
-                <span class="p-float-label">
-                    <input pInputText maxlength="30" id="turmaAloc" class="form-control" formControlName="turma" />
-                    <label for="turmaAloc">Turma</label>
-                </span>
-            </div>
-            <div class="divInput" formGroupName="periodoDisciplina">
-                <span class="p-float-label" formArrayName="alunos">
-                    <p-multiSelect #multiselect appendTo="body" inputId="alunoAloc" display="chip" [(ngModel)]="selectedAlunos" [ngModelOptions]="{standalone: true}" [options]="alunosArray" optionLabel="nome" (onChange)="onAlunosChange($event)" ></p-multiSelect>
-                    <label for="alunoAloc">Selecione os alunos</label>
-                </span>
-            </div>
-            <div class="divBotao">
-                <button type="submit" class="botaoSalva" *ngIf="cadastrar" pButton>Salvar</button>
-                <button type="button" class="botaoCancela" (click)="hideDialog()" pButton>Cancelar</button>
-            </div>
-        </form>
-<!-- <div style="margin-top:20px;margin-left: 4em; width: 600px;" form="form">
+          <p-calendar #calendarIntervalo appendTo="body" selectionMode="multiple" class="max-w-full"
+            [(ngModel)]="diasIntervalo" [ngModelOptions]="{standalone: true}" id="itvData"
+            (ngModelChange)="verificarDataHour()" [minDate]="minDate" [maxDate]="maxDate" [inline]="true"
+            [showWeek]="true" />
+          <!-- <label for="itvData">Intervalo de dias</label> -->
+        </span>
+      </div>
+      <div class="divInput">
+        <span class="p-float-label">
+          <input pInputText maxlength="30" id="turmaAloc" class="form-control" formControlName="turma" />
+          <label for="turmaAloc">Turma</label>
+        </span>
+      </div>
+      <div class="divInput" formGroupName="periodoDisciplina">
+        <span class="p-float-label" formArrayName="alunos">
+          <p-multiSelect #multiselect appendTo="body" inputId="alunoAloc" display="chip" [(ngModel)]="selectedAlunos"
+            [ngModelOptions]="{standalone: true}" [options]="alunosArray" optionLabel="nome"
+            (onChange)="onAlunosChange($event)"></p-multiSelect>
+          <label for="alunoAloc">Selecione os alunos</label>
+        </span>
+      </div>
+      <div class="divBotao">
+        <button type="submit" class="botaoSalva" *ngIf="cadastrar" pButton>Salvar</button>
+        <button type="button" class="botaoCancela" (click)="hideDialog()" pButton>Cancelar</button>
+      </div>
+    </form>
+    <!-- <div style="margin-top:20px;margin-left: 4em; width: 600px;" form="form">
     <div style="background-color: tomato;">
         Detalhes do form
     </div>
@@ -232,184 +253,202 @@
         Valores: <br> {{ form.value | json }}
     </pre>
 </div> -->
-    </p-dialog>
+  </p-dialog>
 </div>
 
 <div class="card flex justify-content-center">
-    <p-dialog class="pHeader" [header]=ehTitulo [(visible)]="visibleEdit" [modal]="true" [breakpoints]="{ '960px': '75vw' }" [style]="{ width: '50vw' }" [draggable]="false" [resizable]="false">
-        <form id="meuFormulario" [formGroup]="form" (ngSubmit)="onSubmit()">
-            <div class="divInput">
-                <span class="p-float-label" formGroupName="periodoDisciplina">
-                    <p-dropdown #dropdownDisc appendTo="body" [options]="disciplinasArray" optionLabel="nome" [filter]="true" filterBy="nome" [showClear]="true" placeholder="Selecione uma disciplina" inputId="discEvent" class="form-control" formControlName="disciplina">
-                        <ng-template pTemplate="selectedItem" let-selectedOption>
-                            <div class="flex align-items-center gap-2">
-                                <div>{{ selectedOption?.nome }}</div>
-                            </div>
-                        </ng-template>
-                        <ng-template let-disciplinaData pTemplate="item">
-                            <div class="flex align-items-center gap-2">
-                                <div>{{ disciplinaData.nome }}</div>
-                            </div>
-                        </ng-template>
-                    </p-dropdown>
-                    <label for="discEvent">Disciplina</label>
-                </span>
-            </div>
-            <div class="divInput">
-                <span class="p-float-label">
-                    <p-dropdown #dropdownProf appendTo="body" [options]="professoresArray" optionLabel="nome" [filter]="true" filterBy="nome" [showClear]="true" placeholder="Selecione um professor" inputId="profAloc" class="form-control" formControlName="professor">
-                        <ng-template pTemplate="selectedItem" let-selectedOption>
-                            <div class="flex align-items-center gap-2">
-                                <div>{{ selectedOption?.nome }}</div>
-                            </div>
-                        </ng-template>
-                        <ng-template let-professorData pTemplate="item">
-                            <div class="flex align-items-center gap-2">
-                                <div>{{ professorData.nome }}</div>
-                            </div>
-                        </ng-template>
-                    </p-dropdown>
-                    <label for="localEvent">Professor</label>
-                </span>
-            </div>
-            <div class="divInput">
-                <span class="p-float-label">
-                    <p-dropdown #dropdownLocal appendTo="body" [options]="locaisArray" optionLabel="nome" [filter]="true" filterBy="nome" [showClear]="true" placeholder="Selecione um local" inputId="localAloc" class="form-control" formControlName="local">
-                        <ng-template pTemplate="selectedItem" let-selectedOption>
-                            <div class="flex align-items-center gap-2">
-                                <div>{{ selectedOption?.nome }}</div>
-                            </div>
-                        </ng-template>
-                        <ng-template let-localData pTemplate="item">
-                            <div class="flex align-items-center gap-2">
-                                <div>{{ localData.nome }}</div>
-                            </div>
-                        </ng-template>
-                    </p-dropdown>
-                    <label for="localAloc">Local</label>
-                </span>
-            </div>
-            <div class="divInput" formGroupName="periodoDisciplina">
-                <span class="p-float-label">
-                    <p-dropdown #dropdownPeriodo appendTo="body" [options]="periodosArray" placeholder="Selecione um período" inputId="perdEvent" class="form-control" formControlName="periodo">
-                        <ng-template let-periodoData pTemplate="selectedItem">
-                            <div>{{periodoData?.ano}}/{{periodoData?.semestre}} : {{ periodoData.dataInicio | date: 'dd/MM/yyyy' }} - {{ periodoData.dataFim | date: 'dd/MM/yyyy' }}</div>
-                          </ng-template>
-                          <ng-template let-periodoData pTemplate="item">
-                            <div class="flex align-items-center gap-2">
-                              <div>{{periodoData?.ano}}/{{periodoData?.semestre}} : {{ periodoData.dataInicio | date: 'dd/MM/yyyy' }} - {{ periodoData.dataFim | date: 'dd/MM/yyyy' }}</div>
-                            </div>
-                          </ng-template>
-                    </p-dropdown>
-                    <label for="perdEvent">Período</label>
-                </span>
-            </div>
-            <div class="divInput">
-                <span class="p-float-label">
-                    <p-calendar #calendar appendTo="body" dateFormat="dd/mm/yy" id="fimPer" class="form-control" formControlName="dataAula" ></p-calendar>
-                    <label for="fimPer">Data da aula</label>
-                </span>
-            </div>
-            <div class="divInput">
-                <span class="p-float-label">
-                    <p-dropdown #dropdownHour appendTo="body" [options]="horariosArray" placeholder="Selecione o horário" inputId="horAloc" class="form-control" formControlName="horario">
-                        <ng-template let-hourData pTemplate="selectedItem">
-                            <div>{{ formatarHora(hourData.horaInicio) }} - {{ formatarHora(hourData.horaFim) }}</div>
-                        </ng-template>
-                        <ng-template let-hourData pTemplate="item">
-                            <div class="flex align-items-center gap-2">
-                            <div>{{ formatarHora(hourData.horaInicio) }} - {{ formatarHora(hourData.horaFim) }}</div>
-                            </div>
-                        </ng-template>
-                    </p-dropdown>
-                    <label for="horAloc">Horário</label>
-                </span>
-            </div>
-            <div class="divInput">
-                <span class="p-float-label">
-                    <input pInputText maxlength="10" id="turmaAloc" class="form-control" formControlName="turma" />
-                    <label for="turmaAloc">Turma</label>
-                </span>
-            </div>
-            <div class="divInput" formGroupName="periodoDisciplina">
-                <span class="p-float-label" formArrayName="alunos">
-                    <p-multiSelect #multiselect appendTo="body" inputId="alunoAloc" display="chip" [(ngModel)]="selectedAlunos" [ngModelOptions]="{standalone: true}" [options]="alunosArray" optionLabel="nome" (ngModelChange)="onAlunosChange($event)" ></p-multiSelect>
-                    <label for="alunoAloc">Selecione os alunos</label>
-                </span>
-            </div>
-            <div class="divBotao">
-                <button type="submit" class="botaoEdit" *ngIf="editar" pButton>Atualizar</button>
-                <button type="button" class="botaoCancela" (click)="hideDialog()" pButton>Cancelar</button>
-            </div>
-        </form>
-    </p-dialog>
+  <p-dialog class="pHeader" [header]=ehTitulo [(visible)]="visibleEdit" [modal]="true"
+    [breakpoints]="{ '960px': '75vw' }" [style]="{ width: '50vw' }" [draggable]="false" [resizable]="false">
+    <form id="meuFormulario" [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="divInput">
+        <span class="p-float-label" formGroupName="periodoDisciplina">
+          <p-dropdown #dropdownDisc appendTo="body" [options]="disciplinasArray" optionLabel="nome" [filter]="true"
+            filterBy="nome" [showClear]="true" placeholder="Selecione uma disciplina" inputId="discEvent"
+            class="form-control" formControlName="disciplina">
+            <ng-template pTemplate="selectedItem" let-selectedOption>
+              <div class="flex align-items-center gap-2">
+                <div>{{ selectedOption?.nome }}</div>
+              </div>
+            </ng-template>
+            <ng-template let-disciplinaData pTemplate="item">
+              <div class="flex align-items-center gap-2">
+                <div>{{ disciplinaData.nome }}</div>
+              </div>
+            </ng-template>
+          </p-dropdown>
+          <label for="discEvent">Disciplina</label>
+        </span>
+      </div>
+      <div class="divInput">
+        <span class="p-float-label">
+          <p-dropdown #dropdownProf appendTo="body" [options]="professoresArray" optionLabel="nome" [filter]="true"
+            filterBy="nome" [showClear]="true" placeholder="Selecione um professor" inputId="profAloc"
+            class="form-control" formControlName="professor">
+            <ng-template pTemplate="selectedItem" let-selectedOption>
+              <div class="flex align-items-center gap-2">
+                <div>{{ selectedOption?.nome }}</div>
+              </div>
+            </ng-template>
+            <ng-template let-professorData pTemplate="item">
+              <div class="flex align-items-center gap-2">
+                <div>{{ professorData.nome }}</div>
+              </div>
+            </ng-template>
+          </p-dropdown>
+          <label for="localEvent">Professor</label>
+        </span>
+      </div>
+      <div class="divInput">
+        <span class="p-float-label">
+          <p-dropdown #dropdownLocal appendTo="body" [options]="locaisArray" optionLabel="nome" [filter]="true"
+            filterBy="nome" [showClear]="true" placeholder="Selecione um local" inputId="localAloc" class="form-control"
+            formControlName="local">
+            <ng-template pTemplate="selectedItem" let-selectedOption>
+              <div class="flex align-items-center gap-2">
+                <div>{{ selectedOption?.nome }}</div>
+              </div>
+            </ng-template>
+            <ng-template let-localData pTemplate="item">
+              <div class="flex align-items-center gap-2">
+                <div>{{ localData.nome }}</div>
+              </div>
+            </ng-template>
+          </p-dropdown>
+          <label for="localAloc">Local</label>
+        </span>
+      </div>
+      <div class="divInput" formGroupName="periodoDisciplina">
+        <span class="p-float-label">
+          <p-dropdown #dropdownPeriodo appendTo="body" [options]="periodosArray" placeholder="Selecione um período"
+            inputId="perdEvent" class="form-control" formControlName="periodo">
+            <ng-template let-periodoData pTemplate="selectedItem">
+              <div>{{periodoData?.ano}}/{{periodoData?.semestre}} : {{ periodoData.dataInicio | date: 'dd/MM/yyyy' }} -
+                {{ periodoData.dataFim | date: 'dd/MM/yyyy' }}</div>
+            </ng-template>
+            <ng-template let-periodoData pTemplate="item">
+              <div class="flex align-items-center gap-2">
+                <div>{{periodoData?.ano}}/{{periodoData?.semestre}} : {{ periodoData.dataInicio | date: 'dd/MM/yyyy' }}
+                  - {{ periodoData.dataFim | date: 'dd/MM/yyyy' }}</div>
+              </div>
+            </ng-template>
+          </p-dropdown>
+          <label for="perdEvent">Período</label>
+        </span>
+      </div>
+      <div class="divInput">
+        <span class="p-float-label">
+          <p-calendar #calendar appendTo="body" dateFormat="dd/mm/yy" id="fimPer" class="form-control"
+            formControlName="dataAula"></p-calendar>
+          <label for="fimPer">Data da aula</label>
+        </span>
+      </div>
+      <div class="divInput">
+        <span class="p-float-label">
+          <p-dropdown #dropdownHour appendTo="body" [options]="horariosArray" placeholder="Selecione o horário"
+            inputId="horAloc" class="form-control" formControlName="horario">
+            <ng-template let-hourData pTemplate="selectedItem">
+              <div>{{ formatarHora(hourData.horaInicio) }} - {{ formatarHora(hourData.horaFim) }}</div>
+            </ng-template>
+            <ng-template let-hourData pTemplate="item">
+              <div class="flex align-items-center gap-2">
+                <div>{{ formatarHora(hourData.horaInicio) }} - {{ formatarHora(hourData.horaFim) }}</div>
+              </div>
+            </ng-template>
+          </p-dropdown>
+          <label for="horAloc">Horário</label>
+        </span>
+      </div>
+      <div class="divInput">
+        <span class="p-float-label">
+          <input pInputText maxlength="10" id="turmaAloc" class="form-control" formControlName="turma" />
+          <label for="turmaAloc">Turma</label>
+        </span>
+      </div>
+      <div class="divInput" formGroupName="periodoDisciplina">
+        <span class="p-float-label" formArrayName="alunos">
+          <p-multiSelect #multiselect appendTo="body" inputId="alunoAloc" display="chip" [(ngModel)]="selectedAlunos"
+            [ngModelOptions]="{standalone: true}" [options]="alunosArray" optionLabel="nome"
+            (ngModelChange)="onAlunosChange($event)"></p-multiSelect>
+          <label for="alunoAloc">Selecione os alunos</label>
+        </span>
+      </div>
+      <div class="divBotao">
+        <button type="submit" class="botaoEdit" *ngIf="editar" pButton>Atualizar</button>
+        <button type="button" class="botaoCancela" (click)="hideDialog()" pButton>Cancelar</button>
+      </div>
+    </form>
+  </p-dialog>
 </div>
 
 <div class="card flex justify-content-center">
-    <p-dialog header="Info da Alocação" [(visible)]="visibleInfo" [breakpoints]="{ '960px': '75vw' }" [style]="{width: '50vw', 'z-index': '1102'}">
-        <div id="meuFormInfo">
-            <div class="divInput">
-                <b>Professor: </b> {{alocacaoInfo?.professor?.nome}}
-            </div>
-            <div class="divInput flexContainer">
-                <div>
-                    <b>Local: </b> {{alocacaoInfo?.local?.nome }}
-                </div>
-            </div>
-            <div class="divInput">
-                <b>Disciplina: </b> {{alocacaoInfo?.periodoDisciplina?.disciplina?.nome}}
-            </div>
-            <div class="divInput">
-                <b>Horário: </b> {{ alocacaoInfo?.horario?.horaInicio }} - {{ alocacaoInfo?.horario?.horaFim }}
-                <!-- <b>Horário: </b> {{ formatarHora(alocacaoInfo?.horarioInicio) }} -->
-            </div>
-            <div class="divInput dtAlocacao flexContainer">
-                <div>
-                    <b>Dia de aula: </b> {{alocacaoInfo?.dataAula | date: 'fullDate' : '' : 'pt-BR'}}
-                </div>
-                <div class="lastDiv">
-                    <b>Turma: </b> {{alocacaoInfo?.turma}}
-                </div>
-            </div>
-            <div class="divInput dtAlocacao">
-                <b>Período: </b> {{ alocacaoInfo?.periodoDisciplina?.periodo?.dataInicio | date: 'fullDate' : '' : 'pt-BR' }}<b> - </b>{{ alocacaoInfo?.periodoDisciplina?.periodo?.dataFim | date: 'fullDate' : '' : 'pt-BR' }}
-            </div>
-            <div class="divBotao replica">
-                <button type="button" class="botaoInfo" (click)="visibleInfo = false" pButton>Ok</button>
-            </div>
+  <p-dialog header="Info da Alocação" [(visible)]="visibleInfo" [breakpoints]="{ '960px': '75vw' }"
+    [style]="{width: '50vw', 'z-index': '1102'}">
+    <div id="meuFormInfo">
+      <div class="divInput">
+        <b>Professor: </b> {{alocacaoInfo?.professor?.nome}}
+      </div>
+      <div class="divInput flexContainer">
+        <div>
+          <b>Local: </b> {{alocacaoInfo?.local?.nome }}
         </div>
-    </p-dialog>
+      </div>
+      <div class="divInput">
+        <b>Disciplina: </b> {{alocacaoInfo?.periodoDisciplina?.disciplina?.nome}}
+      </div>
+      <div class="divInput">
+        <b>Horário: </b> {{ alocacaoInfo?.horario?.horaInicio }} - {{ alocacaoInfo?.horario?.horaFim }}
+        <!-- <b>Horário: </b> {{ formatarHora(alocacaoInfo?.horarioInicio) }} -->
+      </div>
+      <div class="divInput dtAlocacao flexContainer">
+        <div>
+          <b>Dia de aula: </b> {{alocacaoInfo?.dataAula | date: 'fullDate' : '' : 'pt-BR'}}
+        </div>
+        <div class="lastDiv">
+          <b>Turma: </b> {{alocacaoInfo?.turma}}
+        </div>
+      </div>
+      <div class="divInput dtAlocacao">
+        <b>Período: </b> {{ alocacaoInfo?.periodoDisciplina?.periodo?.dataInicio | date: 'fullDate' : '' : 'pt-BR' }}<b>
+          - </b>{{ alocacaoInfo?.periodoDisciplina?.periodo?.dataFim | date: 'fullDate' : '' : 'pt-BR' }}
+      </div>
+      <div class="divBotao replica">
+        <button type="button" class="botaoInfo" (click)="visibleInfo = false" pButton>Ok</button>
+      </div>
+    </div>
+  </p-dialog>
 </div>
 
 <div class="card flex justify-content-center">
-    <p-dialog header="Logs de Alocações" [(visible)]="visibleLog" [modal]="true" [breakpoints]="{ '960px': '75vw' }" [style]="{width: '50vw', 'z-index': '1102'}">
-        <div class="cardLog" *ngIf="logsData.length > 0">
-            <p-accordion>
-                <p-accordionTab *ngFor="let log of logsData">
-                    <ng-template let="header" pTemplate="header" style="display: flex;">
-                        <!-- <p-divider layout="vertical"></p-divider> -->
-                        <div class="custom-header">
-                        <span>Cód. Log: {{ log.id }}</span>
-                        <span>Ação: <p-tag class="severity-{{ +getSeverity(log.operacao)}}" [severity]="getSeverity(log.operacao)" [icon]="getIcons(log.operacao)" value="{{ log.operacao }}"></p-tag></span>
-                        <span>Usuário: {{ log.usuario.nome }}</span>
-                        <span>Data: {{ log.data | date : 'short' : '' : 'pt-BR'}}</span>
-                        </div>
-                    </ng-template>
-                    <p>
-                    <b>Tipo do objeto: </b>{{ log.idRegistro }}
-                    </p>
-                    <p style="white-space: pre-line;">
-                    <b>Descrição: </b>
-                    </p>
-                    <div>
-                      <b>ID da alocação:</b> {{ jsonForObject(log.descricao).id }}
-                      <br>
-                      <b>Turma:</b> {{ jsonForObject(log.descricao).turma }}
-                      <br>
-                    </div>
-                </p-accordionTab>
-            </p-accordion>
-        </div>
+  <p-dialog header="Logs de Alocações" [(visible)]="visibleLog" [modal]="true" [breakpoints]="{ '960px': '75vw' }"
+    [style]="{width: '50vw', 'z-index': '1102'}">
+    <div class="cardLog" *ngIf="logsData.length > 0">
+      <p-accordion>
+        <p-accordionTab *ngFor="let log of logsData">
+          <ng-template let="header" pTemplate="header" style="display: flex;">
+            <!-- <p-divider layout="vertical"></p-divider> -->
+            <div class="custom-header">
+              <span>Cód. Log: {{ log.id }}</span>
+              <span>Ação: <p-tag class="severity-{{ +getSeverity(log.operacao)}}" [severity]="getSeverity(log.operacao)"
+                  [icon]="getIcons(log.operacao)" value="{{ log.operacao }}"></p-tag></span>
+              <span>Usuário: {{ log.usuario.nome }}</span>
+              <span>Data: {{ log.data | date : 'short' : '' : 'pt-BR'}}</span>
+            </div>
+          </ng-template>
+          <table>
+            <tr>
+              <th>Campo</th>
+              <th>Conteúdo</th>
+            </tr>
+            <tr *ngFor="let col of cols">
+              <td>{{ col.header }}</td>
+              <td>
+                {{ formatarApresentacao(jsonForObject(log.descricao), col.field) }}
+              </td>
+            </tr>
+          </table>
+        </p-accordionTab>
+      </p-accordion>
+    </div>
 
     <!-- <div class="cardLog">
         <p-accordion>
@@ -433,16 +472,17 @@
         </p-accordion>
     </div> -->
 
-        <div class="cardLog" *ngIf="logsData.length <= 0">
-            <h3>Não há logs registrados.</h3>
-        </div>
+    <div class="cardLog" *ngIf="logsData.length <= 0">
+      <h3>Não há logs registrados.</h3>
+    </div>
 
-        <div class="divBotao replica">
-            <button type="button" class="botaoL" (click)="visibleLog = false" pButton>Ok</button>
-        </div>
-    </p-dialog>
+    <div class="divBotao replica">
+      <button type="button" class="botaoL" (click)="visibleLog = false" pButton>Ok</button>
+    </div>
+  </p-dialog>
 </div>
 
 <div class="card">
-    <p-messages [(value)]="messages" [showTransitionOptions]="'500ms'" [hideTransitionOptions]="'500ms'" [enableService]="false"></p-messages>
+  <p-messages [(value)]="messages" [showTransitionOptions]="'500ms'" [hideTransitionOptions]="'500ms'"
+    [enableService]="false"></p-messages>
 </div>
