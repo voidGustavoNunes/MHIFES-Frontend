@@ -424,4 +424,26 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
   });
   }
 
+  rfidDialogVisible: boolean = false;
+  rfidValue: string = '';
+  
+  openRFIDDialog() {
+    this.rfidDialogVisible = true;
+    this.rfidValue = '';
+}
+
+onRFIDEnter() {
+  if (this.rfidValue.length === 10) {
+    const matriculaControl = this.form.get('matricula');
+    if (matriculaControl) {
+      matriculaControl.setValue(this.rfidValue);
+    }
+    this.rfidDialogVisible = false;
+  }
+}
+
+closeRFIDDialog() {
+  this.rfidDialogVisible = false;
+}
+
 }
