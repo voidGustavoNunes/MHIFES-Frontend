@@ -24,14 +24,14 @@ export class AuthInterceptor implements HttpInterceptor {
         }
 
         const token = this.userAuthService.getToken();
-        req = this.addToken(req, token);
+        if(token){
+            req = this.addToken(req, token);
+        }
 
         return next.handle(req).pipe(
             catchError(
                 (err: HttpErrorResponse) => {
-                    if(err.status === 401) {
-                        this.router.navigate(["/home"]);
-                    } else if(err.status === 403) {
+                    if(err.status === 401 || err.status === 403) {
                         this.router.navigate(["/forbidden"]);
                     }
                     const errorMess = new Error("Alguma coisa está errada.");

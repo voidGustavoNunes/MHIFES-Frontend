@@ -20,6 +20,7 @@ import { HorariosRComponent } from './read/horarios-r/horarios-r.component';
 export const routes: Routes = [
     { path: '', redirectTo: 'home', pathMatch: 'full' },
     { path: 'home', component: HomeComponent },
+    { path: 'forbidden', component: ForbiddenComponent },
     
     { path: 'login', component: LoginComponent, canActivate: [LoggedGuard] },
     
@@ -33,7 +34,6 @@ export const routes: Routes = [
     { path: 'coordenadorias', component: CoordenadoriasRComponent, canActivate:[AuthGuard], data:{roles:["ADMIN"]} },
     { path: 'locais', component: LocaisRComponent, canActivate:[AuthGuard], data:{roles:["ADMIN"]} },
     { path: 'horarios', component: HorariosRComponent, canActivate:[AuthGuard], data:{roles:["ADMIN"]} },
-    { path: 'forbidden', component: ForbiddenComponent, canActivate:[AuthGuard], data:{roles:["ADMIN"]} },
     { path: 'logs', component: LogsRComponent, canActivate:[AuthGuard], data:{roles:["ADMIN"]} },
     
     { path: 'eventos', component: EventosRComponent, canActivate:[AuthGuard], data:{roles:["ADMIN"]} },

@@ -23,25 +23,17 @@ export class UsuarioService {
   }
 
   register(record: RegisterDTO): Observable<Object> {
-    return this.http.post<RegisterDTO>(`${this.API}/register`, record, {headers: this.requestHeader});
+    return this.http.post<RegisterDTO>(`${this.API}/register`, record);
   }
 
   roleMatch(allowedRoles: any[]): boolean {
-    let isMatch = false;
     const userRole: any = this.userAuthService.getRole();
 
-    if(userRole != null && userRole) {
-      for (let i = 0; i < allowedRoles.length; i++) {
-        if(userRole === allowedRoles[i]) {
-          isMatch = true;
-          return isMatch;
-        } else {
-          return isMatch;
-        }
-        
-      }
+    if (userRole && allowedRoles.includes(userRole)) {
+        return true;
+    } else {
+        return false;
     }
-    return isMatch;
   }
 
 };

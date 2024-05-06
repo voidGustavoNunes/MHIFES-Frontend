@@ -182,6 +182,7 @@ export class NavHeaderComponent implements OnInit, OnDestroy {
   }
   
   ngOnDestroy(): void {
+    this.logout();
   }
   
   // @HostListener('window:beforeunload')
@@ -198,8 +199,7 @@ export class NavHeaderComponent implements OnInit, OnDestroy {
   }
 
   getNameUser() {
-    if(this.userAuthService.getNome()) return this.userAuthService.getNome();
-    return '';
+    return this.userAuthService.getNome();
   }
 
   togglePanel() {
