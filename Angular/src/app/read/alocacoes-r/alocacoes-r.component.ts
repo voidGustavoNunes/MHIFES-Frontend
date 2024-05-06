@@ -206,7 +206,6 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
         //   return dateB.getTime() - dateA.getTime();
         // });
         this.alocacoesData = data;
-        console.log(this.alocacoesData[0]?.periodoDisciplina)
 
         this.alocacoesFilter = this.alocacoesData;
       },
@@ -786,11 +785,11 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       next: (data: any) => {
         this.alocacoesCadast = data;
         // this.goToRouteSave();
-        this.ngOnInit();
         if(this.mss) {
           this.messages = [
             { severity: 'success', summary: 'Sucesso', detail: 'Alocação cadastrada com sucesso!', life: 3000 },
           ];
+          this.ngOnInit();
         }
       },
       error: (err: any) => {
