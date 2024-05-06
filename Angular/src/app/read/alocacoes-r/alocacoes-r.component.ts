@@ -1,3 +1,4 @@
+import { Alocacao } from './../../models/alocacao.models';
 import { CommonModule, registerLocaleData, Time } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import localePT from '@angular/common/locales/pt';
@@ -15,11 +16,10 @@ import { Router, RouterModule } from '@angular/router';
 import { ConfirmationService, Message, MessageService } from 'primeng/api';
 import { Calendar } from 'primeng/calendar';
 import { Dropdown } from 'primeng/dropdown';
-import { InputSwitch } from 'primeng/inputswitch';
 import { MultiSelect } from 'primeng/multiselect';
 import { Subscription } from 'rxjs';
 
-import { Alocacao, AlocacaoHour } from '../../models/alocacao.models';
+import { AlocacaoHour } from '../../models/alocacao.models';
 import { Aluno } from '../../models/aluno.models';
 import { Disciplina } from '../../models/disciplina.models';
 import { Local } from '../../models/local.models';
@@ -194,7 +194,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     .subscribe({
       next: (itens:any) => {
         const data = itens;
-        
+
         data.sort((a: Alocacao, b: Alocacao) => {
           const dateA = new Date(a.dataAula);
           const dateB = new Date(b.dataAula);
@@ -358,7 +358,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     // this.unsubscribe$Log.unsubscribe();
     this.unsubscribe$Hor.unsubscribe();
   }
-  
+
   // verificarHoraFimMaiorQueInicio(formGroup: FormGroup) {
   //   const horaInicio = formGroup.get('horarioInicio')?.value;
   //   const horaFim = formGroup.get('horarioFim')?.value;
@@ -752,7 +752,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     const partes = tempo.split(':');
     const horas = partes[0];
     const minutos = partes[1];
-    
+
     return `${horas}h ${minutos}min`;
   }
 
@@ -936,8 +936,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   }
 
   jsonForObject(descricao: string): any {
-    console.log(JSON.parse(descricao));
-    return JSON.parse(descricao);
-    }
-
+    let alocacao: Alocacao = JSON.parse(descricao);
+    return alocacao;
+}
 }
