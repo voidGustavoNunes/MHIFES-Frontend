@@ -45,11 +45,12 @@
             <button type="button" class="botaoL" (click)="showDialogLog(alocacao)" pButton>Log</button>
             <button type="button" class="botaoInfo" (click)="showInfoDialog(alocacao)" pButton>Info</button>
             <button type="button" class="botaoEdit"
-              (click)="showEditDialog(alocacao, formatarDatas(alocacao?.dataAula))" pButton>Editar</button>
+              (click)="showEditDialog(alocacao, formatarDatas(alocacao?.dataAula))" pButton
+              *ngIf="alocacao.status == 'ATIVO'">Editar</button>
             <p-toast></p-toast>
             <p-confirmPopup></p-confirmPopup>
             <button type="button" class="botaoDele" (click)="confirm2($event, alocacao?.id)" severity="danger"
-              pButton>Deletar</button>
+              pButton *ngIf="alocacao.status == 'ATIVO'">Deletar</button>
           </td>
         </tr>
       </ng-template>

@@ -15,6 +15,7 @@ export interface Alocacao {
   local: Local;
   periodoDisciplina: PeriodoDisciplina;
   professor: Professor;
+  status: string;
   // numAulas: number;
   // horarioInicio: Time;
   // horarioFim: Time;

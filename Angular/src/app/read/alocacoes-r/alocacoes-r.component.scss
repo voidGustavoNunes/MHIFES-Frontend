@@ -84,6 +84,7 @@
                 box-shadow: none;
             }
             .botaoInfo{
+                margin-right: .5rem;
                 @include themeButton(#A2FF7F, #1E8805);
             }
             .botaoInfo:focus{
@@ -92,7 +93,7 @@
 
             .botaoEdit{
                 @include themeButton(#FFDD77, #846406);
-                margin: 0 .5rem;
+                margin-right: .5rem;
             }
             .botaoEdit:focus{
                 border: .02rem solid #846406;
