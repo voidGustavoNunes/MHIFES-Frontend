@@ -7,9 +7,9 @@
             </a>
         </ng-template>
         
-        <ng-template pTemplate="end" class="log-in">
+        <!-- <ng-template pTemplate="end" class="log-in">
             <p-button routerLink="login" label="Entrar" [link]="true"></p-button>
-        </ng-template>
+        </ng-template> -->
     </p-menubar>
 
     <p-menubar class="menu" [model]="itemsAdm" *ngIf="isLogged() && userService.roleMatch(['ADMIN'])">

@@ -129,6 +129,13 @@
     #meuFormulario{
         margin-top: 3rem;
     }
+    .flexContainer{
+        display: flex;
+        flex-flow: column;
+        align-items: center;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
     .validation-error{
         margin-top: -0.5rem;
         margin-bottom: -.4375em;
@@ -212,8 +219,11 @@
         color: white;
         letter-spacing: .1rem;
     }
-    .p-calendar input, .p-inputnumber-input{
+    .p-calendar input, .p-inputnumber-input, .p-multiselect{
         background-color: #BFE4FF;
+    }
+    .p-multiselect{
+        min-height: 2.875rem;
     }
     .p-messages {
         width: fit-content;
@@ -230,7 +240,7 @@
     }
     .p-datatable-striped {
         width: max-content;
-min-width: 79.25rem;
+        min-width: 79.25rem;
     }
 }
 
@@ -260,7 +270,7 @@ min-width: 79.25rem;
         }
     }
     :host ::ng-deep {
-        .p-calendar input, .p-inputnumber-input{
+        .p-calendar input, .p-inputnumber-input, .p-multiselect, .p-multiselect-panel, .p-accordion.p-component{
             width: 40vw;
         }
     }
@@ -297,7 +307,7 @@ min-width: 79.25rem;
         }
     }
     :host ::ng-deep {
-        .p-calendar input, .p-inputnumber-input{
+        .p-calendar input, .p-inputnumber-input, .p-multiselect, .p-multiselect-panel, .p-accordion.p-component{
             width: 60vw;
         }
     }

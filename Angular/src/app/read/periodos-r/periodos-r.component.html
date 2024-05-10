@@ -45,7 +45,7 @@
                     <td>{{periodo?.ano}}/{{periodo?.semestre}}</td>
                     <td>
                         <button type="button" class="botaoInfo" (click)="showInfoDialog(periodo)" pButton>Info</button>
-                        <button type="button" class="botaoEdit" (click)="showEditDialog(periodo)" pButton>Editar</button>
+                        <button type="button" class="botaoEdit" (click)="showEditDialog(periodo, formatarDatas(periodo?.dataInicio), formatarDatas(periodo?.dataFim))" pButton>Editar</button>
                         <p-toast></p-toast>
                         <p-confirmPopup></p-confirmPopup>
                         <button type="button" class="botaoDele" (click)="confirm2($event, periodo?.id)" severity="danger" pButton>Deletar</button>
@@ -68,20 +68,12 @@
     <p-dialog class="pHeader" [header]=ehTitulo [(visible)]="visible" [modal]="true" [breakpoints]="{ '960px': '75vw' }" [style]="{ width: '50vw' }" [draggable]="false" [resizable]="false">
         <form id="meuFormulario" [formGroup]="form" (ngSubmit)="onSubmit()">
             <div class="divInput">
-                <!-- <span class="p-float-label">
-                    <input type="number" id="anoPer" class="form-control" formControlName="ano" [min]="minAno" [max]="maxAno" [mask]="'0000'" />
-                    <label for="anoPer">Ano do período</label>
-                </span> -->
                 <p-floatLabel>
-                    <p-inputNumber inputId="integeronly" id="anoPer" class="form-control" formControlName="ano" [min]="minAno" [max]="maxAno" />
+                    <p-inputNumber inputId="integeronly" id="anoPer" class="form-control" formControlName="ano" [min]="minAno" [max]="maxAno" (ngModelChange)="updateCalendarMinMaxCalend()" />
                     <label for="anoPer">Ano do período</label>
                 </p-floatLabel>
             </div>
             <div class="divInput">
-                <!-- <span class="p-float-label">
-                    <input type="number" id="semPer" class="form-control" formControlName="semestre" maxlength="1" [mask]="'0'" />
-                    <label for="semPer">Semestre</label>
-                </span> -->
                 <p-floatLabel>
                     <p-inputNumber inputId="integeronly" id="semPer" class="form-control" formControlName="semestre" [max]="2" />
                     <label for="semPer">Semestre</label>
@@ -89,17 +81,42 @@
             </div>
             <div class="divInput">
                 <span class="p-float-label">
-                    <p-calendar appendTo="body" dateFormat="dd/mm/yy" id="inicioPer" class="form-control" formControlName="dataInicio" (onSelect)="onMinDate()" ></p-calendar>
+                    <p-calendar #calendarIni appendTo="body" dateFormat="dd/mm/yy" id="inicioPer" class="form-control" formControlName="dataInicio" [minDate]="minCalend" [maxDate]="maxCalend" (onSelect)="onMinDate()" ></p-calendar>
                     <label for="inicioPer">Data de início</label>
                 </span>
             </div>
             <div class="divInput">
                 <span class="p-float-label">
-                    <p-calendar appendTo="body" dateFormat="dd/mm/yy" id="fimPer" class="form-control" formControlName="dataFim" [minDate]="minDate" ></p-calendar>
+                    <p-calendar #calendarFim appendTo="body" dateFormat="dd/mm/yy" id="fimPer" class="form-control" formControlName="dataFim" [minDate]="minDate" [maxDate]="maxCalend" ></p-calendar>
                     <label for="fimPer">Data final</label>
                 </span>
                 <div *ngIf="form.get('dataFim')?.invalid && form.get('dataFim')?.touched" class="validation-error">
                     <p>A data final deve ser maior ou igual que a data de início.</p>
+                </div>
+            </div>
+            
+            <div class="divInput">
+                <span class="p-float-label">
+                    <p-multiSelect #multiselectDiscp appendTo="body" inputId="perDisc" display="chip" [(ngModel)]="selectedDisciplinas" [ngModelOptions]="{standalone: true}" [options]="disciplinasArray" optionLabel="nome" (ngModelChange)="onSelectDisciplinas()"></p-multiSelect>
+                    <label for="perDisc">Selecione as disciplinas</label>
+                </span>
+            </div>
+            <div class="divInput" *ngIf="selectedDisciplinas.length > 0 && cadastrar">
+                <div class="flexContainer" *ngFor="let option of selectedDisciplinas; index as i">
+                    <b>Alunos de {{ option.nome }}:</b>
+                    <span class="p-float-label">
+                        <p-multiSelect appendTo="body" inputId="alunoAloc{{i}}" display="chip" [(ngModel)]="selectedAlunos[i]" [ngModelOptions]="{standalone: true}" [options]="alunosArray" optionLabel="nome" (ngModelChange)="adicionarDisciplinaComAlunos(option, selectedAlunos[i])"></p-multiSelect>
+                        <label for="alunoAloc{{i}}">Selecione os alunos</label>
+                    </span>
+                </div>
+            </div>
+            <div class="divInput" *ngIf="selectedDisciplinas.length > 0 && editar">
+                <div class="flexContainer" *ngFor="let option of selectedDisciplinas; index as i">
+                    <b>Alunos de {{ option.nome }}:</b>
+                    <span class="p-float-label">
+                        <p-multiSelect appendTo="body" inputId="alunoAloc{{i}}" display="chip" [(ngModel)]="selectedAlunos[i]" [ngModelOptions]="{standalone: true}" [options]="alunosArray" optionLabel="nome" (ngModelChange)="adicionarDisciplinaComAlunosEdit(option, selectedAlunos[i])"></p-multiSelect>
+                        <label for="alunoAloc{{i}}">Selecione os alunos</label>
+                    </span>
                 </div>
             </div>
             <div class="divBotao">
@@ -122,6 +139,18 @@
             </div>
             <div class="divInput dtPeriodo">
                 <b>Data de fim:</b> {{periodoInfo?.dataFim | date: 'fullDate' : '' : 'pt-BR'}}
+            </div>
+            <div class="divInput">
+                <p-accordion *ngFor="let discp of periodoInfo?.periodoDisciplinas">
+                    <p-accordionTab header="{{discp?.disciplina?.nome}}">
+                        <b>Alunos:</b>
+                        <ol>
+                            <li *ngFor="let aln of discp?.alunos">
+                               {{aln?.nome}}
+                            </li>
+                        </ol>
+                    </p-accordionTab>
+                </p-accordion>
             </div>
             <div class="divBotao">
                 <button type="button" class="botaoInfo" (click)="visibleInfo = false" pButton>Ok</button>

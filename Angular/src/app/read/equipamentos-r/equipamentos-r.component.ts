@@ -6,18 +6,8 @@ import { EquipamentoService } from '../../service/equipamento.service';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { InputGroupModule } from 'primeng/inputgroup';
-import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
-import { TableModule } from 'primeng/table';
-import { PaginatorModule } from 'primeng/paginator';
-import { DialogModule } from 'primeng/dialog';
 import { ConfirmationService, Message, MessageService } from 'primeng/api';
-import { ToastModule } from 'primeng/toast';
-import { ConfirmPopupModule } from 'primeng/confirmpopup';
-import { ScrollTopModule } from 'primeng/scrolltop';
-import { MessagesModule } from 'primeng/messages';
+import { PrimeNgImportsModule } from '../../shared/prime-ng-imports/prime-ng-imports.module';
 
 @Component({
   selector: 'app-equipamentos-r',
@@ -26,19 +16,9 @@ import { MessagesModule } from 'primeng/messages';
     CommonModule,
     HttpClientModule,
     RouterModule,
-    ButtonModule,
-    InputTextModule,
-    InputGroupModule,
-    InputGroupAddonModule,
-    TableModule,
-    DialogModule,
-    PaginatorModule,
     ReactiveFormsModule,
     FormsModule,
-    ToastModule,
-    ScrollTopModule,
-    ConfirmPopupModule,
-    MessagesModule
+    PrimeNgImportsModule
   ],
   templateUrl: './equipamentos-r.component.html',
   styleUrl: './equipamentos-r.component.scss',

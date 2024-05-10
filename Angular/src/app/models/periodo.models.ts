@@ -1,4 +1,5 @@
-import { PeriodoDisciplina } from "./alocacao.models";
+import { Aluno } from "./aluno.models";
+import { Disciplina } from "./disciplina.models";
 
 export interface Periodo {
     id: number;
@@ -7,6 +8,19 @@ export interface Periodo {
     dataInicio: Date;
     dataFim: Date;
     periodoDisciplinas: Array<PeriodoDisciplina>;
-    // nome: string;
-    // descricao: string;
 }
+
+export interface PeriodoDisciplina {
+    id: number | null;
+    periodo: Periodo | null;
+    disciplina: Disciplina;
+    alunos: Array<Aluno>;
+}
+
+export interface PerDiscMultiSelect {
+    disciplina: Disciplina | null;
+    alunos: Array<Aluno> | null;
+}
+
+// nome: string;
+// descricao: string;

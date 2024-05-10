@@ -6,20 +6,9 @@ import { DisciplinaService } from '../../service/disciplina.service';
 import { Router, RouterModule } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { InputGroupModule } from 'primeng/inputgroup';
-import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
-import { TableModule } from 'primeng/table';
-import { PaginatorModule } from 'primeng/paginator';
-import { DialogModule } from 'primeng/dialog';
 import { ConfirmationService, Message, MessageService } from 'primeng/api';
-import { ToastModule } from 'primeng/toast';
-import { ConfirmPopupModule } from 'primeng/confirmpopup';
-import { ScrollTopModule } from 'primeng/scrolltop';
-import { MessagesModule } from 'primeng/messages';
-import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { FiltrarPesquisa } from '../../models/share/filtrar-pesquisa.models';
+import { PrimeNgImportsModule } from '../../shared/prime-ng-imports/prime-ng-imports.module';
 
 @Component({
   selector: 'app-disciplinas-r',
@@ -28,20 +17,9 @@ import { FiltrarPesquisa } from '../../models/share/filtrar-pesquisa.models';
     CommonModule,
     HttpClientModule,
     RouterModule,
-    ButtonModule,
-    InputTextModule,
-    InputGroupModule,
-    InputGroupAddonModule,
-    TableModule,
-    DialogModule,
-    PaginatorModule,
     ReactiveFormsModule,
     FormsModule,
-    ToastModule,
-    ScrollTopModule,
-    ConfirmPopupModule,
-    MessagesModule,
-    OverlayPanelModule
+    PrimeNgImportsModule
   ],
   templateUrl: './disciplinas-r.component.html',
   styleUrl: './disciplinas-r.component.scss',

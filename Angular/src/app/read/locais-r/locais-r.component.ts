@@ -1,29 +1,17 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
-import { CommonModule } from '@angular/common';
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { InputGroupModule } from 'primeng/inputgroup';
-import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
-import { TableModule } from 'primeng/table';
-import { PaginatorModule } from 'primeng/paginator';
-import { DialogModule } from 'primeng/dialog';
-import { ConfirmationService, Message, MessageService } from 'primeng/api';
-import { ToastModule } from 'primeng/toast';
-import { ConfirmPopupModule } from 'primeng/confirmpopup';
-import { ScrollTopModule } from 'primeng/scrolltop';
 import { LocalService } from '../../service/local.service';
-import { Local, LocalDTO, LocalEquipMultiSelect, LocalEquipamento } from '../../models/local.models';
+import { Local, LocalEquipMultiSelect, LocalEquipamento } from '../../models/local.models';
 import { EquipamentoService } from '../../service/equipamento.service';
 import { Equipamento } from '../../models/equipamento.models';
-import { InputNumberModule } from 'primeng/inputnumber';
-import { MultiSelect, MultiSelectModule } from 'primeng/multiselect';
-import { MessagesModule } from 'primeng/messages';
-import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { FiltrarPesquisa } from '../../models/share/filtrar-pesquisa.models';
+import { ConfirmationService, Message, MessageService } from 'primeng/api';
+import { PrimeNgImportsModule } from '../../shared/prime-ng-imports/prime-ng-imports.module';
+import { MultiSelect } from 'primeng/multiselect';
 
 @Component({
   selector: 'app-locais-r',
@@ -32,22 +20,9 @@ import { FiltrarPesquisa } from '../../models/share/filtrar-pesquisa.models';
     CommonModule,
     HttpClientModule,
     RouterModule,
-    ButtonModule,
-    InputTextModule,
-    InputGroupModule,
-    InputGroupAddonModule,
-    TableModule,
-    DialogModule,
-    PaginatorModule,
     ReactiveFormsModule,
     FormsModule,
-    ToastModule,
-    ScrollTopModule,
-    ConfirmPopupModule,
-    InputNumberModule,
-    MultiSelectModule,
-    MessagesModule,
-    OverlayPanelModule
+    PrimeNgImportsModule
   ],
   templateUrl: './locais-r.component.html',
   styleUrl: './locais-r.component.scss',
@@ -281,7 +256,6 @@ export class LocaisRComponent implements OnInit, OnDestroy {
         this.addEquip(tempEquipamento);
       }
     })
-    console.log('show edit \n',this.form.value)
     
     this.previousEquipLocal = value.localEquipamentos;
     this.multiselect.writeValue(value.localEquipamentos.map(le => le.equipamento));
@@ -403,14 +377,6 @@ export class LocaisRComponent implements OnInit, OnDestroy {
         ];
       }
     });
-  }
-
-  goToRouteSave() {
-    this.router.navigate(['api/locais']);
-  }
-
-  goToRouteEdit(id: number) {
-    this.router.navigate(['api/locais', id]);
   }
 
   onSubmit() {

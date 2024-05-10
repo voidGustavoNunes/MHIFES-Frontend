@@ -1,7 +1,5 @@
-import { Alocacao } from './../../models/alocacao.models';
 import { CommonModule, DatePipe, registerLocaleData, Time } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
-import localePT from '@angular/common/locales/pt';
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import {
   FormArray,
@@ -16,15 +14,14 @@ import { Router, RouterModule } from '@angular/router';
 import { ConfirmationService, Message, MessageService } from 'primeng/api';
 import { Calendar } from 'primeng/calendar';
 import { Dropdown } from 'primeng/dropdown';
-import { MultiSelect } from 'primeng/multiselect';
 import { Subscription } from 'rxjs';
-
+import { Alocacao } from './../../models/alocacao.models';
 import { AlocacaoHour } from '../../models/alocacao.models';
 import { Aluno } from '../../models/aluno.models';
 import { Disciplina } from '../../models/disciplina.models';
 import { Local } from '../../models/local.models';
 import { Log, Operacao } from '../../models/log.models';
-import { Periodo } from '../../models/periodo.models';
+import { Periodo, PeriodoDisciplina } from '../../models/periodo.models';
 import { Professor } from '../../models/professor.models';
 import { FiltrarPesquisa } from '../../models/share/filtrar-pesquisa.models';
 import { AlocacaoService } from '../../service/alocacao.service';
@@ -37,10 +34,10 @@ import { Horario } from '../../models/horario.models';
 import { HorarioService } from '../../service/horario.service';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 import { ProfessorService } from '../../service/professor.service';
-import { PrimeNgImportsModule } from '../../shared/prime-ng-imports/prime-ng-imports.module';
 import { UserRole } from '../../models/usuario';
-
+import localePT from '@angular/common/locales/pt';
 registerLocaleData(localePT);
+import { PrimeNgImportsModule } from '../../shared/prime-ng-imports/prime-ng-imports.module';
 
 interface Column {
   field: string;
@@ -65,18 +62,18 @@ interface Column {
     AlocacaoService,
     ConfirmationService,
     MessageService,
-    AlunoService,
+    // AlunoService,
     ProfessorService,
     LocalService,
     PeriodoService,
-    DisciplinaService,
+    // DisciplinaService,
     HorarioService,
     provideNgxMask()
   ]
 })
 export class AlocacoesRComponent implements OnInit, OnDestroy {
   @ViewChild('searchInput') inputSearch!: ElementRef;
-  @ViewChild('multiselect') multiselect!: MultiSelect;
+  // @ViewChild('multiselect') multiselect!: MultiSelect;
   @ViewChild('dropdownDisc') dropdownDisc!: Dropdown;
   @ViewChild('dropdownPeriodo') dropdownPeriodo!: Dropdown;
   @ViewChild('dropdownLocal') dropdownLocal!: Dropdown;
@@ -84,6 +81,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   @ViewChild('dropdownHour') dropdownHour!: Dropdown;
   // @ViewChild('switch') switch!: InputSwitch;
   @ViewChild('calendar') calendar!: Calendar;
+  @ViewChild('calendarAula') calendarAula!: Calendar;
 
   @ViewChild('calendarIntervalo') calendarIntervalo!: Calendar;
 
@@ -94,8 +92,8 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   alocacaoInfo!: Alocacao;
 
   unsubscribe$!: Subscription;
-  unsubscribe$Aln!: Subscription;
-  unsubscribe$Disc!: Subscription;
+  // unsubscribe$Aln!: Subscription;
+  // unsubscribe$Disc!: Subscription;
   unsubscribe$Prof!: Subscription;
   unsubscribe$Per!: Subscription;
   unsubscribe$Loc!: Subscription;
@@ -118,12 +116,10 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
 
   professoresArray: Professor[] = [];
   locaisArray: Local[] = [];
-  disciplinasArray: Disciplina[] = [];
   periodosArray: Periodo[] = [];
-  alunosArray: Aluno[] = [];
+  selectedPeriodo!: Periodo;
+  periodosDisciplinaArray: PeriodoDisciplina[] = [];
   horariosArray: Horario[] = [];
-
-  selectedAlunos: Aluno[] = [];
 
   visibleEdit: boolean = false;
   visibleInfo: boolean = false;
@@ -145,8 +141,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   visibleLog: boolean = false;
 
   enableSelect: boolean = false;
-  logsExample!: Log[];
-
+  enableDisciplina: boolean = false;
   enableCalendar: boolean = false;
 
   // Tabela
@@ -157,8 +152,8 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     private router: Router,
     private formBuilder: FormBuilder,
     private confirmationService: ConfirmationService,
-    private alunService: AlunoService,
-    private disciService: DisciplinaService,
+    // private alunService: AlunoService,
+    // private disciService: DisciplinaService,
     private locService: LocalService,
     private periodService: PeriodoService,
     private professorService: ProfessorService,
@@ -171,11 +166,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       dataAula: [null, [Validators.required]],
       local: [null, [Validators.required]],
       professor: [null, [Validators.required]],
-      periodoDisciplina: this.formBuilder.group({
-        disciplina: [null, [Validators.required]],
-        periodo: [null, [Validators.required]],
-        alunos: this.formBuilder.array([], [Validators.required])
-      })
+      periodoDisciplina: [null, [Validators.required]],
     })
     // , { validator: this.verificarHoraFimMaiorQueInicio });
   }
@@ -220,32 +211,6 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
         error: (err: any) => {
           this.messages = [
             { severity: 'error', summary: 'Erro', detail: 'Dados de alocações não encontrados.', life: 3000 },
-          ];
-        }
-      });
-
-    this.unsubscribe$Aln = this.alunService.listar()
-      .subscribe({
-        next: (itens: any) => {
-          const data = itens;
-          this.alunosArray = data.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1);
-        },
-        error: (err: any) => {
-          this.messages = [
-            { severity: 'error', summary: 'Erro', detail: 'Dados de alunos não encontrados.', life: 3000 },
-          ];
-        }
-      });
-
-    this.unsubscribe$Disc = this.disciService.listar()
-      .subscribe({
-        next: (itens: any) => {
-          const data = itens;
-          this.disciplinasArray = data.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1);
-        },
-        error: (err: any) => {
-          this.messages = [
-            { severity: 'error', summary: 'Erro', detail: 'Dados de disciplinas não encontrados.', life: 3000 },
           ];
         }
       });
@@ -309,50 +274,6 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
         }
       });
 
-    this.logsExample = [
-      {
-        id: 1,
-        data: new Date(),
-        descricao: "Mussum Ipsum, cacilds vidis litro abertis.  Manduma pindureta quium dia nois paga. Mauris nec dolor in eros commodo tempor. Aenean aliquam molestie leo, vitae iaculis nisl. Vehicula non. Ut sed ex eros. Vivamus sit amet nibh non tellus tristique interdum. Aenean aliquam molestie leo, vitae iaculis nisl.\nQuem manda na minha terra sou euzis! Suco de cevadiss deixa as pessoas mais interessantis. Negão é teu passadis, eu sou faxa pretis. Si num tem leite então bota uma pinga aí cumpadi!\nDetraxit consequat et quo num tendi nada. Interessantiss quisso pudia ce receita de bolis, mais bolis eu num gostis. Paisis, filhis, espiritis santis. Eu nunca mais boto a boca num copo de cachaça, agora eu só uso canudis!",
-        operacao: Operacao.ALTERACAO,
-        idRegistro: 1,
-        usuario: {
-          id: 1,
-          login: "admin@2024",
-          nome: "Admin",
-          password: "123456",
-          role: UserRole.ADMIN
-        }
-      },
-      {
-        id: 1,
-        data: new Date(),
-        descricao: "Mussum Ipsum, cacilds vidis litro abertis.  Manduma pindureta quium dia nois paga. Mauris nec dolor in eros commodo tempor. Aenean aliquam molestie leo, vitae iaculis nisl. Vehicula non. Ut sed ex eros. Vivamus sit amet nibh non tellus tristique interdum. Aenean aliquam molestie leo, vitae iaculis nisl.\nQuem manda na minha terra sou euzis! Suco de cevadiss deixa as pessoas mais interessantis. Negão é teu passadis, eu sou faxa pretis. Si num tem leite então bota uma pinga aí cumpadi!\nDetraxit consequat et quo num tendi nada. Interessantiss quisso pudia ce receita de bolis, mais bolis eu num gostis. Paisis, filhis, espiritis santis. Eu nunca mais boto a boca num copo de cachaça, agora eu só uso canudis!",
-        operacao: Operacao.INCLUSAO,
-        idRegistro: 1,
-        usuario: {
-          id: 1,
-          login: "admin@2024",
-          nome: "Admin",
-          password: "123456",
-          role: UserRole.ADMIN
-        }
-      },
-      {
-        id: 1,
-        data: new Date(),
-        descricao: "Mussum Ipsum, cacilds vidis litro abertis.  Manduma pindureta quium dia nois paga. Mauris nec dolor in eros commodo tempor. Aenean aliquam molestie leo, vitae iaculis nisl. Vehicula non. Ut sed ex eros. Vivamus sit amet nibh non tellus tristique interdum. Aenean aliquam molestie leo, vitae iaculis nisl.\nQuem manda na minha terra sou euzis! Suco de cevadiss deixa as pessoas mais interessantis. Negão é teu passadis, eu sou faxa pretis. Si num tem leite então bota uma pinga aí cumpadi!\nDetraxit consequat et quo num tendi nada. Interessantiss quisso pudia ce receita de bolis, mais bolis eu num gostis. Paisis, filhis, espiritis santis. Eu nunca mais boto a boca num copo de cachaça, agora eu só uso canudis!",
-        operacao: Operacao.EXCLUSAO,
-        idRegistro: 1,
-        usuario: {
-          id: 1,
-          login: "admin@2024",
-          nome: "Admin",
-          password: "123456",
-          role: UserRole.ADMIN
-        }
-      }
-    ]
     // Colunas da tabela
     this.cols = [
       { field: 'disciplina', header: 'Disciplina' },
@@ -368,8 +289,8 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.unsubscribe$.unsubscribe();
-    this.unsubscribe$Aln.unsubscribe();
-    this.unsubscribe$Disc.unsubscribe();
+    // this.unsubscribe$Aln.unsubscribe();
+    // this.unsubscribe$Disc.unsubscribe();
     this.unsubscribe$Loc.unsubscribe();
     this.unsubscribe$Per.unsubscribe();
     this.unsubscribe$Prof.unsubscribe();
@@ -387,22 +308,6 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   //     formGroup.get('horarioFim')?.setErrors(null);
   //   }
   // }
-
-  getAluno(): FormArray {
-    return this.form.get('periodoDisciplina.alunos') as FormArray;
-  }
-
-  addAluno(aluno: Aluno) {
-    this.getAluno().push(new FormControl(aluno));
-  }
-
-  onAlunosChange(event: any) {
-    this.getAluno().clear();
-
-    event.value.forEach((aluno: Aluno) => {
-      this.addAluno(aluno);
-    });
-  }
 
   showDialogLog(valueLog: Alocacao) {
     this.visibleLog = true;
@@ -424,12 +329,10 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   showInfoDialog(valueInfo: Alocacao) {
     this.visibleInfo = true;
     this.alocacaoInfo = valueInfo;
-    console.log(this.alocacaoInfo?.periodoDisciplina?.periodo?.dataInicio)
   }
 
   showEditDialog(value: Alocacao, dtEv: string) {
     this.form.reset();
-    this.getAluno().clear();
     this.ehTitulo = 'Atualizar Alocação'
     this.visibleEdit = true;
     this.visibleInfo = false;
@@ -448,17 +351,10 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     const eventoData = this.formatarDtStrDt(dtEv);
 
     this.calendar.writeValue(eventoData);
-    this.dropdownDisc.writeValue(value.periodoDisciplina.disciplina);
-    this.dropdownPeriodo.writeValue(value.periodoDisciplina.periodo);
+    this.dropdownPeriodo.writeValue(value.periodoDisciplina);
     this.dropdownLocal.writeValue(value.local);
     this.dropdownProf.writeValue(value.professor);
-    this.multiselect.writeValue(value.periodoDisciplina.alunos);
     this.dropdownHour.writeValue(value.horario);
-
-    this.selectedAlunos = value.periodoDisciplina.alunos;
-    value.periodoDisciplina.alunos.forEach(aln => {
-      this.addAluno(aln);
-    })
   }
 
   showDialog() {
@@ -468,19 +364,16 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     this.visibleInfo = false;
     this.cadastrar = true;
     this.editar = false;
-    this.getAluno().clear();
-    this.selectedAlunos = [];
     this.alocacaoHour = [];
   }
 
   hideDialog() {
     if (this.cadastrar) {
       this.visible = false;
-      this.form.reset();
     } else if (this.editar) {
       this.visibleEdit = false;
-      this.form.reset();
     }
+    this.form.reset();
     this.visibleLog = false;
     this.alocacaoHour = [];
   }
@@ -515,10 +408,10 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
 
   atualizarDiasSemana(codes: number[]) {
     let ini: Date = this.form.get('dataAula')?.value;
-    let periodo: Periodo = this.form.get('periodoDisciplina.periodo')?.value;
+    // let periodo: Periodo = this.form.get('periodoDisciplina.periodo')?.value;
 
-    if (ini && periodo) {
-      const periodoFim = new Date(periodo.dataFim);
+    if (ini && this.selectedPeriodo) {
+      const periodoFim = new Date(this.selectedPeriodo.dataFim);
       this.diasIntervalo = this.calcularDiasSemana(ini, periodoFim, codes);
       this.calendarIntervalo.writeValue(this.diasIntervalo);
     }
@@ -526,10 +419,10 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
 
   onMultiselectChange() {
     let ini: Date = this.form.get('dataAula')?.value;
-    let periodo: Periodo = this.form.get('periodoDisciplina.periodo')?.value;
+    // let periodo: Periodo = this.form.get('periodoDisciplina.periodo')?.value;
     let hora: Horario = this.form.get('horario')?.value;
 
-    if (ini && this.selectedDiasSemana && periodo && hora) {
+    if (ini && this.selectedDiasSemana && this.selectedPeriodo && hora) {
       let codes: number[] = this.selectedDiasSemana.map(selD => selD.code);
       this.selectedDiasSemana.forEach(selD => {
         const existe = this.alocacaoHour.some(item => item.diaSemana === selD);
@@ -549,7 +442,8 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       this.minDate.setMonth(this.minDate.getMonth());
       this.minDate.setFullYear(this.minDate.getFullYear());
 
-      this.maxDate = new Date(periodo.dataFim);
+      this.maxDate = new Date(this.selectedPeriodo.dataFim);
+      console.log('max ', this.maxDate)
       this.maxDate.setDate(this.maxDate.getDate());
       this.maxDate.setMonth(this.maxDate.getMonth());
       this.maxDate.setFullYear(this.maxDate.getFullYear());
@@ -590,11 +484,11 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
 
   onDateIniSelect() {
     const dataAula = this.form.get('dataAula')?.value;
-    const periodo: Periodo = this.form.get('periodoDisciplina.periodo')?.value;
+    // const periodo: Periodo = this.form.get('periodoDisciplina.periodo')?.value;
 
-    if (dataAula && periodo) {
-      const periodoInicio = new Date(periodo.dataInicio);
-      const periodoFim = new Date(periodo.dataFim);
+    if (dataAula && this.selectedPeriodo) {
+      const periodoInicio = new Date(this.selectedPeriodo.dataInicio);
+      const periodoFim = new Date(this.selectedPeriodo.dataFim);
       const dataAulaValida = new Date(dataAula) >= periodoInicio && new Date(dataAula) <= periodoFim;
 
       if (dataAulaValida) {
@@ -627,23 +521,59 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     }
   }
 
-  updateDataAulaState() {
-    const periodo: Periodo = this.form.get('periodoDisciplina.periodo')?.value;
-    console.log(periodo)
-    if (periodo && periodo.dataInicio && periodo.dataFim) {
-      this.minDateAula = new Date(periodo.dataInicio);
-      this.minDateAula.setDate(this.minDateAula.getDate() + 1);
+  updateDisciplinaState() {
+    if (this.selectedPeriodo && this.selectedPeriodo.dataInicio && this.selectedPeriodo.dataFim) {
+      this.minDateAula = new Date(this.selectedPeriodo.dataInicio);
+      this.minDateAula.setDate(this.minDateAula.getDate());
       this.minDateAula.setMonth(this.minDateAula.getMonth());
       this.minDateAula.setFullYear(this.minDateAula.getFullYear());
 
-      this.maxDateAula = new Date(periodo.dataFim);
+      this.maxDateAula = new Date(this.selectedPeriodo.dataFim);
       this.maxDateAula.setDate(this.maxDateAula.getDate());
       this.maxDateAula.setMonth(this.maxDateAula.getMonth());
       this.maxDateAula.setFullYear(this.maxDateAula.getFullYear());
 
-      this.enableDataAula = true;
+      this.periodosDisciplinaArray = this.selectedPeriodo.periodoDisciplinas;
+      this.enableDisciplina = true;
+      
+      let discp: Disciplina = this.form.get('periodoDisciplina.disciplina')?.value;
+      if(discp) {
+        this.form.patchValue({
+          periodoDisciplina: null
+        })
+      }
     } else {
-      this.enableDataAula = false;
+      this.periodosDisciplinaArray = [];
+      this.enableDisciplina = false;
+      this.form.patchValue({
+        periodoDisciplina: null
+      })
+    }
+  }
+
+  updateDataAulaState() {
+    let perDisc: PeriodoDisciplina = this.form.get('periodoDisciplina')?.value;
+    if (perDisc) {
+      let discp: Disciplina = perDisc.disciplina;
+      if(discp) {
+        let perIni: Date = new Date(this.selectedPeriodo.dataInicio);
+        let ini: Date = perIni;
+        ini.setDate(ini.getDate() + 1);
+        console.log(ini)
+        this.form.patchValue({
+          dataAula: ini
+        });
+        // this.calendarAula.writeValue(ini)
+        this.onDateIniSelect();
+        this.enableDataAula = true;
+      } else {
+        this.form.patchValue({
+          dataAula: null
+        });
+        // this.calendarAula.writeValue(null)
+        this.onDateIniSelect();
+        this.enableDataAula = false;
+      }
     }
   }
 
@@ -973,7 +903,9 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       return alocacao.local.nome;
     }
     if (field == 'periodo') {
-      return datePipe.transform(alocacao.periodoDisciplina.periodo.dataInicio, 'dd/MM/yyyy') + ' - ' + datePipe.transform(alocacao.periodoDisciplina.periodo.dataFim, 'dd/MM/yyyy');
+      if(alocacao.periodoDisciplina.periodo) {
+        return datePipe.transform(alocacao.periodoDisciplina.periodo.dataInicio, 'dd/MM/yyyy') + ' - ' + datePipe.transform(alocacao.periodoDisciplina.periodo.dataFim, 'dd/MM/yyyy');
+      }
     }
     if (field == 'horario') {
       return alocacao.horario.horaInicio + 'min - ' + alocacao.horario.horaFim + 'min';

@@ -4,35 +4,22 @@ import { CommonModule, Time } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { ConfirmationService, Message, MessageService } from 'primeng/api';
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { InputGroupModule } from 'primeng/inputgroup';
-import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
-import { TableModule } from 'primeng/table';
-import { PaginatorModule } from 'primeng/paginator';
-import { DialogModule } from 'primeng/dialog';
-import { ToastModule } from 'primeng/toast';
-import { ConfirmPopupModule } from 'primeng/confirmpopup';
-import { ScrollTopModule } from 'primeng/scrolltop';
-import { Calendar, CalendarModule } from 'primeng/calendar';
 import { Evento, EventoHourData } from '../../models/evento.models';
 import { EventoService } from '../../service/evento.service';
 import { Local } from '../../models/local.models';
 import { LocalService } from '../../service/local.service';
-import { Dropdown, DropdownModule } from 'primeng/dropdown';
-import { InputMaskModule } from 'primeng/inputmask';
-import { InputSwitch, InputSwitchModule } from 'primeng/inputswitch';
-import { OverlayPanelModule } from 'primeng/overlaypanel';
-import { MessagesModule } from 'primeng/messages';
 import { FiltrarPesquisa } from '../../models/share/filtrar-pesquisa.models';
-import { registerLocaleData } from '@angular/common';
-import localePT from '@angular/common/locales/pt';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
-import { CheckboxModule } from 'primeng/checkbox';
 import { HorarioService } from '../../service/horario.service';
 import { Horario } from '../../models/horario.models';
+import { ConfirmationService, Message, MessageService } from 'primeng/api';
+import { registerLocaleData } from '@angular/common';
+import localePT from '@angular/common/locales/pt';
 registerLocaleData(localePT);
+import { PrimeNgImportsModule } from '../../shared/prime-ng-imports/prime-ng-imports.module';
+import { Dropdown } from 'primeng/dropdown';
+import { InputSwitch } from 'primeng/inputswitch';
+import { Calendar } from 'primeng/calendar';
 
 @Component({
   selector: 'app-eventos-r',
@@ -43,24 +30,8 @@ registerLocaleData(localePT);
     HttpClientModule,
     RouterModule,
     ReactiveFormsModule,
-    ButtonModule,
-    InputTextModule,
-    InputGroupModule,
-    InputGroupAddonModule,
-    TableModule,
-    DialogModule,
-    PaginatorModule,
-    ToastModule,
-    ScrollTopModule,
-    ConfirmPopupModule,
-    CalendarModule,
-    DropdownModule,
-    InputMaskModule,
-    InputSwitchModule,
-    OverlayPanelModule,
-    MessagesModule,
     NgxMaskDirective,
-    CheckboxModule
+    PrimeNgImportsModule
   ],
   templateUrl: './eventos-r.component.html',
   styleUrl: './eventos-r.component.scss',
@@ -285,6 +256,12 @@ export class EventosRComponent implements OnInit, OnDestroy {
       this.enableCheck = true;
     } else {
       this.enableCheck = false;
+    }
+
+    if(this.diasIntervalo && this.diasIntervalo?.length > 0) {
+      this.diasIntervalo = [];
+      this.datasHour = [];
+      this.replicaIntervalo()
     }
   }
 

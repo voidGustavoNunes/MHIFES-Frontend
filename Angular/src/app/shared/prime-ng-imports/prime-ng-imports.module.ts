@@ -1,5 +1,4 @@
 import { NgModule } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AccordionModule } from 'primeng/accordion';
 import { ButtonModule } from 'primeng/button';
 import { CalendarModule } from 'primeng/calendar';
@@ -20,6 +19,9 @@ import { ScrollTopModule } from 'primeng/scrolltop';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
+import { FloatLabelModule } from 'primeng/floatlabel';
+import { CheckboxModule } from 'primeng/checkbox';
+import { InputMaskModule } from 'primeng/inputmask';
 
 @NgModule({
   exports: [TagModule,
@@ -42,8 +44,9 @@ import { ToastModule } from 'primeng/toast';
     InputSwitchModule,
     AccordionModule,
     DividerModule,
-    ReactiveFormsModule,
-    FormsModule
+    FloatLabelModule,
+    CheckboxModule,
+    InputMaskModule
   ]
 })
 export class PrimeNgImportsModule { }
