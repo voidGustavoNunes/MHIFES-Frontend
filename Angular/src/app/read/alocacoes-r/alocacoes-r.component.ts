@@ -443,7 +443,6 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       this.minDate.setFullYear(this.minDate.getFullYear());
 
       this.maxDate = new Date(this.selectedPeriodo.dataFim);
-      console.log('max ', this.maxDate)
       this.maxDate.setDate(this.maxDate.getDate());
       this.maxDate.setMonth(this.maxDate.getMonth());
       this.maxDate.setFullYear(this.maxDate.getFullYear());
@@ -462,7 +461,6 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
         this.form.patchValue({
           horario: alocH.horario,
         });
-        console.log('mudou', alocH.horario)
         this.dropdownHour.writeValue(alocH.horario)
       }
     })
@@ -535,6 +533,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
 
       this.periodosDisciplinaArray = this.selectedPeriodo.periodoDisciplinas;
       this.enableDisciplina = true;
+      console.log('discp ',this.selectedPeriodo.periodoDisciplinas)
       
       let discp: Disciplina = this.form.get('periodoDisciplina.disciplina')?.value;
       if(discp) {
@@ -559,9 +558,12 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
         let perIni: Date = new Date(this.selectedPeriodo.dataInicio);
         let ini: Date = perIni;
         ini.setDate(ini.getDate() + 1);
-        console.log(ini)
+
+        // perDisc.periodo = this.selectedPeriodo;
+
         this.form.patchValue({
-          dataAula: ini
+          dataAula: ini,
+          // periodoDisciplina: perDisc
         });
         // this.calendarAula.writeValue(ini)
         this.onDateIniSelect();
@@ -836,9 +838,6 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
         if (dt.getTime() != ini?.getTime()) {
           this.alocacaoHour.find(alocH => {
             const diaDaSemana = this.obterDiaDaSemana(dt);
-            console.log('dia ', diaDaSemana)
-            console.log('aloh ', alocH.diaSemana.nome)
-            console.log('hor ', alocH.horario)
             if (diaDaSemana == alocH.diaSemana.nome) {
               this.form.patchValue({
                 dataAula: dt,

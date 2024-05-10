@@ -141,6 +141,7 @@
                 <b>Data de fim:</b> {{periodoInfo?.dataFim | date: 'fullDate' : '' : 'pt-BR'}}
             </div>
             <div class="divInput">
+                <b>Disciplinas:</b> <br>
                 <p-accordion *ngFor="let discp of periodoInfo?.periodoDisciplinas">
                     <p-accordionTab header="{{discp?.disciplina?.nome}}">
                         <b>Alunos:</b>
