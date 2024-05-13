@@ -1,0 +1,40 @@
+<div class="caixa">
+    <h1>Relatórios</h1>
+    <div>
+    <p-dropdown #dropdown appendTo="body" [options]="anorelatorioArray" optionLabel="Ano" [filter]="true" [showClear]="true" placeholder="Selecione o Ano" inputId="coodaProf" appendTo="body" [(ngModel)]="selectedAno"
+    [ngModelOptions]="{standalone: true}">
+        <ng-template pTemplate="selectedItem" let-selectedOption>
+            <div class="flex align-items-center gap-2">
+                <div>{{ selectedOption }}</div>
+            </div>
+        </ng-template>
+        <ng-template let-ano pTemplate="item">
+            <div class="flex align-items-center gap-2">
+                <div>{{ ano }}</div>
+            </div>
+        </ng-template>
+    </p-dropdown>
+   </div>
+
+   <div>
+    <p-dropdown #dropdown appendTo="body" [options]="semestrerelatorioArray" optionLabel="Semestre" [filter]="true" [showClear]="true" placeholder="Selecione o Semestre" inputId="coodaProf" appendTo="body" [(ngModel)]="selectedSemestre"
+    [ngModelOptions]="{standalone: true}">
+        <ng-template pTemplate="selectedItem" let-selectedOption>
+            <div class="flex align-items-center gap-2">
+                <div>{{ selectedOption }}</div>
+            </div>
+        </ng-template>
+        <ng-template let-semestre pTemplate="item">
+            <div class="flex align-items-center gap-2">
+                <div>{{ semestre }}</div>
+            </div>
+        </ng-template>
+    </p-dropdown>
+    </div>
+
+    <div>
+        <a class="p-button botaoC" (onClick)="onSubmit()">Gerar Relatorio</a>
+    </div>
+
+</div>
+

@@ -135,4 +135,8 @@ export class LoginComponent implements OnInit {
       this.errM = true;
     }
   }
+
+  rotaRelatorios(){
+    this.router.navigate(['/relatorios']);
+  }
 }
