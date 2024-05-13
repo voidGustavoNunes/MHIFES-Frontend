@@ -141,7 +141,7 @@ export class RegisterComponent implements OnInit {
       let rol = this.form.get('role')?.value;
       if(!log) {
         this.errL = true;
-        this.mssL = 'Por favor insira um login de usuário.';
+        this.mssL = 'Por favor insira a matrícula do usuário.';
       }
       if(!nom) {
         this.errN = true;
@@ -153,7 +153,7 @@ export class RegisterComponent implements OnInit {
       }
       if(!rol) {
         this.errR = true;
-        this.mssR = 'Defina um papel de usuário.';
+        this.mssR = 'Defina um papel do usuário.';
       }
 
       this.messages = [

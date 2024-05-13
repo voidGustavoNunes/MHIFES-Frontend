@@ -89,6 +89,7 @@ export class LoginComponent implements OnInit {
         this.userAuthService.setRole(loginResponse.role.toString())
         this.userAuthService.setToken(loginResponse.token)
         this.userAuthService.setNome(loginResponse.nome)
+        this.userAuthService.setLogin(loginResponse.login)
         this.userAuthService.setTime();
 
         // const role = loginResponse.role.toString();

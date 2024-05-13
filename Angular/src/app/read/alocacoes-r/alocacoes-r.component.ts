@@ -98,7 +98,6 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   cadastrar: boolean = false;
 
   messages!: Message[];
-  mss: boolean = false;
 
   filterOptions: FiltrarPesquisa[] = [];
   selectedFilter!: FiltrarPesquisa;
@@ -218,26 +217,6 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
         }
       });
 
-    this.unsubscribe$Per = this.periodService.listar()
-      .subscribe({
-        next: (itens: any) => {
-          const data = itens;
-
-          data.sort((a: Periodo, b: Periodo) => {
-            const dateA = new Date(a.dataInicio);
-            const dateB = new Date(b.dataInicio);
-            return dateB.getTime() - dateA.getTime();
-          });
-
-          this.periodosArray = data;
-        },
-        error: (err: any) => {
-          this.messages = [
-            { severity: 'error', summary: 'Erro', detail: 'Dados de períodos não encontrados.', life: 3000 },
-          ];
-        }
-      });
-
     this.unsubscribe$Prof = this.professorService.listar()
       .subscribe({
         next: (itens: any) => {
@@ -263,6 +242,26 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
           ];
         }
       });
+      
+    this.unsubscribe$Per = this.periodService.listar()
+    .subscribe({
+      next: (itens: any) => {
+        const data = itens;
+
+        data.sort((a: Periodo, b: Periodo) => {
+          const dateA = new Date(a.dataInicio);
+          const dateB = new Date(b.dataInicio);
+          return dateB.getTime() - dateA.getTime();
+        });
+
+        this.periodosArray = data;
+      },
+      error: (err: any) => {
+        this.messages = [
+          { severity: 'error', summary: 'Erro', detail: 'Dados de períodos não encontrados.', life: 3000 },
+        ];
+      }
+    });
 
     // Colunas da tabela
     this.cols = [
@@ -338,13 +337,22 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       periodoDisciplina: value.periodoDisciplina,
     })
 
+    
     const eventoData = this.formatarDtStrDt(dtEv);
-
     this.calendar.writeValue(eventoData);
-    this.dropdownPeriodo.writeValue(value.periodoDisciplina);
-    this.dropdownLocal.writeValue(value.local);
-    this.dropdownProf.writeValue(value.professor);
-    this.dropdownHour.writeValue(value.horario);
+    
+    let perEdit = value.periodoDisciplina;
+    if (perEdit && perEdit?.periodo && this.periodosArray) {
+      for (const ped of this.periodosArray) {
+        console.log('if 2 ',ped == perEdit.periodo)
+        console.log('if 1 ',ped)
+        console.log('if 1 ',perEdit.periodo)
+        if(ped.id == perEdit.periodo.id) {
+          this.selectedPeriodo = ped;
+          this.updateDisciplinaStateEdit()
+        }
+      }
+    }
   }
 
   showDialog() {
@@ -355,6 +363,10 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     this.cadastrar = true;
     this.editar = false;
     this.alocacaoHour = [];
+
+    let nulo!: Periodo;
+    this.selectedPeriodo = nulo;
+    this.periodosDisciplinaArray = [];
   }
 
   hideDialog() {
@@ -366,6 +378,10 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     this.form.reset();
     this.visibleLog = false;
     this.alocacaoHour = [];
+    
+    let nulo!: Periodo;
+    this.selectedPeriodo = nulo;
+    this.periodosDisciplinaArray = [];
   }
 
   calcularDiasSemana(dtIni: Date, dtFim: Date, diasSemana: number[]): Date[] {
@@ -523,8 +539,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
 
       this.periodosDisciplinaArray = this.selectedPeriodo.periodoDisciplinas;
       this.enableDisciplina = true;
-      console.log('discp ', this.selectedPeriodo.periodoDisciplinas)
-
+      
       let discp: Disciplina = this.form.get('periodoDisciplina.disciplina')?.value;
       if (discp) {
         this.form.patchValue({
@@ -537,6 +552,39 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       this.form.patchValue({
         periodoDisciplina: null
       })
+    }
+  }
+
+  updateDisciplinaStateEdit() {
+    let perdisc: PeriodoDisciplina = this.form.get('periodoDisciplina')?.value;
+    if (this.selectedPeriodo && this.selectedPeriodo.dataInicio && this.selectedPeriodo.dataFim) {
+      this.minDateAula = new Date(this.selectedPeriodo.dataInicio);
+      this.minDateAula.setDate(this.minDateAula.getDate());
+      this.minDateAula.setMonth(this.minDateAula.getMonth());
+      this.minDateAula.setFullYear(this.minDateAula.getFullYear());
+
+      this.maxDateAula = new Date(this.selectedPeriodo.dataFim);
+      this.maxDateAula.setDate(this.maxDateAula.getDate());
+      this.maxDateAula.setMonth(this.maxDateAula.getMonth());
+      this.maxDateAula.setFullYear(this.maxDateAula.getFullYear());
+
+      
+      console.log('perdisc ',this.selectedPeriodo)
+      this.periodosDisciplinaArray = this.selectedPeriodo.periodoDisciplinas;
+      
+      if(perdisc.periodo?.id != this.selectedPeriodo.id) {
+        this.form.patchValue({
+          periodoDisciplina: null
+        })
+      } else {
+        for (const ped of this.selectedPeriodo.periodoDisciplinas) {
+          if(perdisc.id == ped.id) {
+            this.form.patchValue({
+              periodoDisciplina: ped
+            })
+          }
+        }
+      }
     }
   }
 
@@ -726,12 +774,10 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       next: (data: any) => {
         this.alocacoesCadast = data;
         // this.goToRouteSave();
-        if (this.mss) {
-          this.messages = [
-            { severity: 'success', summary: 'Sucesso', detail: 'Alocação cadastrada com sucesso!', life: 3000 },
-          ];
-          this.ngOnInit();
-        }
+        this.messages = [
+          { severity: 'success', summary: 'Sucesso', detail: 'Alocação cadastrada com sucesso!', life: 3000 },
+        ];
+        this.ngOnInit();
       },
       error: (err: any) => {
         this.messages = [
@@ -764,7 +810,6 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
 
     if (this.form.valid && this.cadastrar) {
       this.conditionCreateSave();
-      this.mss = false;
       this.visible = false;
       this.form.reset();
       this.ngOnInit();
@@ -834,7 +879,6 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
                 horario: alocH.horario
               });
               if (new Date(dt).getTime() === ultimoDiaIntervalo.getTime()) {
-                this.mss = true;
               }
               this.alocacoesCadast = this.form.value;
               this.enviarFormSave();

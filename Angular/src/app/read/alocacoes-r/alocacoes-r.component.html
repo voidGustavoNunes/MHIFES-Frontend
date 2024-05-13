@@ -254,25 +254,6 @@
   <p-dialog class="pHeader" [header]=ehTitulo [(visible)]="visibleEdit" [modal]="true"
     [breakpoints]="{ '960px': '75vw' }" [style]="{ width: '50vw' }" [draggable]="false" [resizable]="false">
     <form id="meuFormulario" [formGroup]="form" (ngSubmit)="onSubmit()">
-      <!-- <div class="divInput">
-        <span class="p-float-label">
-          <p-dropdown #dropdownDisc appendTo="body" [options]="disciplinasArray" optionLabel="nome" [filter]="true"
-            filterBy="nome" [showClear]="true" placeholder="Selecione uma disciplina" inputId="discEvent"
-            class="form-control" formControlName="disciplina">
-            <ng-template pTemplate="selectedItem" let-selectedOption>
-              <div class="flex align-items-center gap-2">
-                <div>{{ selectedOption?.nome }}</div>
-              </div>
-            </ng-template>
-            <ng-template let-disciplinaData pTemplate="item">
-              <div class="flex align-items-center gap-2">
-                <div>{{ disciplinaData.nome }}</div>
-              </div>
-            </ng-template>
-          </p-dropdown>
-          <label for="discEvent">Disciplina</label>
-        </span>
-      </div> -->
       <div class="divInput">
         <span class="p-float-label">
           <p-dropdown #dropdownProf appendTo="body" [options]="professoresArray" optionLabel="nome" [filter]="true"
@@ -313,29 +294,40 @@
       </div>
       <div class="divInput">
         <span class="p-float-label">
-          <p-dropdown #dropdownPeriodo appendTo="body" [options]="periodosDisciplinaArray"
-            placeholder="Selecione um período" inputId="perdEvent" class="form-control"
-            formControlName="periodoDisciplina">
-            <ng-template let-periodoData pTemplate="selectedItem">
-              <div>{{periodoData?.periodo?.ano}}/{{periodoData?.periodo?.semestre}} : <br> {{
-                periodoData?.periodo?.dataInicio | date: 'dd/MM/yyyy' }} - {{ periodoData?.periodo?.dataFim | date:
-                'dd/MM/yyyy' }} <br> {{ periodoData?.disciplina?.sigla }} </div>
+          <p-dropdown appendTo="body" [(ngModel)]="selectedPeriodo" [ngModelOptions]="{standalone: true}" [options]="periodosArray" placeholder="Selecione o período" inputId="perArray" (ngModelChange)="updateDisciplinaStateEdit()" >
+            <ng-template pTemplate="selectedItem" let-selectedOption>
+              <div class="flex align-items-center gap-2">
+                <div>{{selectedOption?.ano}}/{{selectedOption?.semestre}} : {{ selectedOption?.dataInicio | date: 'dd/MM/yyyy' }} - {{ selectedOption?.dataFim | date: 'dd/MM/yyyy' }}</div>
+              </div>
             </ng-template>
             <ng-template let-periodoData pTemplate="item">
               <div class="flex align-items-center gap-2">
-                <div>{{periodoData?.periodo?.ano}}/{{periodoData?.periodo?.semestre}} : <br> {{
-                  periodoData?.periodo?.dataInicio | date: 'dd/MM/yyyy' }} - {{ periodoData?.periodo?.dataFim | date:
-                  'dd/MM/yyyy' }} <br> {{ periodoData?.disciplina?.sigla }} </div>
+                <div>{{periodoData?.ano}}/{{periodoData?.semestre}} : {{ periodoData?.dataInicio | date: 'dd/MM/yyyy' }} - {{ periodoData?.dataFim | date: 'dd/MM/yyyy' }}</div>
               </div>
             </ng-template>
           </p-dropdown>
-          <label for="perdEvent">Período</label>
+          <label for="perArray">Período</label>
         </span>
       </div>
       <div class="divInput">
         <span class="p-float-label">
-          <p-calendar #calendar appendTo="body" dateFormat="dd/mm/yy" id="fimPer" class="form-control"
-            formControlName="dataAula"></p-calendar>
+          <p-dropdown appendTo="body" [options]="periodosDisciplinaArray" placeholder="Selecione a disciplina" inputId="perdAloc" class="form-control" formControlName="periodoDisciplina" optionLabel="nome" [filter]="true" filterBy="nome" [showClear]="true">
+            <ng-template let-selectedOption pTemplate="selectedItem">
+              <div> {{ selectedOption?.disciplina?.sigla }} - {{ selectedOption?.disciplina?.nome }} </div>
+            </ng-template>
+            <ng-template let-disciplinaData pTemplate="item">
+              <div class="flex align-items-center gap-2">
+                <div> {{ disciplinaData?.disciplina?.sigla }} - {{ disciplinaData?.disciplina?.nome }} </div>
+              </div>
+            </ng-template>
+          </p-dropdown>
+          <label for="perdAloc">Disciplina</label>
+        </span>
+      </div>
+      <div class="divInput">
+        <span class="p-float-label">
+          <p-calendar #calendar appendTo="body" dateFormat="dd/mm/yy" id="fimPer" class="form-control" formControlName="dataAula" [minDate]="minDateAula"
+          [maxDate]="maxDateAula" ></p-calendar>
           <label for="fimPer">Data da aula</label>
         </span>
       </div>

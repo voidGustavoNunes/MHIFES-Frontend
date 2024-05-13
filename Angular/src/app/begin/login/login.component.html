@@ -13,7 +13,7 @@
             <div class="formInput">
                 <p-iconField iconPosition="left">
                     <p-inputIcon styleClass="pi pi-user" />
-                    <input type="text" class="form-control" formControlName="login" placeholder="Login" pInputText (keydown)="onKeyDown($event)" />
+                    <input type="text" class="form-control" formControlName="login" placeholder="Matrícula" pInputText (keydown)="onKeyDown($event)" />
                 </p-iconField>
                 <div *ngIf="form.get('login')?.invalid && errM" class="validation-error">
                     <p>{{ mssM }}</p>
