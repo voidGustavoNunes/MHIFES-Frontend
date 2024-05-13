@@ -58,6 +58,9 @@
                                 <ng-container *ngIf="exibirAlocacao(aloca, dia) && i != 0">
                                     {{ aloca?.periodoDisciplina?.disciplina.sigla }} - {{ aloca?.local?.nome }}
                                 </ng-container>
+                                <ng-container *ngIf="!exibirAlocacao(aloca, dia) && i != 0">
+                                    
+                                </ng-container>
                             </ng-container>
                         </td>
                     </tr>
@@ -71,7 +74,7 @@
 
             <div class="discSigla">
                 <ul>
-                    <li *ngFor="let aloc of alocacoesUser">
+                    <li *ngFor="let aloc of siglasAgrupadas">
                         {{ aloc?.periodoDisciplina?.disciplina?.sigla }} - {{ aloc?.periodoDisciplina?.disciplina?.nome }} - {{ aloc?.professor?.nome }}
                     </li>
                 </ul>

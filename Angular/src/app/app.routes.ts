@@ -14,7 +14,6 @@ import { AlocacoesRComponent } from './read/alocacoes-r/alocacoes-r.component';
 import { AuthGuard } from './_auth/auth.guard';
 import { ForbiddenComponent } from './begin/forbidden/forbidden.component';
 import { LoggedGuard } from './_auth/logged.guard';
-import { LogsRComponent } from './read/logs-r/logs-r.component';
 import { HorariosRComponent } from './read/horarios-r/horarios-r.component';
 
 export const routes: Routes = [
@@ -34,7 +33,6 @@ export const routes: Routes = [
     { path: 'coordenadorias', component: CoordenadoriasRComponent, canActivate:[AuthGuard], data:{roles:["ADMIN"]} },
     { path: 'locais', component: LocaisRComponent, canActivate:[AuthGuard], data:{roles:["ADMIN"]} },
     { path: 'horarios', component: HorariosRComponent, canActivate:[AuthGuard], data:{roles:["ADMIN"]} },
-    { path: 'logs', component: LogsRComponent, canActivate:[AuthGuard], data:{roles:["ADMIN"]} },
     
     { path: 'eventos', component: EventosRComponent, canActivate:[AuthGuard], data:{roles:["ADMIN"]} },
     { path: 'alocacoes', component: AlocacoesRComponent, canActivate:[AuthGuard], data:{roles:["ADMIN"]} },
