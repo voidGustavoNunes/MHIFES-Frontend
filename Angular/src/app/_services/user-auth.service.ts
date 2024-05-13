@@ -78,6 +78,21 @@ export class UserAuthService {
         return '';
     }
 
+    public setLogin(login: string) {
+        if (this.localStorage) {
+            this.localStorage.setItem("matricula", login);
+            // sessionStorage.setItem("matricula", login);
+        }
+    }
+
+    public getLogin(): string {
+        if (this.localStorage) {
+                return this.localStorage.getItem("matricula") ?? '';
+                // return sessionStorage.getItem("matricula") ?? '';
+        }
+        return '';
+    }
+
     public clear() {
         if (this.localStorage) {
             this.localStorage.clear();

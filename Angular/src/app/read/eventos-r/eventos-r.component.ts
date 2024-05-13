@@ -86,7 +86,6 @@ export class EventosRComponent implements OnInit, OnDestroy {
   txtFilter: string = 'Pesquisar evento';
   
   messages!: Message[];
-  mss: boolean = false;
   
   checkedReplica: boolean = false;
   enableCheck: boolean = false;
@@ -469,13 +468,10 @@ export class EventosRComponent implements OnInit, OnDestroy {
       next: (data: any) => {
         this.eventosCadast = data;
         // this.goToRouteSave();
-        console.log('envio ',this.mss)
-        if(this.mss) {
-          this.messages = [
-            { severity: 'success', summary: 'Sucesso', detail: 'Evento cadastrado com sucesso!', life: 3000 },
-          ];
-        }
         this.ngOnInit();
+        this.messages = [
+          { severity: 'success', summary: 'Sucesso', detail: 'Evento cadastrado com sucesso!', life: 3000 },
+        ];
       },
       error: (err: any) => {
         this.messages = [
@@ -506,7 +502,6 @@ export class EventosRComponent implements OnInit, OnDestroy {
   onSubmit() {
     if (this.form.valid && this.cadastrar) {
       this.conditionCreateSave();
-      this.mss = false;
       this.visible = false;
       this.form.reset();
       this.ngOnInit();
@@ -530,8 +525,6 @@ export class EventosRComponent implements OnInit, OnDestroy {
     if(!this.checkedReplica) {
       //  DATA INÍCIO
       this.eventosCadast = this.form.value;
-      this.mss = true;
-      console.log('antes ',this.mss)
       this.enviarFormSave();
     } else if(this.checkedReplica) {
       //  DATA INÍCIO
@@ -547,12 +540,6 @@ export class EventosRComponent implements OnInit, OnDestroy {
             dataEvento: dt.dataEvento,
             horario: dt.horario
           });
-          console.log('ult ',ultimoDiaIntervalo)
-          console.log('verd ',dt.dataEvento)
-          console.log('if ',new Date(dt.dataEvento).getTime() == ultimoDiaIntervalo.getTime())
-          if (new Date(dt.dataEvento).getTime() == ultimoDiaIntervalo.getTime()) {
-            this.mss = true;
-          }
           this.eventosCadast = this.form.value;
           this.enviarFormSave();
         }

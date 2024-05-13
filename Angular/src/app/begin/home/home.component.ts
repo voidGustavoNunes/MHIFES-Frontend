@@ -10,6 +10,8 @@ import { ConfirmationService, Message, MessageService } from 'primeng/api';
 import { Subscription } from 'rxjs';
 import { DiaSemana, Horario } from '../../models/horario.models';
 import { HttpClientModule } from '@angular/common/http';
+import { AlocacaoService } from '../../service/alocacao.service';
+import { UserAuthService } from '../../_services/user-auth.service';
 
 @Component({
   selector: 'app-home',
@@ -29,17 +31,20 @@ import { HttpClientModule } from '@angular/common/http';
   providers: [
     ConfirmationService,
     MessageService,
+    AlocacaoService,
+    UserAuthService
   ]
 })
 export class HomeComponent implements OnInit, OnDestroy {
   // horarioIndividualData: any[] = [];
   messages!: Message[];
-  form: FormGroup;
   
   filterOptions: FiltrarPesquisa[] = [];
   selectedFilter!: FiltrarPesquisa;
 
   alocacoesArray: Alocacao[] = [];
+  alocacoesUser: Alocacao[] = [];
+  alocacoesAgrupadas: Alocacao[][] = [];
   alocaoMaisProxima!: Alocacao;
   diaSemanaExibido: string = '';
 
@@ -48,334 +53,177 @@ export class HomeComponent implements OnInit, OnDestroy {
   diasDaSemana = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
 
   constructor(
-    private formBuilder: FormBuilder,
+    private alocService: AlocacaoService,
+    private userAuthService: UserAuthService
     ) {
-      this.form = this.formBuilder.group({
-        user: [null],
-        senha: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]]
-      });
   }
 
   ngOnInit() {
-
     this.filterOptions = [
       {nome: 'Aula mais próxima', id: 0},
       {nome: 'Horário do Período', id: 1}
     ];
-    
-    this.selectedFilter = this.filterOptions[0];
 
-    this.alocacoesArray = [
-      // {
-      //   id: 1,
-      //   numAulas: 30,
-      //   horario: {
-      //     id: 0,
-      //     diaSemana: DiaSemana.TERCA,
-      //     horaFim: {hours: 12, minutes:2},
-      //     horaInicio: {hours: 10, minutes:2}
-      //   },
-      //   turma: "V01",
-      //   diaSemana: "Segunda-feira",
-      //   dataAula: new Date(2024, 4, 16),
-      //   local: {
-      //     id: 1,
-      //     nome: "Local 1",
-      //     capacidade: 41,
-      //     localEquipamentos: [
-      //       {
-      //         id: 1,
-      //         equipamento: {
-      //           id: 1,
-      //           nome: "Projetor"
-      //         },
-      //         local: null,
-      //         quantidade: 45
-      //       }
-      //     ]
-      //   },
-      //   disciplina: {
-      //     id: 1,
-      //     nome: "Modelagem de Processos de Negócio"
-      //   },
-      //   periodo: {
-      //     id: 2,
-      //     dataInicio: new Date("2024-04-01"),
-      //     dataFim: new Date("2024-04-30"),
-      //     descricao: "lkjhk\n"
-      //   },
-      //   professor: {
-      //     id: 2,
-      //     nome: "Lays",
-      //     matricula: '54654654',
-      //     curso: "Sistemas",
-      //     ehCoordenador: false
-      //   },
-      //   alunos: [
-      //     {
-      //       id: 1,
-      //       nome: "Aluno",
-      //       matricula: "matricula",
-      //       curso: "curso"
-      //     }
-      //   ]
-      // },
-      // {
-      //   id: 2,
-      //   numAulas: 30,
-      //   horario: {
-      //     id: 0,
-      //     diaSemana: DiaSemana.SEGUNDA,
-      //     horaFim: {hours: 15, minutes:2},
-      //     horaInicio: {hours: 13, minutes:2}
-      //   },
-      //   turma: "V01",
-      //   diaSemana: "Segunda-feira",
-      //   dataAula: new Date(2024,4,15),
-      //   local: {
-      //     id: 1,
-      //     nome: "Local 1",
-      //     capacidade: 41,
-      //     localEquipamentos: [
-      //       {
-      //         id: 1,
-      //         equipamento: {
-      //           id: 1,
-      //           nome: "Projetor"
-      //         },
-      //         local: null,
-      //         quantidade: 45
-      //       }
-      //     ]
-      //   },
-      //   disciplina: {
-      //     id: 2,
-      //     nome: "Tópicos Especiais em Redes de Computadores"
-      //   },
-      //   periodo: {
-      //     id: 2,
-      //     dataInicio: new Date("2024-04-01"),
-      //     dataFim: new Date("2024-04-30"),
-      //     descricao: "lkjhk\n"
-      //   },
-      //   professor: {
-      //     id: 2,
-      //     nome: "Lays",
-      //     matricula: '54654654',
-      //     curso: "Sistemas",
-      //     ehCoordenador: false
-      //   },
-      //   alunos: [
-      //     {
-      //       id: 1,
-      //       nome: "Aluno",
-      //       matricula: "matricula",
-      //       curso: "curso"
-      //     }
-      //   ]
-      // },
-      // {
-      //   id: 3,
-      //   numAulas: 30,
-      //   horario: {
-      //     id: 0,
-      //     diaSemana: DiaSemana.QUINTA,
-      //     horaFim: {hours: 20, minutes:20},
-      //     horaInicio: {hours: 22, minutes:0}
-      //   },
-      //   turma: "V01",
-      //   diaSemana: "Segunda-feira",
-      //   dataAula: new Date(2024, 4, 18),
-      //   local: {
-      //     id: 1,
-      //     nome: "Local 1",
-      //     capacidade: 41,
-      //     localEquipamentos: [
-      //       {
-      //         id: 1,
-      //         equipamento: {
-      //           id: 1,
-      //           nome: "Projetor"
-      //         },
-      //         local: null,
-      //         quantidade: 45
-      //       }
-      //     ]
-      //   },
-      //   disciplina: {
-      //     id: 3,
-      //     nome: "Gerência de Projetos de Software"
-      //   },
-      //   periodo: {
-      //     id: 2,
-      //     dataInicio: new Date("2024-04-01"),
-      //     dataFim: new Date("2024-04-30"),
-      //     descricao: "lkjhk\n"
-      //   },
-      //   professor: {
-      //     id: 2,
-      //     nome: "Lays",
-      //     matricula: '54654654',
-      //     curso: "Sistemas",
-      //     ehCoordenador: false
-      //   },
-      //   alunos: [
-      //     {
-      //       id: 1,
-      //       nome: "Aluno",
-      //       matricula: "matricula",
-      //       curso: "curso"
-      //     }
-      //   ]
-      // },
-      // {
-      //   id: 4,
-      //   numAulas: 30,
-      //   horario: {
-      //     id: 0,
-      //     diaSemana: DiaSemana.SEXTA,
-      //     horaFim: {hours: 18, minutes:2},
-      //     horaInicio: {hours: 19, minutes:2}
-      //   },
-      //   turma: "V01",
-      //   diaSemana: "Segunda-feira",
-      //   dataAula: new Date(2024, 4, 26),
-      //   local: {
-      //     id: 1,
-      //     nome: "Local 1",
-      //     capacidade: 41,
-      //     localEquipamentos: [
-      //       {
-      //         id: 1,
-      //         equipamento: {
-      //           id: 1,
-      //           nome: "Projetor"
-      //         },
-      //         local: null,
-      //         quantidade: 45
-      //       }
-      //     ]
-      //   },
-      //   disciplina: {
-      //     id: 4,
-      //     nome: "Interface com Usuário"
-      //   },
-      //   periodo: {
-      //     id: 2,
-      //     dataInicio: new Date("2024-04-01"),
-      //     dataFim: new Date("2024-04-30"),
-      //     descricao: "lkjhk\n"
-      //   },
-      //   professor: {
-      //     id: 2,
-      //     nome: "Lays",
-      //     matricula: '54654654',
-      //     curso: "Sistemas",
-      //     ehCoordenador: false
-      //   },
-      //   alunos: [
-      //     {
-      //       id: 1,
-      //       nome: "Aluno",
-      //       matricula: "matricula",
-      //       curso: "curso"
-      //     }
-      //   ]
-      // },
-    ]
-    
-    // this.unsubscribe$ = this.alocService.listar()
-    // .subscribe({
-    //   next: (itens:any) => {
-    //     const data = itens;
+    this.selectedFilter = this.filterOptions[0];
+    this.unsubscribe$ = this.alocService.listar()
+    .subscribe({
+      next: (itens:any) => {
+        const data = itens;
         
-    //     data.sort((a: Alocacao, b: Alocacao) => {
-    //       const dateA = new Date(a.dataAula);
-    //       const dateB = new Date(b.dataAula);
-    //       return dateB.getTime() - dateA.getTime();
-    //     });
-        
-    //     // this.alocacoesArray = data;
-    //   },
-    //   error: (err: any) => {
-    //     this.messages = [
-    //       { severity: 'error', summary: 'Erro', detail: 'Dados de alocações não encontrados.', life: 3000 },
-    //     ];
-    //   }
-    // });
-    this.obterContentProx();
+        data.sort((a: Alocacao, b: Alocacao) => {
+          const dateA = new Date(a.dataAula);
+          const dateB = new Date(b.dataAula);
+          return dateB.getTime() - dateA.getTime();
+        });
+        this.alocacoesArray = data;
+
+        const currentYear = new Date().getFullYear();
+        // this.alocacoesArray = this.alocacoesArray.filter((alocacao) => {
+        //   const allocacaoDate = new Date(this.formatarDtStrDt(alocacao.dataAula));
+        //   return allocacaoDate.getFullYear() === currentYear;
+        // });
+
+        for (const alocA of this.alocacoesArray) {
+          // for (const aln of alocA.periodoDisciplina.alunos) {
+          //   if(aln.matricula == this.userAuthService.getLogin()) {
+              const weekArr = this.diasDaSemana[new Date(alocA.dataAula).getDay()];
+              // const weekUse = this.diasDaSemana[new Date(alocU.dataAula).getDay()];
+                if(!this.alocacoesUser.some(alocU => alocU.periodoDisciplina === alocA.periodoDisciplina) && !this.alocacoesUser.some(alocU => this.diasDaSemana[new Date(alocU.dataAula).getDay()] === weekArr) && !this.alocacoesUser.some((alocU) => {
+                  alocU.horario.horaInicio.hours == alocA.horario.horaInicio.hours && alocU.horario.horaInicio.minutes == alocA.horario.horaInicio.minutes
+                }) && weekArr != 'Domingo') this.alocacoesUser.push(alocA);
+          //   }
+          // }
+        }
+        this.alocacoesUser.sort((a:Alocacao, b:Alocacao) => {
+          if (a.horario.horaInicio.hours < b.horario.horaInicio.hours) {
+            return -1;
+          } else if (a.horario.horaInicio.hours > b.horario.horaInicio.hours) {
+            return 1;
+          } else {
+            if (a.horario.horaInicio.minutes < b.horario.horaInicio.minutes) {
+              return -1;
+            } else if (a.horario.horaInicio.minutes > b.horario.horaInicio.minutes) {
+              return 1;
+            } else {
+              return 0;
+            }
+          }
+        })
+        this.obterContentProx();
+        this.agruparPorHorario(this.alocacoesUser);
+      },
+      error: (err: any) => {
+        this.messages = [
+          { severity: 'error', summary: 'Erro', detail: 'Dados de alocações não encontrados.', life: 3000 },
+        ];
+      }
+    });
+
   }
   
   ngOnDestroy() {
-    // this.unsubscribe$.unsubscribe();
+    this.unsubscribe$.unsubscribe();
   }
 
   obterContentProx() {
-    // const horaAtual = new Date().getTime();
-    // const diasDaSemana = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
-    // const diaSemanaAtualTexto = diasDaSemana[new Date().getDay()];
+    const horaAtual = new Date().getTime();
+    const diaSemanaAtualTexto = this.diasDaSemana[new Date().getDay()];
   
-    // let diffMaisProxima = Infinity;
-    // let alocaoMaisProxima: Alocacao | undefined;
+    let diffMaisProxima = Infinity;
+    let alocaoProxima: Alocacao | undefined;
   
-    // this.alocacoesArray.forEach(aloca => {
-    //   const horario: Horario = aloca.horario;
-    //   const milissegundosAloca = this.formatMiliss(horario.horaInicio);
+    this.alocacoesUser.forEach(aloca => {
+      const horario: Horario = aloca.horario;
+      const milissegundosAloca = this.formatMiliss(horario.horaInicio);
   
-    //   const diff = Math.abs(horaAtual - milissegundosAloca);
+      const diff = Math.abs(horaAtual - milissegundosAloca);
   
-    //   const diaSemanaAlocaTexto = this.getDiaSemanaFormatado(new Date(aloca.dataAula).getDay());
+      let dataAlocU = this.formatarDtStrDt(aloca.dataAula)
+      const diaSemanaAlocaTexto = this.diasDaSemana[new Date(dataAlocU).getDay()];
   
-    //   console.log('alc 1 ',aloca)
-    //   console.log('1 ',diaSemanaAlocaTexto)
-    //   console.log('2 ',diaSemanaAtualTexto)
-    //   console.log('dif 1 ',diaSemanaAlocaTexto === diaSemanaAtualTexto)
-    //   console.log('dif 2 ',diff < diffMaisProxima)
-    //   if (diff < diffMaisProxima && diaSemanaAlocaTexto === diaSemanaAtualTexto) {
-    //     alocaoMaisProxima = aloca;
-    //     diffMaisProxima = diff;
-    //   }
-    // });
+      if(diaSemanaAtualTexto !== 'Domingo' && diaSemanaAlocaTexto !== 'Domingo') {
+        if (diff < diffMaisProxima && diaSemanaAlocaTexto === diaSemanaAtualTexto) {
+          alocaoProxima = aloca;
+          diffMaisProxima = diff;
+        }
+      }
+    });
   
-    // if (alocaoMaisProxima) {
-    //   this.alocaoMaisProxima = alocaoMaisProxima;
-    //   this.diaSemanaExibido = diaSemanaAtualTexto;
-    // }
-    // console.log('aloc 2 ',alocaoMaisProxima)
-  }
-  
-  formatarHora(tempo: Time) {
-    if (tempo) {
-    // if (typeof tempo === 'string') {
-      // const partes = tempo.split(':');
-      const horas = tempo.hours.toString().padStart(2, '0');
-      const minutos = tempo.minutes.toString().padStart(2, '0');
-
-      return `${horas}h ${minutos}min`;
+    if (alocaoProxima) {
+      this.alocaoMaisProxima = alocaoProxima;
+      this.diaSemanaExibido = diaSemanaAtualTexto;
     }
-    return null;
+  }
+
+  formatarTmStrTm(tempo: any) {
+    if (tempo) {
+      const partes = tempo.split(':');
+      const horas = parseInt(partes[0], 10);
+      const minutos = parseInt(partes[1], 10);
+
+      if (!isNaN(horas) && !isNaN(minutos) && horas >= 0 && horas <= 23 && minutos >= 0 && minutos <= 59) {
+        return { horas, minutos };
+      } else {
+        return null;
+      }
+    } else {
+      return null;
+    }
+  }
+
+  formatarHora(tempo: any) {
+    const partes = tempo.split(':');
+    const horas = partes[0];
+    const minutos = partes[1];
+
+    return `${horas}:${minutos}`;
   }
 
   formatMiliss(tempo: any) {
     if (tempo) {
-      // const partes = tempo.split(':');
-      const horas = parseInt(tempo.hours.toString(), 10);
-      const minutos = parseInt(tempo.minutes.toString(), 10);
+      const partes = tempo.split(':');
+      const horas = parseInt(partes[0], 10);
+      const minutos = parseInt(partes[1], 10) - 1;
       const milissegundos = (horas * 60 + minutos) * 60000;
       return milissegundos;
     }
     return 0;
   }
 
-  getDiaSemanaFormatado(diaSemana: number): string {
-    return this.diasDaSemana[diaSemana];
+  formatarDtStrDt(date: any) {
+    if(date) {
+      const partes = date.split('-');
+      const ano = parseInt(partes[0], 10);
+      const mes = parseInt(partes[1], 10) - 1;
+      const dia = parseInt(partes[2], 10);
+
+      return new Date(dia, mes, ano);
+    } else {
+      return new Date();
+    }
+  }
+
+  agruparPorHorario(alocacoes: Alocacao[]) {
+    alocacoes.forEach((alocacao) => {
+      const timeKey = `${alocacao.horario.horaInicio.hours}:${alocacao.horario.horaInicio.minutes}`;
+      let agrupamento = this.alocacoesAgrupadas.find((grupo) => grupo[0].horario.horaInicio.hours === alocacao.horario.horaInicio.hours && grupo[0].horario.horaInicio.minutes === alocacao.horario.horaInicio.minutes);
+  
+      if (!agrupamento) {
+        agrupamento = [alocacao];
+        this.alocacoesAgrupadas.push(agrupamento);
+      } else {
+        agrupamento.push(alocacao);
+      }
+    });
   }
 
   exibirAlocacao(alocacao: Alocacao, diaSemana: string): boolean {
-    // if (alocacao.horario.diaSemana.toString() == diaSemana) {
-    //   return true;
-    // }
-
+    let diaAula = this.formatarDtStrDt(alocacao.dataAula)
+    const diaSemanaAloc = this.diasDaSemana[new Date(diaAula).getDay()];
+    if (diaSemanaAloc == diaSemana) {
+      return true;
+    }
     return false;
   }
+
 }

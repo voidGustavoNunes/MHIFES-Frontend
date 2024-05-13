@@ -75,6 +75,12 @@
         .tbBody:hover{
             background-color: #E5E7EB;
         }
+        .discSigla{
+            // text-align: center;
+            li{
+                list-style: none;
+            }
+        }
     }
 }
 :host ::ng-deep{
