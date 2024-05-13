@@ -1,44 +1,34 @@
-import { CommonModule, DatePipe, registerLocaleData, Time } from '@angular/common';
+import { CommonModule, DatePipe, registerLocaleData } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
+import localePT from '@angular/common/locales/pt';
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import {
-  FormArray,
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  FormsModule,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 import { ConfirmationService, Message, MessageService } from 'primeng/api';
 import { Calendar } from 'primeng/calendar';
 import { Dropdown } from 'primeng/dropdown';
 import { Subscription } from 'rxjs';
-import { Alocacao } from './../../models/alocacao.models';
+
 import { AlocacaoHour } from '../../models/alocacao.models';
 import { Aluno } from '../../models/aluno.models';
 import { Disciplina } from '../../models/disciplina.models';
+import { Horario } from '../../models/horario.models';
 import { Local } from '../../models/local.models';
 import { Log, Operacao } from '../../models/log.models';
 import { Periodo, PeriodoDisciplina } from '../../models/periodo.models';
 import { Professor } from '../../models/professor.models';
 import { FiltrarPesquisa } from '../../models/share/filtrar-pesquisa.models';
+import { Semana } from '../../models/share/semana.models';
 import { AlocacaoService } from '../../service/alocacao.service';
-import { AlunoService } from '../../service/aluno.service';
-import { DisciplinaService } from '../../service/disciplina.service';
+import { HorarioService } from '../../service/horario.service';
 import { LocalService } from '../../service/local.service';
 import { PeriodoService } from '../../service/periodo.service';
-import { Semana } from '../../models/share/semana.models';
-import { Horario } from '../../models/horario.models';
-import { HorarioService } from '../../service/horario.service';
-import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 import { ProfessorService } from '../../service/professor.service';
-import { UserRole } from '../../models/usuario';
-import localePT from '@angular/common/locales/pt';
-registerLocaleData(localePT);
 import { PrimeNgImportsModule } from '../../shared/prime-ng-imports/prime-ng-imports.module';
+import { Alocacao } from './../../models/alocacao.models';
 
+registerLocaleData(localePT);
 interface Column {
   field: string;
   header: string;
@@ -314,7 +304,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     this.unsubscribe$Log = this.alocService.buscarPorIdRegistro(valueLog.id)
       .subscribe({
         next: (itens: any) => {
-          const data = itens.sort((a: Log, b: Log) => (a.id > b.id) ? -1 : 1);
+          const data = itens.sort((a: Log, b: Log) => (a.id > b.id) ? 1 : -1);
           this.logsData = data;
         },
         error: (err: any) => {
@@ -551,7 +541,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       this.enableDisciplina = true;
       
       let discp: Disciplina = this.form.get('periodoDisciplina.disciplina')?.value;
-      if(discp) {
+      if (discp) {
         this.form.patchValue({
           periodoDisciplina: null
         })
@@ -602,7 +592,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     let perDisc: PeriodoDisciplina = this.form.get('periodoDisciplina')?.value;
     if (perDisc) {
       let discp: Disciplina = perDisc.disciplina;
-      if(discp) {
+      if (discp) {
         let perIni: Date = new Date(this.selectedPeriodo.dataInicio);
         let ini: Date = perIni;
         ini.setDate(ini.getDate() + 1);
@@ -928,7 +918,6 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
 
   jsonForObject(descricao: string): any {
     let alocacao: Alocacao = JSON.parse(descricao);
-    console.log(alocacao);
     return alocacao;
   }
 
@@ -946,7 +935,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       return alocacao.local.nome;
     }
     if (field == 'periodo') {
-      if(alocacao.periodoDisciplina.periodo) {
+      if (alocacao.periodoDisciplina.periodo) {
         return datePipe.transform(alocacao.periodoDisciplina.periodo.dataInicio, 'dd/MM/yyyy') + ' - ' + datePipe.transform(alocacao.periodoDisciplina.periodo.dataFim, 'dd/MM/yyyy');
       }
     }
@@ -962,11 +951,14 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     if (field == 'alunos') {
       return alocacao.periodoDisciplina.alunos.map((aluno: Aluno) => aluno.nome).join(', ');
     }
+
     return '';
   }
 
-  // isDateField(fieldName: string): boolean {
-  //   // Adicione aqui a lógica para verificar se o campo é uma data
-  //   return fieldName.includes('data') || fieldName.includes('Data');
-  // }
+  formatarDiferenca(valorAnterior: any, valorAtual: any): any {
+    if (valorAnterior !== valorAtual && valorAnterior !== undefined) {
+      return `${valorAnterior} -> ${valorAtual}`;
+    }
+    return valorAtual;
+  }
 }

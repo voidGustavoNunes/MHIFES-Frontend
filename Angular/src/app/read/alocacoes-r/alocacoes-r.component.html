@@ -49,8 +49,8 @@
               *ngIf="alocacao.status == 'ATIVO'">Editar</button>
             <p-toast></p-toast>
             <p-confirmPopup></p-confirmPopup>
-            <button type="button" class="botaoDele" (click)="confirm2($event, alocacao?.id)" severity="danger"
-              pButton *ngIf="alocacao.status == 'ATIVO'">Deletar</button>
+            <button type="button" class="botaoDele" (click)="confirm2($event, alocacao?.id)" severity="danger" pButton
+              *ngIf="alocacao.status == 'ATIVO'">Deletar</button>
           </td>
         </tr>
       </ng-template>
@@ -110,15 +110,19 @@
       </div>
       <div class="divInput">
         <span class="p-float-label">
-          <p-dropdown #dropdownPeriodo appendTo="body" [(ngModel)]="selectedPeriodo" [ngModelOptions]="{standalone: true}" [options]="periodosArray" [filter]="true" [showClear]="true" placeholder="Selecione o período" inputId="perArray" (ngModelChange)="updateDisciplinaState()" >
+          <p-dropdown #dropdownPeriodo appendTo="body" [(ngModel)]="selectedPeriodo"
+            [ngModelOptions]="{standalone: true}" [options]="periodosArray" [filter]="true" [showClear]="true"
+            placeholder="Selecione o período" inputId="perArray" (ngModelChange)="updateDisciplinaState()">
             <ng-template pTemplate="selectedItem" let-selectedOption>
               <div class="flex align-items-center gap-2">
-                <div>{{selectedOption?.ano}}/{{selectedOption?.semestre}} : {{ selectedOption?.dataInicio | date: 'dd/MM/yyyy' }} - {{ selectedOption?.dataFim | date: 'dd/MM/yyyy' }}</div>
+                <div>{{selectedOption?.ano}}/{{selectedOption?.semestre}} : {{ selectedOption?.dataInicio | date:
+                  'dd/MM/yyyy' }} - {{ selectedOption?.dataFim | date: 'dd/MM/yyyy' }}</div>
               </div>
             </ng-template>
             <ng-template let-periodoData pTemplate="item">
               <div class="flex align-items-center gap-2">
-                <div>{{periodoData?.ano}}/{{periodoData?.semestre}} : {{ periodoData?.dataInicio | date: 'dd/MM/yyyy' }} - {{ periodoData?.dataFim | date: 'dd/MM/yyyy' }}</div>
+                <div>{{periodoData?.ano}}/{{periodoData?.semestre}} : {{ periodoData?.dataInicio | date: 'dd/MM/yyyy' }}
+                  - {{ periodoData?.dataFim | date: 'dd/MM/yyyy' }}</div>
               </div>
             </ng-template>
           </p-dropdown>
@@ -127,7 +131,9 @@
       </div>
       <div class="divInput" *ngIf="enableDisciplina">
         <span class="p-float-label">
-          <p-dropdown #dropdownDisc appendTo="body" [options]="periodosDisciplinaArray" placeholder="Selecione a disciplina" inputId="perdAloc" class="form-control" formControlName="periodoDisciplina" (onChange)="updateDataAulaState()">
+          <p-dropdown #dropdownDisc appendTo="body" [options]="periodosDisciplinaArray"
+            placeholder="Selecione a disciplina" inputId="perdAloc" class="form-control"
+            formControlName="periodoDisciplina" (onChange)="updateDataAulaState()">
             <ng-template let-selectedOption pTemplate="selectedItem">
               <div> {{ selectedOption?.disciplina?.sigla }} - {{ selectedOption?.disciplina?.nome }} </div>
             </ng-template>
@@ -372,7 +378,6 @@
       </div>
       <div class="divInput">
         <b>Horário: </b> {{ alocacaoInfo?.horario?.horaInicio }} - {{ alocacaoInfo?.horario?.horaFim }}
-        <!-- <b>Horário: </b> {{ formatarHora(alocacaoInfo?.horarioInicio) }} -->
       </div>
       <div class="divInput dtAlocacao flexContainer">
         <div>
@@ -400,7 +405,6 @@
       <p-accordion>
         <p-accordionTab *ngFor="let log of logsData">
           <ng-template let="header" pTemplate="header" style="display: flex;">
-            <!-- <p-divider layout="vertical"></p-divider> -->
             <div class="custom-header">
               <span>Cód. Log: {{ log.id }}</span>
               <span>Ação: <p-tag class="severity-{{ +getSeverity(log.operacao)}}" [severity]="getSeverity(log.operacao)"
@@ -409,18 +413,20 @@
               <span>Data: {{ log.data | date : 'short' : '' : 'pt-BR'}}</span>
             </div>
           </ng-template>
-          <table>
-            <tr>
-              <th>Campo</th>
-              <th>Conteúdo</th>
-            </tr>
-            <tr *ngFor="let col of cols">
-              <td>{{ col.header }}</td>
-              <td>
-                {{ formatarApresentacao(jsonForObject(log.descricao), col.field) }}
-              </td>
-            </tr>
-          </table>
+          <p-table [value]="cols" [tableStyle]="{ 'width': '100%' }">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>Campo</th>
+                <th>Conteúdo</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-col>
+              <tr>
+                <td>{{ col.header }}</td>
+                <td>{{ formatarApresentacao(jsonForObject(log.descricao), col.field) }}</td>
+              </tr>
+            </ng-template>
+          </p-table>
         </p-accordionTab>
       </p-accordion>
     </div>
