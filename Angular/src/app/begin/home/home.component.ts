@@ -47,10 +47,11 @@ export class HomeComponent implements OnInit, OnDestroy {
   alocacoesAgrupadas: Alocacao[][] = [];
   alocaoMaisProxima!: Alocacao;
   diaSemanaExibido: string = '';
-
+  
   unsubscribe$!: Subscription;
-
+  
   diasDaSemana = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+  siglasAgrupadas: Alocacao[] = [];
 
   constructor(
     private alocService: AlocacaoService,
@@ -111,6 +112,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         })
         this.obterContentProx();
         this.agruparPorHorario(this.alocacoesUser);
+        this.exibirSiglas();
       },
       error: (err: any) => {
         this.messages = [
@@ -224,6 +226,20 @@ export class HomeComponent implements OnInit, OnDestroy {
       return true;
     }
     return false;
+  }
+
+  exibirSiglas() {
+    for (const itt of this.alocacoesAgrupadas) {
+      for (const tor of itt) {
+        if(this.siglasAgrupadas.length > 0) {
+          for (const sga of this.siglasAgrupadas) {
+            if(sga.periodoDisciplina.disciplina.sigla != tor.periodoDisciplina.disciplina.sigla) {
+              this.siglasAgrupadas.push(tor);
+            }
+          }
+        } else if(this.siglasAgrupadas.length <= 0) this.siglasAgrupadas.push(tor);
+      }
+    }
   }
 
 }

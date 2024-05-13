@@ -21,8 +21,6 @@
         
         <ng-template pTemplate="end" class="panel-user" *ngIf="getNameUser()">
             <p-overlayPanel #op>
-                <a routerLink="logs" rel="noopener noreferrer">Data logs</a>
-                <p-divider></p-divider>
                 <p-button (click)="logout()" label="Sair" [link]="true"></p-button>
             </p-overlayPanel>
             <p-button (click)="op.toggle($event)" icon="pi pi-user" label="{{getNameUser()}}"></p-button>
