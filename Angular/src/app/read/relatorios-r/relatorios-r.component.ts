@@ -71,7 +71,6 @@ export class RelatoriosRComponent implements OnInit{
     onSubmit(){
         
       if (this.selectedAno && this.selectedSemestre){
-        
       }
 
     }
