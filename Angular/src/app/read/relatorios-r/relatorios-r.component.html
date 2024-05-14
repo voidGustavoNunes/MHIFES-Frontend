@@ -33,8 +33,13 @@
     </div>
 
     <div>
-        <a class="p-button botaoC" (onClick)="onSubmit()">Gerar Relatorio</a>
+        <a class="p-button botaoC" (click)="onSubmit()">Gerar Relatorio</a>
     </div>
 
 </div>
 
+
+
+<div class="card">
+    <p-messages [(value)]="messages" [showTransitionOptions]="'500ms'" [hideTransitionOptions]="'500ms'" [enableService]="false"></p-messages>
+</div>

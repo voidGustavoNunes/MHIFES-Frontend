@@ -207,7 +207,8 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   agruparPorHorario(alocacoes: Alocacao[]) {
     alocacoes.forEach((alocacao) => {
-      const timeKey = `${alocacao.horario.horaInicio.hours}:${alocacao.horario.horaInicio.minutes}`;
+      // const timeKey = `${alocacao.horario.horaInicio.hours}:${alocacao.horario.horaInicio.minutes}`;
+      
       let agrupamento = this.alocacoesAgrupadas.find((grupo) => grupo[0].horario.horaInicio.hours === alocacao.horario.horaInicio.hours && grupo[0].horario.horaInicio.minutes === alocacao.horario.horaInicio.minutes);
   
       if (!agrupamento) {

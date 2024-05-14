@@ -8,7 +8,7 @@ export class HomeService {
 
   constructor(private http: HttpClient) { }
 
-  gerarRelatorioDisciplinaTurma(ano: number, semestre: number): Observable<Object> {
-    return this.http.get(`${this.API}/relatorio/disciplinas_turma/${ano}/${semestre}`);
+  gerarRelatorioDisciplinaTurma(ano: number, semestre: number): Observable<string> {
+    return this.http.get<string>(`${this.API}/relatorio/disciplinas_turma/${ano}/${semestre}`);
   }
 };

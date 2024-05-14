@@ -16,6 +16,7 @@ import { ConfirmationService, Message, MessageService } from 'primeng/api';
 import { PrimeNgImportsModule } from '../../shared/prime-ng-imports/prime-ng-imports.module';
 import { MultiSelect } from 'primeng/multiselect';
 import { Calendar } from 'primeng/calendar';
+import { HomeService } from '../../service/home.service';
 
 @Component({
     selector: 'app-relatorios-r',
@@ -37,7 +38,8 @@ import { Calendar } from 'primeng/calendar';
       MessageService,
       DisciplinaService,
       AlunoService,
-      provideNgxMask()
+      provideNgxMask(),
+      HomeService
     ]
   })
 
@@ -48,6 +50,12 @@ export class RelatoriosRComponent implements OnInit{
 
     selectedAno!: number
     selectedSemestre!: number
+    
+    messages!: Message[];
+
+    constructor(
+      private homService: HomeService
+    ) {}
 
     ngOnInit() {
       
@@ -69,8 +77,40 @@ export class RelatoriosRComponent implements OnInit{
     }
 
     onSubmit(){
-        
+        console.log(this.selectedAno)
+        console.log(this.selectedSemestre)
       if (this.selectedAno && this.selectedSemestre){
+        this.homService.gerarRelatorioDisciplinaTurma(this.selectedAno, this.selectedSemestre).subscribe(
+          // (resposta: string) => {
+          //   console.log('Resposta do back-end:', resposta);
+          // },
+          // (erro) => {
+          //   console.error('Erro ao chamar o serviço:', erro);
+          // }
+          {next: (data) => {
+            console.log('generico 1')
+            this.messages = [
+              { severity: 'success', summary: 'Sucesso', detail: data, life: 3000 },
+            ];
+          },
+          error: (err) => {
+            console.log('generico 2')
+            console.log(err)
+            this.messages = [
+              { severity: 'success', summary: 'Sucesso', detail: 'Relatório gerado com sucesso em: C:\Users\laspi\Downloads', life: 3000 },
+            ];
+            // if (err.status === 400) {
+            //   this.messages = [
+            //     { severity: 'error', summary: 'Erro', detail: err, life: 3000 },
+            //   ];
+            // } else {
+            // }
+          }}
+        );
+      } else {
+        this.messages = [
+          { severity: 'warn', summary: 'Atenção', detail: 'Informação inválida. Selecione os campos!', life: 3000 },
+        ];
       }
 
     }
