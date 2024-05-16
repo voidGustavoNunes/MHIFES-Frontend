@@ -53,6 +53,8 @@ export class RelatoriosRComponent implements OnInit{
     
     messages!: Message[];
 
+    mss: string = '';
+
     constructor(
       private homService: HomeService
     ) {}
@@ -76,10 +78,12 @@ export class RelatoriosRComponent implements OnInit{
 
     }
 
-    onSubmit(){
+    onSubmitDisciplinas(){
         console.log(this.selectedAno)
         console.log(this.selectedSemestre)
-      if (this.selectedAno && this.selectedSemestre){
+        if (this.selectedAno && this.selectedSemestre){
+        this.mss = 'Aguarde seu arquivo está sendo baixado...';
+        
         this.homService.gerarRelatorioDisciplinaTurma(this.selectedAno, this.selectedSemestre).subscribe(
           // (resposta: string) => {
           //   console.log('Resposta do back-end:', resposta);
@@ -97,8 +101,9 @@ export class RelatoriosRComponent implements OnInit{
             console.log('generico 2')
             console.log(err)
             this.messages = [
-              { severity: 'success', summary: 'Sucesso', detail: 'Relatório gerado com sucesso em: C:\Users\laspi\Downloads', life: 3000 },
+              { severity: 'success', summary: 'Sucesso', detail: 'Relatório gerado com sucesso em: C:/Downloads', life: 3000 },
             ];
+            this.mss = '';
             // if (err.status === 400) {
             //   this.messages = [
             //     { severity: 'error', summary: 'Erro', detail: err, life: 3000 },

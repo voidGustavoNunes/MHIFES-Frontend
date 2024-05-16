@@ -22,6 +22,7 @@ import { ScrollTopModule } from 'primeng/scrolltop';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
+import { TabViewModule } from 'primeng/tabview';
 
 @NgModule({
   exports: [TagModule,
@@ -46,7 +47,8 @@ import { ToastModule } from 'primeng/toast';
     DividerModule,
     FloatLabelModule,
     CheckboxModule,
-    InputMaskModule
+    InputMaskModule,
+    TabViewModule
   ]
 })
 export class PrimeNgImportsModule { }
