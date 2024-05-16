@@ -55,6 +55,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   
   siglasAgrupadas: Alocacao[] = [];
   columnsHorario: Horario[] = [];
+
+  mssVazio = ['Sem aulas agendadas para este período.', '', '', '', '', '', ''];
   
   constructor(
     private alocService: AlocacaoService,
@@ -169,20 +171,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
   }
 
-  // exibirSiglas() {
-  //   for (const itt of this.alocacoesAgrupadas) {
-  //     for (const tor of itt) {
-  //       if(this.siglasAgrupadas.length > 0) {
-  //         for (const sga of this.siglasAgrupadas) {
-  //           if(sga.periodoDisciplina.disciplina.sigla != tor.periodoDisciplina.disciplina.sigla) {
-  //             this.siglasAgrupadas.push(tor);
-  //           }
-  //         }
-  //       } else if(this.siglasAgrupadas.length <= 0) this.siglasAgrupadas.push(tor);
-  //     }
-  //   }
-  // }
-
   obterAlocacaoMaisProxima(): void {
     const hoje = new Date();
     const diaSemanaHoje = this.diasDaSemana[hoje.getDay()];
@@ -190,7 +178,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     const horaAtual = new Date().getHours() * 60 + new Date().getMinutes();
 
     if (this.alocacoesAgrupadas[indiceDiaAtual].length === 0) {
-      console.log('Não há alocações para o dia da semana atual: ', indiceDiaAtual);
       this.alocacaoMaisProxima = undefined;
       return;
     }
@@ -224,15 +211,22 @@ export class HomeComponent implements OnInit, OnDestroy {
     const alocacaoUnique: Alocacao[][] = Array.from({ length: 7 }, () => []);
   
     this.alocacoesArray.forEach((alocacao) => {
-      // for (const aln of alocacao.periodoDisciplina.alunos) {
-      //   if(aln.matricula == this.userAuthService.getLogin()) {
-          const diaSemana = this.formatarDtStrDt(alocacao.dataAula).getDay();
-          alocacaoUnique[diaSemana].push(alocacao);
-      //   }
-      // }
+      const hoje = new Date();
+      const periodo = alocacao.periodoDisciplina.periodo;
+      if(periodo) {
+        if(hoje.getTime() >= this.formatarDtStrDt(periodo.dataInicio).getTime() && hoje.getTime() <= this.formatarDtStrDt(periodo.dataFim).getTime()) {
+          for (const aln of alocacao.periodoDisciplina.alunos) {
+            if(aln.matricula == this.userAuthService.getLogin()) {
+              const diaSemana = this.formatarDtStrDt(alocacao.dataAula).getDay();
+              alocacaoUnique[diaSemana].push(alocacao);
+            }
+          }
+        }
+      }
     });
   
     const horariosUnicos: Horario[] = [];
+    const siglasUnique: Alocacao[] = [];
     alocacaoUnique.forEach((diaAlocacoes, diaSemana) => {
       const alocacoesUnicas: Alocacao[] = [];
     
@@ -252,6 +246,10 @@ export class HomeComponent implements OnInit, OnDestroy {
           if(!jaHora) {
             horariosUnicos.push(alocacaoAtual.horario);
           }
+          const jaSigla = siglasUnique.some((sgl) => sgl.periodoDisciplina.disciplina.nome == alocacaoAtual.periodoDisciplina.disciplina.nome && sgl.periodoDisciplina.disciplina.sigla == alocacaoAtual.periodoDisciplina.disciplina.sigla);
+          if(!jaSigla) {
+            siglasUnique.push(alocacaoAtual);
+          }
         }
       });
     
@@ -261,6 +259,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.alocacoesAgrupadas = alocacaoUnique;
     this.obterAlocacaoMaisProxima();
     this.columnsHorario = horariosUnicos;
+    this.siglasAgrupadas = siglasUnique;
   }
 
   encontrarColunaCorrespondente(colHora: Horario | undefined, alocacao: Alocacao) {
@@ -271,5 +270,16 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     if(colHi?.horas === hIFormatado?.horas && colHi?.minutos === hIFormatado?.minutos && hFFormatado?.horas === colHf?.horas && colHf?.minutos === hFFormatado?.minutos){ return alocacao }
     else{ return null }
+  }
+
+  percorrerGrupoArray() {
+    let alocV!: Alocacao;
+    for (const grp of this.alocacoesAgrupadas) {
+      for (const aloc of grp) {
+        if(aloc != null || aloc != undefined) alocV = aloc;
+      }
+    }
+    if(alocV == null || alocV == undefined){ return true }
+    else{ return false }
   }
 }
