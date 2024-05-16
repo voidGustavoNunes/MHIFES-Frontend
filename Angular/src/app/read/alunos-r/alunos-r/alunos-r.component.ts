@@ -167,11 +167,19 @@ export class AlunosRComponent implements OnInit, OnDestroy {
   }
 
   filterField(searchTerm: string) {
-    if (searchTerm != null || searchTerm != '') {
+    if (searchTerm && (searchTerm != null || searchTerm != '')) {
       if(this.selectedFilter) {
         if(this.selectedFilter.id == 0) this.searchFilter0(searchTerm);
         if(this.selectedFilter.id == 1) this.searchFilter1(searchTerm);
+      } else {
+        this.messages = [
+          { severity: 'warn', summary: 'Atenção', detail: 'Selecione um filtro!', life: 3000 },
+        ];
       }
+    } else {
+      this.messages = [
+        { severity: 'warn', summary: 'Atenção', detail: 'Informação inválida. Preencha o campo!', life: 3000 },
+      ];
     }
   }
 

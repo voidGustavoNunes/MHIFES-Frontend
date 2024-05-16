@@ -159,8 +159,12 @@ export class CoordenadoriasRComponent implements OnInit, OnDestroy {
   }
 
   filterField(searchTerm: string) {
-    if (searchTerm != null || searchTerm != '') {
+    if (searchTerm && (searchTerm != null || searchTerm != '')) {
       this.searchFilterWord(searchTerm);
+    } else {
+      this.messages = [
+        { severity: 'warn', summary: 'Atenção', detail: 'Informação inválida. Preencha o campo!', life: 3000 },
+      ];
     }
   }
 

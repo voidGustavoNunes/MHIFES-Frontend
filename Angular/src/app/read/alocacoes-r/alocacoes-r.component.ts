@@ -689,7 +689,15 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
         if (this.selectedFilter.id == 1) this.searchFilter1(searchTerm);
         if (this.selectedFilter.id == 2) this.searchFilter2(searchTerm);
         if (this.selectedFilter.id == 3) this.searchFilter3(searchTerm);
+      } else {
+        this.messages = [
+          { severity: 'warn', summary: 'Atenção', detail: 'Selecione um filtro!', life: 3000 },
+        ];
       }
+    } else {
+      this.messages = [
+        { severity: 'warn', summary: 'Atenção', detail: 'Informação inválida. Preencha o campo!', life: 3000 },
+      ];
     }
   }
 
