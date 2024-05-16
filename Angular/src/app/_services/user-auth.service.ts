@@ -97,7 +97,7 @@ export class UserAuthService {
         if (this.localStorage) {
             this.localStorage.clear();
             // sessionStorage.clear();
-            this.router.navigate(['/home']).then(() => {
+            this.router.navigate(['/login']).then(() => {
             window.location.reload();
             });
         }

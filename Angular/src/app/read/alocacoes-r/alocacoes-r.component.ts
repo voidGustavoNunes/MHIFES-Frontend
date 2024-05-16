@@ -574,7 +574,8 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       
       if(perdisc.periodo?.id != this.selectedPeriodo.id) {
         this.form.patchValue({
-          periodoDisciplina: null
+          periodoDisciplina: null,
+          dataAula: null
         })
       } else {
         for (const ped of this.selectedPeriodo.periodoDisciplinas) {

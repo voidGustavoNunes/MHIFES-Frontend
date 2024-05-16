@@ -36,7 +36,6 @@ import { UserAuthService } from '../../_services/user-auth.service';
   ]
 })
 export class HomeComponent implements OnInit, OnDestroy {
-  // horarioIndividualData: any[] = [];
   messages!: Message[];
   
   filterOptions: FiltrarPesquisa[] = [];
@@ -45,14 +44,18 @@ export class HomeComponent implements OnInit, OnDestroy {
   alocacoesArray: Alocacao[] = [];
   alocacoesUser: Alocacao[] = [];
   alocacoesAgrupadas: Alocacao[][] = [];
-  alocaoMaisProxima!: Alocacao;
-  diaSemanaExibido: string = '';
+  semanaExibido: string = '';
+  
+  alocacaoMaisProxima!: Alocacao | undefined;
   
   unsubscribe$!: Subscription;
   
-  diasDaSemana = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+  diasDaSemana = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
+  // diasDaSemana = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+  
   siglasAgrupadas: Alocacao[] = [];
-
+  columnsHorario: Horario[] = [];
+  
   constructor(
     private alocService: AlocacaoService,
     private userAuthService: UserAuthService
@@ -79,23 +82,12 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.alocacoesArray = data;
 
         const currentYear = new Date().getFullYear();
-        // this.alocacoesArray = this.alocacoesArray.filter((alocacao) => {
-        //   const allocacaoDate = new Date(this.formatarDtStrDt(alocacao.dataAula));
-        //   return allocacaoDate.getFullYear() === currentYear;
-        // });
+        this.alocacoesArray = this.alocacoesArray.filter((alocacao) => {
+          const allocacaoDate = new Date(this.formatarDtStrDt(alocacao.dataAula));
+          return allocacaoDate.getFullYear() === currentYear;
+        });
 
-        for (const alocA of this.alocacoesArray) {
-          // for (const aln of alocA.periodoDisciplina.alunos) {
-          //   if(aln.matricula == this.userAuthService.getLogin()) {
-              const weekArr = this.diasDaSemana[new Date(alocA.dataAula).getDay()];
-              // const weekUse = this.diasDaSemana[new Date(alocU.dataAula).getDay()];
-                if(!this.alocacoesUser.some(alocU => alocU.periodoDisciplina === alocA.periodoDisciplina) && !this.alocacoesUser.some(alocU => this.diasDaSemana[new Date(alocU.dataAula).getDay()] === weekArr) && !this.alocacoesUser.some((alocU) => {
-                  alocU.horario.horaInicio.hours == alocA.horario.horaInicio.hours && alocU.horario.horaInicio.minutes == alocA.horario.horaInicio.minutes
-                }) && weekArr != 'Domingo') this.alocacoesUser.push(alocA);
-          //   }
-          // }
-        }
-        this.alocacoesUser.sort((a:Alocacao, b:Alocacao) => {
+        this.alocacoesArray.sort((a:Alocacao, b:Alocacao) => {
           if (a.horario.horaInicio.hours < b.horario.horaInicio.hours) {
             return -1;
           } else if (a.horario.horaInicio.hours > b.horario.horaInicio.hours) {
@@ -110,9 +102,8 @@ export class HomeComponent implements OnInit, OnDestroy {
             }
           }
         })
-        this.obterContentProx();
-        this.agruparPorHorario(this.alocacoesUser);
-        this.exibirSiglas();
+
+        this.filtrarAlocacoesPorDiaSemana();
       },
       error: (err: any) => {
         this.messages = [
@@ -125,36 +116,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   
   ngOnDestroy() {
     this.unsubscribe$.unsubscribe();
-  }
-
-  obterContentProx() {
-    const horaAtual = new Date().getTime();
-    const diaSemanaAtualTexto = this.diasDaSemana[new Date().getDay()];
-  
-    let diffMaisProxima = Infinity;
-    let alocaoProxima: Alocacao | undefined;
-  
-    this.alocacoesUser.forEach(aloca => {
-      const horario: Horario = aloca.horario;
-      const milissegundosAloca = this.formatMiliss(horario.horaInicio);
-  
-      const diff = Math.abs(horaAtual - milissegundosAloca);
-  
-      let dataAlocU = this.formatarDtStrDt(aloca.dataAula)
-      const diaSemanaAlocaTexto = this.diasDaSemana[new Date(dataAlocU).getDay()];
-  
-      if(diaSemanaAtualTexto !== 'Domingo' && diaSemanaAlocaTexto !== 'Domingo') {
-        if (diff < diffMaisProxima && diaSemanaAlocaTexto === diaSemanaAtualTexto) {
-          alocaoProxima = aloca;
-          diffMaisProxima = diff;
-        }
-      }
-    });
-  
-    if (alocaoProxima) {
-      this.alocaoMaisProxima = alocaoProxima;
-      this.diaSemanaExibido = diaSemanaAtualTexto;
-    }
   }
 
   formatarTmStrTm(tempo: any) {
@@ -174,18 +135,21 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   formatarHora(tempo: any) {
-    const partes = tempo.split(':');
-    const horas = partes[0];
-    const minutos = partes[1];
+    if (tempo) {
+      const partes = tempo.split(':');
+      const horas = partes[0];
+      const minutos = partes[1];
 
-    return `${horas}:${minutos}`;
+      return `${horas}:${minutos}`;
+    }
+    return `00:00`;
   }
 
   formatMiliss(tempo: any) {
     if (tempo) {
       const partes = tempo.split(':');
       const horas = parseInt(partes[0], 10);
-      const minutos = parseInt(partes[1], 10) - 1;
+      const minutos = parseInt(partes[1], 10);
       const milissegundos = (horas * 60 + minutos) * 60000;
       return milissegundos;
     }
@@ -199,48 +163,113 @@ export class HomeComponent implements OnInit, OnDestroy {
       const mes = parseInt(partes[1], 10) - 1;
       const dia = parseInt(partes[2], 10);
 
-      return new Date(dia, mes, ano);
+      return new Date(ano, mes, dia);
     } else {
       return new Date();
     }
   }
 
-  agruparPorHorario(alocacoes: Alocacao[]) {
-    alocacoes.forEach((alocacao) => {
-      // const timeKey = `${alocacao.horario.horaInicio.hours}:${alocacao.horario.horaInicio.minutes}`;
-      
-      let agrupamento = this.alocacoesAgrupadas.find((grupo) => grupo[0].horario.horaInicio.hours === alocacao.horario.horaInicio.hours && grupo[0].horario.horaInicio.minutes === alocacao.horario.horaInicio.minutes);
+  // exibirSiglas() {
+  //   for (const itt of this.alocacoesAgrupadas) {
+  //     for (const tor of itt) {
+  //       if(this.siglasAgrupadas.length > 0) {
+  //         for (const sga of this.siglasAgrupadas) {
+  //           if(sga.periodoDisciplina.disciplina.sigla != tor.periodoDisciplina.disciplina.sigla) {
+  //             this.siglasAgrupadas.push(tor);
+  //           }
+  //         }
+  //       } else if(this.siglasAgrupadas.length <= 0) this.siglasAgrupadas.push(tor);
+  //     }
+  //   }
+  // }
+
+  obterAlocacaoMaisProxima(): void {
+    const hoje = new Date();
+    const diaSemanaHoje = this.diasDaSemana[hoje.getDay()];
+    const indiceDiaAtual = hoje.getDay();
+    const horaAtual = new Date().getHours() * 60 + new Date().getMinutes();
+
+    if (this.alocacoesAgrupadas[indiceDiaAtual].length === 0) {
+      console.log('Não há alocações para o dia da semana atual: ', indiceDiaAtual);
+      this.alocacaoMaisProxima = undefined;
+      return;
+    }
+    
+    this.alocacoesAgrupadas[indiceDiaAtual]
+      .find((alocacao) => {
+        const diaSemanaAlocacao = this.diasDaSemana[this.formatarDtStrDt(alocacao.dataAula).getDay()];
+        let hIni = this.formatarTmStrTm(alocacao?.horario?.horaInicio)?.horas;
+        let minIni = this.formatarTmStrTm(alocacao?.horario?.horaInicio)?.minutos;
+        let hFim = this.formatarTmStrTm(alocacao?.horario?.horaFim)?.horas;
+        let minFim = this.formatarTmStrTm(alocacao?.horario?.horaFim)?.minutos;
+        
+        if(hIni != undefined && minIni != undefined && hFim != undefined && minFim != undefined) {
+          const horaInicioEmMinutos = hIni * 60 + minIni;
+          const horaFimEmMinutos = hFim * 60 + minFim;
+          
+          const proximidade = 30; //  Isso permite que a hora atual seja até ... minutos antes do horário de início da alocação.
+
+          if (
+            diaSemanaAlocacao === diaSemanaHoje &&
+            horaAtual >= (horaInicioEmMinutos - proximidade) &&
+            horaAtual <= horaFimEmMinutos
+          ) this.alocacaoMaisProxima = alocacao;
+        } else this.alocacaoMaisProxima = undefined;
+      });
+
+    if(this.alocacaoMaisProxima) this.semanaExibido = diaSemanaHoje;
+  }
   
-      if (!agrupamento) {
-        agrupamento = [alocacao];
-        this.alocacoesAgrupadas.push(agrupamento);
-      } else {
-        agrupamento.push(alocacao);
-      }
+  filtrarAlocacoesPorDiaSemana() {
+    const alocacaoUnique: Alocacao[][] = Array.from({ length: 7 }, () => []);
+  
+    this.alocacoesArray.forEach((alocacao) => {
+      // for (const aln of alocacao.periodoDisciplina.alunos) {
+      //   if(aln.matricula == this.userAuthService.getLogin()) {
+          const diaSemana = this.formatarDtStrDt(alocacao.dataAula).getDay();
+          alocacaoUnique[diaSemana].push(alocacao);
+      //   }
+      // }
     });
-  }
+  
+    const horariosUnicos: Horario[] = [];
+    alocacaoUnique.forEach((diaAlocacoes, diaSemana) => {
+      const alocacoesUnicas: Alocacao[] = [];
+    
+      diaAlocacoes.forEach((alocacaoAtual) => {
+        const hIni = this.formatarTmStrTm(alocacaoAtual?.horario?.horaInicio)?.horas;
+        const minIni = this.formatarTmStrTm(alocacaoAtual?.horario?.horaInicio)?.minutos;
+        const hFim = this.formatarTmStrTm(alocacaoAtual?.horario?.horaFim)?.horas;
+        const minFim = this.formatarTmStrTm(alocacaoAtual?.horario?.horaFim)?.minutos;
 
-  exibirAlocacao(alocacao: Alocacao, diaSemana: string): boolean {
-    let diaAula = this.formatarDtStrDt(alocacao.dataAula)
-    const diaSemanaAloc = this.diasDaSemana[new Date(diaAula).getDay()];
-    if (diaSemanaAloc == diaSemana) {
-      return true;
-    }
-    return false;
-  }
-
-  exibirSiglas() {
-    for (const itt of this.alocacoesAgrupadas) {
-      for (const tor of itt) {
-        if(this.siglasAgrupadas.length > 0) {
-          for (const sga of this.siglasAgrupadas) {
-            if(sga.periodoDisciplina.disciplina.sigla != tor.periodoDisciplina.disciplina.sigla) {
-              this.siglasAgrupadas.push(tor);
-            }
+        const jaInserida = alocacoesUnicas.some((alocacao) =>
+          alocacao.periodoDisciplina.disciplina === alocacaoAtual.periodoDisciplina.disciplina && this.formatarTmStrTm(alocacao.horario.horaInicio)?.horas === hIni && this.formatarTmStrTm(alocacao.horario.horaInicio)?.minutos === minIni && this.formatarTmStrTm(alocacao.horario.horaFim)?.horas === hFim && this.formatarTmStrTm(alocacao.horario.horaFim)?.minutos === minFim
+        );
+    
+        if (!jaInserida) {
+          alocacoesUnicas.push(alocacaoAtual);
+          const jaHora = horariosUnicos.some((hora) => this.formatarTmStrTm(hora.horaInicio)?.horas === hIni && this.formatarTmStrTm(hora.horaInicio)?.minutos === minIni && this.formatarTmStrTm(hora.horaFim)?.horas === hFim && this.formatarTmStrTm(hora.horaFim)?.minutos === minFim);
+          if(!jaHora) {
+            horariosUnicos.push(alocacaoAtual.horario);
           }
-        } else if(this.siglasAgrupadas.length <= 0) this.siglasAgrupadas.push(tor);
-      }
-    }
+        }
+      });
+    
+      alocacaoUnique[diaSemana] = alocacoesUnicas;
+    });
+  
+    this.alocacoesAgrupadas = alocacaoUnique;
+    this.obterAlocacaoMaisProxima();
+    this.columnsHorario = horariosUnicos;
   }
 
+  encontrarColunaCorrespondente(colHora: Horario | undefined, alocacao: Alocacao) {
+    const hIFormatado = this.formatarTmStrTm(alocacao?.horario?.horaInicio);
+    const hFFormatado = this.formatarTmStrTm(alocacao?.horario?.horaFim);
+    const colHi = this.formatarTmStrTm(colHora?.horaInicio);
+    const colHf = this.formatarTmStrTm(colHora?.horaFim);
+
+    if(colHi?.horas === hIFormatado?.horas && colHi?.minutos === hIFormatado?.minutos && hFFormatado?.horas === colHf?.horas && colHf?.minutos === hFFormatado?.minutos){ return alocacao }
+    else{ return null }
+  }
 }
