@@ -154,6 +154,14 @@ export class NavHeaderComponent implements OnInit, OnDestroy {
             routerLink:'alocacoes',
           }
         ]
+      },
+      {
+        label: 'Relatórios',
+        routerLink:'relatorios',
+        style: {
+          'margin-right': '.5rem',
+          'font-weight': '600'
+        }
       }
     ]
 
@@ -170,6 +178,14 @@ export class NavHeaderComponent implements OnInit, OnDestroy {
         routerLink:'home',
         style: {
           'margin-left': '2rem',
+          'margin-right': '.5rem',
+          'font-weight': '600'
+        }
+      },
+      {
+        label: 'Relatórios',
+        routerLink:'relatorios',
+        style: {
           'margin-right': '.5rem',
           'font-weight': '600'
         }
