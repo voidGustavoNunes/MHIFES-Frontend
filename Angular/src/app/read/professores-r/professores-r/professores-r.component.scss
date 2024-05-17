@@ -62,8 +62,6 @@
     .eqTable{
         margin: 4rem 0;
         border: .1rem solid #B1CAFA;
-        max-width: 79.25rem;
-        overflow-x: auto;
         
         .tbHeader{
             border-radius: .5rem 0;
@@ -141,11 +139,6 @@
         margin: 0 auto 2rem;
         position: relative;
         input{
-            background-color: #BFE4FF;
-        }
-    }
-    :host ::ng-deep {
-        .p-dropdown{
             background-color: #BFE4FF;
         }
     }
@@ -243,9 +236,12 @@
     .p-datatable-header i.pi.pi-search {
         color: #256CF0;
     }
-    .p-datatable-striped {
-        width: max-content;
-min-width: 79.25rem;
+    .p-datatable>.p-datatable-wrapper {
+        overflow-x: auto;
+    }
+    .p-datatable-table {
+        border-spacing: 0px;
+        width: 89.25rem;
     }
 }
 

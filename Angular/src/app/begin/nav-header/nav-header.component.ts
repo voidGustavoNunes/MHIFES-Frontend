@@ -81,7 +81,6 @@ export class NavHeaderComponent implements OnInit, OnDestroy {
         label: 'Meu Horário IFES',
         style: {
           'font-size': '1.4rem',
-          'margin-right': '2rem',
           'font-family': 'Grandstander Semi'
         }
       },
@@ -89,6 +88,7 @@ export class NavHeaderComponent implements OnInit, OnDestroy {
         label: 'Home',
         routerLink:'home',
         style: {
+          'margin-left': '2rem',
           'margin-right': '.5rem',
           'font-weight': '600'
         }
@@ -162,7 +162,6 @@ export class NavHeaderComponent implements OnInit, OnDestroy {
         label: 'Meu Horário IFES',
         style: {
           'font-size': '1.4rem',
-          'margin-right': '2rem',
           'font-family': 'Grandstander Semi'
         }
       },
@@ -170,6 +169,7 @@ export class NavHeaderComponent implements OnInit, OnDestroy {
         label: 'Home',
         routerLink:'home',
         style: {
+          'margin-left': '2rem',
           'margin-right': '.5rem',
           'font-weight': '600'
         }
@@ -199,7 +199,9 @@ export class NavHeaderComponent implements OnInit, OnDestroy {
   }
 
   getNameUser() {
-    return this.userAuthService.getNome();
+    const fullName = this.userAuthService.getNome();
+    const firstWord = fullName.split(' ')[0];
+    return firstWord;
   }
 
   togglePanel() {

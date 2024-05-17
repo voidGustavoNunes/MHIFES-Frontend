@@ -285,14 +285,26 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
   
   filterField(tipo: string, searchTerm: string) {
     if (searchTerm && (searchTerm != null || searchTerm != '')) {
-      if(this.selectedFilterOri) {
-        if(this.selectedFilterOri.id == 0) this.searchFilter0(tipo, searchTerm);
-        if(this.selectedFilterOri.id == 1) this.searchFilter1(tipo, searchTerm);
-        if(this.selectedFilterProf.id == 2) this.searchFilter2(tipo, searchTerm);
-      } else {
-        this.messages = [
-          { severity: 'warn', summary: 'Atenção', detail: 'Selecione um filtro!', life: 3000 },
-        ];
+      if(tipo == 'o') {
+        if(this.selectedFilterOri) {
+          if(this.selectedFilterOri.id == 0) this.searchFilter0(tipo, searchTerm);
+          if(this.selectedFilterOri.id == 1) this.searchFilter1(tipo, searchTerm);
+          if(this.selectedFilterOri.id == 2) this.searchFilter2(tipo, searchTerm);
+        } else {
+          this.messages = [
+            { severity: 'warn', summary: 'Atenção', detail: 'Selecione um filtro!', life: 3000 },
+          ];
+        }
+      } else if(tipo == 'p') {
+        if(this.selectedFilterProf) {
+          if(this.selectedFilterProf.id == 0) this.searchFilter0(tipo, searchTerm);
+          if(this.selectedFilterProf.id == 1) this.searchFilter1(tipo, searchTerm);
+          if(this.selectedFilterProf.id == 2) this.searchFilter2(tipo, searchTerm);
+        } else {
+          this.messages = [
+            { severity: 'warn', summary: 'Atenção', detail: 'Selecione um filtro!', life: 3000 },
+          ];
+        }
       }
     } else {
       this.messages = [

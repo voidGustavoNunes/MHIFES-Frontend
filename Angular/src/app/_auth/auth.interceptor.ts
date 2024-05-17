@@ -34,7 +34,7 @@ export class AuthInterceptor implements HttpInterceptor {
                     if(err.status === 401 || err.status === 403) {
                         this.router.navigate(["/forbidden"]);
                     }
-                    const errorMess = new Error("Alguma coisa está errada. " + err);
+                    const errorMess = new Error("Alguma coisa está errada.");
                     return throwError(() => errorMess);
                 }
             )

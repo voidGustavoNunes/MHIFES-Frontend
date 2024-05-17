@@ -23,9 +23,11 @@ import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 import { TabViewModule } from 'primeng/tabview';
+import { RadioButtonModule } from 'primeng/radiobutton';
 
 @NgModule({
-  exports: [TagModule,
+  exports: [
+    TagModule,
     ButtonModule,
     InputTextModule,
     InputGroupModule,
@@ -48,7 +50,8 @@ import { TabViewModule } from 'primeng/tabview';
     FloatLabelModule,
     CheckboxModule,
     InputMaskModule,
-    TabViewModule
+    TabViewModule,
+    RadioButtonModule
   ]
 })
 export class PrimeNgImportsModule { }

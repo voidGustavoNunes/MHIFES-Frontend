@@ -1,22 +1,19 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CommonModule, NgFor } from '@angular/common';
 import { FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Subscription } from 'rxjs';
 import { Router, RouterModule } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
-import { PeriodoService } from '../../service/periodo.service';
-import { PerDiscMultiSelect, Periodo, PeriodoDisciplina } from '../../models/periodo.models';
-import { FiltrarPesquisa } from '../../models/share/filtrar-pesquisa.models';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
-import { DisciplinaService } from '../../service/disciplina.service';
-import { AlunoService } from '../../service/aluno.service';
-import { Disciplina } from '../../models/disciplina.models';
-import { Aluno } from '../../models/aluno.models';
 import { ConfirmationService, Message, MessageService } from 'primeng/api';
 import { PrimeNgImportsModule } from '../../shared/prime-ng-imports/prime-ng-imports.module';
-import { MultiSelect } from 'primeng/multiselect';
-import { Calendar } from 'primeng/calendar';
 import { HomeService } from '../../service/home.service';
+import { AlocacaoService } from '../../service/alocacao.service';
+import { Subscription } from 'rxjs';
+import { Alocacao } from '../../models/alocacao.models';
+import { FiltrarPesquisa } from '../../models/share/filtrar-pesquisa.models';
+import { Professor } from '../../models/professor.models';
+import { Coordenadoria } from '../../models/coordenadoria.models';
+import { CoordenadoriaService } from '../../service/coordenadoria.service';
 
 @Component({
     selector: 'app-relatorios-r',
@@ -33,91 +30,343 @@ import { HomeService } from '../../service/home.service';
     templateUrl: './relatorios-r.component.html',
     styleUrl: './relatorios-r.component.scss',
     providers: [
-      PeriodoService,
       ConfirmationService,
       MessageService,
-      DisciplinaService,
-      AlunoService,
       provideNgxMask(),
-      HomeService
+      HomeService,
+      AlocacaoService,
+      CoordenadoriaService
     ]
   })
 
-export class RelatoriosRComponent implements OnInit{
+export class RelatoriosRComponent implements OnInit,OnDestroy {
     
-    anorelatorioArray: number[] = [];
-    semestrerelatorioArray: number[] = [];
+  anorelatorioArray: number[] = [];
+  semestrerelatorioArray: number[] = [];
 
-    selectedAno!: number
-    selectedSemestre!: number
-    
-    messages!: Message[];
+  selectedAnoDiscp: number | undefined
+  selectedSemestreDiscp: number | undefined
 
-    mss: string = '';
+  selectedAnoTurma: number | undefined
+  selectedSemestreTurma: number | undefined
+  selectedTurma: string | undefined
 
-    constructor(
-      private homService: HomeService
-    ) {}
-
-    ngOnInit() {
-      
-      let anoAtual = new Date(); 
-      
-      for (let index = 0; index < 5; index++) {
-        
-        let ano = anoAtual.getFullYear()-index;
-        
-        this.anorelatorioArray.push(ano)
-      }
-
-      
-    for (let index = 1; index < 3; index++) {
+  selectedAnoProf: number | undefined
+  selectedSemestreProf: number | undefined
+  selectedProf: number | undefined
+  selectedCood: number | undefined
+  selectedProfLabel: {value: number | undefined, label: string} | undefined
+  selectedCoodLabel: {value: number | undefined, label: string} | undefined
   
+  messages!: Message[];
+
+  mss: string = '';
+  reportData: any;
+  
+  unsubscribe$!: Subscription;
+  alocacoesArray: Alocacao[] = [];
+  turmasArray: string[] = [];
+  
+  turmaFilterOptions: FiltrarPesquisa[] = [];
+  selectedTurmaFilter!: FiltrarPesquisa;
+  
+  profFilterOptions: FiltrarPesquisa[] = [];
+  selectedProfFilter!: FiltrarPesquisa;
+  
+  
+  unsubscribe$Cood!: Subscription;
+  coodArray: [{value: number | undefined, label: string}] = [{value: undefined, label: ''}];
+  profArray: [{value: number | undefined, label: string}] = [{value: undefined, label: ''}];
+
+  constructor(
+    private homService: HomeService,
+    private alocService: AlocacaoService,
+    private coordaService: CoordenadoriaService
+  ) {}
+
+  ngOnInit() {
+    let anoAtual = new Date(); 
+    
+    for (let index = 0; index < 5; index++) {
+      let ano = anoAtual.getFullYear()-index;
+      this.anorelatorioArray.push(ano)
+    }
+    
+    for (let index = 1; index < 3; index++) {
       this.semestrerelatorioArray.push(index)
     }
 
-    }
+    this.turmaFilterOptions = [
+      {nome: 'Nenhum', id: 0},
+      {nome: 'Turma', id: 1}
+    ];
+    this.selectedTurmaFilter = this.turmaFilterOptions[0];
 
-    onSubmitDisciplinas(){
-        console.log(this.selectedAno)
-        console.log(this.selectedSemestre)
-        if (this.selectedAno && this.selectedSemestre){
-        this.mss = 'Aguarde seu arquivo está sendo baixado...';
-        
-        this.homService.gerarRelatorioDisciplinaTurma(this.selectedAno, this.selectedSemestre).subscribe(
-          // (resposta: string) => {
-          //   console.log('Resposta do back-end:', resposta);
-          // },
-          // (erro) => {
-          //   console.error('Erro ao chamar o serviço:', erro);
-          // }
-          {next: (data) => {
-            console.log('generico 1')
+    this.profFilterOptions = [
+      {nome: 'Nenhum', id: 0},
+      {nome: 'Coordenadoria', id: 1},
+      {nome: 'Professor', id: 2}
+    ];
+    this.selectedProfFilter = this.profFilterOptions[0];
+
+    this.unsubscribe$ = this.alocService.listar()
+    .subscribe({
+      next: (itens:any) => {
+        const data = itens;
+        this.alocacoesArray = data;
+
+        const turmasUnique: string[] = [];
+        this.alocacoesArray.forEach((alocaAtual) => {
+          const jaTurma = turmasUnique.some((sgl) => sgl == alocaAtual.turma);
+          if(!jaTurma) {
+            turmasUnique.push(alocaAtual.turma);
+          }
+        });
+        this.turmasArray = turmasUnique;
+      },
+      error: (err: any) => {
+        this.messages = [
+          { severity: 'error', summary: 'Erro', detail: 'Ocorreu um erro na recuperação de dados.', life: 3000 },
+        ];
+      }
+    });
+    
+    this.unsubscribe$Cood = this.coordaService.listar()
+    .subscribe({
+      next: (itens:any) => {
+        let data: Coordenadoria[] = itens;
+        data.forEach((dt) =>{
+          this.coodArray.push({value: dt.id, label:`${dt.nome}`});
+          this.profArray.push({value: dt.coordenador.id, label:`${dt.coordenador.nome}`});
+        })
+      },
+      error: (err: any) => {
+        this.messages = [
+          { severity: 'error', summary: 'Erro', detail: 'Ocorreu um erro na recuperação de dados.', life: 3000 },
+        ];
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.unsubscribe$.unsubscribe();
+    this.unsubscribe$Cood.unsubscribe();
+  }
+
+  onSubmitDisciplinas(){
+    if (this.selectedAnoDiscp && this.selectedSemestreDiscp && this.selectedAnoDiscp != undefined && this.selectedSemestreDiscp != undefined){
+      this.mss = 'Aguarde seu arquivo está sendo baixado...';
+      
+      this.homService.gerarRelatorioDisciplinaTurma(this.selectedAnoDiscp, this.selectedSemestreDiscp).subscribe({
+        next: (data) => {
+          this.mss = '';
+          this.messages = [
+            { severity: 'success', summary: 'Sucesso', detail: 'Relatório gerado com sucesso no diretório "Downloads"', life: 3000 },
+          ];
+        },
+        error: (err) => {
+          this.mss = '';
+          if (err.status === 400) {
             this.messages = [
-              { severity: 'success', summary: 'Sucesso', detail: data, life: 3000 },
+              { severity: 'error', summary: 'Erro', detail: err, life: 3000 },
             ];
-          },
-          error: (err) => {
-            console.log('generico 2')
-            console.log(err)
+          } else if(err.status === 200) {
             this.messages = [
               { severity: 'success', summary: 'Sucesso', detail: 'Relatório gerado com sucesso em: C:/Downloads', life: 3000 },
             ];
-            this.mss = '';
-            // if (err.status === 400) {
-            //   this.messages = [
-            //     { severity: 'error', summary: 'Erro', detail: err, life: 3000 },
-            //   ];
-            // } else {
-            // }
-          }}
-        );
-      } else {
-        this.messages = [
-          { severity: 'warn', summary: 'Atenção', detail: 'Informação inválida. Selecione os campos!', life: 3000 },
-        ];
-      }
-
+          } else {
+            this.messages = [
+              { severity: 'error', summary: 'Erro inesperado', detail: 'Ocorreu um erro durante busca do relatório.\nPor favor, tente novamente.', life: 3000 },
+            ];
+          }
+        }
+      });
+    } else {
+      this.messages = [
+        { severity: 'warn', summary: 'Atenção', detail: 'Informação inválida. Selecione os campos!', life: 3000 },
+      ];
     }
+  }
 
+  onSubmitTurmas(){
+    if (this.selectedAnoTurma && this.selectedSemestreTurma && this.selectedTurma && this.selectedAnoTurma != undefined && this.selectedSemestreTurma != undefined && this.selectedTurma != undefined){
+      this.mss = 'Aguarde seu arquivo está sendo baixado...';
+      
+      this.homService.gerarRelatorioHorarioTurma(this.selectedAnoTurma, this.selectedSemestreTurma, this.selectedTurma).subscribe({
+        next: (data) => {
+          this.mss = '';
+          this.messages = [
+            { severity: 'success', summary: 'Sucesso', detail: 'Relatório gerado com sucesso no diretório "Downloads"', life: 3000 },
+          ];
+        },
+        error: (err) => {
+          this.mss = '';
+          if (err.status === 400) {
+            this.messages = [
+              { severity: 'error', summary: 'Erro', detail: err, life: 3000 },
+            ];
+          } else if(err.status === 200) {
+            this.messages = [
+              { severity: 'success', summary: 'Sucesso', detail: 'Relatório gerado com sucesso no diretório "Downloads"', life: 3000 },
+            ];
+          } else {
+            this.messages = [
+              { severity: 'error', summary: 'Erro inesperado', detail: 'Ocorreu um erro durante busca do relatório.\nPor favor, tente novamente.', life: 3000 },
+            ];
+          }
+        }
+      });
+    } else if (this.selectedAnoTurma && this.selectedSemestreTurma && this.selectedAnoTurma != undefined && this.selectedSemestreTurma != undefined){
+      this.mss = 'Aguarde seu arquivo está sendo baixado...';
+      
+      this.homService.gerarRelatorioHorarioTurma(this.selectedAnoTurma, this.selectedSemestreTurma, undefined).subscribe({
+        next: (data) => {
+          this.mss = '';
+          this.messages = [
+            { severity: 'success', summary: 'Sucesso', detail: 'Relatório gerado com sucesso no diretório "Downloads"', life: 3000 },
+          ];
+        },
+        error: (err) => {
+          this.mss = '';
+          if (err.status === 400) {
+            this.messages = [
+              { severity: 'error', summary: 'Erro', detail: err, life: 3000 },
+            ];
+          } else if(err.status === 200) {
+            this.messages = [
+              { severity: 'success', summary: 'Sucesso', detail: 'Relatório gerado com sucesso no diretório "Downloads"', life: 3000 },
+            ];
+          } else {
+            this.messages = [
+              { severity: 'error', summary: 'Erro inesperado', detail: 'Ocorreu um erro durante busca do relatório.\nPor favor, tente novamente.', life: 3000 },
+            ];
+          }
+        }
+      });
+    } else {
+      this.messages = [
+        { severity: 'warn', summary: 'Atenção', detail: 'Informação inválida. Selecione os campos!', life: 3000 },
+      ];
     }
+  }
+
+  onSubmitProfessores(){
+    if (this.selectedAnoProf && this.selectedSemestreProf && this.selectedProf && this.selectedCood && this.selectedAnoProf != undefined && this.selectedSemestreProf != undefined && this.selectedProf != undefined && this.selectedCood != undefined){
+      this.mss = 'Aguarde seu arquivo está sendo baixado...';
+      
+      this.homService.gerarRelatorioHorarioPorProfessor(this.selectedAnoProf, this.selectedSemestreProf, this.selectedProf, this.selectedCood).subscribe({
+        next: (data) => {
+          this.mss = '';
+          this.messages = [
+            { severity: 'success', summary: 'Sucesso', detail: 'Relatório gerado com sucesso no diretório "Downloads"', life: 3000 },
+          ];
+        },
+        error: (err) => {
+          this.mss = '';
+          if (err.status === 400) {
+            this.messages = [
+              { severity: 'error', summary: 'Erro', detail: err, life: 3000 },
+            ];
+          } else if(err.status === 200) {
+            this.messages = [
+              { severity: 'success', summary: 'Sucesso', detail: 'Relatório gerado com sucesso no diretório "Downloads"', life: 3000 },
+            ];
+          } else {
+            this.messages = [
+              { severity: 'error', summary: 'Erro inesperado', detail: 'Ocorreu um erro durante busca do relatório.\nPor favor, tente novamente.', life: 3000 },
+            ];
+          }
+        }
+      });
+    } else if (this.selectedAnoProf && this.selectedSemestreProf && this.selectedCood && this.selectedAnoProf != undefined && this.selectedSemestreProf != undefined && this.selectedCood != undefined){
+      this.mss = 'Aguarde seu arquivo está sendo baixado...';
+      
+      this.homService.gerarRelatorioHorarioPorProfessor(this.selectedAnoProf, this.selectedSemestreProf, this.selectedCood, undefined).subscribe({
+        next: (data) => {
+          this.mss = '';
+          this.messages = [
+            { severity: 'success', summary: 'Sucesso', detail: 'Relatório gerado com sucesso no diretório "Downloads"', life: 3000 },
+          ];
+        },
+        error: (err) => {
+          this.mss = '';
+          if (err.status === 400) {
+            this.messages = [
+              { severity: 'error', summary: 'Erro', detail: err, life: 3000 },
+            ];
+          } else if(err.status === 200) {
+            this.messages = [
+              { severity: 'success', summary: 'Sucesso', detail: 'Relatório gerado com sucesso no diretório "Downloads"', life: 3000 },
+            ];
+          } else {
+            this.messages = [
+              { severity: 'error', summary: 'Erro inesperado', detail: 'Ocorreu um erro durante busca do relatório.\nPor favor, tente novamente.', life: 3000 },
+            ];
+          }
+        }
+      });
+    } else if (this.selectedAnoProf && this.selectedSemestreProf && this.selectedAnoProf != undefined && this.selectedSemestreProf != undefined){
+      this.mss = 'Aguarde seu arquivo está sendo baixado...';
+      
+      this.homService.gerarRelatorioHorarioPorProfessor(this.selectedAnoProf, this.selectedSemestreProf, undefined, undefined).subscribe({
+        next: (data) => {
+          this.mss = '';
+          this.messages = [
+            { severity: 'success', summary: 'Sucesso', detail: 'Relatório gerado com sucesso no diretório "Downloads"', life: 3000 },
+          ];
+        },
+        error: (err) => {
+          this.mss = '';
+          if (err.status === 400) {
+            this.messages = [
+              { severity: 'error', summary: 'Erro', detail: err, life: 3000 },
+            ];
+          } else if(err.status === 200) {
+            this.messages = [
+              { severity: 'success', summary: 'Sucesso', detail: 'Relatório gerado com sucesso no diretório "Downloads"', life: 3000 },
+            ];
+          } else {
+            this.messages = [
+              { severity: 'error', summary: 'Erro inesperado', detail: 'Ocorreu um erro durante busca do relatório.\nPor favor, tente novamente.', life: 3000 },
+            ];
+          }
+        }
+      });
+    } else {
+      this.messages = [
+        { severity: 'warn', summary: 'Atenção', detail: 'Informação inválida. Selecione os campos!', life: 3000 },
+      ];
+    }
+  }
+
+  mudarValorTurma() {
+    if(this.selectedTurmaFilter.id == 0) {
+      this.selectedTurma = undefined;
+    }
+  }
+
+  mudarValorProfessor() {
+    if(this.selectedProfFilter.id == 0) {
+      this.selectedProfLabel = undefined;
+      this.selectedProf = undefined;
+
+      this.selectedCoodLabel = undefined;
+      this.selectedCood = undefined;
+    } else if(this.selectedProfFilter.id == 1) {
+      this.selectedProfLabel = undefined;
+      this.selectedProf = undefined;
+    }
+  }
+
+  transformCoord() {
+    if(this.selectedCoodLabel != undefined) {
+      this.selectedCood = this.selectedCoodLabel.value;
+    }
+  }
+
+  transformProf() {
+    if(this.selectedProfLabel != undefined) {
+      this.selectedProf = this.selectedProfLabel.value;
+    }
+  }
+}

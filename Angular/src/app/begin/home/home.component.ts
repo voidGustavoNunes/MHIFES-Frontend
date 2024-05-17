@@ -1,9 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { RadioButtonModule } from 'primeng/radiobutton';
-import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { TableModule } from 'primeng/table';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule, Time } from '@angular/common';
-import { PaginatorModule } from 'primeng/paginator';
 import { FiltrarPesquisa } from '../../models/share/filtrar-pesquisa.models';
 import { Alocacao } from '../../models/alocacao.models';
 import { ConfirmationService, Message, MessageService } from 'primeng/api';
@@ -12,19 +9,18 @@ import { DiaSemana, Horario } from '../../models/horario.models';
 import { HttpClientModule } from '@angular/common/http';
 import { AlocacaoService } from '../../service/alocacao.service';
 import { UserAuthService } from '../../_services/user-auth.service';
+import { PrimeNgImportsModule } from '../../shared/prime-ng-imports/prime-ng-imports.module';
 
 @Component({
   selector: 'app-home',
   standalone: true,
   imports: [
     CommonModule,
-    RadioButtonModule,
     FormsModule,
     ReactiveFormsModule,
-    TableModule,
     CommonModule,
-    PaginatorModule,
     HttpClientModule,
+    PrimeNgImportsModule
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
@@ -40,15 +36,15 @@ export class HomeComponent implements OnInit, OnDestroy {
   
   filterOptions: FiltrarPesquisa[] = [];
   selectedFilter!: FiltrarPesquisa;
-
+  
+  unsubscribe$!: Subscription;
   alocacoesArray: Alocacao[] = [];
+
   alocacoesUser: Alocacao[] = [];
   alocacoesAgrupadas: Alocacao[][] = [];
   semanaExibido: string = '';
   
   alocacaoMaisProxima!: Alocacao | undefined;
-  
-  unsubscribe$!: Subscription;
   
   diasDaSemana = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
   // diasDaSemana = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
@@ -88,6 +84,8 @@ export class HomeComponent implements OnInit, OnDestroy {
           const allocacaoDate = new Date(this.formatarDtStrDt(alocacao.dataAula));
           return allocacaoDate.getFullYear() === currentYear;
         });
+
+        this.alocacoesArray = this.alocacoesArray.filter(alocacao => alocacao.status == 'ATIVO');
 
         this.alocacoesArray.sort((a:Alocacao, b:Alocacao) => {
           if (a.horario.horaInicio.hours < b.horario.horaInicio.hours) {
@@ -237,16 +235,18 @@ export class HomeComponent implements OnInit, OnDestroy {
         const minFim = this.formatarTmStrTm(alocacaoAtual?.horario?.horaFim)?.minutos;
 
         const jaInserida = alocacoesUnicas.some((alocacao) =>
-          alocacao.periodoDisciplina.disciplina === alocacaoAtual.periodoDisciplina.disciplina && this.formatarTmStrTm(alocacao.horario.horaInicio)?.horas === hIni && this.formatarTmStrTm(alocacao.horario.horaInicio)?.minutos === minIni && this.formatarTmStrTm(alocacao.horario.horaFim)?.horas === hFim && this.formatarTmStrTm(alocacao.horario.horaFim)?.minutos === minFim
+          alocacao.periodoDisciplina.disciplina.nome === alocacaoAtual.periodoDisciplina.disciplina.nome && this.formatarTmStrTm(alocacao.horario.horaInicio)?.horas === hIni && this.formatarTmStrTm(alocacao.horario.horaInicio)?.minutos === minIni && this.formatarTmStrTm(alocacao.horario.horaFim)?.horas === hFim && this.formatarTmStrTm(alocacao.horario.horaFim)?.minutos === minFim
         );
     
         if (!jaInserida) {
           alocacoesUnicas.push(alocacaoAtual);
           const jaHora = horariosUnicos.some((hora) => this.formatarTmStrTm(hora.horaInicio)?.horas === hIni && this.formatarTmStrTm(hora.horaInicio)?.minutos === minIni && this.formatarTmStrTm(hora.horaFim)?.horas === hFim && this.formatarTmStrTm(hora.horaFim)?.minutos === minFim);
+          
           if(!jaHora) {
             horariosUnicos.push(alocacaoAtual.horario);
           }
           const jaSigla = siglasUnique.some((sgl) => sgl.periodoDisciplina.disciplina.nome == alocacaoAtual.periodoDisciplina.disciplina.nome && sgl.periodoDisciplina.disciplina.sigla == alocacaoAtual.periodoDisciplina.disciplina.sigla);
+          
           if(!jaSigla) {
             siglasUnique.push(alocacaoAtual);
           }

@@ -55,8 +55,6 @@
     .eqTable{
         margin: 4rem 0;
         border: .1rem solid #B1CAFA;
-        max-width: 79.25rem;
-        overflow-x: auto;
         
         .tbHeader{
             border-radius: .5rem 0;
@@ -171,9 +169,12 @@
         right: 1.25rem;
         z-index: 11000;
     }
-    .p-datatable-striped {
-        width: max-content;
-min-width: 79.25rem;
+    .p-datatable>.p-datatable-wrapper {
+        overflow-x: auto;
+    }
+    .p-datatable-table {
+        border-spacing: 0px;
+        width: 89.25rem;
     }
 }
 

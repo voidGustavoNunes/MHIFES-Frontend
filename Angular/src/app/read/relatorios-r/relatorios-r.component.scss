@@ -62,8 +62,6 @@
 //     .eqTable{
 //         margin: 4rem 0;
 //         border: .1rem solid #B1CAFA;
-//         max-width: 79.25rem;
-//         overflow-x: auto;
         
 //         .tbHeader{
 //             border-radius: .5rem 0;
@@ -151,6 +149,13 @@
             //     padding-left: 4rem;
             //     padding-right: 4rem;
             // }
+            
+            .rdButton{
+                display: flex;
+                margin-bottom: 2rem;
+                justify-content: center;
+            }
+
             button:active{
                 box-shadow: none;
             }
@@ -226,15 +231,21 @@
     .p-datatable-header i.pi.pi-search {
         color: #256CF0;
     }
-    .p-datatable-striped {
-        width: max-content;
-        min-width: 79.25rem;
+    .p-datatable>.p-datatable-wrapper {
+        overflow-x: auto;
+    }
+    .p-datatable-table {
+        border-spacing: 0px;
+        width: 89.25rem;
     }
     .p-tabview .p-tabview-nav li {
         width: 100%;
     }
     .p-tabview-title {
         margin: 0 auto;
+    }
+    p-radiobutton.p-element{
+        margin: 0 1rem;
     }
 }
 

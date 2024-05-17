@@ -70,10 +70,11 @@
             td{
                 text-align: center;
                 border-bottom: .1rem solid #B1CAFA;
+                height: 5rem;
             }
             .larguraFixa {
                 border-right: .1rem solid #B1CAFA;
-                width: 200px;
+                width: 12.5rem;
             }
             td:not(.larguraFixa) {
                 width: calc((100% - 200px) / 6);
@@ -81,7 +82,7 @@
   
         }
         .tbBody:hover{
-            background-color: #E5E7EB;
+            // background-color: #E5E7EB;
         }
         .discSigla{
             // text-align: center;

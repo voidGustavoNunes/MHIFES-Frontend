@@ -63,13 +63,12 @@ interface Column {
 })
 export class AlocacoesRComponent implements OnInit, OnDestroy {
   @ViewChild('searchInput') inputSearch!: ElementRef;
-  // @ViewChild('multiselect') multiselect!: MultiSelect;
+  @ViewChild('searchInputInat') inputSearchInat!: ElementRef;
   @ViewChild('dropdownDisc') dropdownDisc!: Dropdown;
   @ViewChild('dropdownPeriodo') dropdownPeriodo!: Dropdown;
   @ViewChild('dropdownLocal') dropdownLocal!: Dropdown;
   @ViewChild('dropdownProf') dropdownProf!: Dropdown;
   @ViewChild('dropdownHour') dropdownHour!: Dropdown;
-  // @ViewChild('switch') switch!: InputSwitch;
   @ViewChild('calendar') calendar!: Calendar;
   @ViewChild('calendarAula') calendarAula!: Calendar;
 
@@ -77,9 +76,14 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
 
   alocacoesData: Alocacao[] = [];
   alocacoesFilter: Alocacao[] = [];
+  
   alocacoesCadast: Alocacao[] = [];
   alocacoesEdit: Alocacao[] = [];
   alocacaoInfo!: Alocacao;
+  
+  alocacoesDataDelete: Alocacao[] = [];
+  alocacoesDeleteFilter: Alocacao[] = [];
+  selectedFilterInat!: FiltrarPesquisa;
 
   unsubscribe$!: Subscription;
   // unsubscribe$Aln!: Subscription;
@@ -102,6 +106,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   filterOptions: FiltrarPesquisa[] = [];
   selectedFilter!: FiltrarPesquisa;
   txtFilter: string = 'Pesquisar alocação';
+  txtFilterInat: string = 'Pesquisar alocação deletada';
 
   professoresArray: Professor[] = [];
   locaisArray: Local[] = [];
@@ -195,7 +200,11 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
           // });
           this.alocacoesData = data;
 
+          this.alocacoesDataDelete = this.alocacoesData.filter(alocacao => alocacao.status == 'INATIVO');
+          this.alocacoesData = this.alocacoesData.filter(alocacao => alocacao.status == 'ATIVO');
+          
           this.alocacoesFilter = this.alocacoesData;
+          this.alocacoesDeleteFilter = this.alocacoesDataDelete;
         },
         error: (err: any) => {
           this.messages = [
@@ -618,81 +627,148 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     }
   }
 
-  limparFilter() {
-    const inputElement = this.inputSearch.nativeElement.value
-    if (inputElement) {
-      this.inputSearch.nativeElement.value = '';
+  limparFilter(tipo: string) {
+    if(tipo == 'a') {
+      const inputElement = this.inputSearch.nativeElement.value
+      if (inputElement) {
+        this.inputSearch.nativeElement.value = '';
+      }
+      this.selectedFilter = {} as FiltrarPesquisa;
+      this.alocacoesData = this.alocacoesFilter;
+    } else if(tipo == 'i') {
+      const inputElement = this.inputSearchInat.nativeElement.value
+      if (inputElement) {
+        this.inputSearchInat.nativeElement.value = '';
+      }
+      this.selectedFilterInat = {} as FiltrarPesquisa;
+      this.alocacoesDataDelete = this.alocacoesDeleteFilter;
     }
-    this.selectedFilter = {} as FiltrarPesquisa;
-    this.alocacoesData = this.alocacoesFilter;
   }
 
-  searchFilter0(term: string) {
-    this.alocacoesData = this.alocacoesFilter.filter(aloca => {
-      if (aloca.professor.nome.toLowerCase().includes(term.toLowerCase())) {
-        return aloca;
-      } else {
-        return null;
-      }
-    })
-  }
-
-  searchFilter1(term: string) {
-    this.alocacoesData = this.alocacoesFilter.filter(aloca => {
-      if (aloca.local.nome.toLowerCase().includes(term.toLowerCase())) {
-        return aloca;
-      } else {
-        return null;
-      }
-    })
-  }
-
-  searchFilter2(term: string) {
-    // this.alocacoesData = this.alocacoesFilter.filter(aloca => {
-    //   if (aloca.disciplina.nome.toLowerCase().includes(term.toLowerCase())) {
-    //     return aloca;
-    //   } else {
-    //     return null;
-    //   }
-    // })
-  }
-
-  searchFilter3(term: string) {
-    const compA = this.formatarTmStrTm(term);
-    if (compA != null) {
+  searchFilter0(tipo: string, term: string) {
+    if(tipo == 'a') {
       this.alocacoesData = this.alocacoesFilter.filter(aloca => {
-        const compB = this.formatarTmStrTm(aloca.horario.horaInicio);
-        if (compB != null) {
-          if (compA.horas === compB.horas && compA.minutos === compB.minutos) {
-            return aloca;
-          } else {
-            return null;
-          }
+        if (aloca.professor.nome.toLowerCase().includes(term.toLowerCase())) {
+          return aloca;
+        } else {
+          return null;
+        }
+      })
+    } else if(tipo == 'i') {
+      this.alocacoesDataDelete = this.alocacoesDeleteFilter.filter(aloca => {
+        if (aloca.professor.nome.toLowerCase().includes(term.toLowerCase())) {
+          return aloca;
         } else {
           return null;
         }
       })
     }
-    return null;
   }
 
-  onKeyDown(event: KeyboardEvent, searchTerm: string) {
-    if (event.key === "Enter") {
-      this.filterField(searchTerm);
+  searchFilter1(tipo: string, term: string) {
+    if(tipo == 'a') {
+      this.alocacoesData = this.alocacoesFilter.filter(aloca => {
+        if (aloca.local.nome.toLowerCase().includes(term.toLowerCase())) {
+          return aloca;
+        } else {
+          return null;
+        }
+      })
+    } else if(tipo == 'i') {
+      this.alocacoesDataDelete = this.alocacoesDeleteFilter.filter(aloca => {
+        if (aloca.local.nome.toLowerCase().includes(term.toLowerCase())) {
+          return aloca;
+        } else {
+          return null;
+        }
+      })
     }
   }
 
-  filterField(searchTerm: string) {
-    if (searchTerm != null || searchTerm != '') {
-      if (this.selectedFilter) {
-        if (this.selectedFilter.id == 0) this.searchFilter0(searchTerm);
-        if (this.selectedFilter.id == 1) this.searchFilter1(searchTerm);
-        if (this.selectedFilter.id == 2) this.searchFilter2(searchTerm);
-        if (this.selectedFilter.id == 3) this.searchFilter3(searchTerm);
-      } else {
-        this.messages = [
-          { severity: 'warn', summary: 'Atenção', detail: 'Selecione um filtro!', life: 3000 },
-        ];
+  searchFilter2(tipo: string, term: string) {
+    if(tipo == 'a') {
+      this.alocacoesData = this.alocacoesFilter.filter(aloca => {
+        if (aloca.periodoDisciplina.disciplina.nome.toLowerCase().includes(term.toLowerCase())) {
+          return aloca;
+        } else {
+          return null;
+        }
+      })
+    } else if(tipo == 'i') {
+      this.alocacoesDataDelete = this.alocacoesDeleteFilter.filter(aloca => {
+        if (aloca.periodoDisciplina.disciplina.nome.toLowerCase().includes(term.toLowerCase())) {
+          return aloca;
+        } else {
+          return null;
+        }
+      })
+    }
+  }
+
+  searchFilter3(tipo: string, term: string) {
+    const compA = this.formatarTmStrTm(term);
+    if (compA != null) {
+      if(tipo == 'a') {
+        this.alocacoesData = this.alocacoesFilter.filter(aloca => {
+          const compB = this.formatarTmStrTm(aloca.horario.horaInicio);
+          if (compB != null) {
+            if (compA.horas === compB.horas && compA.minutos === compB.minutos) {
+              return aloca;
+            } else {
+              return null;
+            }
+          } else {
+            return null;
+          }
+        })
+      } else if(tipo == 'i') {
+        this.alocacoesDataDelete = this.alocacoesDeleteFilter.filter(aloca => {
+          const compB = this.formatarTmStrTm(aloca.horario.horaInicio);
+          if (compB != null) {
+            if (compA.horas === compB.horas && compA.minutos === compB.minutos) {
+              return aloca;
+            } else {
+              return null;
+            }
+          } else {
+            return null;
+          }
+        })
+      }
+    }
+    return null;
+  }
+
+  onKeyDown(tipo: string, event: KeyboardEvent, searchTerm: string) {
+    if (event.key === "Enter") {
+      this.filterField(tipo, searchTerm);
+    }
+  }
+
+  filterField(tipo: string, searchTerm: string) {
+    if (searchTerm && (searchTerm != null || searchTerm != '')) {
+      if(tipo == 'a') {
+        if (this.selectedFilter) {
+          if (this.selectedFilter.id == 0) this.searchFilter0(tipo, searchTerm);
+          if (this.selectedFilter.id == 1) this.searchFilter1(tipo, searchTerm);
+          if (this.selectedFilter.id == 2) this.searchFilter2(tipo, searchTerm);
+          if (this.selectedFilter.id == 3) this.searchFilter3(tipo, searchTerm);
+        } else {
+          this.messages = [
+            { severity: 'warn', summary: 'Atenção', detail: 'Selecione um filtro!', life: 3000 },
+          ];
+        }
+      } else if(tipo == 'i') {
+        if (this.selectedFilterInat) {
+          if (this.selectedFilterInat.id == 0) this.searchFilter0(tipo, searchTerm);
+          if (this.selectedFilterInat.id == 1) this.searchFilter1(tipo, searchTerm);
+          if (this.selectedFilterInat.id == 2) this.searchFilter2(tipo, searchTerm);
+          if (this.selectedFilterInat.id == 3) this.searchFilter3(tipo, searchTerm);
+        } else {
+          this.messages = [
+            { severity: 'warn', summary: 'Atenção', detail: 'Selecione um filtro!', life: 3000 },
+          ];
+        }
       }
     } else {
       this.messages = [
@@ -753,11 +829,19 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     return `${horas}h ${minutos}min`;
   }
 
-  updateMask() {
-    if (this.selectedFilter?.id == 3) {
-      this.txtFilter = '00:00';
-    } else {
-      this.txtFilter = 'Pesquisar alocação';
+  updateMask(tipo: string) {
+    if(tipo == 'a') {
+      if (this.selectedFilter?.id == 3) {
+        this.txtFilter = '00:00';
+      } else {
+        this.txtFilter = 'Pesquisar alocação';
+      }
+    } else if(tipo == 'i') {
+      if (this.selectedFilterInat?.id == 3) {
+        this.txtFilterInat = '00:00';
+      } else {
+        this.txtFilterInat = 'Pesquisar alocação deletada';
+      }
     }
   }
 

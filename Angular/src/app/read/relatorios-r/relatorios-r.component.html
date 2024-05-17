@@ -4,21 +4,15 @@
     <div class="card">
         <p-tabView>
             <p-tabPanel header="Turmas">
-                <p>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-                    consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                </p>
-            </p-tabPanel>
-            <p-tabPanel header="Professores">
-                <p>
-                    Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim
-                    ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Consectetur, adipisci velit, sed quia non numquam eius modi.
-                </p>
-            </p-tabPanel>
-            <p-tabPanel header="Disciplinas">
+                <div class="rdButton">
+                    <div class="flex align-items-center" *ngFor="let turma of turmaFilterOptions" class="field-checkbox">
+                        <p-radioButton  [inputId]="'tu'+turma.id.toString()" [value]="turma" [(ngModel)]="selectedTurmaFilter" (ngModelChange)="mudarValorTurma()" name="turma" ></p-radioButton>
+                        <label [for]="'tu'+turma.id" class="ml-2">{{ turma.nome }}</label>
+                    </div>
+                </div>
+
                 <div class="dropFlex">
-                    <p-dropdown #dropdown appendTo="body" [options]="anorelatorioArray" optionLabel="Ano" [filter]="true" [showClear]="true" placeholder="Selecione o Ano" inputId="coodaProf" appendTo="body" [(ngModel)]="selectedAno"
-                    [ngModelOptions]="{standalone: true}">
+                    <p-dropdown appendTo="body" placeholder="Ano" optionLabel="Ano" [options]="anorelatorioArray" [filter]="true" [showClear]="true" inputId="relatAno" [(ngModel)]="selectedAnoTurma" >
                         <ng-template pTemplate="selectedItem" let-selectedOption>
                             <div class="flex align-items-center gap-2">
                                 <div>{{ selectedOption }}</div>
@@ -30,11 +24,134 @@
                             </div>
                         </ng-template>
                     </p-dropdown>
-               <!-- </div>
+                    
+                    <p-dropdown appendTo="body" placeholder="Semestre" optionLabel="Semestre" [options]="semestrerelatorioArray" [filter]="true" [showClear]="true" inputId="relatSemTurma" [(ngModel)]="selectedSemestreTurma" >
+                        <ng-template pTemplate="selectedItem" let-selectedOption>
+                            <div class="flex align-items-center gap-2">
+                                <div>{{ selectedOption }}</div>
+                            </div>
+                        </ng-template>
+                        <ng-template let-semestre pTemplate="item">
+                            <div class="flex align-items-center gap-2">
+                                <div>{{ semestre }}</div>
+                            </div>
+                        </ng-template>
+                    </p-dropdown>
+                    
+                    <ng-container *ngIf="selectedTurmaFilter.id == 1">
+                        <p-dropdown appendTo="body" placeholder="Turma" optionLabel="Turma" [options]="turmasArray" [filter]="true" [showClear]="true" inputId="relatTurma" [(ngModel)]="selectedTurma" >
+                            <ng-template pTemplate="selectedItem" let-selectedOption>
+                                <div class="flex align-items-center gap-2">
+                                    <div>{{ selectedOption }}</div>
+                                </div>
+                            </ng-template>
+                            <ng-template let-turma pTemplate="item">
+                                <div class="flex align-items-center gap-2">
+                                    <div>{{ turma }}</div>
+                                </div>
+                            </ng-template>
+                        </p-dropdown>
+                    </ng-container>
+                </div>
+
+                <div class="tab3-mss" *ngIf="mss != ''">
+                    {{ mss }}
+                </div>
             
-               <div> -->
-                    <p-dropdown #dropdown appendTo="body" [options]="semestrerelatorioArray" optionLabel="Semestre" [filter]="true" [showClear]="true" placeholder="Selecione o Semestre" inputId="coodaProf" appendTo="body" [(ngModel)]="selectedSemestre"
-                    [ngModelOptions]="{standalone: true}">
+                <div class="tab3-btn">
+                    <a class="p-button botaoC" (click)="onSubmitTurmas()">Gerar Relatorio</a>
+                </div>
+            </p-tabPanel>
+            <p-tabPanel header="Professores">
+                <div class="rdButton">
+                    <div class="flex align-items-center" *ngFor="let prof of profFilterOptions" class="field-checkbox">
+                        <p-radioButton  [inputId]="'pro'+prof.id.toString()" [value]="prof" [(ngModel)]="selectedProfFilter" (ngModelChange)="mudarValorProfessor()" name="prof" ></p-radioButton>
+                        <label [for]="'pro'+prof.id" class="ml-2">{{ prof.nome }}</label>
+                    </div>
+                </div>
+
+                <div class="dropFlex">
+                    <p-dropdown appendTo="body" placeholder="Ano" optionLabel="Ano" [options]="anorelatorioArray" [filter]="true" [showClear]="true" inputId="relatAno" [(ngModel)]="selectedAnoProf" >
+                        <ng-template pTemplate="selectedItem" let-selectedOption>
+                            <div class="flex align-items-center gap-2">
+                                <div>{{ selectedOption }}</div>
+                            </div>
+                        </ng-template>
+                        <ng-template let-ano pTemplate="item">
+                            <div class="flex align-items-center gap-2">
+                                <div>{{ ano }}</div>
+                            </div>
+                        </ng-template>
+                    </p-dropdown>
+                    
+                    <p-dropdown appendTo="body" placeholder="Semestre" optionLabel="Semestre" [options]="semestrerelatorioArray" [filter]="true" [showClear]="true" inputId="relatSemTurma" [(ngModel)]="selectedSemestreProf" >
+                        <ng-template pTemplate="selectedItem" let-selectedOption>
+                            <div class="flex align-items-center gap-2">
+                                <div>{{ selectedOption }}</div>
+                            </div>
+                        </ng-template>
+                        <ng-template let-semestre pTemplate="item">
+                            <div class="flex align-items-center gap-2">
+                                <div>{{ semestre }}</div>
+                            </div>
+                        </ng-template>
+                    </p-dropdown>
+                    
+                    <ng-container *ngIf="selectedProfFilter.id == 1 || selectedProfFilter.id == 2">
+                        <p-dropdown appendTo="body" placeholder="Coordenadoria" optionLabel="Coordenadoria" [options]="coodArray" [filter]="true" [showClear]="true" inputId="relatCoord" [(ngModel)]="selectedCoodLabel" (ngModelChange)="transformCoord()" >
+                            <ng-template pTemplate="selectedItem" let-selectedOption>
+                                <div class="flex align-items-center gap-2">
+                                    <div>{{ selectedOption.label }}</div>
+                                </div>
+                            </ng-template>
+                            <ng-template let-cood pTemplate="item">
+                                <div class="flex align-items-center gap-2">
+                                    <div>{{ cood.label }}</div>
+                                </div>
+                            </ng-template>
+                        </p-dropdown>
+                    </ng-container>
+                    
+                    <ng-container *ngIf="selectedProfFilter.id == 2">
+                        <p-dropdown appendTo="body" placeholder="Professor" optionLabel="Professor" [options]="profArray" [filter]="true" [showClear]="true" inputId="relatProf" [(ngModel)]="selectedProfLabel" (ngModelChange)="transformProf()" >
+                            <ng-template pTemplate="selectedItem" let-selectedOption>
+                                <div class="flex align-items-center gap-2">
+                                    <div>{{ selectedOption.label }}</div>
+                                </div>
+                            </ng-template>
+                            <ng-template let-prof pTemplate="item">
+                                <div class="flex align-items-center gap-2">
+                                    <div>{{ prof.label }}</div>
+                                </div>
+                            </ng-template>
+                        </p-dropdown>
+                    </ng-container>
+                </div>
+
+                <div class="tab3-mss" *ngIf="mss != ''">
+                    {{ mss }}
+                </div>
+            
+                <div class="tab3-btn">
+                    <a class="p-button botaoC" (click)="onSubmitProfessores()">Gerar Relatorio</a>
+                </div>
+            </p-tabPanel>
+            <p-tabPanel header="Disciplinas">
+                <div class="dropFlex">
+                    <p-dropdown appendTo="body" placeholder="Ano" [options]="anorelatorioArray" optionLabel="Ano" [filter]="true" [showClear]="true" inputId="relatDiscp" [(ngModel)]="selectedAnoDiscp" >
+                        <ng-template pTemplate="selectedItem" let-selectedOption>
+                            <div class="flex align-items-center gap-2">
+                                <div>{{ selectedOption }}</div>
+                            </div>
+                        </ng-template>
+                        <ng-template let-ano pTemplate="item">
+                            <div class="flex align-items-center gap-2">
+                                <div>{{ ano }}</div>
+                            </div>
+                        </ng-template>
+                    </p-dropdown>
+                    
+                    <p-dropdown appendTo="body" placeholder="Semestre" [options]="semestrerelatorioArray" optionLabel="Semestre" [filter]="true" [showClear]="true" inputId="relatSem" [(ngModel)]="selectedSemestreDiscp" >
                         <ng-template pTemplate="selectedItem" let-selectedOption>
                             <div class="flex align-items-center gap-2">
                                 <div>{{ selectedOption }}</div>
