@@ -3,6 +3,8 @@ import { NavHeaderComponent } from './begin/nav-header/nav-header.component';
 import { RouterOutlet } from '@angular/router';
 import { PrimeNGConfig } from 'primeng/api';
 import { FooterComponent } from './begin/footer/footer.component';
+import { PrimeNgImportsModule } from './shared/prime-ng-imports/prime-ng-imports.module';
+import { ScannerPopupComponent } from './read/scanner-popup/scanner-popup.component';
 
 @Component({
   selector: 'app-root',
@@ -11,11 +13,11 @@ import { FooterComponent } from './begin/footer/footer.component';
     RouterOutlet,
     NavHeaderComponent,
     FooterComponent,
+    PrimeNgImportsModule,
+    ScannerPopupComponent
   ],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss',
-  providers: [
-  ]
+  styleUrl: './app.component.scss'
 })
 export class AppComponent implements OnInit {
   title = 'Angular';

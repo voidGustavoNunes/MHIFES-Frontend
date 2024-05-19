@@ -55,13 +55,19 @@
         gap: 1rem;
     }
     .p-card-footer .p-button{
-        background-color: #256CF0;
-        color: #BFE4FF;
         text-transform: uppercase;
         letter-spacing: .1rem;
         border: none;
         border-radius: 2rem;
         box-shadow: 0 .2rem .2rem rgba(0, 0, 0, 0.26);
+    }
+    .p-card-footer .btn-login .p-button{
+        background-color: #256CF0;
+        color: #BFE4FF;
+    }
+    .p-card-footer .btn-relat .p-button{
+        color: #256CF0;
+        background-color: #BFE4FF;
     }
     .p-card-footer .p-button:focus{
         border: .1rem solid #BFE4FF;

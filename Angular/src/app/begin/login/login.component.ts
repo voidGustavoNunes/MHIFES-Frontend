@@ -81,7 +81,6 @@ export class LoginComponent implements OnInit {
     }
   }
   
-  
   enviarForm() {
     this.userService.login(this.login).subscribe({
       next: (data: any) => {
@@ -92,23 +91,14 @@ export class LoginComponent implements OnInit {
         this.userAuthService.setLogin(loginResponse.login)
         this.userAuthService.setTime();
 
-        // const role = loginResponse.role.toString();
-        
-        // if(role == "ADMIN") {
-        //   this.router.navigate(['alunos']).then(() => {
-        //     window.location.reload();
-        //   });
-        // } else {
-          this.router.navigate(['home']).then(() => {
-            window.location.reload();
-          });
-        // }
-        
+        this.router.navigate(['home']).then(() => {
+          window.location.reload();
+        });
       },
       error: (err: any) => {
         if (err.status === 400) {
           this.messages = [
-            { severity: 'error', summary: 'Erro', detail: 'Login ou senha inválidos!', life: 3000 },
+            { severity: 'error', summary: 'Erro', detail: 'Matrícula ou senha inválidos!', life: 3000 },
           ];
         } else {
           this.messages = [
@@ -130,7 +120,7 @@ export class LoginComponent implements OnInit {
       this.messages = [
         { severity: 'warn', summary: 'Atenção', detail: 'Informação inválida. Preencha os campos!', life: 3000 },
       ];
-      this.mssM = 'Login inválida.';
+      this.mssM = 'Matrícula inválida.';
       this.mssS = 'Senha inválida!';
       this.errS = true;
       this.errM = true;

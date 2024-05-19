@@ -1,9 +1,11 @@
 <div class="principal">
   <app-nav-header></app-nav-header>
   <main class="display-area">
-      <div>
-          <router-outlet></router-outlet>
-      </div>
+    <div>
+      <router-outlet></router-outlet>
+    </div>
   </main>
+  <app-scanner-popup></app-scanner-popup>
+  <p-scrollTop target="parent" styleClass="custom-scrolltop" [threshold]="100" icon="pi pi-arrow-up" />
   <app-footer></app-footer>
 </div>

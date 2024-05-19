@@ -16,11 +16,13 @@ import { ForbiddenComponent } from './begin/forbidden/forbidden.component';
 import { LoggedGuard } from './_auth/logged.guard';
 import { HorariosRComponent } from './read/horarios-r/horarios-r.component';
 import { RelatoriosRComponent } from './read/relatorios-r/relatorios-r.component';
+import { ScannerPopupComponent } from './read/scanner-popup/scanner-popup.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'login', pathMatch: 'full' },
     { path: 'login', component: LoginComponent, canActivate: [LoggedGuard] },
     { path: 'forbidden', component: ForbiddenComponent },
+    { path: 'relatorios', component: RelatoriosRComponent },
     
     { path: 'home', component: HomeComponent, canActivate:[AuthGuard], data:{roles:["ADMIN", "USER"]} },
     
@@ -37,5 +39,4 @@ export const routes: Routes = [
     
     { path: 'eventos', component: EventosRComponent, canActivate:[AuthGuard], data:{roles:["ADMIN"]} },
     { path: 'alocacoes', component: AlocacoesRComponent, canActivate:[AuthGuard], data:{roles:["ADMIN"]} },
-    {path: 'relatorios', component: RelatoriosRComponent}
 ];

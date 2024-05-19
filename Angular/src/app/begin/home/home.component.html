@@ -44,12 +44,17 @@
                         <td class="larguraFixa" *ngIf="!percorrerGrupoArray()">{{ diasDaSemana[i] }}</td>
                         <ng-container *ngIf="!percorrerGrupoArray()">
                             <ng-container *ngFor="let aloca of grupo">
-                                    <ng-container *ngFor="let col of columnsHorario">
-                                        <td>
-                                            {{ encontrarColunaCorrespondente(col, aloca)?.periodoDisciplina?.disciplina?.sigla || '' }} <br> {{ encontrarColunaCorrespondente(col, aloca)?.local?.nome || '' }}
-                                        </td>
-                                        <td *ngIf="aloca.length === 0"></td>
-                                    </ng-container>
+                                <ng-container *ngFor="let col of columnsHorario">
+                                    <td>
+                                        {{ encontrarColunaCorrespondente(col, aloca)?.periodoDisciplina?.disciplina?.sigla || '' }} <br> {{ encontrarColunaCorrespondente(col, aloca)?.local?.nome || '' }}
+                                    </td>
+                                </ng-container>
+                            </ng-container>
+                            
+                            <ng-container *ngIf="grupo.length <= 0">
+                                <ng-container *ngFor="let col of columnsHorario">
+                                    <td></td>
+                                </ng-container>
                             </ng-container>
                         </ng-container>
                         <td colspan="3" *ngIf="mssVazio[i] != '' && percorrerGrupoArray()">{{ mssVazio[i] }}</td>

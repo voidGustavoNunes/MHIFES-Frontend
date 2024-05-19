@@ -21,3 +21,18 @@
         box-shadow: 0px -.1rem .3rem rgba(255, 254, 254, 0.747)
     }
 }
+
+:host ::ng-deep {
+    p-scrolltop.p-element.ng-tns-c2180378017-0 {
+        position: fixed;
+        bottom: .5rem;
+        right: 1.5rem;
+        opacity: .7;
+    }
+    span.ng-tns-c2180378017-0.pi.pi-arrow-up.p-scrolltop-icon.ng-star-inserted {
+        color: #4A82FD;
+    }
+    button.ng-trigger.ng-trigger-animation.ng-tns-c2180378017-0.custom-scrolltop.p-scrolltop.p-link.p-component.p-scrolltop-sticky.ng-star-inserted {
+        background: #BFE4FF;
+    }
+}

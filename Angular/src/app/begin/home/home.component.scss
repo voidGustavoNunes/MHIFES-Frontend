@@ -36,8 +36,6 @@
         display: flex;
         margin: 0 3rem 0;
     }
-    .rdButton div{
-    }
 
     .eqTable{
         width: 90%;
@@ -70,6 +68,7 @@
             td{
                 text-align: center;
                 border-bottom: .1rem solid #B1CAFA;
+                border-left: .1rem solid #B1CAFA;
                 height: 5rem;
             }
             .larguraFixa {
@@ -95,6 +94,13 @@
 :host ::ng-deep{
     p-radiobutton.p-element{
         margin: 0 1rem;
+    }
+    .p-datatable>.p-datatable-wrapper {
+        overflow-x: auto;
+    }
+    .p-datatable-table {
+        border-spacing: 0px;
+        // width: max-content;
     }
 }
 

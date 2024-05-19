@@ -10,6 +10,7 @@ import { Coordenadoria } from '../../models/coordenadoria.models';
 import { ProfessorService } from '../../service/professor.service';
 import { Professor } from '../../models/professor.models';
 import { PrimeNgImportsModule } from '../../shared/prime-ng-imports/prime-ng-imports.module';
+import { Dropdown } from 'primeng/dropdown';
 
 @Component({
   selector: 'app-coordenadorias-r',
@@ -33,6 +34,7 @@ import { PrimeNgImportsModule } from '../../shared/prime-ng-imports/prime-ng-imp
 })
 export class CoordenadoriasRComponent implements OnInit, OnDestroy {
   @ViewChild('searchInput') inputSearch!: ElementRef;
+  @ViewChild('dropdown') dropdown!: Dropdown;
 
   coordenadoriasData: Coordenadoria[] = [];
   coordenadoriasFilter: Coordenadoria[] = [];
@@ -112,11 +114,13 @@ export class CoordenadoriasRComponent implements OnInit, OnDestroy {
     this.visible = true;
     this.cadastrar = false;
     this.editar = true;
-    this.form.setValue({
+    this.form.patchValue({
       id: value.id,
       nome: value.nome,
       coordenador: value.coordenador
     })
+    console.log(value.coordenador)
+    // this.dropdown.writeValue(value.coordenador)
   }
 
   showDialog() {
@@ -230,9 +234,9 @@ export class CoordenadoriasRComponent implements OnInit, OnDestroy {
   }
 
   onSubmit() {
+    console.log(this.form.value)
     if (this.form.valid && this.cadastrar) {
       this.coordenadoriasCadast = this.form.value;
-      console.log(this.form.value)
       this.enviarFormSave();
       this.visible = false;
       this.form.reset();

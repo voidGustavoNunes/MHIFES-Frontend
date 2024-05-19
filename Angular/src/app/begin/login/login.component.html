@@ -29,8 +29,9 @@
         </form>
 
         <ng-template pTemplate="footer">
-            <p-button type="submit" label="Login" (onClick)="onSubmit()"></p-button>
-            <p-button type="button" label="Relatórios" (onClick)="rotaRelatorios()"></p-button>
+            <p-button type="submit" class="btn-login" label="Login" (onClick)="onSubmit()"></p-button>
+            <p-button type="button" class="btn-relat" icon="pi pi-file-pdf
+            " label="Relatórios" (onClick)="rotaRelatorios()"></p-button>
         </ng-template>
     </p-card>
 </div>

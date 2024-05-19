@@ -113,7 +113,7 @@ export class RegisterComponent implements OnInit {
       error: (err: any) => {
         if (err.status === 400) {
           this.messages = [
-            { severity: 'error', summary: 'Erro', detail: 'Login já existente!', life: 3000 },
+            { severity: 'error', summary: 'Erro', detail: 'Matrícula já existente!', life: 3000 },
           ];
         } else {
           this.messages = [

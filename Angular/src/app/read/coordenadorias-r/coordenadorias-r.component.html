@@ -67,15 +67,15 @@
             </div>
             <div class="divInput">
                 <span class="p-float-label">
-                    <p-dropdown #dropdown appendTo="body" [options]="coordenadoresArray" optionLabel="nome" [filter]="true" filterBy="nome" [showClear]="true" placeholder="Selecione a coordenadoria" inputId="coodaProf" class="form-control" formControlName="coordenador">
+                    <p-dropdown #dropdown appendTo="body" [options]="coordenadoresArray" [filter]="true" filterBy="nome" placeholder="Selecione o coordenador" inputId="coodaProf" class="form-control" formControlName="coordenador">
                         <ng-template pTemplate="selectedItem" let-selectedOption>
                             <div class="flex align-items-center gap-2">
-                                <div>{{ selectedOption?.nome }}</div>
+                                <div>{{ selectedOption?.sigla }}</div>
                             </div>
                         </ng-template>
-                        <ng-template let-coordenadorData pTemplate="item">
+                        <ng-template let-coordenador pTemplate="item">
                             <div class="flex align-items-center gap-2">
-                                <div>{{ coordenadorData.nome }}</div>
+                                <div>{{ coordenador?.sigla }} - {{ coordenador?.nome }}</div>
                             </div>
                         </ng-template>
                     </p-dropdown>

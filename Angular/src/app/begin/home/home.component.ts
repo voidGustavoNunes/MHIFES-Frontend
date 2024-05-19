@@ -87,22 +87,6 @@ export class HomeComponent implements OnInit, OnDestroy {
 
         this.alocacoesArray = this.alocacoesArray.filter(alocacao => alocacao.status == 'ATIVO');
 
-        this.alocacoesArray.sort((a:Alocacao, b:Alocacao) => {
-          if (a.horario.horaInicio.hours < b.horario.horaInicio.hours) {
-            return -1;
-          } else if (a.horario.horaInicio.hours > b.horario.horaInicio.hours) {
-            return 1;
-          } else {
-            if (a.horario.horaInicio.minutes < b.horario.horaInicio.minutes) {
-              return -1;
-            } else if (a.horario.horaInicio.minutes > b.horario.horaInicio.minutes) {
-              return 1;
-            } else {
-              return 0;
-            }
-          }
-        })
-
         this.filtrarAlocacoesPorDiaSemana();
       },
       error: (err: any) => {
@@ -260,6 +244,18 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.obterAlocacaoMaisProxima();
     this.columnsHorario = horariosUnicos;
     this.siglasAgrupadas = siglasUnique;
+    this.columnsHorario.sort((a:Horario, b:Horario) => {
+      let hAi = this.formatMiliss(a.horaInicio)
+      let hBi = this.formatMiliss(b.horaInicio)
+      
+      if (hAi < hBi) {
+        return -1;
+      } else if (hAi > hBi) {
+        return 1;
+      } else {
+        return 0;
+      }
+    })
   }
 
   encontrarColunaCorrespondente(colHora: Horario | undefined, alocacao: Alocacao) {
