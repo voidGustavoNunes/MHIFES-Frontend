@@ -2,79 +2,74 @@
     <!-- <div class="background"></div> -->
     <div class="card">
         <p>Seja bem-vindo ao MHIFES! Aqui, onde seu horário individual está sempre à vista, seja para a semana ou para o horário mais próximo.</p>
-        <div class="rdButton">
-            <div class="flex align-items-center" *ngFor="let horario of filterOptions" class="field-checkbox">
-                <p-radioButton  [inputId]="horario.id.toString()" [value]="horario" [(ngModel)]="selectedFilter" name="horario" inputId="ingredient1"></p-radioButton>
-                <label [for]="horario.id" class="ml-2">{{ horario.nome }}</label>
+        <div *ngIf="qualPapel() === 'USER'">
+            <div class="rdButton">
+                <div class="flex align-items-center" *ngFor="let horario of filterOptions" class="field-checkbox">
+                    <p-radioButton  [inputId]="horario.id.toString()" [value]="horario" [(ngModel)]="selectedFilter" name="horario" inputId="ingredient1"></p-radioButton>
+                    <label [for]="horario.id" class="ml-2">{{ horario.nome }}</label>
+                </div>
             </div>
-        </div>
-        
-        <div class="eqTable" *ngIf="selectedFilter.id === 0">
-            <p-table [value]="alocacaoMaisProxima ? [alocacaoMaisProxima] : []" styleClass="p-datatable-striped" [tableStyle]="{'min-width': '50vw'}" >
-                <ng-template pTemplate="header" let-columns>
-                    <tr class="tbHeader">
-                        <th></th>
-                        <th>{{ formatarHora(alocacaoMaisProxima?.horario?.horaInicio) }} - {{ formatarHora(alocacaoMaisProxima?.horario?.horaFim) }}</th>
-                    </tr>
-                </ng-template>
-                <ng-template pTemplate="body" let-proximo>
-                    <tr class="tbBody">
-                        <td class="larguraFixa">{{ semanaExibido }}</td>
-                        <td>{{ alocacaoMaisProxima?.periodoDisciplina?.disciplina?.nome }} <br> {{ alocacaoMaisProxima?.local?.nome }} <br> {{ alocacaoMaisProxima?.professor?.nome }} </td>
-                    </tr>
-                </ng-template>
-                <ng-template pTemplate="emptymessage">
-                  <tr>
-                    <td colspan="3">Sem aulas agendadas nos próximos 30 minutos.</td>
-                  </tr>
-                </ng-template>
-            </p-table>
-        </div>
             
-        <div class="eqTable" *ngIf="selectedFilter.id === 1">
-            <p-table [value]="alocacoesAgrupadas" styleClass="p-datatable-gridlines" [tableStyle]="{'min-width': '50vw'}" >
-                <ng-template pTemplate="header">
-                    <tr class="tbHeader">
-                        <th></th>
-                        <th *ngFor="let col of columnsHorario">{{ formatarHora(col?.horaInicio) }} <br> {{ formatarHora(col?.horaFim) }}</th>
-                    </tr>
-                </ng-template>
-                <ng-template pTemplate="body" let-grupo let-i="rowIndex">
-                    <tr class="tbBody">
-                        <td class="larguraFixa" *ngIf="!percorrerGrupoArray()">{{ diasDaSemana[i] }}</td>
-                        <ng-container *ngIf="!percorrerGrupoArray()">
-                            <ng-container *ngFor="let aloca of grupo">
+            <div class="eqTable" *ngIf="selectedFilter.id === 0">
+                <p-table [value]="alocacaoMaisProxima ? [alocacaoMaisProxima] : []" styleClass="p-datatable-striped" [tableStyle]="{'min-width': '50vw'}" >
+                    <ng-template pTemplate="header" let-columns>
+                        <tr class="tbHeader">
+                            <th></th>
+                            <th>{{ formatarHora(alocacaoMaisProxima?.horario?.horaInicio) }} - {{ formatarHora(alocacaoMaisProxima?.horario?.horaFim) }}</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-proximo>
+                        <tr class="tbBody">
+                            <td class="larguraFixa">{{ semanaExibido }}</td>
+                            <td>{{ alocacaoMaisProxima?.periodoDisciplina?.disciplina?.nome }} <br> {{ alocacaoMaisProxima?.local?.nome }} <br> {{ alocacaoMaisProxima?.professor?.nome }} </td>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="emptymessage">
+                      <tr>
+                        <td colspan="3">Sem aulas agendadas nos próximos 30 minutos.</td>
+                      </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+            
+            <div class="eqTable" *ngIf="selectedFilter.id === 1">
+                <p-table [value]="alocacoesAgrupadasSemFinalSemana" styleClass="p-datatable-gridlines" [tableStyle]="{'min-width': '50vw'}" >
+                    <ng-template pTemplate="header">
+                        <tr class="tbHeader">
+                            <th></th>
+                            <th *ngFor="let col of columnsHorario">{{ formatarHora(col?.horaInicio) }} <br> {{ formatarHora(col?.horaFim) }}</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-grupo let-i="rowIndex">
+                        <tr class="tbBody">
+                            <td class="larguraFixa" *ngIf="!percorrerGrupoArray()">{{ diasDaSemanaSemFinal[i] }}</td>
+                            <ng-container *ngIf="!percorrerGrupoArray()">
                                 <ng-container *ngFor="let col of columnsHorario">
                                     <td>
-                                        {{ encontrarColunaCorrespondente(col, aloca)?.periodoDisciplina?.disciplina?.sigla || '' }} <br> {{ encontrarColunaCorrespondente(col, aloca)?.local?.nome || '' }}
+                                        <ng-container *ngIf="encontrarColunaCorrespondente(col, grupo)">
+                                            {{ encontrarColunaCorrespondente(col, grupo)?.periodoDisciplina?.disciplina?.sigla || '' }} <br> {{  encontrarColunaCorrespondente(col, grupo)?.local?.nome || '' }} <br> {{ encontrarColunaCorrespondente(col, grupo)?.professor?.sigla || '' }}
+                                        </ng-container>
                                     </td>
                                 </ng-container>
                             </ng-container>
-                            
-                            <ng-container *ngIf="grupo.length <= 0">
-                                <ng-container *ngFor="let col of columnsHorario">
-                                    <td></td>
-                                </ng-container>
-                            </ng-container>
-                        </ng-container>
-                        <td colspan="3" *ngIf="mssVazio[i] != '' && percorrerGrupoArray()">{{ mssVazio[i] }}</td>
-                        </tr>
+                            <td colspan="3" *ngIf="mssVazio[i] != '' && percorrerGrupoArray()">{{ mssVazio[i] }}</td>
+                            </tr>
+                        </ng-template>
+                    <ng-template pTemplate="emptymessage" *ngIf="percorrerGrupoArray()">
+                      <tr>
+                        <td colspan="3">Sem aulas agendadas para este período.</td>
+                      </tr>
                     </ng-template>
-                <ng-template pTemplate="emptymessage" *ngIf="percorrerGrupoArray()">
-                  <tr>
-                    <td colspan="3">Sem aulas agendadas para este período.</td>
-                  </tr>
-                </ng-template>
-            </p-table>
-
-            <div class="discSigla" *ngIf="siglasAgrupadas.length > 0">
-                <ng-container>
-                    <ul>
-                        <li *ngFor="let sgl of siglasAgrupadas">
-                            {{ sgl?.periodoDisciplina?.disciplina?.sigla }} - {{ sgl?.periodoDisciplina?.disciplina?.nome }} - {{ sgl?.professor?.nome }}
-                        </li>
-                    </ul>
-                </ng-container>
+                </p-table>
+                <div class="discSigla" *ngIf="siglasAgrupadas.length > 0">
+                    <ng-container>
+                        <ul>
+                            <li *ngFor="let sgl of siglasAgrupadas">
+                                {{ sgl?.periodoDisciplina?.disciplina?.sigla }} - {{ sgl?.periodoDisciplina?.disciplina?.nome }} - {{ sgl?.professor?.nome }}
+                            </li>
+                        </ul>
+                    </ng-container>
+                </div>
             </div>
         </div>
     </div>

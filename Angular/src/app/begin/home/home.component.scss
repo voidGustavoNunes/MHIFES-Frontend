@@ -64,19 +64,14 @@
                 letter-spacing: .1rem;
                 text-align: center;
                 text-transform: uppercase;
+                width: .05%;
             }
             td{
                 text-align: center;
                 border-bottom: .1rem solid #B1CAFA;
                 border-left: .1rem solid #B1CAFA;
                 height: 5rem;
-            }
-            .larguraFixa {
-                border-right: .1rem solid #B1CAFA;
-                width: 12.5rem;
-            }
-            td:not(.larguraFixa) {
-                width: calc((100% - 200px) / 6);
+                width: 1%;
             }
   
         }

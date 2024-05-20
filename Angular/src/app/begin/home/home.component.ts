@@ -18,7 +18,6 @@ import { PrimeNgImportsModule } from '../../shared/prime-ng-imports/prime-ng-imp
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    CommonModule,
     HttpClientModule,
     PrimeNgImportsModule
   ],
@@ -40,13 +39,14 @@ export class HomeComponent implements OnInit, OnDestroy {
   unsubscribe$!: Subscription;
   alocacoesArray: Alocacao[] = [];
 
-  alocacoesUser: Alocacao[] = [];
   alocacoesAgrupadas: Alocacao[][] = [];
+  alocacoesAgrupadasSemFinalSemana: Alocacao[][] = [];
   semanaExibido: string = '';
   
   alocacaoMaisProxima!: Alocacao | undefined;
   
   diasDaSemana = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
+  diasDaSemanaSemFinal = ['SEG', 'TER', 'QUA', 'QUI', 'SEX'];
   // diasDaSemana = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
   
   siglasAgrupadas: Alocacao[] = [];
@@ -100,6 +100,10 @@ export class HomeComponent implements OnInit, OnDestroy {
   
   ngOnDestroy() {
     this.unsubscribe$.unsubscribe();
+  }
+
+  qualPapel() {
+    return this.userAuthService.getRole();
   }
 
   formatarTmStrTm(tempo: any) {
@@ -191,6 +195,10 @@ export class HomeComponent implements OnInit, OnDestroy {
   
   filtrarAlocacoesPorDiaSemana() {
     const alocacaoUnique: Alocacao[][] = Array.from({ length: 7 }, () => []);
+    const alocacaoUniqueSemFinalSemana: Alocacao[][] = Array.from({ length: 5 }, () => []);
+  
+    const horariosUnicos: Horario[] = [];
+    const siglasUnique: Alocacao[] = [];
   
     this.alocacoesArray.forEach((alocacao) => {
       const hoje = new Date();
@@ -201,14 +209,16 @@ export class HomeComponent implements OnInit, OnDestroy {
             if(aln.matricula == this.userAuthService.getLogin()) {
               const diaSemana = this.formatarDtStrDt(alocacao.dataAula).getDay();
               alocacaoUnique[diaSemana].push(alocacao);
+              
+              if (diaSemana >= 1 && diaSemana <= 5) {
+                alocacaoUniqueSemFinalSemana[diaSemana - 1].push(alocacao);
+              }
             }
           }
         }
       }
     });
-  
-    const horariosUnicos: Horario[] = [];
-    const siglasUnique: Alocacao[] = [];
+    
     alocacaoUnique.forEach((diaAlocacoes, diaSemana) => {
       const alocacoesUnicas: Alocacao[] = [];
     
@@ -224,6 +234,38 @@ export class HomeComponent implements OnInit, OnDestroy {
     
         if (!jaInserida) {
           alocacoesUnicas.push(alocacaoAtual);
+          // const jaHora = horariosUnicos.some((hora) => this.formatarTmStrTm(hora.horaInicio)?.horas === hIni && this.formatarTmStrTm(hora.horaInicio)?.minutos === minIni && this.formatarTmStrTm(hora.horaFim)?.horas === hFim && this.formatarTmStrTm(hora.horaFim)?.minutos === minFim);
+          
+          // if(!jaHora) {
+          //   horariosUnicos.push(alocacaoAtual.horario);
+          // }
+          // const jaSigla = siglasUnique.some((sgl) => sgl.periodoDisciplina.disciplina.nome == alocacaoAtual.periodoDisciplina.disciplina.nome && sgl.periodoDisciplina.disciplina.sigla == alocacaoAtual.periodoDisciplina.disciplina.sigla);
+          
+          // if(!jaSigla) {
+          //   siglasUnique.push(alocacaoAtual);
+          // }
+        }
+      });
+    
+      alocacaoUnique[diaSemana] = alocacoesUnicas;
+    });
+
+    alocacaoUniqueSemFinalSemana.forEach((diaAlocacoes, diaSemana) => {
+      const alocacoesUnicasSemFinalSemana: Alocacao[] = [];
+      
+      diaAlocacoes.forEach((alocacaoAtual) => {
+        const hIni = this.formatarTmStrTm(alocacaoAtual?.horario?.horaInicio)?.horas;
+        const minIni = this.formatarTmStrTm(alocacaoAtual?.horario?.horaInicio)?.minutos;
+        const hFim = this.formatarTmStrTm(alocacaoAtual?.horario?.horaFim)?.horas;
+        const minFim = this.formatarTmStrTm(alocacaoAtual?.horario?.horaFim)?.minutos;
+        
+        const jaInseridaSemFinal = alocacoesUnicasSemFinalSemana.some((alocacao) =>
+          alocacao.periodoDisciplina.disciplina.nome === alocacaoAtual.periodoDisciplina.disciplina.nome && this.formatarTmStrTm(alocacao.horario.horaInicio)?.horas === hIni && this.formatarTmStrTm(alocacao.horario.horaInicio)?.minutos === minIni && this.formatarTmStrTm(alocacao.horario.horaFim)?.horas === hFim && this.formatarTmStrTm(alocacao.horario.horaFim)?.minutos === minFim
+        );
+        
+        if (!jaInseridaSemFinal) {
+          alocacoesUnicasSemFinalSemana.push(alocacaoAtual);
+          
           const jaHora = horariosUnicos.some((hora) => this.formatarTmStrTm(hora.horaInicio)?.horas === hIni && this.formatarTmStrTm(hora.horaInicio)?.minutos === minIni && this.formatarTmStrTm(hora.horaFim)?.horas === hFim && this.formatarTmStrTm(hora.horaFim)?.minutos === minFim);
           
           if(!jaHora) {
@@ -237,10 +279,11 @@ export class HomeComponent implements OnInit, OnDestroy {
         }
       });
     
-      alocacaoUnique[diaSemana] = alocacoesUnicas;
+      alocacaoUniqueSemFinalSemana[diaSemana] = alocacoesUnicasSemFinalSemana;
     });
   
     this.alocacoesAgrupadas = alocacaoUnique;
+    this.alocacoesAgrupadasSemFinalSemana = alocacaoUniqueSemFinalSemana;
     this.obterAlocacaoMaisProxima();
     this.columnsHorario = horariosUnicos;
     this.siglasAgrupadas = siglasUnique;
@@ -258,19 +301,23 @@ export class HomeComponent implements OnInit, OnDestroy {
     })
   }
 
-  encontrarColunaCorrespondente(colHora: Horario | undefined, alocacao: Alocacao) {
-    const hIFormatado = this.formatarTmStrTm(alocacao?.horario?.horaInicio);
-    const hFFormatado = this.formatarTmStrTm(alocacao?.horario?.horaFim);
-    const colHi = this.formatarTmStrTm(colHora?.horaInicio);
-    const colHf = this.formatarTmStrTm(colHora?.horaFim);
-
-    if(colHi?.horas === hIFormatado?.horas && colHi?.minutos === hIFormatado?.minutos && hFFormatado?.horas === colHf?.horas && colHf?.minutos === hFFormatado?.minutos){ return alocacao }
-    else{ return null }
+  encontrarColunaCorrespondente(colHora: Horario, grupo: Alocacao[]) {
+    for (let alocacao of grupo) {
+      const hIFormatado = this.formatarHora(alocacao.horario.horaInicio);
+      const hFFormatado = this.formatarHora(alocacao.horario.horaFim);
+      const colHi = this.formatarHora(colHora.horaInicio);
+      const colHf = this.formatarHora(colHora.horaFim);
+      
+      if (colHi === hIFormatado && colHf === hFFormatado) {
+        return alocacao;
+      }
+    }
+    return null;
   }
 
   percorrerGrupoArray() {
     let alocV!: Alocacao;
-    for (const grp of this.alocacoesAgrupadas) {
+    for (const grp of this.alocacoesAgrupadasSemFinalSemana) {
       for (const aloc of grp) {
         if(aloc != null || aloc != undefined) alocV = aloc;
       }
