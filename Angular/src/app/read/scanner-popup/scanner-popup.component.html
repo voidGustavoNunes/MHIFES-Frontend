@@ -10,13 +10,13 @@
 <div class="card" *ngIf="mssMatriculaVazia == ''">
     <p-dialog header="{{alunoComHorario?.nome || 'Erro na recuperação de dado'}}" [modal]="true" [(visible)]="visible" [style]="{ width: '45rem' }">
         <div class="rdButtonScan">
-            <div *ngFor="let horario of filterOptions">
-                <p-radioButton  [inputId]="'scan'+horario.id.toString()" [value]="horario" [(ngModel)]="selectedFilter" name="horario" inputId="ingredient1"></p-radioButton>
+            <div *ngFor="let horario of filterOptionsScan">
+                <p-radioButton  [inputId]="'scan'+horario.id.toString()" [value]="horario" [(ngModel)]="selectedFilterScan" name="horario" inputId="ingredient1"></p-radioButton>
                 <label [for]="'scan'+horario.id.toString()" class="ml-2">{{ horario.nome }}</label>
             </div>
         </div>
     
-        <div class="eqTableScan" *ngIf="selectedFilter.id === 0">
+        <div class="eqTableScan" *ngIf="selectedFilterScan.id === 0">
             <p-table [value]="alocacaoMaisProxima ? [alocacaoMaisProxima] : []" styleClass="p-datatable-striped" [tableStyle]="{'width': '35rem'}" >
                 <ng-template pTemplate="header" let-columns>
                     <tr class="tbHeaderScan">
@@ -38,7 +38,7 @@
             </p-table>
         </div>
     
-        <div class="eqTableScan" *ngIf="selectedFilter.id === 1">
+        <div class="eqTableScan" *ngIf="selectedFilterScan.id === 1">
             <p-table [value]="alocacoesAgrupadasSemFinalSemana" styleClass="p-datatable-gridlines" [tableStyle]="{'width': '35rem'}" >
                 <ng-template pTemplate="header">
                     <tr class="tbHeaderScan">

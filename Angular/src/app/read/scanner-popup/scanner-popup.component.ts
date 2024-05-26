@@ -46,8 +46,8 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
   visible: boolean = false;
   mssMatriculaVazia: string = '';
   
-  filterOptions: FiltrarPesquisa[] = [];
-  selectedFilter!: FiltrarPesquisa;
+  filterOptionsScan: FiltrarPesquisa[] = [];
+  selectedFilterScan!: FiltrarPesquisa;
   
   alocacoesAgrupadas: Alocacao[][] = [];
   alocacoesAgrupadasSemFinalSemana: Alocacao[][] = [];
@@ -68,11 +68,11 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
     private userAuthService: UserAuthService,
     private alocService: AlocacaoService
   ) {
-    this.filterOptions = [
+    this.filterOptionsScan = [
       {nome: 'Aula mais próxima', id: 0},
       {nome: 'Horário do Período', id: 1}
     ];
-    this.selectedFilter = this.filterOptions[0];
+    this.selectedFilterScan = this.filterOptionsScan[0];
   }
 
   ngOnInit(): void {
@@ -116,11 +116,11 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
           this.previousBarcode = this.barcode;
           this.barcode = ''
 
-          // this.filterOptions = [
+          // this.filterOptionsScan = [
           //   {nome: 'Aula mais próxima', id: 0},
           //   {nome: 'Horário do Período', id: 1}
           // ];
-          // this.selectedFilter = this.filterOptions[0];
+          // this.selectedFilterScan = this.filterOptionsScan[0];
           this.mssMatriculaVazia = ''
           this.carregarUsersScan()
         }, 500);
@@ -143,6 +143,7 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
 
     if(this.alunoComHorario != null && this.alunoComHorario != undefined) {
       this.filtrarAlocacoesPorDiaSemanaScan();
+      this.selectedFilterScan = this.filterOptionsScan[0];
       this.mssMatriculaVazia = ''
       this.visible = true
     } else {

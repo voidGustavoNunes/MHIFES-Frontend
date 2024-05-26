@@ -1,35 +1,14 @@
 .caixa{
-    // height: calc(100vh - 5rem);
-    // color: white;
-    // display: flex;
-    // justify-content: center;
-    // width: 100%;
-    // // position: relative;
-    // margin-bottom: 12rem;
-    
     .card{
         width: 90%;
         position: relative;
         z-index: 1; 
     }
 
-    // .background {
-    //     position: absolute;
-    //     top: 0;
-    //     left: 0;
-    //     width: 100%;
-    //     height: calc(100vh + 5rem);
-    //     background-image: url("../../../assets/img/J4o.gif");
-    //     opacity: .85;
-    // }
-
     p{
         margin: 0 3rem 6rem;
         font-size: 1.5rem;
         letter-spacing: .1rem;
-        // padding: .5rem;
-        // border-radius: 1rem;
-        // background-color: rgba(0, 0, 0, 0.5);
     }
 
     .rdButton{
@@ -52,7 +31,6 @@
                 letter-spacing: .1rem;
                 text-align: center;
                 text-transform: uppercase;
-                // border: .1rem solid #B1CAFA;
             }
         }
         
@@ -75,11 +53,7 @@
             }
   
         }
-        .tbBody:hover{
-            // background-color: #E5E7EB;
-        }
         .discSigla{
-            // text-align: center;
             li{
                 list-style: none;
             }
@@ -95,7 +69,6 @@
     }
     .p-datatable-table {
         border-spacing: 0px;
-        // width: max-content;
     }
 }
 

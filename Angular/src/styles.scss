@@ -23,3 +23,35 @@ body {
     // font-size: 1.2rem;
     font-family: "Helvetica Neue", Arial, sans-serif;
 }
+
+body::-webkit-scrollbar,
+body::-moz-scrollbar,
+body::-o-scrollbar,
+body::-ms-scrollbar {
+  width: 0.8rem;
+  height: .8rem;
+}
+
+body::-webkit-scrollbar-track,
+body::-moz-scrollbar-track,
+body::-o-scrollbar-track,
+body::-ms-scrollbar-track {
+  background-color: #B1CAFA;
+  opacity: 0.7;
+  // border-radius: 10px;
+}
+
+body::-webkit-scrollbar-thumb,
+body::-moz-scrollbar-thumb,
+body::-o-scrollbar-thumb,
+body::-ms-scrollbar-thumb {
+  background: #3B82F6;
+  border-radius: 10px;
+}
+
+body::-webkit-scrollbar-thumb:active,
+body::-moz-scrollbar-thumb:active,
+body::-o-scrollbar-thumb:active,
+body::-ms-scrollbar-thumb:active {
+  background: #256CF0;
+}

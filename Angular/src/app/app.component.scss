@@ -36,3 +36,29 @@
         background: #BFE4FF;
     }
 }
+
+// :host {
+//   scrollbar-color: #3B82F6 #B1CAFA; /* Cor do thumb, cor da track */
+// // scrollbar-width: thin;
+//   scrollbar-width: none;
+// }
+
+:host ::-webkit-scrollbar {
+    width: .8rem;
+    // height: .8rem;
+    border-radius: 10px;
+}
+:host ::-webkit-scrollbar-track {
+    background-color: #B1CAFA;
+    // border-radius: 10px;
+    opacity: .7;
+}
+
+:host ::-webkit-scrollbar-thumb {
+    background: #3B82F6;
+    border-radius: 10px;
+}
+
+:host ::-webkit-scrollbar-thumb:active {
+    background: #256CF0;
+}
