@@ -12,6 +12,7 @@ import { Horario } from '../../models/horario.models';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
+import { Professor } from '../../models/professor.models';
 
 @Component({
   selector: 'app-scanner-popup',
@@ -42,6 +43,7 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
   alocacoesArray: Alocacao[] = [];
   
   alunoComHorario!: Aluno;
+  professorComHorario!: Professor;
   
   visible: boolean = false;
   mssMatriculaVazia: string = '';
@@ -62,6 +64,9 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
   columnsHorario: Horario[] = [];
 
   mssVazio = ['Sem aulas agendadas para este período.', '', '', '', '', '', ''];
+  
+  ehAluno: boolean = false;
+  ehProfessor: boolean = false;
 
   constructor(
     private router: Router,
@@ -115,12 +120,6 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
         setTimeout(() => {
           this.previousBarcode = this.barcode;
           this.barcode = ''
-
-          // this.filterOptionsScan = [
-          //   {nome: 'Aula mais próxima', id: 0},
-          //   {nome: 'Horário do Período', id: 1}
-          // ];
-          // this.selectedFilterScan = this.filterOptionsScan[0];
           this.mssMatriculaVazia = ''
           this.carregarUsersScan()
         }, 500);
@@ -137,18 +136,29 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
     for (const aloc of this.alocacoesArray) {
       for (const aln of aloc.periodoDisciplina.alunos) {
         // console.log('aln ',aln.matricula, 'prev ', this.previousBarcode)
-        if(aln.matricula === this.previousBarcode) this.alunoComHorario = aln;
+        if(aln.matricula === this.previousBarcode){
+          this.alunoComHorario = aln;
+          this.ehAluno = true;
+          this.ehProfessor = false;
+        }
+      }
+      if(!this.ehAluno) {
+        if(aloc.professor.matricula === this.previousBarcode){
+          this.professorComHorario = aloc.professor;
+          this.ehProfessor = true;
+          this.ehAluno = false;
+        }
       }
     }
 
-    if(this.alunoComHorario != null && this.alunoComHorario != undefined) {
+    if((this.alunoComHorario != null && this.alunoComHorario != undefined) || this.professorComHorario != null && this.professorComHorario != undefined) {
       this.filtrarAlocacoesPorDiaSemanaScan();
       this.selectedFilterScan = this.filterOptionsScan[0];
       this.mssMatriculaVazia = ''
       this.visible = true
     } else {
       this.visible = true
-      this.mssMatriculaVazia = 'não há horário para esta matrícula'
+      this.mssMatriculaVazia = 'Não há horário para esta matrícula.'
     }
   }
 

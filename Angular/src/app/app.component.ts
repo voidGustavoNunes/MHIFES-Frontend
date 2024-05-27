@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { NavHeaderComponent } from './begin/nav-header/nav-header.component';
 import { RouterOutlet } from '@angular/router';
 import { PrimeNGConfig } from 'primeng/api';
 import { FooterComponent } from './begin/footer/footer.component';
 import { PrimeNgImportsModule } from './shared/prime-ng-imports/prime-ng-imports.module';
 import { ScannerPopupComponent } from './read/scanner-popup/scanner-popup.component';
+import { CommonModule } from '@angular/common';
+import { DataService } from './_services/data.service';
 
 @Component({
   selector: 'app-root',
@@ -14,16 +16,19 @@ import { ScannerPopupComponent } from './read/scanner-popup/scanner-popup.compon
     NavHeaderComponent,
     FooterComponent,
     PrimeNgImportsModule,
-    ScannerPopupComponent
+    ScannerPopupComponent,
+    CommonModule
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, AfterViewInit {
   title = 'Angular';
+  carregado: boolean = false;
 
   constructor(
-    private primengConfig: PrimeNGConfig
+    private primengConfig: PrimeNGConfig,
+    private dataService: DataService
   ) {}
 
   ngOnInit() {
@@ -41,6 +46,22 @@ export class AppComponent implements OnInit {
       monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
       today: 'Hoje'
       //translations
+    });
+
+    setTimeout(() => {
+      this.dataService.setDataLoaded(true);
+      this.loadAppData()
+    }, 2000);
+  }
+
+  ngAfterViewInit(): void {
+    // setTimeout(() => this.carregado = true, 1000);
+  }
+
+  private loadAppData() {
+    this.dataService.getDataLoaded().subscribe(loaded => {
+      console.log(loaded)
+      this.carregado = loaded;
     });
   }
 }

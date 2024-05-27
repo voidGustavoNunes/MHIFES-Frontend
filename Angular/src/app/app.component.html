@@ -1,4 +1,4 @@
-<div class="principal">
+<div class="principal" *ngIf="carregado">
   <app-nav-header></app-nav-header>
   <main class="display-area">
     <div>
@@ -8,4 +8,8 @@
   <app-scanner-popup></app-scanner-popup>
   <p-scrollTop target="parent" styleClass="custom-scrolltop" [threshold]="100" icon="pi pi-arrow-up" />
   <app-footer></app-footer>
+</div>
+
+<div class="loading" *ngIf="!carregado">
+  <img src="assets/img/puzzle.gif" alt="">
 </div>

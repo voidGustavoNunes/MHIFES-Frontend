@@ -189,6 +189,9 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
           const data = itens;
 
           data.sort((a: Alocacao, b: Alocacao) => {
+            if ((a.dataAula === undefined || b.dataAula === undefined) || (a.dataAula === null || b.dataAula === null)) {
+              return 0;
+            }
             const dateA = new Date(a.dataAula);
             const dateB = new Date(b.dataAula);
             return dateB.getTime() - dateA.getTime();
@@ -329,7 +332,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     this.alocacaoInfo = valueInfo;
   }
 
-  showEditDialog(value: Alocacao, dtEv: string) {
+  showEditDialog(value: Alocacao, dtEv: string | null) {
     this.form.reset();
     this.ehTitulo = 'Atualizar Alocação'
     this.visibleEdit = true;
@@ -346,9 +349,10 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       periodoDisciplina: value.periodoDisciplina,
     })
 
-    
-    const eventoData = this.formatarDtStrDt(dtEv);
-    this.calendar.writeValue(eventoData);
+    if(dtEv != null) {
+      const eventoData = this.formatarDtStrDt(dtEv);
+      this.calendar.writeValue(eventoData);
+    }
     
     let perEdit = value.periodoDisciplina;
     if (perEdit && perEdit?.periodo && this.periodosArray) {
@@ -776,20 +780,23 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       ];
     }
   }
-
   formatarDatas(date: string) {
-    const partes = date.split('-');
-    const ano = parseInt(partes[0], 10);
-    const mes = parseInt(partes[1], 10) - 1;
-    const dia = parseInt(partes[2], 10);
+    if (date) {
+      const partes = date.split('-');
+      const ano = parseInt(partes[0], 10);
+      const mes = parseInt(partes[1], 10) - 1;
+      const dia = parseInt(partes[2], 10);
 
-    const data = new Date(ano, mes, dia);
+      const data = new Date(ano, mes, dia);
 
-    const diaFormatado = ('0' + data.getDate()).slice(-2);
-    const mesFormatado = ('0' + (data.getMonth() + 1)).slice(-2);
-    const anoFormatado = data.getFullYear();
+      const diaFormatado = ('0' + data.getDate()).slice(-2);
+      const mesFormatado = ('0' + (data.getMonth() + 1)).slice(-2);
+      const anoFormatado = data.getFullYear();
 
-    return `${diaFormatado}/${mesFormatado}/${anoFormatado}`;
+      return `${diaFormatado}/${mesFormatado}/${anoFormatado}`;
+    } else {
+      return null;
+    }
   }
 
   formatarDtStrDt(date: string) {
@@ -822,11 +829,15 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   }
 
   formatarHora(tempo: any) {
-    const partes = tempo.split(':');
-    const horas = partes[0];
-    const minutos = partes[1];
+    if (tempo) {
+      const partes = tempo.split(':');
+      const horas = partes[0];
+      const minutos = partes[1];
 
-    return `${horas}h ${minutos}min`;
+      return `${horas}h ${minutos}min`;
+    } else {
+      return `00:00`;
+    }
   }
 
   updateMask(tipo: string) {

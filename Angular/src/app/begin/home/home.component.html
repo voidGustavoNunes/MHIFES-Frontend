@@ -1,8 +1,60 @@
 <div class="caixa">
     <!-- <div class="background"></div> -->
-    <div class="card">
-        <p>Seja bem-vindo ao MHIFES! Aqui, onde seu horário individual está sempre à vista, seja para a semana ou para o horário mais próximo.</p>
-        <div *ngIf="qualPapel() === 'USER'">
+    
+    <div class="card" *ngIf="qualPapel() === 'ADMIN'">
+        <div class="content-home">
+            <h1>Seja bem-vindo ao MHIFES!</h1>
+            <p>O MHIFES foi projetado para facilitar o gerenciamento de pessoas e recursos da instituição de ensino. Como administrador, você terá acesso a uma gama completa de ferramentas para:</p>
+
+            <ul>
+                <li><b>Gerenciar alunos e professores:</b> Cadastrar, editar e excluir informações, acompanhar histórico escolar, gerar relatórios e muito mais.</li>
+                <li><b>Gerenciar disciplinas e horários:</b> Criar e editar disciplinas, definir turmas e horários, alocar professores e alunos, visualizar conflitos de horários e muito mais.</li>
+                <li><b>Gerenciar coordenadorias:</b> Criar e editar coordenadorias, definir responsabilidades, delegar tarefas e acompanhar o andamento das atividades.</li>
+            </ul>
+
+            <p>Clique numa das opções abaixo ou no menu de navegação para começar.</p>
+            
+            <div class="gp-home">
+                <div class="grupo-home">
+                    <div>
+                        <h4>Gerenciar Pessoas</h4>
+                        <ul>
+                            <li><a href="alunos">Alunos</a></li>
+                            <li><a href="professores">Professores</a></li>
+                            <li><a href="coordenadorias">Coordenadorias</a></li>
+                            <li><a href="registrar">Usuários</a></li>
+                        </ul>
+                    </div>
+                
+                    <div>
+                        <h4>Gerenciar Recursos</h4>
+                        <ul>
+                            <li><a href="equipamentos">Equipamentos</a></li>
+                            <li><a href="disciplinas">Disciplinas</a></li>
+                            <li><a href="periodos">Períodos</a></li>
+                            <li><a href="horarios">Horários</a></li>
+                            <li><a href="locais">Locais</a></li>
+                            <li><a href="eventos">Eventos</a></li>
+                            <li><a href="alocacoes">Alocações</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="grupo-home2">
+                    Sem ideias para este vazio por enquanto
+                    <br>
+                    <img src="assets/img/puzzle.gif" alt="">
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card" *ngIf="qualPapel() === 'USER'">
+        <div class="content-home">
+            <h1>Seja bem-vindo ao MHIFES!</h1>
+            <p>Aqui, onde seu horário individual está sempre à vista, seja para a semana ou para a hora mais próxima.</p>
+        </div>
+    
+        <div>
             <div class="rdButton">
                 <div class="flex align-items-center" *ngFor="let horario of filterOptions" class="field-checkbox">
                     <p-radioButton  [inputId]="horario.id.toString()" [value]="horario" [(ngModel)]="selectedFilter" name="horario" inputId="ingredient1"></p-radioButton>

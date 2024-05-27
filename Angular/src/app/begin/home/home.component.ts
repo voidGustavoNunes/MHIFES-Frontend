@@ -73,6 +73,9 @@ export class HomeComponent implements OnInit, OnDestroy {
         const data = itens;
         
         data.sort((a: Alocacao, b: Alocacao) => {
+          if ((a.dataAula === undefined || b.dataAula === undefined) || (a.dataAula === null || b.dataAula === null)) {
+            return 0;
+          }
           const dateA = new Date(a.dataAula);
           const dateB = new Date(b.dataAula);
           return dateB.getTime() - dateA.getTime();

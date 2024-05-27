@@ -37,9 +37,9 @@
       </ng-template>
       <ng-template pTemplate="body" let-alocacao>
         <tr class="tbBody">
-          <td>{{alocacao?.professor.nome}}</td>
-          <td>{{alocacao?.local.nome}}</td>
-          <td>{{alocacao?.periodoDisciplina?.disciplina.nome}}</td>
+          <td>{{alocacao?.professor?.nome}}</td>
+          <td>{{alocacao?.local?.nome}}</td>
+          <td>{{alocacao?.periodoDisciplina?.disciplina?.nome}}</td>
           <td>{{ formatarHora(alocacao?.horario?.horaInicio) }} - {{ formatarHora(alocacao?.horario?.horaFim) }}</td>
           <td>
             <button type="button" class="botaoL" (click)="showDialogLog(alocacao)" pButton>Log</button>
@@ -93,9 +93,9 @@
       </ng-template>
       <ng-template pTemplate="body" let-alocacaoInat>
         <tr class="tbBody">
-          <td>{{alocacaoInat?.professor.nome}}</td>
-          <td>{{alocacaoInat?.local.nome}}</td>
-          <td>{{alocacaoInat?.periodoDisciplina?.disciplina.nome}}</td>
+          <td>{{alocacaoInat?.professor?.nome}}</td>
+          <td>{{alocacaoInat?.local?.nome}}</td>
+          <td>{{alocacaoInat?.periodoDisciplina?.disciplina?.nome}}</td>
           <td>{{ formatarHora(alocacaoInat?.horario?.horaInicio) }} - {{ formatarHora(alocacaoInat?.horario?.horaFim) }}</td>
           <td>
             <button type="button" class="botaoL" (click)="showDialogLog(alocacaoInat)" pButton>Log</button>

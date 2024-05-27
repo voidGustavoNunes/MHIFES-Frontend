@@ -9,12 +9,12 @@ export interface Alocacao {
   id: number;
   horario: Horario;
   turma: string;
-  dataAula: Date;
+  dataAula?: Date;  //  MUDOU PARA NULL = TRUE
+  diaSemana?: number; // NOVO ADICIONADO
   local: Local;
   periodoDisciplina: PeriodoDisciplina;
   professor: Professor;
   status: string;
-  // numAulas: number;
   // horarioInicio: Time;
   // horarioFim: Time;
   // dataAula: Date;
