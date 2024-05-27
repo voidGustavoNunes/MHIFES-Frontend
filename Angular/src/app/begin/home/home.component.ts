@@ -332,7 +332,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       const colHi = this.formatarHora(colHora.inicio);
       const colHf = this.formatarHora(colHora.fim);
       
-      if (colHi === hIFormatado && colHf === hFFormatado) {
+      if (colHi >= hIFormatado && colHf <= hFFormatado) {
         return alocacao;
       }
     }

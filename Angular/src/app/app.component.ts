@@ -32,10 +32,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     private primengConfig: PrimeNGConfig,
     private dataService: DataService
   ) {
-    setTimeout(() => {
-      this.dataService.setDataLoaded(true);
-      this.loadAppData()
-    }, 2000);}
+  }
 
   ngOnInit() {
     this.primengConfig.ripple = true;
@@ -54,6 +51,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       //translations
     });
     
+    this.dataService.setDataLoaded(true);
     this.loadAppData()
   }
 

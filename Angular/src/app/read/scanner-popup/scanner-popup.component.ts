@@ -433,7 +433,7 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
       const colHi = this.formatarHoraScan(colHora.inicio);
       const colHf = this.formatarHoraScan(colHora.fim);
       
-      if (colHi === hIFormatado && colHf === hFFormatado) {
+      if (colHi >= hIFormatado && colHf <= hFFormatado) {
         return alocacao;
       }
     }
