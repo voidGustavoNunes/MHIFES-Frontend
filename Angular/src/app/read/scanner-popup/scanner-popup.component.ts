@@ -140,10 +140,11 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
 
     if ((this.isLoggedScan() && !url.includes('login') && !url.includes('forbidden')) || (this.isLoggedScan() && url.includes('relatorios'))) {
     // if ((!url.includes('login') && !url.includes('forbidden')) || (url.includes('relatorios'))) {
-      if(role === "ADMIN" || login === this.previousBarcode) {
+      if(role === "ADMIN" || login === this.barcode) {
         setTimeout(() => {
           if(this.barcode != '') this.previousBarcode = this.barcode;
           else if(this.codeConsulta != '') this.previousBarcode = this.codeConsulta;
+          if(this.barcode == '' && this.codeConsulta == '') this.previousBarcode = '';
           console.log('perv ',this.previousBarcode)
           this.barcode = ''
           this.codeConsulta = ''
