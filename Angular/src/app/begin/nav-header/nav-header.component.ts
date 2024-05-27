@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostListener, Inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, HostListener, Inject, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { MenubarModule } from 'primeng/menubar';
@@ -12,6 +12,7 @@ import { ButtonModule } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { DividerModule } from 'primeng/divider';
+import { ScannerPopupComponent } from '../../read/scanner-popup/scanner-popup.component';
 
 @Component({
   selector: 'app-nav-header',
@@ -35,6 +36,8 @@ import { DividerModule } from 'primeng/divider';
   ]
 })
 export class NavHeaderComponent implements OnInit, OnDestroy {
+  @Output() openScanner = new EventEmitter<void>();
+
   itemsLog: MenuItem[] | undefined;
   itemsAdm: MenuItem[] | undefined;
   itemsUse: MenuItem[] | undefined;
@@ -156,12 +159,21 @@ export class NavHeaderComponent implements OnInit, OnDestroy {
         ]
       },
       {
-        label: 'Relatórios',
-        routerLink:'relatorios',
+        label: 'Análises',
         style: {
           'margin-right': '.5rem',
           'font-weight': '600'
-        }
+        },
+        items: [
+          {
+            label: 'Relatórios',
+            routerLink:'relatorios',
+          },
+          {
+            label: 'Consultar',
+            command: () => this.openScanner.emit()
+          }
+        ]
       }
     ]
 
@@ -223,5 +235,4 @@ export class NavHeaderComponent implements OnInit, OnDestroy {
   togglePanel() {
     this.panelVisible = !this.panelVisible;
   }
-
 }

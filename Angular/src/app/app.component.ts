@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { NavHeaderComponent } from './begin/nav-header/nav-header.component';
 import { RouterOutlet } from '@angular/router';
 import { PrimeNGConfig } from 'primeng/api';
@@ -23,13 +23,19 @@ import { DataService } from './_services/data.service';
   styleUrl: './app.component.scss'
 })
 export class AppComponent implements OnInit, AfterViewInit {
+  @ViewChild('scanner') scanner!: ScannerPopupComponent; 
+
   title = 'Angular';
   carregado: boolean = false;
 
   constructor(
     private primengConfig: PrimeNGConfig,
     private dataService: DataService
-  ) {}
+  ) {
+    setTimeout(() => {
+      this.dataService.setDataLoaded(true);
+      this.loadAppData()
+    }, 2000);}
 
   ngOnInit() {
     this.primengConfig.ripple = true;
@@ -47,11 +53,8 @@ export class AppComponent implements OnInit, AfterViewInit {
       today: 'Hoje'
       //translations
     });
-
-    setTimeout(() => {
-      this.dataService.setDataLoaded(true);
-      this.loadAppData()
-    }, 2000);
+    
+    this.loadAppData()
   }
 
   ngAfterViewInit(): void {
@@ -63,5 +66,10 @@ export class AppComponent implements OnInit, AfterViewInit {
       console.log(loaded)
       this.carregado = loaded;
     });
+  }
+
+  openScannerDialog() {
+    if (this.scanner) this.scanner.openConsultaDialog();
+    else console.log('erro consulta erro')
   }
 }

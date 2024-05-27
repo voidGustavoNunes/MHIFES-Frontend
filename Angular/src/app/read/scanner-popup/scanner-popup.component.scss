@@ -95,10 +95,11 @@
         margin: 0 .5rem;
     }
     .p-datatable>.p-datatable-wrapper {
-        overflow: hidden;
+        overflow: auto;
     }
     .p-datatable-table {
         border-spacing: 0px;
+        width: 100.25rem;
     }
     .p-radiobutton .p-radiobutton-box {
         width: 1rem;

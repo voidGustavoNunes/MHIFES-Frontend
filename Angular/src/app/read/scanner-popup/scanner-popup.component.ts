@@ -8,7 +8,7 @@ import { Subscription } from 'rxjs';
 import { Alocacao } from '../../models/alocacao.models';
 import { Aluno } from '../../models/aluno.models';
 import { FiltrarPesquisa } from '../../models/share/filtrar-pesquisa.models';
-import { Horario } from '../../models/horario.models';
+import { Horario, HorarioTable } from '../../models/horario.models';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -37,6 +37,7 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
   
   messages!: Message[];
   barcode: string = '';
+  codeConsulta: string = '';
   previousBarcode: string = '';
   
   unsubscribe$!: Subscription;
@@ -46,6 +47,7 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
   professorComHorario!: Professor;
   
   visible: boolean = false;
+  visibleConsu: boolean = false;
   mssMatriculaVazia: string = '';
   
   filterOptionsScan: FiltrarPesquisa[] = [];
@@ -61,7 +63,24 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
   diasDaSemanaSemFinal = ['SEG', 'TER', 'QUA', 'QUI', 'SEX'];
   
   siglasAgrupadas: Alocacao[] = [];
-  columnsHorario: Horario[] = [];
+  columnsHorario: HorarioTable[] = [
+    {inicio: '07:00', fim: '07:50'},
+    {inicio: '07:50', fim: '08:40'},
+    {inicio: '08:40', fim: '09:30'},
+    {inicio: '09:50', fim: '10:40'},
+    {inicio: '10:40', fim: '11:30'},
+    {inicio: '11:30', fim: '12:20'},
+    {inicio: '13:00', fim: '13:50'},
+    {inicio: '13:50', fim: '14:40'},
+    {inicio: '14:40', fim: '15:30'},
+    {inicio: '15:50', fim: '16:40'},
+    {inicio: '16:40', fim: '17:30'},
+    {inicio: '17:30', fim: '18:20'},
+    {inicio: '18:50', fim: '19:35'},
+    {inicio: '19:35', fim: '20:20'},
+    {inicio: '20:30', fim: '21:15'},
+    {inicio: '21:15', fim: '22:00'},
+  ];
 
   mssVazio = ['Sem aulas agendadas para este período.', '', '', '', '', '', ''];
   
@@ -108,18 +127,26 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
   isLoggedScan() {
     return this.userAuthService.isLoggedIn();
   }
+
+  openConsultaDialog() {
+    this.visibleConsu = true;
+  }
   
   onKey() {
     const url = this.router.url;
     const role = this.userAuthService.getRole();
     const login = this.userAuthService.getLogin();
+    this.visibleConsu = false;
 
     if ((this.isLoggedScan() && !url.includes('login') && !url.includes('forbidden')) || (this.isLoggedScan() && url.includes('relatorios'))) {
     // if ((!url.includes('login') && !url.includes('forbidden')) || (url.includes('relatorios'))) {
       if(role === "ADMIN" || login === this.previousBarcode) {
         setTimeout(() => {
-          this.previousBarcode = this.barcode;
+          if(this.barcode != '') this.previousBarcode = this.barcode;
+          else if(this.codeConsulta != '') this.previousBarcode = this.codeConsulta;
+          console.log('perv ',this.previousBarcode)
           this.barcode = ''
+          this.codeConsulta = ''
           this.mssMatriculaVazia = ''
           this.carregarUsersScan()
         }, 500);
@@ -129,6 +156,7 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
       }
     } else {
       this.barcode = '';
+      this.codeConsulta = '';
     }
   }
 
@@ -158,6 +186,7 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
       this.visible = true
     } else {
       this.visible = true
+      console.log('nao tem matr.')
       this.mssMatriculaVazia = 'Não há horário para esta matrícula.'
     }
   }
@@ -286,7 +315,7 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
     const alocacaoUnique: Alocacao[][] = Array.from({ length: 7 }, () => []);
     const alocacaoUniqueSemFinalSemana: Alocacao[][] = Array.from({ length: 5 }, () => []);
   
-    const horariosUnicos: Horario[] = [];
+    // const horariosUnicos: Horario[] = [];
     const siglasUnique: Alocacao[] = [];
   
     this.alocacoesArray.forEach((alocacao) => {
@@ -346,11 +375,11 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
         if (!jaInseridaSemFinal) {
           alocacoesUnicasSemFinalSemana.push(alocacaoAtual);
           
-          const jaHora = horariosUnicos.some((hora) => this.formatMilissScan(hora.horaInicio) === hIni && this.formatMilissScan(hora.horaInicio) === hIni && this.formatMilissScan(hora.horaFim) === hFim && this.formatMilissScan(hora.horaFim) === hFim);
+          // const jaHora = horariosUnicos.some((hora) => this.formatMilissScan(hora.horaInicio) === hIni && this.formatMilissScan(hora.horaInicio) === hIni && this.formatMilissScan(hora.horaFim) === hFim && this.formatMilissScan(hora.horaFim) === hFim);
           
-          if(!jaHora) {
-            horariosUnicos.push(alocacaoAtual.horario);
-          }
+          // if(!jaHora) {
+          //   horariosUnicos.push(alocacaoAtual.horario);
+          // }
           const jaSigla = siglasUnique.some((sgl) => sgl.periodoDisciplina.disciplina.nome === alocacaoAtual.periodoDisciplina.disciplina.nome && sgl.periodoDisciplina.disciplina.sigla === alocacaoAtual.periodoDisciplina.disciplina.sigla);
           
           if(!jaSigla) {
@@ -380,28 +409,28 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
       })
     })
     this.obterAlocacaoMaisProximaScan();
-    this.columnsHorario = horariosUnicos;
+    // this.columnsHorario = horariosUnicos;
     this.siglasAgrupadas = siglasUnique;
-    this.columnsHorario.sort((a:Horario, b:Horario) => {
-      let hAi = this.formatMilissScan(a.horaInicio)
-      let hBi = this.formatMilissScan(b.horaInicio)
+    // this.columnsHorario.sort((a:Horario, b:Horario) => {
+    //   let hAi = this.formatMilissScan(a.horaInicio)
+    //   let hBi = this.formatMilissScan(b.horaInicio)
       
-      if (hAi < hBi) {
-        return -1;
-      } else if (hAi > hBi) {
-        return 1;
-      } else {
-        return 0;
-      }
-    })
+    //   if (hAi < hBi) {
+    //     return -1;
+    //   } else if (hAi > hBi) {
+    //     return 1;
+    //   } else {
+    //     return 0;
+    //   }
+    // })
   }
 
-  encontrarColunaCorrespondenteScan(colHora: Horario, grupo: Alocacao[]) {
+  encontrarColunaCorrespondenteScan(colHora: HorarioTable, grupo: Alocacao[]) {
     for (let alocacao of grupo) {
       const hIFormatado = this.formatarHoraScan(alocacao.horario.horaInicio);
       const hFFormatado = this.formatarHoraScan(alocacao.horario.horaFim);
-      const colHi = this.formatarHoraScan(colHora.horaInicio);
-      const colHf = this.formatarHoraScan(colHora.horaFim);
+      const colHi = this.formatarHoraScan(colHora.inicio);
+      const colHf = this.formatarHoraScan(colHora.fim);
       
       if (colHi === hIFormatado && colHf === hFFormatado) {
         return alocacao;

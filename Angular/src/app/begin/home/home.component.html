@@ -7,9 +7,10 @@
             <p>O MHIFES foi projetado para facilitar o gerenciamento de pessoas e recursos da instituição de ensino. Como administrador, você terá acesso a uma gama completa de ferramentas para:</p>
 
             <ul>
-                <li><b>Gerenciar alunos e professores:</b> Cadastrar, editar e excluir informações, acompanhar histórico escolar, gerar relatórios e muito mais.</li>
-                <li><b>Gerenciar disciplinas e horários:</b> Criar e editar disciplinas, definir turmas e horários, alocar professores e alunos, visualizar conflitos de horários e muito mais.</li>
-                <li><b>Gerenciar coordenadorias:</b> Criar e editar coordenadorias, definir responsabilidades, delegar tarefas e acompanhar o andamento das atividades.</li>
+                <li><b>Gerenciar alunos e professores:</b> Cadastrar, editar e excluir informações, acompanhar histórico escolar, gerar relatórios e etc.</li>
+                <li><b>Gerenciar disciplinas e horários:</b> Criar e editar disciplinas, definir turmas e horários, alocar professores e alunos, visualizar conflitos de horários e etc.</li>
+                <li><b>Gerenciar coordenadorias:</b> Criar e editar coordenadorias e definir coordenadores.</li>
+                <li><b>E muito mais:</b> Definir conta de acesso à usuários, gerenciar calendários e eventos, entre outras funcionalidades.</li>
             </ul>
 
             <p>Clique numa das opções abaixo ou no menu de navegação para começar.</p>
@@ -48,7 +49,8 @@
         </div>
     </div>
     
-    <div class="card" *ngIf="qualPapel() === 'USER'">
+    <div class="card">
+    <!-- <div class="card" *ngIf="qualPapel() === 'USER'"> -->
         <div class="content-home">
             <h1>Seja bem-vindo ao MHIFES!</h1>
             <p>Aqui, onde seu horário individual está sempre à vista, seja para a semana ou para a hora mais próxima.</p>
@@ -87,9 +89,18 @@
             <div class="eqTable" *ngIf="selectedFilter.id === 1">
                 <p-table [value]="alocacoesAgrupadasSemFinalSemana" styleClass="p-datatable-gridlines" [tableStyle]="{'min-width': '50vw'}" >
                     <ng-template pTemplate="header">
-                        <tr class="tbHeader">
+                        <tr class="tbHeader" *ngIf="!percorrerGrupoArray()">
                             <th></th>
-                            <th *ngFor="let col of columnsHorario">{{ formatarHora(col?.horaInicio) }} <br> {{ formatarHora(col?.horaFim) }}</th>
+                            <th colspan="6">Matutino</th>
+                            <th colspan="6">Vespertino</th>
+                            <th colspan="4">Noturno</th>
+                        </tr>
+                        <tr class="tbHeader" *ngIf="!percorrerGrupoArray()">
+                            <th></th>
+                            <th *ngFor="let col of columnsHorario">{{ formatarHora(col?.inicio) }} <br> {{ formatarHora(col?.fim) }}</th>
+                        </tr>
+                        <tr *ngIf="percorrerGrupoArray()">
+                            <td></td>
                         </tr>
                     </ng-template>
                     <ng-template pTemplate="body" let-grupo let-i="rowIndex">

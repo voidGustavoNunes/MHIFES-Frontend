@@ -5,7 +5,7 @@ import { FiltrarPesquisa } from '../../models/share/filtrar-pesquisa.models';
 import { Alocacao } from '../../models/alocacao.models';
 import { ConfirmationService, Message, MessageService } from 'primeng/api';
 import { Subscription } from 'rxjs';
-import { DiaSemana, Horario } from '../../models/horario.models';
+import { DiaSemana, Horario, HorarioTable } from '../../models/horario.models';
 import { HttpClientModule } from '@angular/common/http';
 import { AlocacaoService } from '../../service/alocacao.service';
 import { UserAuthService } from '../../_services/user-auth.service';
@@ -50,7 +50,24 @@ export class HomeComponent implements OnInit, OnDestroy {
   // diasDaSemana = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
   
   siglasAgrupadas: Alocacao[] = [];
-  columnsHorario: Horario[] = [];
+  columnsHorario: HorarioTable[] = [
+    {inicio: '07:00', fim: '07:50'},
+    {inicio: '07:50', fim: '08:40'},
+    {inicio: '08:40', fim: '09:30'},
+    {inicio: '09:50', fim: '10:40'},
+    {inicio: '10:40', fim: '11:30'},
+    {inicio: '11:30', fim: '12:20'},
+    {inicio: '13:00', fim: '13:50'},
+    {inicio: '13:50', fim: '14:40'},
+    {inicio: '14:40', fim: '15:30'},
+    {inicio: '15:50', fim: '16:40'},
+    {inicio: '16:40', fim: '17:30'},
+    {inicio: '17:30', fim: '18:20'},
+    {inicio: '18:50', fim: '19:35'},
+    {inicio: '19:35', fim: '20:20'},
+    {inicio: '20:30', fim: '21:15'},
+    {inicio: '21:15', fim: '22:00'},
+  ];
 
   mssVazio = ['Sem aulas agendadas para este período.', '', '', '', '', '', ''];
   
@@ -200,7 +217,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     const alocacaoUnique: Alocacao[][] = Array.from({ length: 7 }, () => []);
     const alocacaoUniqueSemFinalSemana: Alocacao[][] = Array.from({ length: 5 }, () => []);
   
-    const horariosUnicos: Horario[] = [];
+    // const horariosUnicos: Horario[] = [];
     const siglasUnique: Alocacao[] = [];
   
     this.alocacoesArray.forEach((alocacao) => {
@@ -209,12 +226,16 @@ export class HomeComponent implements OnInit, OnDestroy {
       if(periodo) {
         if(hoje.getTime() >= this.formatarDtStrDt(periodo.dataInicio).getTime() && hoje.getTime() <= this.formatarDtStrDt(periodo.dataFim).getTime()) {
           for (const aln of alocacao.periodoDisciplina.alunos) {
-            if(aln.matricula == this.userAuthService.getLogin()) {
+            if(aln.matricula == '7891033533497') {
+            // if(aln.matricula == this.userAuthService.getLogin()) {
               const diaSemana = this.formatarDtStrDt(alocacao.dataAula).getDay();
               alocacaoUnique[diaSemana].push(alocacao);
+              console.log(diaSemana)
+              console.log(alocacaoUnique[diaSemana])
               
               if (diaSemana >= 1 && diaSemana <= 5) {
                 alocacaoUniqueSemFinalSemana[diaSemana - 1].push(alocacao);
+                console.log(alocacaoUniqueSemFinalSemana[diaSemana - 1])
               }
             }
           }
@@ -269,11 +290,11 @@ export class HomeComponent implements OnInit, OnDestroy {
         if (!jaInseridaSemFinal) {
           alocacoesUnicasSemFinalSemana.push(alocacaoAtual);
           
-          const jaHora = horariosUnicos.some((hora) => this.formatarTmStrTm(hora.horaInicio)?.horas === hIni && this.formatarTmStrTm(hora.horaInicio)?.minutos === minIni && this.formatarTmStrTm(hora.horaFim)?.horas === hFim && this.formatarTmStrTm(hora.horaFim)?.minutos === minFim);
+          // const jaHora = horariosUnicos.some((hora) => this.formatarTmStrTm(hora.horaInicio)?.horas === hIni && this.formatarTmStrTm(hora.horaInicio)?.minutos === minIni && this.formatarTmStrTm(hora.horaFim)?.horas === hFim && this.formatarTmStrTm(hora.horaFim)?.minutos === minFim);
           
-          if(!jaHora) {
-            horariosUnicos.push(alocacaoAtual.horario);
-          }
+          // if(!jaHora) {
+          //   horariosUnicos.push(alocacaoAtual.horario);
+          // }
           const jaSigla = siglasUnique.some((sgl) => sgl.periodoDisciplina.disciplina.nome == alocacaoAtual.periodoDisciplina.disciplina.nome && sgl.periodoDisciplina.disciplina.sigla == alocacaoAtual.periodoDisciplina.disciplina.sigla);
           
           if(!jaSigla) {
@@ -288,28 +309,28 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.alocacoesAgrupadas = alocacaoUnique;
     this.alocacoesAgrupadasSemFinalSemana = alocacaoUniqueSemFinalSemana;
     this.obterAlocacaoMaisProxima();
-    this.columnsHorario = horariosUnicos;
+    // this.columnsHorario = horariosUnicos;
     this.siglasAgrupadas = siglasUnique;
-    this.columnsHorario.sort((a:Horario, b:Horario) => {
-      let hAi = this.formatMiliss(a.horaInicio)
-      let hBi = this.formatMiliss(b.horaInicio)
+    // this.columnsHorario.sort((a:Horario, b:Horario) => {
+    //   let hAi = this.formatMiliss(a.horaInicio)
+    //   let hBi = this.formatMiliss(b.horaInicio)
       
-      if (hAi < hBi) {
-        return -1;
-      } else if (hAi > hBi) {
-        return 1;
-      } else {
-        return 0;
-      }
-    })
+    //   if (hAi < hBi) {
+    //     return -1;
+    //   } else if (hAi > hBi) {
+    //     return 1;
+    //   } else {
+    //     return 0;
+    //   }
+    // })
   }
 
-  encontrarColunaCorrespondente(colHora: Horario, grupo: Alocacao[]) {
+  encontrarColunaCorrespondente(colHora: HorarioTable, grupo: Alocacao[]) {
     for (let alocacao of grupo) {
       const hIFormatado = this.formatarHora(alocacao.horario.horaInicio);
       const hFFormatado = this.formatarHora(alocacao.horario.horaFim);
-      const colHi = this.formatarHora(colHora.horaInicio);
-      const colHf = this.formatarHora(colHora.horaFim);
+      const colHi = this.formatarHora(colHora.inicio);
+      const colHf = this.formatarHora(colHora.fim);
       
       if (colHi === hIFormatado && colHf === hFFormatado) {
         return alocacao;

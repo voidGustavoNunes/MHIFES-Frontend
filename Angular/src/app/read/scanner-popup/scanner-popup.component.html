@@ -7,6 +7,22 @@
     </div>
 </section>
 
+<div class="card">
+    <p-dialog header="Consultar horário" [modal]="true" [(visible)]="visibleConsu" [style]="{ width: '25rem' }">
+        <span class="p-text-secondary block mb-5">Insira a matrícula</span>
+        <div style="margin: 2rem 1rem;">
+            <p-floatLabel>
+                <input pInputText id="username" (keydown.enter)="onKey()" [(ngModel)]="codeConsulta" />
+                <label for="username">Matrícula</label>
+            </p-floatLabel>
+        </div>
+        <div style="display: flex; justify-content: space-around;">
+            <p-button label="Cancelar" severity="secondary" (onClick)="visibleConsu = false" />
+            <p-button label="Consultar" (onClick)="onKey()" />
+        </div>
+    </p-dialog>
+</div>
+
 <div class="card" *ngIf="mssMatriculaVazia == '' && ehAluno">
     <p-dialog header="{{alunoComHorario?.nome || 'Erro na recuperação de dado'}}" [modal]="true" [(visible)]="visible" [style]="{ width: '45rem' }">
         <div class="rdButtonScan">
@@ -41,9 +57,15 @@
         <div class="eqTableScan" *ngIf="selectedFilterScan.id === 1">
             <p-table [value]="alocacoesAgrupadasSemFinalSemana" styleClass="p-datatable-gridlines" [tableStyle]="{'width': '35rem'}" >
                 <ng-template pTemplate="header">
+                    <tr class="tbHeaderScan" *ngIf="!percorrerGrupoArrayScan()">
+                        <th></th>
+                        <th colspan="6">Matutino</th>
+                        <th colspan="6">Vespertino</th>
+                        <th colspan="4">Noturno</th>
+                    </tr>
                     <tr class="tbHeaderScan">
                         <th></th>
-                        <th *ngFor="let col of columnsHorario">{{ formatarHoraScan(col?.horaInicio) }} <br> {{ formatarHoraScan(col?.horaFim) }}</th>
+                        <th *ngFor="let col of columnsHorario">{{ formatarHoraScan(col?.inicio) }} <br> {{ formatarHoraScan(col?.fim) }}</th>
                     </tr>
                 </ng-template>
                 <ng-template pTemplate="body" let-grupo let-i="rowIndex">
@@ -121,7 +143,7 @@
                 <ng-template pTemplate="header">
                     <tr class="tbHeaderScan">
                         <th></th>
-                        <th *ngFor="let col of columnsHorario">{{ formatarHoraScan(col?.horaInicio) }} <br> {{ formatarHoraScan(col?.horaFim) }}</th>
+                        <th *ngFor="let col of columnsHorario">{{ formatarHoraScan(col?.inicio) }} <br> {{ formatarHoraScan(col?.fim) }}</th>
                     </tr>
                 </ng-template>
                 <ng-template pTemplate="body" let-grupo let-i="rowIndex">

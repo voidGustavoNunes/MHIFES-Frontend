@@ -1,11 +1,11 @@
 <div class="principal" *ngIf="carregado">
-  <app-nav-header></app-nav-header>
+  <app-nav-header (openScanner)="openScannerDialog()"></app-nav-header>
   <main class="display-area">
     <div>
       <router-outlet></router-outlet>
     </div>
   </main>
-  <app-scanner-popup></app-scanner-popup>
+  <app-scanner-popup #scanner></app-scanner-popup>
   <p-scrollTop target="parent" styleClass="custom-scrolltop" [threshold]="100" icon="pi pi-arrow-up" />
   <app-footer></app-footer>
 </div>

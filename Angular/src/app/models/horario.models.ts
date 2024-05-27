@@ -16,3 +16,8 @@ export enum DiaSemana {
     SABADO = 'Sábado',
     DOMINGO = 'Domingo'
 }
+
+export interface HorarioTable {
+    inicio: string;
+    fim: string;
+}
