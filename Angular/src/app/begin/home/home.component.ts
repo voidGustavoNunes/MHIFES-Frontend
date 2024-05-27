@@ -226,8 +226,8 @@ export class HomeComponent implements OnInit, OnDestroy {
       if(periodo) {
         if(hoje.getTime() >= this.formatarDtStrDt(periodo.dataInicio).getTime() && hoje.getTime() <= this.formatarDtStrDt(periodo.dataFim).getTime()) {
           for (const aln of alocacao.periodoDisciplina.alunos) {
-            if(aln.matricula == '7891033533497') {
-            // if(aln.matricula == this.userAuthService.getLogin()) {
+            // if(aln.matricula == '7891033533497') {
+            if(aln.matricula == this.userAuthService.getLogin()) {
               const diaSemana = this.formatarDtStrDt(alocacao.dataAula).getDay();
               alocacaoUnique[diaSemana].push(alocacao);
               console.log(diaSemana)
