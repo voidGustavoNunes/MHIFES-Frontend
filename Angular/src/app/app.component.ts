@@ -56,13 +56,13 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    // setTimeout(() => this.carregado = true, 1000);
   }
-
+  
   private loadAppData() {
     this.dataService.getDataLoaded().subscribe(loaded => {
       console.log(loaded)
-      this.carregado = loaded;
+      // this.carregado = loaded;
+      setTimeout(() => this.carregado = loaded, 500);
     });
   }
 
