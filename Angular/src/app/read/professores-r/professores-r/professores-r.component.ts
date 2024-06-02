@@ -46,11 +46,8 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
   professoresCadast: Professor[] = [];
   professoresEdit!: Professor;
   
-  professoresFilterOri: Professor[] = [];
-  professoresNaoOrienta: Professor[] = [];
-  
+  professoresData: Professor[] = [];
   professoresFilterProf: Professor[] = [];
-  professoresOrientador: Professor[] = [];
 
   unsubscribe$!: Subscription;
   unsubscribe$Coord!: Subscription;
@@ -66,7 +63,6 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
   mss: boolean = false;
   
   filterOptions: FiltrarPesquisa[] = [];
-  selectedFilterOri!: FiltrarPesquisa;
   selectedFilterProf!: FiltrarPesquisa;
   
   professorInfo!: Professor;
@@ -95,28 +91,25 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
     this.filterOptions = [
       {nome: 'Nome', id: 0},
       {nome: 'Sigla', id: 1},
-      {nome: 'Matrícula', id: 2}
+      {nome: 'Matrícula', id: 2},
+      {nome: 'Orientadores', id: 3}
     ];
 
     this.unsubscribe$ = this.professorService.listar()
     .subscribe({
       next: (itens:any) => {
         const data = itens.sort((a:any, b:any) => (a.nome < b.nome) ? -1 : 1);
-        this.professoresNaoOrienta = [];
-        this.professoresOrientador = [];
+        // this.professoresData = [];
+        // this.professoresOrientador = [];
 
-        data.forEach((prf: Professor) => {
-          if(!prf.ehCoordenador) {
-            this.professoresNaoOrienta.push(prf);
-            this.professoresFilterProf.push(prf);
-          }
-        })
-        data.forEach((prf: Professor) => {
-          if(prf.ehCoordenador) {
-            this.professoresOrientador.push(prf);
-            this.professoresFilterOri.push(prf);
-          }
-        })
+            this.professoresData = data;
+            this.professoresFilterProf = this.professoresData;
+        // data.forEach((prf: Professor) => {
+        //   if(prf.ehCoordenador) {
+        //     this.professoresOrientador.push(prf);
+        //     this.professoresFilterOri.push(prf);
+        //   }
+        // })
       },
       error: (err: any) => {
         this.messages = [
@@ -199,116 +192,85 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
     }
   }
 
-  limparFilter(tipo: string){
-    if(tipo == 'o') {
-      const inputElement = this.inputSearchOri.nativeElement.value
-      if (inputElement) {
-        this.inputSearchOri.nativeElement.value = '';
-      }
-      this.selectedFilterOri = {} as FiltrarPesquisa;
-      this.professoresOrientador = this.professoresFilterOri;
-    } else if(tipo == 'p') {
+  limparFilter(){
       const inputElement = this.inputSearchProf.nativeElement.value
       if (inputElement) {
         this.inputSearchProf.nativeElement.value = '';
       }
       this.selectedFilterProf = {} as FiltrarPesquisa;
-      this.professoresNaoOrienta = this.professoresFilterProf;
-    }
+      this.professoresData = this.professoresFilterProf;
   }
 
-  searchFilter0(tipo: string, term: string) {
-    if(tipo == 'o') {
-      this.professoresOrientador = this.professoresFilterOri.filter(el => {
+  searchFilter0(term: string) {
+      this.professoresData = this.professoresFilterProf.filter(el => {
         if (el.nome.toLowerCase().includes(term.toLowerCase())) {
           return el;
         } else {
           return null;
         }
       })
-    } else if(tipo == 'p') {
-      this.professoresNaoOrienta = this.professoresFilterProf.filter(el => {
-        if (el.nome.toLowerCase().includes(term.toLowerCase())) {
-          return el;
-        } else {
-          return null;
-        }
-      })
-    }
   }
 
-  searchFilter1(tipo: string, term: string) {
-    if(tipo == 'o') {
-      this.professoresOrientador = this.professoresFilterOri.filter(el => {
+  searchFilter1(term: string) {
+      this.professoresData = this.professoresFilterProf.filter(el => {
         if (el.sigla.toLowerCase().includes(term.toLowerCase())) {
           return el;
         } else {
           return null;
         }
       })
-    } else if(tipo == 'p') {
-      this.professoresNaoOrienta = this.professoresFilterProf.filter(el => {
-        if (el.sigla.toLowerCase().includes(term.toLowerCase())) {
-          return el;
-        } else {
-          return null;
-        }
-      })
-    }
   }
 
-  searchFilter2(tipo: string, term: string) {
-    if(tipo == 'o') {
-      this.professoresOrientador = this.professoresFilterOri.filter(el => {
+  searchFilter2(term: string) {
+      this.professoresData = this.professoresFilterProf.filter(el => {
         if (el.matricula.toString().toLowerCase().includes(term.toLowerCase())) {
           return el;
         } else {
           return null;
         }
       })
-    } else if(tipo == 'p') {
-      this.professoresNaoOrienta = this.professoresFilterProf.filter(el => {
-        if (el.matricula.toString().toLowerCase().includes(term.toLowerCase())) {
-          return el;
-        } else {
-          return null;
-        }
-      })
-    }
   }
 
-  onKeyDown(tipo: string, event: KeyboardEvent, searchTerm: string) {
+  searchFilter3(term: string) {
+      this.professoresData = this.professoresFilterProf.filter(el => {
+        if(term == null || term == '') {
+          if (el.ehCoordenador) {
+            return el;
+          } else {
+            return null;
+          }
+        } else {
+          if (el.ehCoordenador && el.nome.toString().toLowerCase().includes(term.toLowerCase())) {
+            return el;
+          } else {
+            return null;
+          }
+        }
+      })
+  }
+
+  onKeyDown(event: KeyboardEvent, searchTerm: string) {
     if (event.key === "Enter") {
-      this.filterField(tipo, searchTerm);
+      this.filterField(searchTerm);
     }
   }
   
-  filterField(tipo: string, searchTerm: string) {
-    if (searchTerm && (searchTerm != null || searchTerm != '')) {
-      if(tipo == 'o') {
-        if(this.selectedFilterOri) {
-          if(this.selectedFilterOri.id == 0) this.searchFilter0(tipo, searchTerm);
-          if(this.selectedFilterOri.id == 1) this.searchFilter1(tipo, searchTerm);
-          if(this.selectedFilterOri.id == 2) this.searchFilter2(tipo, searchTerm);
-        } else {
-          this.messages = [
-            { severity: 'warn', summary: 'Atenção', detail: 'Selecione um filtro!', life: 3000 },
-          ];
-        }
-      } else if(tipo == 'p') {
-        if(this.selectedFilterProf) {
-          if(this.selectedFilterProf.id == 0) this.searchFilter0(tipo, searchTerm);
-          if(this.selectedFilterProf.id == 1) this.searchFilter1(tipo, searchTerm);
-          if(this.selectedFilterProf.id == 2) this.searchFilter2(tipo, searchTerm);
-        } else {
-          this.messages = [
-            { severity: 'warn', summary: 'Atenção', detail: 'Selecione um filtro!', life: 3000 },
-          ];
-        }
+  filterField(searchTerm: string) {
+    if(this.selectedFilterProf) {
+      if(this.selectedFilterProf.id == 3 && (searchTerm == null || searchTerm == '')) this.searchFilter3(searchTerm);
+      else if (searchTerm && (searchTerm != null || searchTerm != '')) {
+        if(this.selectedFilterProf.id == 0) this.searchFilter0(searchTerm);
+        if(this.selectedFilterProf.id == 1) this.searchFilter1(searchTerm);
+        if(this.selectedFilterProf.id == 2) this.searchFilter2(searchTerm);
+        if(this.selectedFilterProf.id == 3) this.searchFilter2(searchTerm);
+      } else {
+        this.messages = [
+          { severity: 'warn', summary: 'Atenção', detail: 'Informação inválida. Preencha o campo!', life: 3000 },
+        ];
       }
     } else {
       this.messages = [
-        { severity: 'warn', summary: 'Atenção', detail: 'Informação inválida. Preencha o campo!', life: 3000 },
+        { severity: 'warn', summary: 'Atenção', detail: 'Selecione um filtro!', life: 3000 },
       ];
     }
   }

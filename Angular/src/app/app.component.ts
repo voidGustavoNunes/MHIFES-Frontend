@@ -1,12 +1,12 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { NavHeaderComponent } from './begin/nav-header/nav-header.component';
-import { RouterOutlet } from '@angular/router';
+import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { PrimeNGConfig } from 'primeng/api';
 import { FooterComponent } from './begin/footer/footer.component';
 import { PrimeNgImportsModule } from './shared/prime-ng-imports/prime-ng-imports.module';
 import { ScannerPopupComponent } from './read/scanner-popup/scanner-popup.component';
 import { CommonModule } from '@angular/common';
-import { DataService } from './_services/data.service';
+import { UserAuthService } from './_services/user-auth.service';
 
 @Component({
   selector: 'app-root',
@@ -27,10 +27,12 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   title = 'Angular';
   carregado: boolean = false;
+  dados: any;
 
   constructor(
     private primengConfig: PrimeNGConfig,
-    private dataService: DataService
+    private route: ActivatedRoute,
+    private userAuthService: UserAuthService
   ) {
   }
 
@@ -51,18 +53,23 @@ export class AppComponent implements OnInit, AfterViewInit {
       //translations
     });
     
-    this.dataService.setDataLoaded(true);
-    this.loadAppData()
+    // this.loadAppData()
+    this.carregado = false;
   }
 
   ngAfterViewInit(): void {
+    setTimeout(() => {
+      this.carregado = true;
+     });
   }
   
   private loadAppData() {
-    this.dataService.getDataLoaded().subscribe(loaded => {
-      console.log(loaded)
-      // this.carregado = loaded;
-      setTimeout(() => this.carregado = loaded, 500);
+    this.route.data.subscribe(({ resolver }) => {
+      console.log('dt ',resolver)
+      this.dados = resolver;
+      console.log('dd ',this.dados)
+      if(this.dados == this.userAuthService.getLogin()) this.carregado = true;
+      else this.carregado = false;
     });
   }
 

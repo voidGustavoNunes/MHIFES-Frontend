@@ -10,7 +10,8 @@ import { AuthGuard } from './_auth/auth.guard';
 import { AuthInterceptor } from './_auth/auth.interceptor';
 import { UsuarioService } from './_services/usuario.service';
 import { UserAuthService } from './_services/user-auth.service';
-import { DataService } from './_services/data.service';
+import { DataLoadingGuard } from './_auth/data.loading.guard';
+import { DataResolver } from './_auth/data.resolver';
 
 const maskConfigFunction: () => Partial<IConfig> = () => {
   return {
@@ -34,6 +35,7 @@ export const appConfig: ApplicationConfig = {
     UsuarioService,
     UserAuthService,
     Router,
-    DataService
+    DataResolver,
+    DataLoadingGuard
   ]
 };

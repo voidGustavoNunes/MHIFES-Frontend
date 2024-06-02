@@ -17,6 +17,7 @@ import { LoggedGuard } from './_auth/logged.guard';
 import { HorariosRComponent } from './read/horarios-r/horarios-r.component';
 import { RelatoriosRComponent } from './read/relatorios-r/relatorios-r.component';
 import { ScannerPopupComponent } from './read/scanner-popup/scanner-popup.component';
+import { DataResolver } from './_auth/data.resolver';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -24,12 +25,12 @@ export const routes: Routes = [
     { path: 'forbidden', component: ForbiddenComponent },
     { path: 'relatorios', component: RelatoriosRComponent },
     
-    { path: 'home', component: HomeComponent, canActivate:[AuthGuard], data:{roles:["ADMIN", "USER"]} },
+    { path: 'home', component: HomeComponent, canActivate:[AuthGuard], resolve: {resolver: DataResolver}, data:{roles:["ADMIN", "USER"]} },
     
     { path: 'registrar', component: RegisterComponent, canActivate: [AuthGuard], data:{roles:["ADMIN"]} },
     
     { path: 'equipamentos', component: EquipamentosRComponent, canActivate:[AuthGuard], data:{roles:["ADMIN"]} },
-    { path: 'disciplinas', component: DisciplinasRComponent, canActivate:[AuthGuard], data:{roles:["ADMIN"]} },
+    { path: 'disciplinas', component: DisciplinasRComponent, canActivate:[AuthGuard], resolve: {resolver: DataResolver}, data:{roles:["ADMIN"]} },
     { path: 'periodos', component: PeriodosRComponent, canActivate:[AuthGuard], data:{roles:["ADMIN"]} },
     { path: 'professores', component: ProfessoresRComponent, canActivate:[AuthGuard], data:{roles:["ADMIN"]} },
     { path: 'alunos', component: AlunosRComponent, canActivate:[AuthGuard], data:{roles:["ADMIN"]} },

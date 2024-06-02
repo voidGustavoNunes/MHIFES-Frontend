@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AutheticationDTO, LoginResponseDTO, RegisterDTO } from '../models/usuario';
 import { UserAuthService } from './user-auth.service';
-    
+
 @Injectable()
 export class UsuarioService {
   private readonly API = '/api/auth';
@@ -30,9 +30,9 @@ export class UsuarioService {
     const userRole: any = this.userAuthService.getRole();
 
     if (userRole && allowedRoles.includes(userRole)) {
-        return true;
+      return true;
     } else {
-        return false;
+      return false;
     }
   }
 

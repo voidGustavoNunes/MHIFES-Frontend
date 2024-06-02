@@ -1,12 +1,15 @@
 import { DOCUMENT } from "@angular/common";
 import { Inject, Injectable } from "@angular/core";
 import { Router } from "@angular/router";
+import { BehaviorSubject } from "rxjs";
 
 @Injectable()
 export class UserAuthService {
     private localStorage!: any;
+
     
-    constructor(private router: Router,
+    constructor(
+        private router: Router,
         @Inject(DOCUMENT) private document: Document
         ) {
             this.localStorage = this.document.defaultView?.localStorage;

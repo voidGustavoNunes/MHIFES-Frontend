@@ -2,7 +2,7 @@ import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest
 import { Observable, catchError, throwError } from "rxjs";
 import { UserAuthService } from "../_services/user-auth.service";
 import { Router } from "@angular/router";
-import { Injectable } from "@angular/core";
+import { Injectable, NgZone } from "@angular/core";
 
 @Injectable({
     providedIn: 'root'
@@ -12,6 +12,7 @@ export class AuthInterceptor implements HttpInterceptor {
     constructor(
         private userAuthService: UserAuthService,
         private router: Router,
+        private ngZone: NgZone
     ) {}
     
     intercept(
@@ -29,10 +30,11 @@ export class AuthInterceptor implements HttpInterceptor {
         }
 
         return next.handle(req).pipe(
-            catchError(
-                (err: HttpErrorResponse) => {
+            catchError((err: HttpErrorResponse) => {
                     if(err.status === 401 || err.status === 403) {
                         this.router.navigate(["/forbidden"]);
+                        // console.log('nao eh para vir daqui')
+                        // this.ngZone.run(() => this.router.navigate(['/forbidden']));
                     }
                     const errorMess = new Error("Alguma coisa está errada.");
                     return throwError(() => errorMess);
