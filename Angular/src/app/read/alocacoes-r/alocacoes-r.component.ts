@@ -215,7 +215,18 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
           this.alocacoesPageData = itens;
           this.sizeAloc = this.alocacoesPageData.totalElements;
           
-          this.listarPage()
+          this.alocacoesData = this.alocacoesPageData.content;
+
+          this.alocacoesData.sort((a: Alocacao, b: Alocacao) => {
+            if ((a.dataAula === undefined || b.dataAula === undefined) || (a.dataAula === null || b.dataAula === null)) {
+              return 0;
+            }
+            const dateA = new Date(a.dataAula);
+            const dateB = new Date(b.dataAula);
+            return dateB.getTime() - dateA.getTime();
+          });
+          
+          // this.listarPage()
           this.listarPageObj(0)
         },
         error: (err: any) => {
@@ -326,46 +337,11 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     }
   }
   
-  listarPage() {
-    if(this.sizeAloc <= 0) {
-      this.alocService.listar(0, 10).subscribe(alocs => {
-        alocs.content.forEach((alc: Alocacao) => {
-          this.alocacoesData.push(alc);
-        })
-        this.sizeAloc = alocs.totalElements
-        if(this.alocacoesData.length > 0) {
-          this.alocacoesData.sort((a: Alocacao, b: Alocacao) => {
-            if ((a.dataAula === undefined || b.dataAula === undefined) || (a.dataAula === null || b.dataAula === null)) {
-              return 0;
-            }
-            const dateA = new Date(a.dataAula);
-            const dateB = new Date(b.dataAula);
-            return dateB.getTime() - dateA.getTime();
-          });
-        }
-      });
-    } else {
-      this.alocacoesData = this.alocacoesPageData.content;
-
-      this.alocacoesData.sort((a: Alocacao, b: Alocacao) => {
-        if ((a.dataAula === undefined || b.dataAula === undefined) || (a.dataAula === null || b.dataAula === null)) {
-          return 0;
-        }
-        const dateA = new Date(a.dataAula);
-        const dateB = new Date(b.dataAula);
-        return dateB.getTime() - dateA.getTime();
-      });
-    }
-  }
-
   listarPageAt() {
-    let contem: boolean = false;
-
     this.alocService.listarAtivos(this.pageAloc, this.rowsAloc).subscribe(alcc => {
       this.alocacoesData = alcc.content;
 
       if(this.alocacoesData.length > 0) {
-        if(alcc.totalElements > 0) contem = true;
         this.alocacoesData.sort((a: Alocacao, b: Alocacao) => {
           if ((a.dataAula === undefined || b.dataAula === undefined) || (a.dataAula === null || b.dataAula === null)) {
             return 0;
@@ -376,24 +352,6 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
         });
       }
     });
-    
-    if(!contem) {
-      this.alocService.listar(this.pageAloc, this.rowsAloc).subscribe(alcc => {
-        this.alocacoesData = alcc.content;
-      
-        if(this.alocacoesData.length > 0) {
-          contem = true;
-          this.alocacoesData.sort((a: Alocacao, b: Alocacao) => {
-            if ((a.dataAula === undefined || b.dataAula === undefined) || (a.dataAula === null || b.dataAula === null)) {
-              return 0;
-            }
-            const dateA = new Date(a.dataAula);
-            const dateB = new Date(b.dataAula);
-            return dateB.getTime() - dateA.getTime();
-          });
-        }
-      });
-    }
   }
 
   listarPageInat() {
@@ -416,9 +374,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   listarPageObj(object: number) {
     if(object == 0) {
       this.alocService.listarInativos(0,10).subscribe(alcc => {
-        alcc.content.forEach((alc: Alocacao) => {
-          this.alocacoesDataDelete.push(alc);
-        })
+        this.alocacoesDataDelete = alcc.content
 
         if(this.alocacoesDataDelete.length > 0) {
           this.alocacoesDataDelete.sort((a: Alocacao, b: Alocacao) => {
@@ -477,10 +433,16 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   
   pageFilter() {
     if(this.sizeAloc > 0) {
-      this.alocService.listarAtivos(0,this.sizeAloc).subscribe(alcc => this.alocacoesFilter = alcc.content)
+      this.alocService.listarAtivos(0,this.sizeAloc).subscribe(alcc => {
+        this.alocacoesFilter = alcc.content
+      })
     }
     if(this.sizeDelAloc > 0) {
-      this.alocService.listarInativos(0,this.sizeDelAloc).subscribe(alcc => this.alocacoesDeleteFilter = alcc.content)
+      this.alocService.listarInativos(0,this.sizeDelAloc).subscribe(alcc => {
+        alcc.content.forEach((alc: Alocacao) => {
+          this.alocacoesDeleteFilter.push(alc)
+        })
+      })
     }
   }
 
