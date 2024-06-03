@@ -10,14 +10,14 @@ import { Calendar } from 'primeng/calendar';
 import { Dropdown } from 'primeng/dropdown';
 import { Subscription } from 'rxjs';
 
-import { AlocacaoHour } from '../../models/alocacao.models';
-import { Aluno } from '../../models/aluno.models';
-import { Disciplina } from '../../models/disciplina.models';
-import { Horario } from '../../models/horario.models';
-import { Local } from '../../models/local.models';
-import { Log, Operacao } from '../../models/log.models';
-import { Periodo, PeriodoDisciplina } from '../../models/periodo.models';
-import { Professor } from '../../models/professor.models';
+import { AlocacaoHour } from '../../models/postgres/alocacao.models';
+import { Aluno } from '../../models/postgres/aluno.models';
+import { Disciplina } from '../../models/postgres/disciplina.models';
+import { Horario } from '../../models/postgres/horario.models';
+import { Local } from '../../models/postgres/local.models';
+import { Log, Operacao } from '../../models/postgres/log.models';
+import { Periodo, PeriodoDisciplina } from '../../models/postgres/periodo.models';
+import { Professor } from '../../models/postgres/professor.models';
 import { FiltrarPesquisa } from '../../models/share/filtrar-pesquisa.models';
 import { Semana } from '../../models/share/semana.models';
 import { AlocacaoService } from '../../service/alocacao.service';
@@ -26,7 +26,9 @@ import { LocalService } from '../../service/local.service';
 import { PeriodoService } from '../../service/periodo.service';
 import { ProfessorService } from '../../service/professor.service';
 import { PrimeNgImportsModule } from '../../shared/prime-ng-imports/prime-ng-imports.module';
-import { Alocacao } from './../../models/alocacao.models';
+import { Alocacao } from '../../models/postgres/alocacao.models';
+import { Page } from '../../models/share/page.models';
+import { PaginatorState } from 'primeng/paginator';
 
 registerLocaleData(localePT);
 interface Column {
@@ -76,7 +78,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
 
   alocacoesData: Alocacao[] = [];
   alocacoesFilter: Alocacao[] = [];
-  
+
   alocacoesCadast: Alocacao[] = [];
   alocacoesEdit: Alocacao[] = [];
   alocacaoInfo!: Alocacao;
@@ -86,8 +88,6 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   selectedFilterInat!: FiltrarPesquisa;
 
   unsubscribe$!: Subscription;
-  // unsubscribe$Aln!: Subscription;
-  // unsubscribe$Disc!: Subscription;
   unsubscribe$Prof!: Subscription;
   unsubscribe$Per!: Subscription;
   unsubscribe$Loc!: Subscription;
@@ -140,7 +140,22 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
 
   // Tabela
   cols!: Column[];
+  
+  firstAloc: number = 0;
+  rowsAloc: number = 10;
+  sizeAloc: number = 0;
+  
+  firstDelAloc: number = 0;
+  rowsDelAloc: number = 10;
+  sizeDelAloc: number = 0;
 
+  alocacoesPageData!: Page<Alocacao>;
+  alocacoesDelPageData!: Page<Alocacao>;
+  horariosPageData!: Page<Horario>;
+  locaisPageData!: Page<Local>;
+  periodosPageData!: Page<Periodo>;
+  professoresPageData!: Page<Professor>;
+  
   constructor(
     private alocService: AlocacaoService,
     private router: Router,
@@ -183,12 +198,15 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       { nome: 'Hora de início', id: 3 },
     ];
 
-    this.unsubscribe$ = this.alocService.listar()
+    this.unsubscribe$ = this.alocService.listarAtivos(0,10)
       .subscribe({
         next: (itens: any) => {
-          const data = itens;
+          this.alocacoesPageData = itens;
+          this.sizeAloc = this.alocacoesPageData.totalElements;
+          
+          this.alocacoesData = this.alocacoesPageData.content;
 
-          data.sort((a: Alocacao, b: Alocacao) => {
+          this.alocacoesData.sort((a: Alocacao, b: Alocacao) => {
             if ((a.dataAula === undefined || b.dataAula === undefined) || (a.dataAula === null || b.dataAula === null)) {
               return 0;
             }
@@ -196,18 +214,8 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
             const dateB = new Date(b.dataAula);
             return dateB.getTime() - dateA.getTime();
           });
-          // data.sort((a: Alocacao, b: Alocacao) => {
-          //   const dateB = new Date(b.periodoDisciplina?.periodo?.dataInicio);
-          //   const dateA = new Date(a.periodoDisciplina?.periodo?.dataInicio);
-          //   return dateB.getTime() - dateA.getTime();
-          // });
-          this.alocacoesData = data;
-
-          this.alocacoesDataDelete = this.alocacoesData.filter(alocacao => alocacao.status == 'INATIVO');
-          this.alocacoesData = this.alocacoesData.filter(alocacao => alocacao.status == 'ATIVO');
           
-          this.alocacoesFilter = this.alocacoesData;
-          this.alocacoesDeleteFilter = this.alocacoesDataDelete;
+          this.listarPageObj(0)
         },
         error: (err: any) => {
           this.messages = [
@@ -216,11 +224,11 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
         }
       });
 
-    this.unsubscribe$Loc = this.locService.listar()
+    this.unsubscribe$Loc = this.locService.listar(0,10)
       .subscribe({
         next: (itens: any) => {
-          const data = itens;
-          this.locaisArray = data.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1);
+          this.locaisPageData = itens
+          this.listarPageObj(2)
         },
         error: (err: any) => {
           this.messages = [
@@ -229,11 +237,11 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
         }
       });
 
-    this.unsubscribe$Prof = this.professorService.listar()
+    this.unsubscribe$Prof = this.professorService.listar(0,10)
       .subscribe({
         next: (itens: any) => {
-          const data = itens.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1);
-          this.professoresArray = data;
+          this.professoresPageData = itens
+          this.listarPageObj(4)
         },
         error: (err: any) => {
           this.messages = [
@@ -242,11 +250,11 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
         }
       });
 
-    this.unsubscribe$Hor = this.hourService.listar()
+    this.unsubscribe$Hor = this.hourService.listar(0,10)
       .subscribe({
         next: (itens: any) => {
-          const data = itens.sort((a: any, b: any) => (a.id > b.id) ? -1 : 1);
-          this.horariosArray = data;
+          this.horariosPageData = itens
+          this.listarPageObj(1)
         },
         error: (err: any) => {
           this.messages = [
@@ -255,18 +263,11 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
         }
       });
       
-    this.unsubscribe$Per = this.periodService.listar()
+    this.unsubscribe$Per = this.periodService.listar(0,10)
     .subscribe({
       next: (itens: any) => {
-        const data = itens;
-
-        data.sort((a: Periodo, b: Periodo) => {
-          const dateA = new Date(a.dataInicio);
-          const dateB = new Date(b.dataInicio);
-          return dateB.getTime() - dateA.getTime();
-        });
-
-        this.periodosArray = data;
+        this.periodosPageData = itens
+        this.listarPageObj(3)
       },
       error: (err: any) => {
         this.messages = [
@@ -290,13 +291,100 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.unsubscribe$.unsubscribe();
-    // this.unsubscribe$Aln.unsubscribe();
-    // this.unsubscribe$Disc.unsubscribe();
     this.unsubscribe$Loc.unsubscribe();
     this.unsubscribe$Per.unsubscribe();
     this.unsubscribe$Prof.unsubscribe();
-    // this.unsubscribe$Log.unsubscribe();
     this.unsubscribe$Hor.unsubscribe();
+  }
+  
+  onPageChange(event: PaginatorState, stat: number) {
+    if (event.first !== undefined && event.rows !== undefined) {
+      if(stat == 0) {
+        this.firstAloc = event.first;
+        this.rowsAloc = event.rows;
+        this.listarPageAt()
+      } else if(stat == 1) {
+        this.firstDelAloc = event.first;
+        this.rowsDelAloc = event.rows;
+        this.listarPageInat()
+      }
+    }
+  }
+
+  listarPageAt() {
+    this.alocService.listarAtivos(this.firstAloc, this.rowsAloc).subscribe(itens => this.alocacoesData = itens.content)
+    this.alocacoesData.sort((a: Alocacao, b: Alocacao) => {
+      if ((a.dataAula === undefined || b.dataAula === undefined) || (a.dataAula === null || b.dataAula === null)) {
+        return 0;
+      }
+      const dateA = new Date(a.dataAula);
+      const dateB = new Date(b.dataAula);
+      return dateB.getTime() - dateA.getTime();
+    });
+  }
+
+  listarPageInat() {
+    this.alocService.listarInativos(this.firstDelAloc, this.rowsDelAloc).subscribe(alcc => this.alocacoesDataDelete = alcc.content)
+    this.alocacoesDataDelete.sort((a: Alocacao, b: Alocacao) => {
+      if ((a.dataAula === undefined || b.dataAula === undefined) || (a.dataAula === null || b.dataAula === null)) {
+        return 0;
+      }
+      const dateA = new Date(a.dataAula);
+      const dateB = new Date(b.dataAula);
+      return dateB.getTime() - dateA.getTime();
+    });
+  }
+
+  listarPageObj(object: number) {
+    if(object == 0) {
+      this.alocService.listarInativos(0,10).subscribe(alcc => this.alocacoesDataDelete = alcc.content)
+      this.alocacoesDataDelete.sort((a: Alocacao, b: Alocacao) => {
+        if ((a.dataAula === undefined || b.dataAula === undefined) || (a.dataAula === null || b.dataAula === null)) {
+          return 0;
+        }
+        const dateA = new Date(a.dataAula);
+        const dateB = new Date(b.dataAula);
+        return dateB.getTime() - dateA.getTime();
+      });
+      this.sizeDelAloc = this.alocacoesDataDelete.length
+      this.pageFilter()
+    } else if(object == 1) {
+      let sizeUm = this.horariosPageData.totalElements
+      this.hourService.listar(0,sizeUm).subscribe(hor => this.horariosArray = hor.content)
+      this.horariosArray.sort((a:Horario, b:Horario) => {
+        let hAi = this.formatMiliss(a.horaInicio)
+        let hBi = this.formatMiliss(b.horaFim)
+        
+        if (hAi < hBi) {
+          return -1;
+        } else if (hAi > hBi) {
+          return 1;
+        } else {
+          return 0;
+        }
+      })
+    } else if(object == 2) {
+      let sizeDois = this.locaisPageData.totalElements
+      this.locService.listar(0,sizeDois).subscribe(locs => this.locaisArray = locs.content)
+      this.locaisArray.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1)
+    } else if(object == 3) {
+      let sizeTres = this.periodosPageData.totalElements
+      this.periodService.listar(0,sizeTres).subscribe(pero => this.periodosArray = pero.content)
+      this.periodosArray.sort((a: Periodo, b: Periodo) => {
+        const dateA = new Date(a.dataInicio);
+        const dateB = new Date(b.dataInicio);
+        return dateB.getTime() - dateA.getTime();
+      });
+    } else if(object == 4) {
+      let sizeQuatro = this.professoresPageData.totalElements
+      this.professorService.listar(0,sizeQuatro).subscribe(prfs => this.professoresArray = prfs.content)
+      this.professoresArray.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1)
+    }
+  }
+  
+  pageFilter() {
+    this.alocService.listarAtivos(0,this.sizeAloc).subscribe(alcc => this.alocacoesFilter = alcc.content)
+    this.alocService.listarInativos(0,this.sizeDelAloc).subscribe(alcc => this.alocacoesDeleteFilter = alcc.content)
   }
 
   // verificarHoraFimMaiorQueInicio(formGroup: FormGroup) {
@@ -838,6 +926,17 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     } else {
       return `00:00`;
     }
+  }
+
+  formatMiliss(tempo: any) {
+    if (tempo) {
+      const partes = tempo.split(':');
+      const horas = parseInt(partes[0], 10);
+      const minutos = parseInt(partes[1], 10);
+      const milissegundos = (horas * 60 + minutos) * 60000;
+      return milissegundos;
+    }
+    return 0;
   }
 
   updateMask(tipo: string) {

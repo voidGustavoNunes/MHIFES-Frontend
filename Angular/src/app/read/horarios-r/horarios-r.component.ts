@@ -4,12 +4,14 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { Router, RouterModule } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
-import { Horario } from '../../models/horario.models';
+import { Horario } from '../../models/postgres/horario.models';
 import { HorarioService } from '../../service/horario.service';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 import { FiltrarPesquisa } from '../../models/share/filtrar-pesquisa.models';
 import { ConfirmationService, Message, MessageService } from 'primeng/api';
 import { PrimeNgImportsModule } from '../../shared/prime-ng-imports/prime-ng-imports.module';
+import { PaginatorState } from 'primeng/paginator';
+import { Page } from '../../models/share/page.models';
 
 @Component({
   selector: 'app-horarios-r',
@@ -53,6 +55,12 @@ export class HorariosRComponent implements OnInit, OnDestroy {
   filterOptions: FiltrarPesquisa[] = [];
   selectedFilter!: FiltrarPesquisa;
   txtFilter: string = 'Pesquisar horário';
+  
+  firstHors: number = 0;
+  rowsHors: number = 10;
+  sizeHors: number = 0;
+
+  horasPageData!: Page<Horario>;
 
   constructor(
     private hourService: HorarioService,
@@ -73,12 +81,26 @@ export class HorariosRComponent implements OnInit, OnDestroy {
       {nome: 'Hora de fim', id: 1},
     ];
 
-    this.unsubscribe$ = this.hourService.listar()
+    this.unsubscribe$ = this.hourService.listar(0,10)
     .subscribe({
       next: (itens:any) => {
-        const data = itens;
-        this.horariosData = data.sort((a:Horario, b:Horario) => (a.horaInicio < b.horaInicio) ? -1 : 1);
-        this.horariosFilter = this.horariosData;
+        this.horasPageData = itens;
+        this.sizeHors = this.horasPageData.totalElements;
+        
+        this.horariosData = this.horasPageData.content;
+        this.horariosData.sort((a:Horario, b:Horario) => {
+          let hAi = this.formatMiliss(a.horaInicio)
+          let hBi = this.formatMiliss(b.horaFim)
+          
+          if (hAi < hBi) {
+            return -1;
+          } else if (hAi > hBi) {
+            return 1;
+          } else {
+            return 0;
+          }
+        });
+        this.pageFilter()
       },
       error: (err: any) => {
         this.messages = [
@@ -90,6 +112,38 @@ export class HorariosRComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.unsubscribe$.unsubscribe();
+  }
+  
+  onPageChange(event: PaginatorState) {
+    if (event.first !== undefined && event.rows !== undefined) {
+      this.firstHors = event.first;
+      this.rowsHors = event.rows;
+      this.listarPage()
+    }
+  }
+
+  listarPage() {
+    this.hourService.listar(this.firstHors, this.rowsHors)
+    .subscribe((itens:any) => {
+        this.horasPageData = itens;
+        this.horariosData = this.horasPageData.content;
+        this.horariosData.sort((a:Horario, b:Horario) => {
+          let hAi = this.formatMiliss(a.horaInicio)
+          let hBi = this.formatMiliss(b.horaFim)
+          
+          if (hAi < hBi) {
+            return -1;
+          } else if (hAi > hBi) {
+            return 1;
+          } else {
+            return 0;
+          }
+        });
+      });
+  }
+
+  pageFilter() {
+    this.hourService.listar(0, this.sizeHors).subscribe(hors => this.horariosFilter = hors.content)
   }
   
   verificarHoraFimMaiorQueInicio(formGroup: FormGroup) {
@@ -229,6 +283,17 @@ export class HorariosRComponent implements OnInit, OnDestroy {
     } else {
       return null;
     }
+  }
+  
+  formatMiliss(tempo: any) {
+    if (tempo) {
+      const partes = tempo.split(':');
+      const horas = parseInt(partes[0], 10);
+      const minutos = parseInt(partes[1], 10);
+      const milissegundos = (horas * 60 + minutos) * 60000;
+      return milissegundos;
+    }
+    return 0;
   }
 
   confirm2(event: Event, id: number) {

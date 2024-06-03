@@ -9,11 +9,11 @@ import { PrimeNgImportsModule } from '../../shared/prime-ng-imports/prime-ng-imp
 import { HomeService } from '../../service/home.service';
 import { AlocacaoService } from '../../service/alocacao.service';
 import { Subscription } from 'rxjs';
-import { Alocacao } from '../../models/alocacao.models';
+import { Alocacao } from '../../models/postgres/alocacao.models';
 import { FiltrarPesquisa } from '../../models/share/filtrar-pesquisa.models';
-import { Professor } from '../../models/professor.models';
-import { Coordenadoria } from '../../models/coordenadoria.models';
+import { Coordenadoria } from '../../models/postgres/coordenadoria.models';
 import { CoordenadoriaService } from '../../service/coordenadoria.service';
+import { Page } from '../../models/share/page.models';
 
 @Component({
     selector: 'app-relatorios-r',
@@ -65,6 +65,8 @@ export class RelatoriosRComponent implements OnInit,OnDestroy {
   
   unsubscribe$!: Subscription;
   alocacoesArray: Alocacao[] = [];
+  
+
   turmasArray: string[] = [];
   
   turmaFilterOptions: FiltrarPesquisa[] = [];
@@ -77,6 +79,11 @@ export class RelatoriosRComponent implements OnInit,OnDestroy {
   unsubscribe$Cood!: Subscription;
   coodArray: [{value: number | undefined, label: string}] = [{value: undefined, label: ''}];
   profArray: [{value: number | undefined, label: string}] = [{value: undefined, label: ''}];
+
+  sizeAcods: number = 0;
+
+  alocacoesPageData!: Page<Alocacao>;
+  coordenadoriasPageData!: Page<Coordenadoria>;
 
   constructor(
     private homService: HomeService,
@@ -109,20 +116,11 @@ export class RelatoriosRComponent implements OnInit,OnDestroy {
     ];
     this.selectedProfFilter = this.profFilterOptions[0];
 
-    this.unsubscribe$ = this.alocService.listar()
+    this.unsubscribe$ = this.alocService.listar(0,10)
     .subscribe({
       next: (itens:any) => {
-        const data = itens;
-        this.alocacoesArray = data;
-
-        const turmasUnique: string[] = [];
-        this.alocacoesArray.forEach((alocaAtual) => {
-          const jaTurma = turmasUnique.some((sgl) => sgl == alocaAtual.turma);
-          if(!jaTurma) {
-            turmasUnique.push(alocaAtual.turma);
-          }
-        });
-        this.turmasArray = turmasUnique;
+        this.alocacoesPageData = itens
+        this.listarPageObj(1)
       },
       error: (err: any) => {
         this.messages = [
@@ -131,14 +129,11 @@ export class RelatoriosRComponent implements OnInit,OnDestroy {
       }
     });
     
-    this.unsubscribe$Cood = this.coordaService.listar()
+    this.unsubscribe$Cood = this.coordaService.listar(0,10)
     .subscribe({
       next: (itens:any) => {
-        let data: Coordenadoria[] = itens;
-        data.forEach((dt) =>{
-          this.coodArray.push({value: dt.id, label:`${dt.nome}`});
-          this.profArray.push({value: dt.coordenador.id, label:`${dt.coordenador.nome}`});
-        })
+        this.coordenadoriasPageData = itens
+        this.listarPageObj(2)
       },
       error: (err: any) => {
         this.messages = [
@@ -151,6 +146,28 @@ export class RelatoriosRComponent implements OnInit,OnDestroy {
   ngOnDestroy(): void {
     this.unsubscribe$.unsubscribe();
     this.unsubscribe$Cood.unsubscribe();
+  }
+  
+  listarPageObj(object: number) {
+    if(object == 1) {
+      let sizeUm = this.alocacoesPageData.totalElements
+      this.alocService.listarInativos(0,sizeUm).subscribe(alcc => this.alocacoesArray = alcc.content);
+
+      const turmasUnique: string[] = [];
+      this.alocacoesArray.forEach((alocaAtual) => {
+        const jaTurma = turmasUnique.some((sgl) => sgl == alocaAtual.turma);
+        if(!jaTurma) {
+          turmasUnique.push(alocaAtual.turma);
+        }
+      });
+      this.turmasArray = turmasUnique;
+    } else if(object == 2) {
+      let sizeDois = this.coordenadoriasPageData.totalElements
+      this.coordaService.listar(0,sizeDois).subscribe(cods => cods.content.forEach((dt) =>{
+        this.coodArray.push({value: dt.id, label:`${dt.nome}`});
+        this.profArray.push({value: dt.coordenador.id, label:`${dt.coordenador.nome}`});
+      }))
+    }
   }
 
   onSubmitDisciplinas(){

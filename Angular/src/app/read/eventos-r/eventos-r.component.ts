@@ -4,14 +4,14 @@ import { CommonModule, Time } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { Evento, EventoHourData } from '../../models/evento.models';
+import { Evento, EventoHourData } from '../../models/postgres/evento.models';
 import { EventoService } from '../../service/evento.service';
-import { Local } from '../../models/local.models';
+import { Local } from '../../models/postgres/local.models';
 import { LocalService } from '../../service/local.service';
 import { FiltrarPesquisa } from '../../models/share/filtrar-pesquisa.models';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 import { HorarioService } from '../../service/horario.service';
-import { Horario } from '../../models/horario.models';
+import { Horario } from '../../models/postgres/horario.models';
 import { ConfirmationService, Message, MessageService } from 'primeng/api';
 import { registerLocaleData } from '@angular/common';
 import localePT from '@angular/common/locales/pt';
@@ -20,6 +20,8 @@ import { PrimeNgImportsModule } from '../../shared/prime-ng-imports/prime-ng-imp
 import { Dropdown } from 'primeng/dropdown';
 import { InputSwitch } from 'primeng/inputswitch';
 import { Calendar } from 'primeng/calendar';
+import { PaginatorState } from 'primeng/paginator';
+import { Page } from '../../models/share/page.models';
 
 @Component({
   selector: 'app-eventos-r',
@@ -91,6 +93,14 @@ export class EventosRComponent implements OnInit, OnDestroy {
   enableCheck: boolean = false;
   datasHour: EventoHourData[] = [];
   minDate!: Date;
+  
+  firstEvn: number = 0;
+  rowsEvn: number = 10;
+  sizeEvn: number = 0;
+
+  eventosPageData!: Page<Evento>;
+  horariosPageData!: Page<Horario>;
+  locaisPageData!: Page<Local>;
 
   constructor(
     private eventService: EventoService,
@@ -118,19 +128,21 @@ export class EventosRComponent implements OnInit, OnDestroy {
       {nome: 'Hora de início', id: 2}
     ];
 
-    this.unsubscribe$ = this.eventService.listar()
+    this.unsubscribe$ = this.eventService.listar(0,10)
     .subscribe({
       next: (itens:any) => {
-        const data = itens;
+        this.eventosPageData = itens;
+        this.sizeEvn = this.eventosPageData.totalElements;
         
-        data.sort((a: Evento, b: Evento) => {
+        this.eventosData = this.eventosPageData.content;
+        this.eventosData.sort((a:any, b:any) => (a.nome < b.nome ) ? -1 : 1);
+        this.pageFilter()
+        
+        this.eventosData.sort((a: Evento, b: Evento) => {
           const dateA = new Date(a.dataEvento);
           const dateB = new Date(b.dataEvento);
           return dateB.getTime() - dateA.getTime();
         });
-        this.eventosData = data;
-        
-        this.eventosFilter = this.eventosData;
       },
       error: (err: any) => {
         this.messages = [
@@ -139,11 +151,11 @@ export class EventosRComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.unsubscribe$LA = this.locService.listar()
+    this.unsubscribe$LA = this.locService.listar(0,10)
     .subscribe({
       next: (itens:any) => {
-        const data = itens;
-        this.locaisArray = data.sort((a:any, b:any) => (a.nome < b.nome) ? -1 : 1);
+        this.locaisPageData = itens
+        this.listarPageObj(2)
       },
       error: (err: any) => {
         this.messages = [
@@ -152,11 +164,11 @@ export class EventosRComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.unsubscribe$Hor = this.hourService.listar()
+    this.unsubscribe$Hor = this.hourService.listar(0,10)
     .subscribe({
       next: (itens:any) => {
-        const data = itens;
-        this.horariosArray = data.sort((a:any, b:any) => (a.id > b.id) ? -1 : 1);
+        this.horariosPageData = itens
+        this.listarPageObj(1)
       },
       error: (err: any) => {
         this.messages = [
@@ -170,6 +182,55 @@ export class EventosRComponent implements OnInit, OnDestroy {
     this.unsubscribe$.unsubscribe();
     this.unsubscribe$LA.unsubscribe();
     this.unsubscribe$Hor.unsubscribe();
+  }
+
+  
+  onPageChange(event: PaginatorState) {
+    if (event.first !== undefined && event.rows !== undefined) {
+      this.firstEvn = event.first;
+      this.rowsEvn = event.rows;
+      this.listarPage()
+    }
+  }
+
+  listarPage() {
+    this.eventService.listar(this.firstEvn, this.rowsEvn)
+    .subscribe((itens:any) => {
+        this.eventosPageData = itens;
+        this.eventosData = this.eventosPageData.content;
+        this.eventosData.sort((a: Evento, b: Evento) => {
+          const dateA = new Date(a.dataEvento);
+          const dateB = new Date(b.dataEvento);
+          return dateB.getTime() - dateA.getTime();
+        });
+      });
+  }
+
+  listarPageObj(object: number) {
+    if(object == 1) {
+      let sizeUm = this.horariosPageData.totalElements
+      this.hourService.listar(0,sizeUm).subscribe(hor => this.horariosArray = hor.content)
+      this.horariosArray.sort((a:Horario, b:Horario) => {
+        let hAi = this.formatMiliss(a.horaInicio)
+        let hBi = this.formatMiliss(b.horaFim)
+        
+        if (hAi < hBi) {
+          return -1;
+        } else if (hAi > hBi) {
+          return 1;
+        } else {
+          return 0;
+        }
+      })
+    } else if(object == 2) {
+      let sizeDois = this.locaisPageData.totalElements
+      this.locService.listar(0,sizeDois).subscribe(locs => this.locaisArray = locs.content)
+      this.locaisArray.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1)
+    }
+  }
+
+  pageFilter() {
+    this.eventService.listar(0, this.sizeEvn).subscribe(evnt => this.eventosFilter = evnt.content)
   }
   
   // verificarHoraFimMaiorQueInicio(formGroup: FormGroup) {
@@ -428,6 +489,17 @@ export class EventosRComponent implements OnInit, OnDestroy {
     } else {
       return null;
     }
+  }
+  
+  formatMiliss(tempo: any) {
+    if (tempo) {
+      const partes = tempo.split(':');
+      const horas = parseInt(partes[0], 10);
+      const minutos = parseInt(partes[1], 10);
+      const milissegundos = (horas * 60 + minutos) * 60000;
+      return milissegundos;
+    }
+    return 0;
   }
 
   onKeyDown(event: KeyboardEvent, searchTerm: string) {

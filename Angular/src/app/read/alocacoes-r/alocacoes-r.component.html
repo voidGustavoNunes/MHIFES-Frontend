@@ -22,10 +22,7 @@
   </div>
 
   <div class="eqTable">
-    <p-table #dt1 [value]="alocacoesData" styleClass="p-datatable-striped" [tableStyle]="{'min-width': '50rem'}"
-      [paginator]="true" [rows]="10" [showCurrentPageReport]="true"
-      currentPageReportTemplate="Mostrando do {first} ao {last} de {totalRecords} registros"
-      [rowsPerPageOptions]="[10, 20, 40]">
+    <p-table #dt1 [value]="alocacoesData" styleClass="p-datatable-striped" [tableStyle]="{'min-width': '50rem'}" >
       <ng-template pTemplate="header">
         <tr class="tbHeader">
           <th>Professor</th>
@@ -58,13 +55,19 @@
         </tr>
       </ng-template>
     </p-table>
+
+    <p-paginator
+    (onPageChange)="onPageChange($event, 0)"
+    [first]="firstAloc"
+    [rows]="rowsAloc"
+    [totalRecords]="sizeAloc"
+    [rowsPerPageOptions]="[10, 20, 40, 60]"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Mostrando do {first} ao {last} de {totalRecords} registros" />
   </div>
 
   <div class="eqTable">
-    <p-table #dt1 [value]="alocacoesDataDelete" styleClass="p-datatable-striped" [tableStyle]="{'min-width': '50rem'}"
-      [paginator]="true" [rows]="10" [showCurrentPageReport]="true"
-      currentPageReportTemplate="Mostrando do {first} ao {last} de {totalRecords} registros"
-      [rowsPerPageOptions]="[10, 20, 40]">
+    <p-table #dt1 [value]="alocacoesDataDelete" styleClass="p-datatable-striped" [tableStyle]="{'min-width': '50rem'}" >
       <ng-template pTemplate="caption">
         <h3>Alocações Deletadas</h3>
         <div class="pesq">
@@ -109,6 +112,15 @@
         </tr>
       </ng-template>
     </p-table>
+
+    <p-paginator
+    (onPageChange)="onPageChange($event, 1)"
+    [first]="firstDelAloc"
+    [rows]="rowsDelAloc"
+    [totalRecords]="sizeDelAloc"
+    [rowsPerPageOptions]="[10, 20, 40, 60]"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Mostrando do {first} ao {last} de {totalRecords} registros" />
   </div>
   <p-scrollTop></p-scrollTop>
 </div>

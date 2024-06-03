@@ -19,11 +19,6 @@
             [value]="coordenadoriasData"
             styleClass="p-datatable-striped"
             [tableStyle]="{'min-width': '50rem'}"
-            [paginator]="true"
-            [rows]="10"
-            [showCurrentPageReport]="true"
-            currentPageReportTemplate="Mostrando do {first} ao {last} de {totalRecords} registros"
-            [rowsPerPageOptions]="[10, 20, 40]"
         >
             <ng-template pTemplate="header">
                 <tr class="tbHeader">
@@ -50,6 +45,15 @@
                 </tr>
             </ng-template>
         </p-table>
+        
+        <p-paginator
+        (onPageChange)="onPageChange($event)"
+        [first]="firstCoor"
+        [rows]="rowsCoor"
+        [totalRecords]="sizeCoor"
+        [rowsPerPageOptions]="[10, 20, 40, 60]"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Mostrando do {first} ao {last} de {totalRecords} registros" />
     </div>
     
     <p-scrollTop></p-scrollTop>

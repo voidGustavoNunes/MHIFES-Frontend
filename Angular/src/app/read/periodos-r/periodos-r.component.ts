@@ -5,17 +5,19 @@ import { Subscription } from 'rxjs';
 import { Router, RouterModule } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
 import { PeriodoService } from '../../service/periodo.service';
-import { PerDiscMultiSelect, Periodo, PeriodoDisciplina } from '../../models/periodo.models';
+import { PerDiscMultiSelect, Periodo, PeriodoDisciplina } from '../../models/postgres/periodo.models';
 import { FiltrarPesquisa } from '../../models/share/filtrar-pesquisa.models';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 import { DisciplinaService } from '../../service/disciplina.service';
 import { AlunoService } from '../../service/aluno.service';
-import { Disciplina } from '../../models/disciplina.models';
-import { Aluno } from '../../models/aluno.models';
+import { Disciplina } from '../../models/postgres/disciplina.models';
+import { Aluno } from '../../models/postgres/aluno.models';
 import { ConfirmationService, Message, MessageService } from 'primeng/api';
 import { PrimeNgImportsModule } from '../../shared/prime-ng-imports/prime-ng-imports.module';
 import { MultiSelect } from 'primeng/multiselect';
 import { Calendar } from 'primeng/calendar';
+import { Page } from '../../models/share/page.models';
+import { PaginatorState } from 'primeng/paginator';
 
 @Component({
   selector: 'app-periodos-r',
@@ -87,6 +89,14 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
   
   minCalend!: Date;
   maxCalend!: Date;
+  
+  firstPerds: number = 0;
+  rowsPerds: number = 10;
+  sizePerds: number = 0;
+
+  periodosPageData!: Page<Periodo>;
+  alunosPageData!: Page<Aluno>;
+  disciplinasPageData!: Page<Disciplina>;
 
   constructor(
     private periodService: PeriodoService,
@@ -117,19 +127,19 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
       {nome: 'Ano', id: 1}
     ];
 
-    this.unsubscribe$ = this.periodService.listar()
+    this.unsubscribe$ = this.periodService.listar(0,10)
     .subscribe({
       next: (itens:any) => {
-        const data = itens;
+        this.periodosPageData = itens;
+        this.sizePerds = this.periodosPageData.totalElements;
         
-        data.sort((a: Periodo, b: Periodo) => {
+        this.periodosData = this.periodosPageData.content;
+        this.periodosData.sort((a: Periodo, b: Periodo) => {
           const dateA = new Date(a.dataInicio);
           const dateB = new Date(b.dataInicio);
           return dateB.getTime() - dateA.getTime();
         });
-        
-        this.periodosData = data;
-        this.periodosFilter = this.periodosData;
+        this.pageFilter()
       },
       error: (err: any) => {
         this.messages = [
@@ -138,11 +148,11 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
       }
     });
     
-    this.unsubscribe$Disc = this.disciService.listar()
+    this.unsubscribe$Disc = this.disciService.listar(0,10)
     .subscribe({
       next: (itens:any) => {
-        const data = itens;
-        this.disciplinasArray = data.sort((a:any, b:any) => (a.nome < b.nome) ? -1 : 1);
+        this.disciplinasPageData = itens
+        this.listarPageObj(2)
       },
       error: (err: any) => {
         this.messages = [
@@ -151,11 +161,11 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.unsubscribe$Aln = this.alunService.listar()
+    this.unsubscribe$Aln = this.alunService.listar(0,10)
     .subscribe({
       next: (itens:any) => {
-        const data = itens;
-        this.alunosArray = data.sort((a:any, b:any) => (a.nome < b.nome ) ? -1 : 1);
+        this.alunosPageData = itens
+        this.listarPageObj(1)
       },
       error: (err: any) => {
         this.messages = [
@@ -169,6 +179,43 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
     this.unsubscribe$.unsubscribe();
     this.unsubscribe$Aln.unsubscribe();
     this.unsubscribe$Disc.unsubscribe();
+  }
+  
+  onPageChange(event: PaginatorState) {
+    if (event.first !== undefined && event.rows !== undefined) {
+      this.firstPerds = event.first;
+      this.rowsPerds = event.rows;
+      this.listarPage()
+    }
+  }
+
+  listarPage() {
+    this.periodService.listar(this.firstPerds, this.rowsPerds)
+    .subscribe((itens:any) => {
+        this.periodosPageData = itens;
+        this.periodosData = this.periodosPageData.content;
+        this.periodosData.sort((a: Periodo, b: Periodo) => {
+          const dateA = new Date(a.dataInicio);
+          const dateB = new Date(b.dataInicio);
+          return dateB.getTime() - dateA.getTime();
+        });
+      });
+  }
+
+  listarPageObj(object: number) {
+    if(object == 1) {
+      let sizeUm = this.alunosPageData.totalElements
+      this.alunService.listar(0,sizeUm).subscribe(alno => this.alunosArray = alno.content)
+      this.alunosArray.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1)
+    } else if(object == 2) {
+      let sizeDois = this.disciplinasPageData.totalElements
+      this.disciService.listar(0,sizeDois).subscribe(discp => this.disciplinasArray = discp.content)
+      this.disciplinasArray.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1)
+    }
+  }  
+
+  pageFilter() {
+    this.periodService.listar(0, this.sizePerds).subscribe(perds => this.periodosFilter = perds.content)
   }
 
   updateCalendarMinMaxCalend() {

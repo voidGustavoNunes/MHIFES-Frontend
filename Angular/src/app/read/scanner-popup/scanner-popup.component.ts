@@ -5,14 +5,15 @@ import { PrimeNgImportsModule } from '../../shared/prime-ng-imports/prime-ng-imp
 import { UserAuthService } from '../../_services/user-auth.service';
 import { AlocacaoService } from '../../service/alocacao.service';
 import { Subscription } from 'rxjs';
-import { Alocacao } from '../../models/alocacao.models';
-import { Aluno } from '../../models/aluno.models';
+import { Alocacao } from '../../models/postgres/alocacao.models';
+import { Aluno } from '../../models/postgres/aluno.models';
 import { FiltrarPesquisa } from '../../models/share/filtrar-pesquisa.models';
-import { Horario, HorarioTable } from '../../models/horario.models';
+import { Horario, HorarioTable } from '../../models/postgres/horario.models';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
-import { Professor } from '../../models/professor.models';
+import { Professor } from '../../models/postgres/professor.models';
+import { Page } from '../../models/share/page.models';
 
 @Component({
   selector: 'app-scanner-popup',
@@ -42,6 +43,8 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
   
   unsubscribe$!: Subscription;
   alocacoesArray: Alocacao[] = [];
+
+  alocacoesPageData!: Page<Alocacao>;
   
   alunoComHorario!: Aluno;
   professorComHorario!: Professor;
@@ -193,13 +196,13 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
   }
 
   carregarUsersScan() {
-    this.alocService.listar()
+    this.alocService.listar(0,10)
     .subscribe({
       next: (itens:any) => {
         const data = itens;
-        this.alocacoesArray = data;
+        this.alocacoesPageData = data;
 
-        this.alocacoesArray = this.alocacoesArray.filter((alocacao) => {
+        this.alocacoesArray = this.alocacoesPageData.content.filter((alocacao) => {
           const hoje = new Date();
           const periodo = alocacao.periodoDisciplina.periodo;
           if(periodo) {

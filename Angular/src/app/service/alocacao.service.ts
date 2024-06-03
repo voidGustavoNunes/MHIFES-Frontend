@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { Alocacao } from '../models/alocacao.models';
-import { Log } from '../models/log.models';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable, map } from 'rxjs';
+import { Alocacao } from '../models/postgres/alocacao.models';
+import { Log } from '../models/postgres/log.models';
+import { Page } from '../models/share/page.models';
 
 @Injectable()
 export class AlocacaoService {
@@ -10,8 +11,32 @@ export class AlocacaoService {
 
   constructor(private http: HttpClient) { }
 
-  listar(): Observable<Alocacao[]> {
-    return this.http.get<Alocacao[]>(`${this.API}`);
+  // listar(): Observable<Alocacao[]> {
+  //   return this.http.get<Alocacao[]>(`${this.API}`);
+  // }
+
+  listar(page: number, size: number): Observable<Page<Alocacao>> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+
+    return this.http.get<Page<Alocacao>>(`${this.API}`, { params });
+  }
+
+  listarAtivos(page: number, size: number): Observable<Page<Alocacao>> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+
+    return this.http.get<Page<Alocacao>>(`${this.API}/ativos?page=${page}&size=${size}`, { params });
+  }
+
+  listarInativos(page: number, size: number): Observable<Page<Alocacao>> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+
+    return this.http.get<Page<Alocacao>>(`${this.API}/inativos?page=${page}&size=${size}`, { params });
   }
 
   buscarPorId(id: number): Observable<Alocacao> {

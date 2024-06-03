@@ -25,11 +25,6 @@
           [value]="alunosData"
           styleClass="p-datatable-striped"
           [tableStyle]="{'min-width': '50rem'}"
-          [paginator]="true"
-          [rows]="10"
-          [showCurrentPageReport]="true"
-          currentPageReportTemplate="Mostrando do {first} ao {last} de {totalRecords} registros"
-          [rowsPerPageOptions]="[10, 20, 40]"
       >
           <ng-template pTemplate="header">
               <tr class="tbHeader">
@@ -58,7 +53,16 @@
                   <td colspan="3">Não há alunos cadastrados.</td>
               </tr>
           </ng-template>
-      </p-table>
+        </p-table>
+        
+        <p-paginator
+        (onPageChange)="onPageChange($event)"
+        [first]="firstAln"
+        [rows]="rowsAln"
+        [totalRecords]="sizeAln"
+        [rowsPerPageOptions]="[10, 20, 40, 60]"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Mostrando do {first} ao {last} de {totalRecords} registros" />
   </div>
 
   <p-scrollTop></p-scrollTop>

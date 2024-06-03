@@ -4,15 +4,17 @@ import { Router, RouterModule } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { Professor } from '../../../models/professor.models';
+import { Professor } from '../../../models/postgres/professor.models';
 import { ProfessorService } from '../../../service/professor.service';
 import { FiltrarPesquisa } from '../../../models/share/filtrar-pesquisa.models';
-import { Coordenadoria } from '../../../models/coordenadoria.models';
+import { Coordenadoria } from '../../../models/postgres/coordenadoria.models';
 import { CoordenadoriaService } from '../../../service/coordenadoria.service';
 import { ConfirmationService, Message, MessageService } from 'primeng/api';
 import { PrimeNgImportsModule } from '../../../shared/prime-ng-imports/prime-ng-imports.module';
 import { InputSwitch } from 'primeng/inputswitch';
 import { Dropdown } from 'primeng/dropdown';
+import { PaginatorState } from 'primeng/paginator';
+import { Page } from '../../../models/share/page.models';
 
 @Component({
   selector: 'app-professores-r',
@@ -69,6 +71,13 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
   visibleInfo: boolean = false;
 
   coordenadoriasArray: Coordenadoria[] = [];
+  
+  firstProfsr: number = 0;
+  rowsProfsr: number = 10;
+  sizeProfsr: number = 0;
+
+  professoresPageData!: Page<Professor>;
+  coordenasPageData!: Page<Coordenadoria>;
 
   constructor(
     private professorService: ProfessorService,
@@ -95,21 +104,15 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
       {nome: 'Orientadores', id: 3}
     ];
 
-    this.unsubscribe$ = this.professorService.listar()
+    this.unsubscribe$ = this.professorService.listar(0,10)
     .subscribe({
       next: (itens:any) => {
-        const data = itens.sort((a:any, b:any) => (a.nome < b.nome) ? -1 : 1);
-        // this.professoresData = [];
-        // this.professoresOrientador = [];
-
-            this.professoresData = data;
-            this.professoresFilterProf = this.professoresData;
-        // data.forEach((prf: Professor) => {
-        //   if(prf.ehCoordenador) {
-        //     this.professoresOrientador.push(prf);
-        //     this.professoresFilterOri.push(prf);
-        //   }
-        // })
+        this.professoresPageData = itens;
+        this.sizeProfsr = this.professoresPageData.totalElements;
+        
+        this.professoresData = this.professoresPageData.content;
+        this.professoresData.sort((a:any, b:any) => (a.nome < b.nome ) ? -1 : 1);
+        this.pageFilter()
       },
       error: (err: any) => {
         this.messages = [
@@ -118,11 +121,11 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
       }
     });
     
-    this.unsubscribe$Coord = this.coordaService.listar()
+    this.unsubscribe$Coord = this.coordaService.listar(0,10)
     .subscribe({
       next: (itens:any) => {
-        const data = itens;
-        this.coordenadoriasArray = data.sort((a:any, b:any) => (a.nome < b.nome) ? -1 : 1);
+        this.coordenasPageData = itens
+        this.listarPageObj()
       },
       error: (err: any) => {
         this.messages = [
@@ -135,6 +138,34 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.unsubscribe$.unsubscribe();
     this.unsubscribe$Coord.unsubscribe();
+  }
+
+  
+  onPageChange(event: PaginatorState) {
+    if (event.first !== undefined && event.rows !== undefined) {
+      this.firstProfsr = event.first;
+      this.rowsProfsr = event.rows;
+      this.listarPage()
+    }
+  }
+
+  listarPage() {
+    this.professorService.listar(this.firstProfsr, this.rowsProfsr)
+    .subscribe((itens:any) => {
+        this.professoresPageData = itens;
+        this.professoresData = this.professoresPageData.content;
+        this.professoresData.sort((a:any, b:any) => (a.nome < b.nome ) ? -1 : 1);
+      });
+  }
+  
+  listarPageObj() {
+    let sizeAll = this.coordenasPageData.totalElements
+    this.coordaService.listar(0,sizeAll).subscribe(codr => this.coordenadoriasArray = codr.content)
+    this.coordenadoriasArray.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1)
+  }
+
+  pageFilter() {
+    this.professorService.listar(0, this.sizeProfsr).subscribe(prfs => this.professoresFilterProf = prfs.content)
   }
 
   showInfoDialog(value: Professor) {

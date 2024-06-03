@@ -5,13 +5,15 @@ import { FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFo
 import { Router, RouterModule } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
 import { LocalService } from '../../service/local.service';
-import { Local, LocalEquipMultiSelect, LocalEquipamento } from '../../models/local.models';
+import { Local, LocalEquipMultiSelect, LocalEquipamento } from '../../models/postgres/local.models';
 import { EquipamentoService } from '../../service/equipamento.service';
-import { Equipamento } from '../../models/equipamento.models';
+import { Equipamento } from '../../models/postgres/equipamento.models';
 import { FiltrarPesquisa } from '../../models/share/filtrar-pesquisa.models';
 import { ConfirmationService, Message, MessageService } from 'primeng/api';
 import { PrimeNgImportsModule } from '../../shared/prime-ng-imports/prime-ng-imports.module';
 import { MultiSelect } from 'primeng/multiselect';
+import { PaginatorState } from 'primeng/paginator';
+import { Page } from '../../models/share/page.models';
 
 @Component({
   selector: 'app-locais-r',
@@ -67,6 +69,13 @@ export class LocaisRComponent implements OnInit, OnDestroy {
   
   filterOptions: FiltrarPesquisa[] = [];
   selectedFilter!: FiltrarPesquisa;
+  
+  firstLocs: number = 0;
+  rowsLocs: number = 10;
+  sizeLocs: number = 0;
+
+  locaisPageData!: Page<Local>;
+  equipamentosPageData!: Page<Equipamento>;
 
   constructor(
     private locService: LocalService,
@@ -89,12 +98,15 @@ export class LocaisRComponent implements OnInit, OnDestroy {
       {nome: 'Capacidade', id: 1}
     ];
 
-    this.unsubscribe$ = this.locService.listar()
+    this.unsubscribe$ = this.locService.listar(0,10)
     .subscribe({
       next: (itens:any) => {
-        const data = itens;
-        this.locaisData = data.sort((a:any, b:any) => (a.nome < b.nome) ? -1 : 1);
-        this.locaisFilter = this.locaisData;
+        this.locaisPageData = itens;
+        this.sizeLocs = this.locaisPageData.totalElements;
+        
+        this.locaisData = this.locaisPageData.content;
+        this.locaisData.sort((a:any, b:any) => (a.nome < b.nome ) ? -1 : 1);
+        this.pageFilter()
       },
       error: (err: any) => {
         this.messages = [
@@ -103,11 +115,11 @@ export class LocaisRComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.unsubscribe$EQ = this.equipService.listar()
+    this.unsubscribe$EQ = this.equipService.listar(0,10)
     .subscribe({
       next: (itens:any) => {
-        const data = itens;
-        this.equipamentosData = data.sort((a:any, b:any) => (a.nome < b.nome) ? -1 : 1);
+        this.equipamentosPageData = itens
+        this.listarPageObj()
       },
       error: (err: any) => {
         this.messages = [
@@ -120,6 +132,33 @@ export class LocaisRComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.unsubscribe$.unsubscribe();
     this.unsubscribe$EQ.unsubscribe();
+  }
+  
+  onPageChange(event: PaginatorState) {
+    if (event.first !== undefined && event.rows !== undefined) {
+      this.firstLocs = event.first;
+      this.rowsLocs = event.rows;
+      this.listarPage()
+    }
+  }
+
+  listarPage() {
+    this.locService.listar(this.firstLocs, this.rowsLocs)
+    .subscribe((itens:any) => {
+        this.locaisPageData = itens;
+        this.locaisData = this.locaisPageData.content;
+        this.locaisData.sort((a:any, b:any) => (a.nome < b.nome ) ? -1 : 1);
+      });
+  }
+  
+  listarPageObj() {
+    let sizeAll = this.equipamentosPageData.totalElements
+    this.equipService.listar(0,sizeAll).subscribe(eqps => this.equipamentosData = eqps.content)
+    this.equipamentosData.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1)
+  }
+
+  pageFilter() {
+    this.locService.listar(0, this.sizeLocs).subscribe(locs => this.locaisFilter = locs.content)
   }
 
   getEquipamento(): FormArray {

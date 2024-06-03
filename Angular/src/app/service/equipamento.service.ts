@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Equipamento } from '../models/equipamento.models';
-import { HttpClient } from '@angular/common/http';
+import { Equipamento } from '../models/postgres/equipamento.models';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { Page } from '../models/share/page.models';
     
 @Injectable()
 export class EquipamentoService {
@@ -9,8 +10,16 @@ export class EquipamentoService {
 
   constructor(private http: HttpClient) { }
 
-  listar(): Observable<Equipamento[]> {
-    return this.http.get<Equipamento[]>(`${this.API}`);
+  // listar(): Observable<Equipamento[]> {
+  //   return this.http.get<Equipamento[]>(`${this.API}`);
+  // }
+
+  listar(page: number, size: number): Observable<Page<Equipamento>> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+
+    return this.http.get<Page<Equipamento>>(`${this.API}`, { params });
   }
 
   buscarPorId(id: number): Observable<Equipamento> {

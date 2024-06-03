@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Horario } from '../models/horario.models';
+import { Horario } from '../models/postgres/horario.models';
+import { Page } from '../models/share/page.models';
 
 @Injectable()
 export class HorarioService {
@@ -9,8 +10,16 @@ export class HorarioService {
 
   constructor(private http: HttpClient) { }
 
-  listar(): Observable<Horario[]> {
-    return this.http.get<Horario[]>(`${this.API}`);
+  // listar(): Observable<Horario[]> {
+  //   return this.http.get<Horario[]>(`${this.API}`);
+  // }
+
+  listar(page: number, size: number): Observable<Page<Horario>> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+
+    return this.http.get<Page<Horario>>(`${this.API}`, { params });
   }
 
   buscarPorId(id: number): Observable<Horario> {

@@ -6,10 +6,12 @@ import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { ConfirmationService, Message, MessageService } from 'primeng/api';
 import { AlunoService } from '../../../service/aluno.service';
-import { Aluno } from '../../../models/aluno.models';
+import { Aluno } from '../../../models/postgres/aluno.models';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 import { FiltrarPesquisa } from '../../../models/share/filtrar-pesquisa.models';
 import { PrimeNgImportsModule } from '../../../shared/prime-ng-imports/prime-ng-imports.module';
+import { Page, PageEvent } from '../../../models/share/page.models';
+import { PaginatorState } from 'primeng/paginator';
 
 @Component({
   selector: 'app-alunos-r',
@@ -40,7 +42,7 @@ export class AlunosRComponent implements OnInit, OnDestroy {
   alunosFilter: Aluno[] = [];
   alunosCadast: Aluno[] = [];
   alunosEdit!: Aluno;
-
+  
   unsubscribe$!: Subscription;
   form: FormGroup;
 
@@ -57,6 +59,12 @@ export class AlunosRComponent implements OnInit, OnDestroy {
   
   filterOptions: FiltrarPesquisa[] = [];
   selectedFilter!: FiltrarPesquisa;
+
+  firstAln: number = 0;
+  rowsAln: number = 10;
+  sizeAln: number = 0;
+
+  alunosPageData!: Page<Aluno>;
 
   constructor(
     private alunService: AlunoService,
@@ -78,12 +86,15 @@ export class AlunosRComponent implements OnInit, OnDestroy {
       {nome: 'Matrícula', id: 1}
     ];
 
-    this.unsubscribe$ = this.alunService.listar()
+    this.unsubscribe$ = this.alunService.listar(0,10)
     .subscribe({
       next: (itens:any) => {
-        const data = itens;
-        this.alunosData = data.sort((a:any, b:any) => (a.nome < b.nome ) ? -1 : 1);
-        this.alunosFilter = this.alunosData;
+        this.alunosPageData = itens;
+        this.sizeAln = this.alunosPageData.totalElements;
+        
+        this.alunosData = this.alunosPageData.content;
+        this.alunosData.sort((a:any, b:any) => (a.nome < b.nome ) ? -1 : 1);
+        this.pageFilter()
       },
       error: (err: any) => {
         this.messages = [
@@ -95,6 +106,27 @@ export class AlunosRComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.unsubscribe$.unsubscribe();
+  }
+  
+  onPageChange(event: PaginatorState) {
+    if (event.first !== undefined && event.rows !== undefined) {
+      this.firstAln = event.first;
+      this.rowsAln = event.rows;
+      this.listarPage()
+    }
+  }
+
+  listarPage() {
+    this.alunService.listar(this.firstAln, this.rowsAln)
+    .subscribe((itens:any) => {
+        this.alunosPageData = itens;
+        this.alunosData = this.alunosPageData.content;
+        this.alunosData.sort((a:any, b:any) => (a.nome < b.nome ) ? -1 : 1);
+      });
+  }
+
+  pageFilter() {
+    this.alunService.listar(0, this.sizeAln).subscribe(alno => this.alunosFilter = alno.content)
   }
 
   showInfoDialog(value: Aluno) {

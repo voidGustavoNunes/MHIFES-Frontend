@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Coordenadoria } from '../models/coordenadoria.models';
+import { Coordenadoria } from '../models/postgres/coordenadoria.models';
+import { Page } from '../models/share/page.models';
 
 @Injectable()
 export class CoordenadoriaService {
@@ -9,8 +10,16 @@ export class CoordenadoriaService {
 
   constructor(private http: HttpClient) { }
 
-  listar(): Observable<Coordenadoria[]> {
-    return this.http.get<Coordenadoria[]>(`${this.API}`);
+  // listar(): Observable<Coordenadoria[]> {
+  //   return this.http.get<Coordenadoria[]>(`${this.API}`);
+  // }
+
+  listar(page: number, size: number): Observable<Page<Coordenadoria>> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+
+    return this.http.get<Page<Coordenadoria>>(`${this.API}`, { params });
   }
 
   buscarPorId(id: number): Observable<Coordenadoria> {

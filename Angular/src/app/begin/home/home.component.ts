@@ -2,14 +2,15 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule, Time } from '@angular/common';
 import { FiltrarPesquisa } from '../../models/share/filtrar-pesquisa.models';
-import { Alocacao } from '../../models/alocacao.models';
+import { Alocacao } from '../../models/postgres/alocacao.models';
 import { ConfirmationService, Message, MessageService } from 'primeng/api';
 import { Subscription } from 'rxjs';
-import { DiaSemana, Horario, HorarioTable } from '../../models/horario.models';
+import { DiaSemana, Horario, HorarioTable } from '../../models/postgres/horario.models';
 import { HttpClientModule } from '@angular/common/http';
 import { AlocacaoService } from '../../service/alocacao.service';
 import { UserAuthService } from '../../_services/user-auth.service';
 import { PrimeNgImportsModule } from '../../shared/prime-ng-imports/prime-ng-imports.module';
+import { Page } from '../../models/share/page.models';
 
 @Component({
   selector: 'app-home',
@@ -38,6 +39,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   
   unsubscribe$!: Subscription;
   alocacoesArray: Alocacao[] = [];
+  alocacoesPageData!: Page<Alocacao>;
 
   alocacoesAgrupadas: Alocacao[][] = [];
   alocacoesAgrupadasSemFinalSemana: Alocacao[][] = [];
@@ -84,7 +86,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     ];
 
     this.selectedFilter = this.filterOptions[0];
-    this.unsubscribe$ = this.alocService.listar()
+    this.unsubscribe$ = this.alocService.listar(0,10)
     .subscribe({
       next: (itens:any) => {
         const data = itens;
@@ -97,10 +99,10 @@ export class HomeComponent implements OnInit, OnDestroy {
           const dateB = new Date(b.dataAula);
           return dateB.getTime() - dateA.getTime();
         });
-        this.alocacoesArray = data;
+        this.alocacoesPageData = data;
 
         const currentYear = new Date().getFullYear();
-        this.alocacoesArray = this.alocacoesArray.filter((alocacao) => {
+        this.alocacoesArray = this.alocacoesPageData.content.filter((alocacao) => {
           const allocacaoDate = new Date(this.formatarDtStrDt(alocacao.dataAula));
           return allocacaoDate.getFullYear() === currentYear;
         });

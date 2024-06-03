@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Disciplina } from '../../models/disciplina.models';
+import { Disciplina } from '../../models/postgres/disciplina.models';
 import { Subscription } from 'rxjs';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DisciplinaService } from '../../service/disciplina.service';
@@ -9,6 +9,8 @@ import { CommonModule } from '@angular/common';
 import { ConfirmationService, Message, MessageService } from 'primeng/api';
 import { FiltrarPesquisa } from '../../models/share/filtrar-pesquisa.models';
 import { PrimeNgImportsModule } from '../../shared/prime-ng-imports/prime-ng-imports.module';
+import { Page } from '../../models/share/page.models';
+import { PaginatorState } from 'primeng/paginator';
 
 @Component({
   selector: 'app-disciplinas-r',
@@ -50,6 +52,12 @@ export class DisciplinasRComponent implements OnInit, OnDestroy {
   
   filterOptions: FiltrarPesquisa[] = [];
   selectedFilter!: FiltrarPesquisa;
+  
+  firstDiscp: number = 0;
+  rowsDiscp: number = 10;
+  sizeDiscp: number = 0;
+
+  disciplinasPageData!: Page<Disciplina>;
 
   constructor(
     private disciService: DisciplinaService,
@@ -70,12 +78,15 @@ export class DisciplinasRComponent implements OnInit, OnDestroy {
       {nome: 'Sigla', id: 1}
     ];
 
-    this.unsubscribe$ = this.disciService.listar()
+    this.unsubscribe$ = this.disciService.listar(0,10)
     .subscribe({
       next: (itens:any) => {
-        const data = itens;
-        this.disciplinasData = data.sort((a:any, b:any) => (a.nome < b.nome) ? -1 : 1);
-        this.dicisplinasFilter = this.disciplinasData;
+        this.disciplinasPageData = itens;
+        this.sizeDiscp = this.disciplinasPageData.totalElements;
+        
+        this.disciplinasData = this.disciplinasPageData.content;
+        this.disciplinasData.sort((a:any, b:any) => (a.nome < b.nome ) ? -1 : 1);
+        this.pageFilter()
       },
       error: (err: any) => {
         this.messages = [
@@ -87,6 +98,27 @@ export class DisciplinasRComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.unsubscribe$.unsubscribe();
+  }
+  
+  onPageChange(event: PaginatorState) {
+    if (event.first !== undefined && event.rows !== undefined) {
+      this.firstDiscp = event.first;
+      this.rowsDiscp = event.rows;
+      this.listarPage()
+    }
+  }
+
+  listarPage() {
+    this.disciService.listar(this.firstDiscp, this.rowsDiscp)
+    .subscribe((itens:any) => {
+        this.disciplinasPageData = itens;
+        this.disciplinasData = this.disciplinasPageData.content;
+        this.disciplinasData.sort((a:any, b:any) => (a.nome < b.nome ) ? -1 : 1);
+      });
+  }
+
+  pageFilter() {
+    this.disciService.listar(0, this.sizeDiscp).subscribe(discp => this.dicisplinasFilter = discp.content)
   }
 
   showEditDialog(value: Disciplina) {

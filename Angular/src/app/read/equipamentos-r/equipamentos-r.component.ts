@@ -1,13 +1,15 @@
 import { Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Subscription, interval } from 'rxjs';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Equipamento } from '../../models/equipamento.models';
+import { Equipamento } from '../../models/postgres/equipamento.models';
 import { EquipamentoService } from '../../service/equipamento.service';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { ConfirmationService, Message, MessageService } from 'primeng/api';
 import { PrimeNgImportsModule } from '../../shared/prime-ng-imports/prime-ng-imports.module';
+import { PaginatorState } from 'primeng/paginator';
+import { Page } from '../../models/share/page.models';
 
 @Component({
   selector: 'app-equipamentos-r',
@@ -47,6 +49,12 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
   
   messages!: Message[];
   mss: boolean = false;
+  
+  firstEqp: number = 0;
+  rowsEqp: number = 10;
+  sizeEqp: number = 0;
+
+  equipamentosPageData!: Page<Equipamento>;
 
   constructor(
     private equipService: EquipamentoService,
@@ -61,12 +69,15 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.unsubscribe$ = this.equipService.listar()
+    this.unsubscribe$ = this.equipService.listar(0,10)
     .subscribe({
       next: (itens:any) => {
-        const data = itens;
-        this.equipamentosData = data.sort((a:any, b:any) => (a.nome < b.nome) ? -1 : 1);
-        this.equipamentosFilter = this.equipamentosData;
+        this.equipamentosPageData = itens;
+        this.sizeEqp = this.equipamentosPageData.totalElements;
+        
+        this.equipamentosData = this.equipamentosPageData.content;
+        this.equipamentosData.sort((a:any, b:any) => (a.nome < b.nome ) ? -1 : 1);
+        this.pageFilter()
       },
       error: (err: any) => {
         this.messages = [
@@ -78,6 +89,27 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.unsubscribe$.unsubscribe();
+  }
+  
+  onPageChange(event: PaginatorState) {
+    if (event.first !== undefined && event.rows !== undefined) {
+      this.firstEqp = event.first;
+      this.rowsEqp = event.rows;
+      this.listarPage()
+    }
+  }
+
+  listarPage() {
+    this.equipService.listar(this.firstEqp, this.rowsEqp)
+    .subscribe((itens:any) => {
+        this.equipamentosPageData = itens;
+        this.equipamentosData = this.equipamentosPageData.content;
+        this.equipamentosData.sort((a:any, b:any) => (a.nome < b.nome ) ? -1 : 1);
+      });
+  }
+
+  pageFilter() {
+    this.equipService.listar(0, this.sizeEqp).subscribe(eqpm => this.equipamentosFilter = eqpm.content)
   }
 
   showEditDialog(value: Equipamento) {

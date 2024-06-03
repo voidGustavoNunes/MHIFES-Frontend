@@ -79,11 +79,6 @@
             [value]="professoresData"
             styleClass="p-datatable-striped"
             [tableStyle]="{'min-width': '50rem'}"
-            [paginator]="true"
-            [rows]="10"
-            [showCurrentPageReport]="true"
-            currentPageReportTemplate="Mostrando do {first} ao {last} de {totalRecords} registros"
-            [rowsPerPageOptions]="[10, 20, 40]"
         >
             <!-- <ng-template pTemplate="caption">
                 <h3>Professores</h3>
@@ -129,6 +124,15 @@
                 </tr>
             </ng-template>
         </p-table>
+        
+        <p-paginator
+        (onPageChange)="onPageChange($event)"
+        [first]="firstProfsr"
+        [rows]="rowsProfsr"
+        [totalRecords]="sizeProfsr"
+        [rowsPerPageOptions]="[10, 20, 40, 60]"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Mostrando do {first} ao {last} de {totalRecords} registros" />
     </div>
     
     <p-scrollTop></p-scrollTop>

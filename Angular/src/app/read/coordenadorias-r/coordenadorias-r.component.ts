@@ -6,11 +6,13 @@ import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { ConfirmationService, Message, MessageService } from 'primeng/api';
 import { CoordenadoriaService } from '../../service/coordenadoria.service';
-import { Coordenadoria } from '../../models/coordenadoria.models';
+import { Coordenadoria } from '../../models/postgres/coordenadoria.models';
 import { ProfessorService } from '../../service/professor.service';
-import { Professor } from '../../models/professor.models';
+import { Professor } from '../../models/postgres/professor.models';
 import { PrimeNgImportsModule } from '../../shared/prime-ng-imports/prime-ng-imports.module';
 import { Dropdown } from 'primeng/dropdown';
+import { Page } from '../../models/share/page.models';
+import { PaginatorState } from 'primeng/paginator';
 
 @Component({
   selector: 'app-coordenadorias-r',
@@ -55,6 +57,13 @@ export class CoordenadoriasRComponent implements OnInit, OnDestroy {
 
   coordenadoresArray: Professor[] = [];
 
+  firstCoor: number = 0;
+  rowsCoor: number = 10;
+  sizeCoor: number = 0;
+
+  coordenadoriasPageData!: Page<Coordenadoria>;
+  professoresPageData!: Page<Professor>;
+
   constructor(
     private coordaService: CoordenadoriaService,
     private router: Router,
@@ -70,12 +79,15 @@ export class CoordenadoriasRComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.unsubscribe$ = this.coordaService.listar()
+    this.unsubscribe$ = this.coordaService.listar(0,10)
     .subscribe({
       next: (itens:any) => {
-        const data = itens;
-        this.coordenadoriasData = data.sort((a:any, b:any) => (a.nome < b.nome) ? -1 : 1);
-        this.coordenadoriasFilter = this.coordenadoriasData;
+        this.coordenadoriasPageData = itens
+        this.sizeCoor = this.coordenadoriasPageData.totalElements;
+        
+        this.coordenadoriasData = this.coordenadoriasPageData.content;
+        this.coordenadoriasData.sort((a:any, b:any) => (a.nome < b.nome ) ? -1 : 1);
+        this.pageFilter()
       },
       error: (err: any) => {
         this.messages = [
@@ -84,16 +96,11 @@ export class CoordenadoriasRComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.unsubscribe$Prof = this.professorService.listar()
+    this.unsubscribe$Prof = this.professorService.listar(0,10)
     .subscribe({
       next: (itens:any) => {
-        const data = itens.sort((a:any, b:any) => (a.nome < b.nome) ? -1 : 1);
-
-        data.forEach((prf: Professor) => {
-          if(prf.ehCoordenador) {
-            this.coordenadoresArray.push(prf);
-          }
-        })
+        this.professoresPageData = itens
+        this.listarPageObj()
       },
       error: (err: any) => {
         this.messages = [
@@ -106,6 +113,35 @@ export class CoordenadoriasRComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.unsubscribe$.unsubscribe();
     this.unsubscribe$Prof.unsubscribe();
+  }
+  
+  onPageChange(event: PaginatorState) {
+    if (event.first !== undefined && event.rows !== undefined) {
+      this.firstCoor = event.first;
+      this.rowsCoor = event.rows;
+      this.listarPage()
+    }
+  }
+
+  listarPage() {
+    this.coordaService.listar(this.firstCoor, this.rowsCoor).subscribe(itens => this.coordenadoriasData = itens.content);
+    this.coordenadoriasData.sort((a:any, b:any) => (a.nome < b.nome ) ? -1 : 1);
+  }
+  
+  listarPageObj() {
+    let sizeAll = this.professoresPageData.totalElements
+    let profesArr!: Professor[]
+    this.professorService.listar(0,sizeAll).subscribe(prfs => profesArr = prfs.content)
+    profesArr.forEach((prf: Professor) => {
+      if(prf.ehCoordenador) {
+        this.coordenadoresArray.push(prf);
+      }
+    })
+    this.coordenadoresArray.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1)
+  }
+
+  pageFilter() {
+    this.coordaService.listar(0, this.sizeCoor).subscribe(coord => this.coordenadoriasFilter = coord.content)
   }
 
   showEditDialog(value: Coordenadoria) {

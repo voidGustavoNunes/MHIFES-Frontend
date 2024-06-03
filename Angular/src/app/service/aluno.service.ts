@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Aluno} from '../models/aluno.models';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Aluno} from '../models/postgres/aluno.models';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable, map } from 'rxjs';
+import { Page } from '../models/share/page.models';
 
 @Injectable()
 export class AlunoService {
@@ -9,8 +10,16 @@ export class AlunoService {
 
   constructor(private http: HttpClient) { }
 
-  listar(): Observable<Aluno[]> {
-    return this.http.get<Aluno[]>(`${this.API}`);
+  // listar(): Observable<Aluno[]> {
+  //   return this.http.get<Aluno[]>(`${this.API}`);
+  // }
+
+  listar(page: number, size: number): Observable<Page<Aluno>> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+
+    return this.http.get<Page<Aluno>>(`${this.API}`, { params });
   }
 
   buscarPorId(id: number): Observable<Aluno> {

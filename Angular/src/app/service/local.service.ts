@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Local, LocalDTO, LocalEquipamento } from '../models/local.models';
+import { Local, LocalDTO, LocalEquipamento } from '../models/postgres/local.models';
+import { Page } from '../models/share/page.models';
 
 @Injectable()
 export class LocalService {
@@ -9,8 +10,16 @@ export class LocalService {
 
   constructor(private http: HttpClient) { }
 
-  listar(): Observable<Local[]> {
-    return this.http.get<Local[]>(`${this.API}`);
+  // listar(): Observable<Local[]> {
+  //   return this.http.get<Local[]>(`${this.API}`);
+  // }
+
+  listar(page: number, size: number): Observable<Page<Local>> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+
+    return this.http.get<Page<Local>>(`${this.API}`, { params });
   }
 
   buscarPorId(id: number): Observable<Local> {

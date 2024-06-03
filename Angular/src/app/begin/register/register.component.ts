@@ -11,7 +11,7 @@ import { Router } from '@angular/router';
 import { ConfirmationService, Message, MessageService } from 'primeng/api';
 import { MessagesModule } from 'primeng/messages';
 import { HttpClientModule } from '@angular/common/http';
-import { RegisterDTO, UserRole } from '../../models/usuario';
+import { RegisterDTO, UserRole } from '../../models/postgres/usuario';
 import { UsuarioService } from '../../_services/usuario.service';
 import { DropdownModule } from 'primeng/dropdown';
 

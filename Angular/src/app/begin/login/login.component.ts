@@ -11,7 +11,7 @@ import { MessagesModule } from 'primeng/messages';
 import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { ConfirmationService, Message, MessageService } from 'primeng/api';
-import { AutheticationDTO, LoginResponseDTO } from '../../models/usuario';
+import { AutheticationDTO, LoginResponseDTO } from '../../models/postgres/usuario';
 import { UsuarioService } from '../../_services/usuario.service';
 import { UserAuthService } from '../../_services/user-auth.service';
 
