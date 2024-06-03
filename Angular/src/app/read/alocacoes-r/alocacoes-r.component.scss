@@ -26,13 +26,26 @@
             letter-spacing: .1rem;
             font-weight: 600;
             text-transform: uppercase;
-            border: .1rem solid #00208F;
+            border: none;
             box-shadow: 0 .2rem .2rem rgba(0, 0, 0, 0.26);
         }
-        .botaoC:active{
+        .botaoC:focus{
             background-color: white;
             color: #00208F;
-            box-shadow: 0 .2rem .2rem rgba(0, 0, 0, 0.4);
+        }
+        .botaoM{
+            color: white;
+            background-color: #68696d;
+            border: none;
+            text-decoration: none;
+            letter-spacing: .1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            box-shadow: 0 .2rem .2rem rgba(0, 0, 0, 0.26);
+        }
+        .botaoM:focus{
+            background-color: white;
+            color: #68696d;
         }
 
         .pesq{
@@ -130,6 +143,7 @@
             .botaoL:focus{
                 border: .02rem solid #3b268b;
             }
+
         }
         .tbBody:hover{
             background-color: #E5E7EB;
@@ -238,6 +252,14 @@
         }
         .botaoCancela:focus{
             border: .02rem solid #89041E;
+        }
+    
+        .botaoM{
+            margin-right: .5rem;
+            @include themeButton(white, #68696d);
+        }
+        .botaoM:focus{
+            border: .02rem solid #68696d;
         }
     }
     .botaoL{

@@ -2,7 +2,10 @@
   <h1>Alocações</h1>
 
   <div class="opcao">
-    <a (click)="showDialog()" class="p-button botaoC">Cadastrar +</a>
+    <div>
+      <a (click)="showDialog()" class="p-button botaoC">Cadastrar +</a>
+      <a (click)="showMigraDialog()" class="p-button botaoM">Migrar +</a>
+    </div>
 
     <div class="pesq">
       <p-overlayPanel #op>
@@ -497,6 +500,56 @@
 
     <div class="divBotao replica">
       <button type="button" class="botaoL" (click)="visibleLog = false" pButton>Ok</button>
+    </div>
+  </p-dialog>
+</div>
+
+<div class="card flex justify-content-center">
+  <p-dialog header="Migrar Alocações" [(visible)]="visibleMigra" [modal]="true" [breakpoints]="{ '960px': '75vw' }"
+    [style]="{width: '50vw', 'z-index': '1102'}">
+    <div id="meuFormInfo">
+      <div class="divInput">
+        <p-floatLabel>
+          <p-multiSelect 
+              appendTo="body"
+              inputId="float-label" 
+              [options]="dataMysqlAlocacoes" 
+              [(ngModel)]="mysqlAlocacoes" 
+              optionLabel="disciplinaMySQL.sigla"
+              display="chip" 
+              [showClear]="true" >
+              <ng-template let-value pTemplate="selectedItems">
+                <div class="inline-flex align-items-center gap-2 px-1" *ngFor="let option of value">
+                    <div>{{ option.disciplinaMySQL.sigla }} - {{ option.ano }}/{{ option.semestre }}</div>
+                </div>
+                <div *ngIf="!value || value.length === 0">Select Countries</div>
+            </ng-template>
+            <ng-template let-sqlAloc pTemplate="item">
+                <div class="flex align-items-center gap-2">
+                    <div>{{ sqlAloc.disciplinaMySQL.sigla }} - {{ sqlAloc.ano }}/{{ sqlAloc.semestre }}</div>
+                </div>
+            </ng-template>
+            <ng-template let-sqlAloc pTemplate="footer">
+                <div class="py-2 px-3">
+                    <b>
+                        {{ sqlAloc ? sqlAloc.length : 0 }}
+                    </b> 
+                    itens{{ (sqlAloc ? sqlAloc.length : 0) > 1 ? 's' : '' }} selecionados.
+                </div>
+            </ng-template>
+          </p-multiSelect>
+          <label for="float-label">Selecione as alocações para migração</label>
+      </p-floatLabel>
+      </div>
+    </div>
+
+    <div class="cardLog" *ngIf="dataMysqlAlocacoes.length <= 0">
+      <h3>Não há alocações registradas.</h3>
+    </div>
+
+    <div class="divBotao">
+      <!-- <button type="button" class="botaoM" (click)="saveMigrationMysql()" pButton>Enviar</button> -->
+      <button type="button" (click)="saveMigrationMysql()" pButton>Enviar</button>
     </div>
   </p-dialog>
 </div>
