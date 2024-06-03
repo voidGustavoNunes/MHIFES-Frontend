@@ -43,8 +43,6 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
   
   unsubscribe$!: Subscription;
   alocacoesArray: Alocacao[] = [];
-
-  alocacoesPageData!: Page<Alocacao>;
   
   alunoComHorario!: Aluno;
   professorComHorario!: Professor;
@@ -89,6 +87,9 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
   
   ehAluno: boolean = false;
   ehProfessor: boolean = false;
+
+  alocacoesPageData!: Page<Alocacao>;
+  sizeAloc: number = 0;
 
   constructor(
     private router: Router,
@@ -199,26 +200,9 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
     this.alocService.listar(0,10)
     .subscribe({
       next: (itens:any) => {
-        const data = itens;
-        this.alocacoesPageData = data;
-
-        this.alocacoesArray = this.alocacoesPageData.content.filter((alocacao) => {
-          const hoje = new Date();
-          const periodo = alocacao.periodoDisciplina.periodo;
-          if(periodo) {
-            if(hoje.getTime() >= this.formatarDtStrDtScan(periodo.dataInicio).getTime() && hoje.getTime() <= this.formatarDtStrDtScan(periodo.dataFim).getTime()) {
-              return true;
-            } else {
-              return false;
-            }
-          } else {
-            return false;
-          }
-        })
-
-        this.alocacoesArray = this.alocacoesArray.filter(alocacao => alocacao.status === 'ATIVO');
-
-        this.mostrarHorarioUserScan()
+        this.alocacoesPageData = itens;
+        this.sizeAloc = this.alocacoesPageData.totalElements
+        this.listarPage()
       },
       error: (err: any) => {
         this.messages = [
@@ -226,6 +210,37 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
         ];
       }
     });
+  }
+
+  listarPage() {
+    let alocsAllData: Alocacao[] = [];
+    if(this.sizeAloc > 0) {
+      this.alocService.listarAtivos(0, this.sizeAloc).subscribe(alocs => alocsAllData = alocs.content)
+    } else {
+      this.alocService.listar(0, 10).subscribe(alocs => this.alocacoesPageData = alocs)
+      this.sizeAloc = this.alocacoesPageData.totalElements
+      if(this.sizeAloc > 0) {
+        this.alocService.listar(0, this.sizeAloc).subscribe(alocs => alocsAllData = alocs.content)
+      }
+    }
+
+    if(alocsAllData.length > 0) {
+      this.alocacoesArray = alocsAllData.filter((alocacao) => {
+        const hoje = new Date();
+        const periodo = alocacao.periodoDisciplina.periodo;
+        if(periodo) {
+          if(hoje.getTime() >= this.formatarDtStrDtScan(periodo.dataInicio).getTime() && hoje.getTime() <= this.formatarDtStrDtScan(periodo.dataFim).getTime()) {
+            return true;
+          } else {
+            return false;
+          }
+        } else {
+          return false;
+        }
+      })
+
+      this.mostrarHorarioUserScan()
+    }
   }
   
   formatarTmStrTmScan(tempo: any) {

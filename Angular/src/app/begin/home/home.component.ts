@@ -39,7 +39,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   
   unsubscribe$!: Subscription;
   alocacoesArray: Alocacao[] = [];
-  alocacoesPageData!: Page<Alocacao>;
 
   alocacoesAgrupadas: Alocacao[][] = [];
   alocacoesAgrupadasSemFinalSemana: Alocacao[][] = [];
@@ -72,6 +71,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   ];
 
   mssVazio = ['Sem aulas agendadas para este período.', '', '', '', '', '', ''];
+
+  alocacoesPageData!: Page<Alocacao>;
+  sizeAlocs: number = 0;
   
   constructor(
     private alocService: AlocacaoService,
@@ -84,32 +86,14 @@ export class HomeComponent implements OnInit, OnDestroy {
       {nome: 'Aula mais próxima', id: 0},
       {nome: 'Horário do Período', id: 1}
     ];
-
     this.selectedFilter = this.filterOptions[0];
-    this.unsubscribe$ = this.alocService.listar(0,10)
+
+    this.unsubscribe$ = this.alocService.listarAtivos(0,10)
     .subscribe({
       next: (itens:any) => {
-        const data = itens;
-        
-        data.sort((a: Alocacao, b: Alocacao) => {
-          if ((a.dataAula === undefined || b.dataAula === undefined) || (a.dataAula === null || b.dataAula === null)) {
-            return 0;
-          }
-          const dateA = new Date(a.dataAula);
-          const dateB = new Date(b.dataAula);
-          return dateB.getTime() - dateA.getTime();
-        });
-        this.alocacoesPageData = data;
-
-        const currentYear = new Date().getFullYear();
-        this.alocacoesArray = this.alocacoesPageData.content.filter((alocacao) => {
-          const allocacaoDate = new Date(this.formatarDtStrDt(alocacao.dataAula));
-          return allocacaoDate.getFullYear() === currentYear;
-        });
-
-        this.alocacoesArray = this.alocacoesArray.filter(alocacao => alocacao.status == 'ATIVO');
-
-        this.filtrarAlocacoesPorDiaSemana();
+        this.alocacoesPageData = itens;
+        this.sizeAlocs = this.alocacoesPageData.totalElements
+        this.listarPage()
       },
       error: (err: any) => {
         this.messages = [
@@ -122,6 +106,62 @@ export class HomeComponent implements OnInit, OnDestroy {
   
   ngOnDestroy() {
     this.unsubscribe$.unsubscribe();
+  }
+
+  listarPage() {
+    if(this.sizeAlocs > 0) {
+      this.alocService.listarAtivos(0, this.sizeAlocs).subscribe(alocs => {
+        alocs.content.forEach((alc: Alocacao) => {
+          this.alocacoesArray.push(alc);
+        })
+        if(this.alocacoesArray.length > 0) {
+          this.alocacoesArray.sort((a: Alocacao, b: Alocacao) => {
+            if ((a.dataAula === undefined || b.dataAula === undefined) || (a.dataAula === null || b.dataAula === null)) {
+              return 0;
+            }
+            const dateA = new Date(a.dataAula);
+            const dateB = new Date(b.dataAula);
+            return dateB.getTime() - dateA.getTime();
+          });
+          
+          const currentYear = new Date().getFullYear();
+          this.alocacoesArray = this.alocacoesArray.filter((alocacao) => {
+            const allocacaoDate = new Date(this.formatarDtStrDt(alocacao.dataAula));
+            return allocacaoDate.getFullYear() === currentYear;
+          });
+          
+          this.filtrarAlocacoesPorDiaSemana();
+        }
+      });
+    } else {
+      this.alocService.listar(0, 10).subscribe(alocs => this.alocacoesPageData = alocs)
+      this.sizeAlocs = this.alocacoesPageData.totalElements
+      if(this.sizeAlocs > 0) {
+        this.alocService.listar(0, this.sizeAlocs).subscribe(alocs => {
+          alocs.content.forEach((alc: Alocacao) => {
+            this.alocacoesArray.push(alc);
+          })
+          if(this.alocacoesArray.length > 0) {
+            this.alocacoesArray.sort((a: Alocacao, b: Alocacao) => {
+              if ((a.dataAula === undefined || b.dataAula === undefined) || (a.dataAula === null || b.dataAula === null)) {
+                return 0;
+              }
+              const dateA = new Date(a.dataAula);
+              const dateB = new Date(b.dataAula);
+              return dateB.getTime() - dateA.getTime();
+            });
+            
+            const currentYear = new Date().getFullYear();
+            this.alocacoesArray = this.alocacoesArray.filter((alocacao) => {
+              const allocacaoDate = new Date(this.formatarDtStrDt(alocacao.dataAula));
+              return allocacaoDate.getFullYear() === currentYear;
+            });
+            
+            this.filtrarAlocacoesPorDiaSemana();
+          }
+        });
+      }
+    }
   }
 
   qualPapel() {

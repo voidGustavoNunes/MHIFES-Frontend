@@ -51,6 +51,7 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
   mss: boolean = false;
   
   firstEqp: number = 0;
+  pageEqp: number = 0;
   rowsEqp: number = 10;
   sizeEqp: number = 0;
 
@@ -92,15 +93,16 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
   }
   
   onPageChange(event: PaginatorState) {
-    if (event.first !== undefined && event.rows !== undefined) {
+    if (event.first !== undefined && event.rows !== undefined && event.page !== undefined) {
       this.firstEqp = event.first;
       this.rowsEqp = event.rows;
+      this.pageEqp = event.page;
       this.listarPage()
     }
   }
 
   listarPage() {
-    this.equipService.listar(this.firstEqp, this.rowsEqp)
+    this.equipService.listar(this.pageEqp, this.rowsEqp)
     .subscribe((itens:any) => {
         this.equipamentosPageData = itens;
         this.equipamentosData = this.equipamentosPageData.content;
@@ -109,7 +111,9 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
   }
 
   pageFilter() {
-    this.equipService.listar(0, this.sizeEqp).subscribe(eqpm => this.equipamentosFilter = eqpm.content)
+    if(this.sizeEqp > 0) {
+      this.equipService.listar(0, this.sizeEqp).subscribe(eqpm => this.equipamentosFilter = eqpm.content)
+    }
   }
 
   showEditDialog(value: Equipamento) {

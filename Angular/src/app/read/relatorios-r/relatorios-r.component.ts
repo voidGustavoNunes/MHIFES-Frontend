@@ -151,22 +151,26 @@ export class RelatoriosRComponent implements OnInit,OnDestroy {
   listarPageObj(object: number) {
     if(object == 1) {
       let sizeUm = this.alocacoesPageData.totalElements
-      this.alocService.listarInativos(0,sizeUm).subscribe(alcc => this.alocacoesArray = alcc.content);
+      if(sizeUm > 0) {
+        this.alocService.listarInativos(0,sizeUm).subscribe(alcc => this.alocacoesArray = alcc.content);
 
-      const turmasUnique: string[] = [];
-      this.alocacoesArray.forEach((alocaAtual) => {
-        const jaTurma = turmasUnique.some((sgl) => sgl == alocaAtual.turma);
-        if(!jaTurma) {
-          turmasUnique.push(alocaAtual.turma);
-        }
-      });
-      this.turmasArray = turmasUnique;
+        const turmasUnique: string[] = [];
+        this.alocacoesArray.forEach((alocaAtual) => {
+          const jaTurma = turmasUnique.some((sgl) => sgl == alocaAtual.turma);
+          if(!jaTurma) {
+            turmasUnique.push(alocaAtual.turma);
+          }
+        });
+        this.turmasArray = turmasUnique;
+      }
     } else if(object == 2) {
       let sizeDois = this.coordenadoriasPageData.totalElements
-      this.coordaService.listar(0,sizeDois).subscribe(cods => cods.content.forEach((dt) =>{
-        this.coodArray.push({value: dt.id, label:`${dt.nome}`});
-        this.profArray.push({value: dt.coordenador.id, label:`${dt.coordenador.nome}`});
-      }))
+      if(sizeDois > 0) {
+        this.coordaService.listar(0,sizeDois).subscribe(cods => cods.content.forEach((dt) =>{
+          this.coodArray.push({value: dt.id, label:`${dt.nome}`});
+          this.profArray.push({value: dt.coordenador.id, label:`${dt.coordenador.nome}`});
+        }))
+      }
     }
   }
 

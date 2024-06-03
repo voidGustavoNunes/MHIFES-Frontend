@@ -29,6 +29,8 @@ import { PrimeNgImportsModule } from '../../shared/prime-ng-imports/prime-ng-imp
 import { Alocacao } from '../../models/postgres/alocacao.models';
 import { Page } from '../../models/share/page.models';
 import { PaginatorState } from 'primeng/paginator';
+import { AlocacaoMySQL } from '../../models/mysql/alocacao-mysql.models';
+import { MigrationService } from '../../service/migration.service';
 
 registerLocaleData(localePT);
 interface Column {
@@ -60,7 +62,8 @@ interface Column {
     PeriodoService,
     // DisciplinaService,
     HorarioService,
-    provideNgxMask()
+    provideNgxMask(),
+    MigrationService
   ]
 })
 export class AlocacoesRComponent implements OnInit, OnDestroy {
@@ -93,6 +96,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   unsubscribe$Loc!: Subscription;
   unsubscribe$Hor!: Subscription;
   unsubscribe$Log!: Subscription;
+  unsubscribe$Migr!: Subscription;
 
   form: FormGroup;
 
@@ -142,10 +146,12 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   cols!: Column[];
   
   firstAloc: number = 0;
+  pageAloc: number = 0;
   rowsAloc: number = 10;
   sizeAloc: number = 0;
   
   firstDelAloc: number = 0;
+  pageDelAloc: number = 0;
   rowsDelAloc: number = 10;
   sizeDelAloc: number = 0;
 
@@ -155,6 +161,10 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   locaisPageData!: Page<Local>;
   periodosPageData!: Page<Periodo>;
   professoresPageData!: Page<Professor>;
+
+  visibleMigra: boolean = false;
+  mysqlAlocacoes: AlocacaoMySQL[] = [];
+  dataMysqlAlocacoes: AlocacaoMySQL[] = [];
   
   constructor(
     private alocService: AlocacaoService,
@@ -167,6 +177,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     private periodService: PeriodoService,
     private professorService: ProfessorService,
     private hourService: HorarioService,
+    private migraService: MigrationService,
   ) {
     this.form = this.formBuilder.group({
       id: [null],
@@ -204,17 +215,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
           this.alocacoesPageData = itens;
           this.sizeAloc = this.alocacoesPageData.totalElements;
           
-          this.alocacoesData = this.alocacoesPageData.content;
-
-          this.alocacoesData.sort((a: Alocacao, b: Alocacao) => {
-            if ((a.dataAula === undefined || b.dataAula === undefined) || (a.dataAula === null || b.dataAula === null)) {
-              return 0;
-            }
-            const dateA = new Date(a.dataAula);
-            const dateB = new Date(b.dataAula);
-            return dateB.getTime() - dateA.getTime();
-          });
-          
+          this.listarPage()
           this.listarPageObj(0)
         },
         error: (err: any) => {
@@ -275,6 +276,18 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
         ];
       }
     });
+      
+    this.unsubscribe$Migr = this.migraService.listaMysql()
+    .subscribe({
+      next: (itens: any) => {
+        this.dataMysqlAlocacoes = itens
+      },
+      error: (err: any) => {
+        this.messages = [
+          { severity: 'error', summary: 'Erro', detail: 'Dados de mysql alocações não encontrados.', life: 3000 },
+        ];
+      }
+    });
 
     // Colunas da tabela
     this.cols = [
@@ -298,47 +311,43 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   }
   
   onPageChange(event: PaginatorState, stat: number) {
-    if (event.first !== undefined && event.rows !== undefined) {
+    if (event.first !== undefined && event.rows !== undefined && event.page !== undefined) {
       if(stat == 0) {
         this.firstAloc = event.first;
         this.rowsAloc = event.rows;
+        this.pageAloc = event.page;
         this.listarPageAt()
       } else if(stat == 1) {
         this.firstDelAloc = event.first;
         this.rowsDelAloc = event.rows;
+        this.pageDelAloc = event.page;
         this.listarPageInat()
       }
     }
   }
+  
+  listarPage() {
+    if(this.sizeAloc <= 0) {
+      this.alocService.listar(0, 10).subscribe(alocs => {
+        alocs.content.forEach((alc: Alocacao) => {
+          this.alocacoesData.push(alc);
+        })
+        this.sizeAloc = alocs.totalElements
+        if(this.alocacoesData.length > 0) {
+          this.alocacoesData.sort((a: Alocacao, b: Alocacao) => {
+            if ((a.dataAula === undefined || b.dataAula === undefined) || (a.dataAula === null || b.dataAula === null)) {
+              return 0;
+            }
+            const dateA = new Date(a.dataAula);
+            const dateB = new Date(b.dataAula);
+            return dateB.getTime() - dateA.getTime();
+          });
+        }
+      });
+    } else {
+      this.alocacoesData = this.alocacoesPageData.content;
 
-  listarPageAt() {
-    this.alocService.listarAtivos(this.firstAloc, this.rowsAloc).subscribe(itens => this.alocacoesData = itens.content)
-    this.alocacoesData.sort((a: Alocacao, b: Alocacao) => {
-      if ((a.dataAula === undefined || b.dataAula === undefined) || (a.dataAula === null || b.dataAula === null)) {
-        return 0;
-      }
-      const dateA = new Date(a.dataAula);
-      const dateB = new Date(b.dataAula);
-      return dateB.getTime() - dateA.getTime();
-    });
-  }
-
-  listarPageInat() {
-    this.alocService.listarInativos(this.firstDelAloc, this.rowsDelAloc).subscribe(alcc => this.alocacoesDataDelete = alcc.content)
-    this.alocacoesDataDelete.sort((a: Alocacao, b: Alocacao) => {
-      if ((a.dataAula === undefined || b.dataAula === undefined) || (a.dataAula === null || b.dataAula === null)) {
-        return 0;
-      }
-      const dateA = new Date(a.dataAula);
-      const dateB = new Date(b.dataAula);
-      return dateB.getTime() - dateA.getTime();
-    });
-  }
-
-  listarPageObj(object: number) {
-    if(object == 0) {
-      this.alocService.listarInativos(0,10).subscribe(alcc => this.alocacoesDataDelete = alcc.content)
-      this.alocacoesDataDelete.sort((a: Alocacao, b: Alocacao) => {
+      this.alocacoesData.sort((a: Alocacao, b: Alocacao) => {
         if ((a.dataAula === undefined || b.dataAula === undefined) || (a.dataAula === null || b.dataAula === null)) {
           return 0;
         }
@@ -346,57 +355,138 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
         const dateB = new Date(b.dataAula);
         return dateB.getTime() - dateA.getTime();
       });
-      this.sizeDelAloc = this.alocacoesDataDelete.length
+    }
+  }
+
+  listarPageAt() {
+    let contem: boolean = false;
+
+    this.alocService.listarAtivos(this.pageAloc, this.rowsAloc).subscribe(alcc => {
+      this.alocacoesData = alcc.content;
+
+      if(this.alocacoesData.length > 0) {
+        if(alcc.totalElements > 0) contem = true;
+        this.alocacoesData.sort((a: Alocacao, b: Alocacao) => {
+          if ((a.dataAula === undefined || b.dataAula === undefined) || (a.dataAula === null || b.dataAula === null)) {
+            return 0;
+          }
+          const dateA = new Date(a.dataAula);
+          const dateB = new Date(b.dataAula);
+          return dateB.getTime() - dateA.getTime();
+        });
+      }
+    });
+    
+    if(!contem) {
+      this.alocService.listar(this.pageAloc, this.rowsAloc).subscribe(alcc => {
+        this.alocacoesData = alcc.content;
+      
+        if(this.alocacoesData.length > 0) {
+          contem = true;
+          this.alocacoesData.sort((a: Alocacao, b: Alocacao) => {
+            if ((a.dataAula === undefined || b.dataAula === undefined) || (a.dataAula === null || b.dataAula === null)) {
+              return 0;
+            }
+            const dateA = new Date(a.dataAula);
+            const dateB = new Date(b.dataAula);
+            return dateB.getTime() - dateA.getTime();
+          });
+        }
+      });
+    }
+  }
+
+  listarPageInat() {
+    this.alocService.listarInativos(this.pageDelAloc, this.rowsDelAloc).subscribe(alcc => {
+      this.alocacoesDataDelete = alcc.content;
+      
+      if(this.alocacoesDataDelete.length > 0) {
+        this.alocacoesDataDelete.sort((a: Alocacao, b: Alocacao) => {
+          if ((a.dataAula === undefined || b.dataAula === undefined) || (a.dataAula === null || b.dataAula === null)) {
+            return 0;
+          }
+          const dateA = new Date(a.dataAula);
+          const dateB = new Date(b.dataAula);
+          return dateB.getTime() - dateA.getTime();
+        });
+      }
+    });
+  }
+
+  listarPageObj(object: number) {
+    if(object == 0) {
+      this.alocService.listarInativos(0,10).subscribe(alcc => {
+        alcc.content.forEach((alc: Alocacao) => {
+          this.alocacoesDataDelete.push(alc);
+        })
+
+        if(this.alocacoesDataDelete.length > 0) {
+          this.alocacoesDataDelete.sort((a: Alocacao, b: Alocacao) => {
+            if ((a.dataAula === undefined || b.dataAula === undefined) || (a.dataAula === null || b.dataAula === null)) {
+              return 0;
+            }
+            const dateA = new Date(a.dataAula);
+            const dateB = new Date(b.dataAula);
+            return dateB.getTime() - dateA.getTime();
+          });
+          this.sizeDelAloc = this.alocacoesDataDelete.length
+        }
+      })
       this.pageFilter()
     } else if(object == 1) {
       let sizeUm = this.horariosPageData.totalElements
-      this.hourService.listar(0,sizeUm).subscribe(hor => this.horariosArray = hor.content)
-      this.horariosArray.sort((a:Horario, b:Horario) => {
-        let hAi = this.formatMiliss(a.horaInicio)
-        let hBi = this.formatMiliss(b.horaFim)
-        
-        if (hAi < hBi) {
-          return -1;
-        } else if (hAi > hBi) {
-          return 1;
-        } else {
-          return 0;
-        }
-      })
+      if(sizeUm > 0) {
+        this.hourService.listar(0,sizeUm).subscribe(hor => this.horariosArray = hor.content)
+        this.horariosArray.sort((a:Horario, b:Horario) => {
+          let hAi = this.formatMiliss(a.horaInicio)
+          let hBi = this.formatMiliss(b.horaFim)
+          
+          if (hAi < hBi) {
+            return -1;
+          } else if (hAi > hBi) {
+            return 1;
+          } else {
+            return 0;
+          }
+        })
+      }
     } else if(object == 2) {
       let sizeDois = this.locaisPageData.totalElements
-      this.locService.listar(0,sizeDois).subscribe(locs => this.locaisArray = locs.content)
-      this.locaisArray.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1)
+      if(sizeDois > 0) {
+        this.locService.listar(0,sizeDois).subscribe(locs => this.locaisArray = locs.content)
+        this.locaisArray.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1)
+      }
     } else if(object == 3) {
       let sizeTres = this.periodosPageData.totalElements
-      this.periodService.listar(0,sizeTres).subscribe(pero => this.periodosArray = pero.content)
-      this.periodosArray.sort((a: Periodo, b: Periodo) => {
-        const dateA = new Date(a.dataInicio);
-        const dateB = new Date(b.dataInicio);
-        return dateB.getTime() - dateA.getTime();
-      });
+      if(sizeTres > 0) {
+        this.periodService.listar(0,sizeTres).subscribe(pero => this.periodosArray = pero.content)
+        this.periodosArray.sort((a: Periodo, b: Periodo) => {
+          const dateA = new Date(a.dataInicio);
+          const dateB = new Date(b.dataInicio);
+          return dateB.getTime() - dateA.getTime();
+        });
+      }
     } else if(object == 4) {
       let sizeQuatro = this.professoresPageData.totalElements
-      this.professorService.listar(0,sizeQuatro).subscribe(prfs => this.professoresArray = prfs.content)
-      this.professoresArray.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1)
+      if(sizeQuatro > 0) {
+        this.professorService.listar(0,sizeQuatro).subscribe(prfs => this.professoresArray = prfs.content)
+        this.professoresArray.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1)
+      }
     }
   }
   
   pageFilter() {
-    this.alocService.listarAtivos(0,this.sizeAloc).subscribe(alcc => this.alocacoesFilter = alcc.content)
-    this.alocService.listarInativos(0,this.sizeDelAloc).subscribe(alcc => this.alocacoesDeleteFilter = alcc.content)
+    if(this.sizeAloc > 0) {
+      this.alocService.listarAtivos(0,this.sizeAloc).subscribe(alcc => this.alocacoesFilter = alcc.content)
+    }
+    if(this.sizeDelAloc > 0) {
+      this.alocService.listarInativos(0,this.sizeDelAloc).subscribe(alcc => this.alocacoesDeleteFilter = alcc.content)
+    }
   }
 
-  // verificarHoraFimMaiorQueInicio(formGroup: FormGroup) {
-  //   const horaInicio = formGroup.get('horarioInicio')?.value;
-  //   const horaFim = formGroup.get('horarioFim')?.value;
-
-  //   if (horaInicio && horaFim && horaInicio >= horaFim) {
-  //     formGroup.get('horarioFim')?.setErrors({ 'horaFimMenorQueInicio': true });
-  //   } else {
-  //     formGroup.get('horarioFim')?.setErrors(null);
-  //   }
-  // }
+  showMigraDialog() {
+    this.visibleMigra = true;
+  }
 
   showDialogLog(valueLog: Alocacao) {
     this.visibleLog = true;
@@ -475,6 +565,9 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       this.visible = false;
     } else if (this.editar) {
       this.visibleEdit = false;
+    } else if (this.visibleMigra) {
+      this.visibleMigra = false;
+      this.mysqlAlocacoes = []
     }
     this.form.reset();
     this.visibleLog = false;
@@ -726,14 +819,14 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
         this.inputSearch.nativeElement.value = '';
       }
       this.selectedFilter = {} as FiltrarPesquisa;
-      this.alocacoesData = this.alocacoesFilter;
+      this.listarPageAt()
     } else if(tipo == 'i') {
       const inputElement = this.inputSearchInat.nativeElement.value
       if (inputElement) {
         this.inputSearchInat.nativeElement.value = '';
       }
       this.selectedFilterInat = {} as FiltrarPesquisa;
-      this.alocacoesDataDelete = this.alocacoesDeleteFilter;
+      this.listarPageInat()
     }
   }
 
@@ -868,6 +961,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       ];
     }
   }
+
   formatarDatas(date: string) {
     if (date) {
       const partes = date.split('-');
@@ -1025,6 +1119,30 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     } else {
       this.messages = [
         { severity: 'warn', summary: 'Atenção', detail: 'Informação inválida. Preencha os campos!', life: 3000 },
+      ];
+    }
+  }
+
+  saveMigrationMysql() {
+    if(this.mysqlAlocacoes.length > 0) {
+      this.migraService.migrateAlocacoes(this.mysqlAlocacoes).subscribe({
+        next: (data: any) => {
+          this.messages = [
+            { severity: 'success', summary: 'Sucesso', detail: data, life: 3000 },
+            // { severity: 'success', summary: 'Sucesso', detail: 'Migração realizada com sucesso!', life: 3000 },
+          ];
+          this.hideDialog();
+          this.ngOnInit();
+        },
+        error: (err: any) => {
+          this.messages = [
+            { severity: 'error', summary: 'Erro', detail: 'Migração não enviada.', life: 3000 },
+          ];
+        }
+      });
+    } else {
+      this.messages = [
+        { severity: 'warn', summary: 'Atenção', detail: 'Informação inválida. Selecione ao menos uma opção!', life: 3000 },
       ];
     }
   }

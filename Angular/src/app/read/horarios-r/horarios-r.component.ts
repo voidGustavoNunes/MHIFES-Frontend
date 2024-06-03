@@ -57,6 +57,7 @@ export class HorariosRComponent implements OnInit, OnDestroy {
   txtFilter: string = 'Pesquisar horário';
   
   firstHors: number = 0;
+  pageHours: number = 0;
   rowsHors: number = 10;
   sizeHors: number = 0;
 
@@ -115,15 +116,16 @@ export class HorariosRComponent implements OnInit, OnDestroy {
   }
   
   onPageChange(event: PaginatorState) {
-    if (event.first !== undefined && event.rows !== undefined) {
+    if (event.first !== undefined && event.rows !== undefined && event.page !== undefined) {
       this.firstHors = event.first;
       this.rowsHors = event.rows;
+      this.pageHours = event.page;
       this.listarPage()
     }
   }
-
+  
   listarPage() {
-    this.hourService.listar(this.firstHors, this.rowsHors)
+    this.hourService.listar(this.pageHours, this.rowsHors)
     .subscribe((itens:any) => {
         this.horasPageData = itens;
         this.horariosData = this.horasPageData.content;
@@ -143,7 +145,9 @@ export class HorariosRComponent implements OnInit, OnDestroy {
   }
 
   pageFilter() {
-    this.hourService.listar(0, this.sizeHors).subscribe(hors => this.horariosFilter = hors.content)
+    if(this.sizeHors > 0) {
+      this.hourService.listar(0, this.sizeHors).subscribe(hors => this.horariosFilter = hors.content)
+    }
   }
   
   verificarHoraFimMaiorQueInicio(formGroup: FormGroup) {

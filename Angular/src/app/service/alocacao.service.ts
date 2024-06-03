@@ -28,7 +28,7 @@ export class AlocacaoService {
       .set('page', page.toString())
       .set('size', size.toString());
 
-    return this.http.get<Page<Alocacao>>(`${this.API}/ativos?page=${page}&size=${size}`, { params });
+    return this.http.get<Page<Alocacao>>(`${this.API}/ativos`, { params });
   }
 
   listarInativos(page: number, size: number): Observable<Page<Alocacao>> {
@@ -36,7 +36,7 @@ export class AlocacaoService {
       .set('page', page.toString())
       .set('size', size.toString());
 
-    return this.http.get<Page<Alocacao>>(`${this.API}/inativos?page=${page}&size=${size}`, { params });
+    return this.http.get<Page<Alocacao>>(`${this.API}/inativos`, { params });
   }
 
   buscarPorId(id: number): Observable<Alocacao> {

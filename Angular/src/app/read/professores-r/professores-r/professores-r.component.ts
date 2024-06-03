@@ -73,6 +73,7 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
   coordenadoriasArray: Coordenadoria[] = [];
   
   firstProfsr: number = 0;
+  pageProfsr: number = 0;
   rowsProfsr: number = 10;
   sizeProfsr: number = 0;
 
@@ -142,15 +143,16 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
 
   
   onPageChange(event: PaginatorState) {
-    if (event.first !== undefined && event.rows !== undefined) {
+    if (event.first !== undefined && event.rows !== undefined && event.page !== undefined) {
       this.firstProfsr = event.first;
       this.rowsProfsr = event.rows;
+      this.pageProfsr = event.page;
       this.listarPage()
     }
   }
 
   listarPage() {
-    this.professorService.listar(this.firstProfsr, this.rowsProfsr)
+    this.professorService.listar(this.pageProfsr, this.rowsProfsr)
     .subscribe((itens:any) => {
         this.professoresPageData = itens;
         this.professoresData = this.professoresPageData.content;
@@ -160,12 +162,16 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
   
   listarPageObj() {
     let sizeAll = this.coordenasPageData.totalElements
-    this.coordaService.listar(0,sizeAll).subscribe(codr => this.coordenadoriasArray = codr.content)
-    this.coordenadoriasArray.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1)
+    if(sizeAll > 0) {
+      this.coordaService.listar(0,sizeAll).subscribe(codr => this.coordenadoriasArray = codr.content)
+      this.coordenadoriasArray.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1)
+    }
   }
 
   pageFilter() {
-    this.professorService.listar(0, this.sizeProfsr).subscribe(prfs => this.professoresFilterProf = prfs.content)
+    if(this.sizeProfsr > 0) {
+      this.professorService.listar(0, this.sizeProfsr).subscribe(prfs => this.professoresFilterProf = prfs.content)
+    }
   }
 
   showInfoDialog(value: Professor) {

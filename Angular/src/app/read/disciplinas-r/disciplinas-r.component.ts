@@ -54,6 +54,7 @@ export class DisciplinasRComponent implements OnInit, OnDestroy {
   selectedFilter!: FiltrarPesquisa;
   
   firstDiscp: number = 0;
+  pageDiscp: number = 0;
   rowsDiscp: number = 10;
   sizeDiscp: number = 0;
 
@@ -101,15 +102,16 @@ export class DisciplinasRComponent implements OnInit, OnDestroy {
   }
   
   onPageChange(event: PaginatorState) {
-    if (event.first !== undefined && event.rows !== undefined) {
+    if (event.first !== undefined && event.rows !== undefined && event.page !== undefined) {
       this.firstDiscp = event.first;
       this.rowsDiscp = event.rows;
+      this.pageDiscp = event.page;
       this.listarPage()
     }
   }
 
   listarPage() {
-    this.disciService.listar(this.firstDiscp, this.rowsDiscp)
+    this.disciService.listar(this.pageDiscp, this.rowsDiscp)
     .subscribe((itens:any) => {
         this.disciplinasPageData = itens;
         this.disciplinasData = this.disciplinasPageData.content;
@@ -118,7 +120,9 @@ export class DisciplinasRComponent implements OnInit, OnDestroy {
   }
 
   pageFilter() {
-    this.disciService.listar(0, this.sizeDiscp).subscribe(discp => this.dicisplinasFilter = discp.content)
+    if(this.sizeDiscp > 0) {
+      this.disciService.listar(0, this.sizeDiscp).subscribe(discp => this.dicisplinasFilter = discp.content)
+    }
   }
 
   showEditDialog(value: Disciplina) {

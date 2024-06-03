@@ -91,6 +91,7 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
   maxCalend!: Date;
   
   firstPerds: number = 0;
+  pagePerds: number = 0;
   rowsPerds: number = 10;
   sizePerds: number = 0;
 
@@ -182,15 +183,16 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
   }
   
   onPageChange(event: PaginatorState) {
-    if (event.first !== undefined && event.rows !== undefined) {
+    if (event.first !== undefined && event.rows !== undefined && event.page !== undefined) {
       this.firstPerds = event.first;
       this.rowsPerds = event.rows;
+      this.pagePerds = event.page;
       this.listarPage()
     }
   }
 
   listarPage() {
-    this.periodService.listar(this.firstPerds, this.rowsPerds)
+    this.periodService.listar(this.pagePerds, this.rowsPerds)
     .subscribe((itens:any) => {
         this.periodosPageData = itens;
         this.periodosData = this.periodosPageData.content;
@@ -205,17 +207,23 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
   listarPageObj(object: number) {
     if(object == 1) {
       let sizeUm = this.alunosPageData.totalElements
-      this.alunService.listar(0,sizeUm).subscribe(alno => this.alunosArray = alno.content)
-      this.alunosArray.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1)
+      if(sizeUm > 0) {
+        this.alunService.listar(0,sizeUm).subscribe(alno => this.alunosArray = alno.content)
+        this.alunosArray.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1)
+      }
     } else if(object == 2) {
       let sizeDois = this.disciplinasPageData.totalElements
-      this.disciService.listar(0,sizeDois).subscribe(discp => this.disciplinasArray = discp.content)
-      this.disciplinasArray.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1)
+      if(sizeDois > 0) {
+        this.disciService.listar(0,sizeDois).subscribe(discp => this.disciplinasArray = discp.content)
+        this.disciplinasArray.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1)
+      }
     }
   }  
 
   pageFilter() {
-    this.periodService.listar(0, this.sizePerds).subscribe(perds => this.periodosFilter = perds.content)
+    if(this.sizePerds > 0) {
+      this.periodService.listar(0, this.sizePerds).subscribe(perds => this.periodosFilter = perds.content)
+    }
   }
 
   updateCalendarMinMaxCalend() {

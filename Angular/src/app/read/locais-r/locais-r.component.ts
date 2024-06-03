@@ -71,6 +71,7 @@ export class LocaisRComponent implements OnInit, OnDestroy {
   selectedFilter!: FiltrarPesquisa;
   
   firstLocs: number = 0;
+  pageLocs: number = 0;
   rowsLocs: number = 10;
   sizeLocs: number = 0;
 
@@ -135,15 +136,16 @@ export class LocaisRComponent implements OnInit, OnDestroy {
   }
   
   onPageChange(event: PaginatorState) {
-    if (event.first !== undefined && event.rows !== undefined) {
+    if (event.first !== undefined && event.rows !== undefined && event.page !== undefined) {
       this.firstLocs = event.first;
       this.rowsLocs = event.rows;
+      this.pageLocs = event.page;
       this.listarPage()
     }
   }
 
   listarPage() {
-    this.locService.listar(this.firstLocs, this.rowsLocs)
+    this.locService.listar(this.pageLocs, this.rowsLocs)
     .subscribe((itens:any) => {
         this.locaisPageData = itens;
         this.locaisData = this.locaisPageData.content;
@@ -153,12 +155,16 @@ export class LocaisRComponent implements OnInit, OnDestroy {
   
   listarPageObj() {
     let sizeAll = this.equipamentosPageData.totalElements
-    this.equipService.listar(0,sizeAll).subscribe(eqps => this.equipamentosData = eqps.content)
-    this.equipamentosData.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1)
+    if(sizeAll > 0) {
+      this.equipService.listar(0,sizeAll).subscribe(eqps => this.equipamentosData = eqps.content)
+      this.equipamentosData.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1)
+    }
   }
 
   pageFilter() {
-    this.locService.listar(0, this.sizeLocs).subscribe(locs => this.locaisFilter = locs.content)
+    if(this.sizeLocs > 0) {
+      this.locService.listar(0, this.sizeLocs).subscribe(locs => this.locaisFilter = locs.content)
+    }
   }
 
   getEquipamento(): FormArray {

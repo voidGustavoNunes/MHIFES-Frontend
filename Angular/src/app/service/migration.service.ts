@@ -11,7 +11,11 @@ export class MigrationService {
 
   constructor(private http: HttpClient) { }
 
-  // listarAlocacoes(page: number, size: number): Observable<Page<AlocacaoMySQL>> {
-  //   return this.http.get<Page<AlocacaoMySQL>>(`${this.API}/alocacoes?page=${page}&size=${size}`);
-  // }
+  migrateAlocacoes(alocacaoList: AlocacaoMySQL[]): Observable<any> {
+    return this.http.post(`${this.API}`, alocacaoList);
+  }
+
+  listaMysql(): Observable<AlocacaoMySQL[]> {
+    return this.http.get<AlocacaoMySQL[]>(`${this.API}/alocacoes-mysql`);
+  }
 }

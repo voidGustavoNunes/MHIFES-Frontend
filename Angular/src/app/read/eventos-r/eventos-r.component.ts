@@ -95,6 +95,7 @@ export class EventosRComponent implements OnInit, OnDestroy {
   minDate!: Date;
   
   firstEvn: number = 0;
+  pageEvn: number = 0;
   rowsEvn: number = 10;
   sizeEvn: number = 0;
 
@@ -186,15 +187,16 @@ export class EventosRComponent implements OnInit, OnDestroy {
 
   
   onPageChange(event: PaginatorState) {
-    if (event.first !== undefined && event.rows !== undefined) {
+    if (event.first !== undefined && event.rows !== undefined && event.page !== undefined) {
       this.firstEvn = event.first;
       this.rowsEvn = event.rows;
+      this.pageEvn = event.page;
       this.listarPage()
     }
   }
 
   listarPage() {
-    this.eventService.listar(this.firstEvn, this.rowsEvn)
+    this.eventService.listar(this.pageEvn, this.rowsEvn)
     .subscribe((itens:any) => {
         this.eventosPageData = itens;
         this.eventosData = this.eventosPageData.content;
@@ -209,28 +211,34 @@ export class EventosRComponent implements OnInit, OnDestroy {
   listarPageObj(object: number) {
     if(object == 1) {
       let sizeUm = this.horariosPageData.totalElements
-      this.hourService.listar(0,sizeUm).subscribe(hor => this.horariosArray = hor.content)
-      this.horariosArray.sort((a:Horario, b:Horario) => {
-        let hAi = this.formatMiliss(a.horaInicio)
-        let hBi = this.formatMiliss(b.horaFim)
-        
-        if (hAi < hBi) {
-          return -1;
-        } else if (hAi > hBi) {
-          return 1;
-        } else {
-          return 0;
-        }
-      })
+      if(sizeUm > 0) {
+        this.hourService.listar(0,sizeUm).subscribe(hor => this.horariosArray = hor.content)
+        this.horariosArray.sort((a:Horario, b:Horario) => {
+          let hAi = this.formatMiliss(a.horaInicio)
+          let hBi = this.formatMiliss(b.horaFim)
+          
+          if (hAi < hBi) {
+            return -1;
+          } else if (hAi > hBi) {
+            return 1;
+          } else {
+            return 0;
+          }
+        })
+      }
     } else if(object == 2) {
       let sizeDois = this.locaisPageData.totalElements
-      this.locService.listar(0,sizeDois).subscribe(locs => this.locaisArray = locs.content)
-      this.locaisArray.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1)
+      if(sizeDois > 0) {
+        this.locService.listar(0,sizeDois).subscribe(locs => this.locaisArray = locs.content)
+        this.locaisArray.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1)
+      }
     }
   }
 
   pageFilter() {
-    this.eventService.listar(0, this.sizeEvn).subscribe(evnt => this.eventosFilter = evnt.content)
+    if(this.sizeEvn > 0) {
+      this.eventService.listar(0, this.sizeEvn).subscribe(evnt => this.eventosFilter = evnt.content)
+    }
   }
   
   // verificarHoraFimMaiorQueInicio(formGroup: FormGroup) {

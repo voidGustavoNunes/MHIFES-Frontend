@@ -58,6 +58,7 @@ export class CoordenadoriasRComponent implements OnInit, OnDestroy {
   coordenadoresArray: Professor[] = [];
 
   firstCoor: number = 0;
+  pageCoor: number = 0;
   rowsCoor: number = 10;
   sizeCoor: number = 0;
 
@@ -116,32 +117,39 @@ export class CoordenadoriasRComponent implements OnInit, OnDestroy {
   }
   
   onPageChange(event: PaginatorState) {
-    if (event.first !== undefined && event.rows !== undefined) {
+    if (event.first !== undefined && event.rows !== undefined && event.page !== undefined) {
       this.firstCoor = event.first;
       this.rowsCoor = event.rows;
+      this.pageCoor = event.page;
       this.listarPage()
     }
   }
 
   listarPage() {
-    this.coordaService.listar(this.firstCoor, this.rowsCoor).subscribe(itens => this.coordenadoriasData = itens.content);
+    this.coordaService.listar(this.pageCoor, this.rowsCoor).subscribe(itens => this.coordenadoriasData = itens.content);
     this.coordenadoriasData.sort((a:any, b:any) => (a.nome < b.nome ) ? -1 : 1);
   }
   
   listarPageObj() {
     let sizeAll = this.professoresPageData.totalElements
-    let profesArr!: Professor[]
-    this.professorService.listar(0,sizeAll).subscribe(prfs => profesArr = prfs.content)
-    profesArr.forEach((prf: Professor) => {
-      if(prf.ehCoordenador) {
-        this.coordenadoresArray.push(prf);
-      }
-    })
-    this.coordenadoresArray.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1)
+    if(sizeAll > 0) {
+      this.professorService.listar(0,sizeAll).subscribe(prfs => {
+        prfs.content.forEach((prf: Professor) => {
+          if(prf.ehCoordenador) {
+            this.coordenadoresArray.push(prf);
+          }
+        })
+        if(this.coordenadoresArray.length > 0) {
+          this.coordenadoresArray.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1)
+        }
+      })
+    }
   }
 
   pageFilter() {
-    this.coordaService.listar(0, this.sizeCoor).subscribe(coord => this.coordenadoriasFilter = coord.content)
+    if(this.sizeCoor > 0) {
+      this.coordaService.listar(0, this.sizeCoor).subscribe(coord => this.coordenadoriasFilter = coord.content)
+    }
   }
 
   showEditDialog(value: Coordenadoria) {

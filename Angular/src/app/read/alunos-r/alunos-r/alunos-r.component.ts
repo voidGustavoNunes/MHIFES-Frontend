@@ -61,6 +61,7 @@ export class AlunosRComponent implements OnInit, OnDestroy {
   selectedFilter!: FiltrarPesquisa;
 
   firstAln: number = 0;
+  pageAln: number = 0;
   rowsAln: number = 10;
   sizeAln: number = 0;
 
@@ -109,15 +110,16 @@ export class AlunosRComponent implements OnInit, OnDestroy {
   }
   
   onPageChange(event: PaginatorState) {
-    if (event.first !== undefined && event.rows !== undefined) {
+    if (event.first !== undefined && event.rows !== undefined && event.page !== undefined) {
       this.firstAln = event.first;
       this.rowsAln = event.rows;
+      this.pageAln = event.page;
       this.listarPage()
     }
   }
 
   listarPage() {
-    this.alunService.listar(this.firstAln, this.rowsAln)
+    this.alunService.listar(this.pageAln, this.rowsAln)
     .subscribe((itens:any) => {
         this.alunosPageData = itens;
         this.alunosData = this.alunosPageData.content;
@@ -126,7 +128,9 @@ export class AlunosRComponent implements OnInit, OnDestroy {
   }
 
   pageFilter() {
-    this.alunService.listar(0, this.sizeAln).subscribe(alno => this.alunosFilter = alno.content)
+    if(this.sizeAln > 0) {
+      this.alunService.listar(0, this.sizeAln).subscribe(alno => this.alunosFilter = alno.content)
+    }
   }
 
   showInfoDialog(value: Aluno) {
