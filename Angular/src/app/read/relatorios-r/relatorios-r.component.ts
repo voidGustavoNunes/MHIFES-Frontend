@@ -81,7 +81,6 @@ export class RelatoriosRComponent implements OnInit,OnDestroy {
   profArray: [{value: number | undefined, label: string}] = [{value: undefined, label: ''}];
 
   sizeAcods: number = 0;
-
   alocacoesPageData!: Page<Alocacao>;
   coordenadoriasPageData!: Page<Coordenadoria>;
 
@@ -116,10 +115,11 @@ export class RelatoriosRComponent implements OnInit,OnDestroy {
     ];
     this.selectedProfFilter = this.profFilterOptions[0];
 
-    this.unsubscribe$ = this.alocService.listar(0,10)
+    this.unsubscribe$ = this.alocService.listarAtivos(0,10)
     .subscribe({
       next: (itens:any) => {
         this.alocacoesPageData = itens
+        this.sizeAcods = this.alocacoesPageData.totalElements
         this.listarPageObj(1)
       },
       error: (err: any) => {
@@ -150,18 +150,19 @@ export class RelatoriosRComponent implements OnInit,OnDestroy {
   
   listarPageObj(object: number) {
     if(object == 1) {
-      let sizeUm = this.alocacoesPageData.totalElements
-      if(sizeUm > 0) {
-        this.alocService.listarInativos(0,sizeUm).subscribe(alcc => this.alocacoesArray = alcc.content);
+      if(this.sizeAcods > 0) {
+        this.alocService.listarAtivos(0,this.sizeAcods).subscribe(alcc => {
+          this.alocacoesArray = alcc.content
 
-        const turmasUnique: string[] = [];
-        this.alocacoesArray.forEach((alocaAtual) => {
-          const jaTurma = turmasUnique.some((sgl) => sgl == alocaAtual.turma);
-          if(!jaTurma) {
-            turmasUnique.push(alocaAtual.turma);
-          }
-        });
-        this.turmasArray = turmasUnique;
+          const turmasUnique: string[] = [];
+          this.alocacoesArray.forEach((alocaAtual) => {
+            const jaTurma = turmasUnique.some((sgl) => sgl == alocaAtual.turma);
+            if(!jaTurma) {
+              turmasUnique.push(alocaAtual.turma);
+            }
+          });
+          this.turmasArray = turmasUnique;
+        })
       }
     } else if(object == 2) {
       let sizeDois = this.coordenadoriasPageData.totalElements

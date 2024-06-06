@@ -439,9 +439,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     }
     if(this.sizeDelAloc > 0) {
       this.alocService.listarInativos(0,this.sizeDelAloc).subscribe(alcc => {
-        alcc.content.forEach((alc: Alocacao) => {
-          this.alocacoesDeleteFilter.push(alc)
-        })
+        this.alocacoesDeleteFilter = alcc.content
       })
     }
   }

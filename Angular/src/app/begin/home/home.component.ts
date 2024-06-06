@@ -111,9 +111,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   listarPage() {
     if(this.sizeAlocs > 0) {
       this.alocService.listarAtivos(0, this.sizeAlocs).subscribe(alocs => {
-        alocs.content.forEach((alc: Alocacao) => {
-          this.alocacoesArray.push(alc);
-        })
+        this.alocacoesArray = alocs.content;
+
         if(this.alocacoesArray.length > 0) {
           this.alocacoesArray.sort((a: Alocacao, b: Alocacao) => {
             if ((a.dataAula === undefined || b.dataAula === undefined) || (a.dataAula === null || b.dataAula === null)) {
@@ -133,34 +132,6 @@ export class HomeComponent implements OnInit, OnDestroy {
           this.filtrarAlocacoesPorDiaSemana();
         }
       });
-    } else {
-      this.alocService.listar(0, 10).subscribe(alocs => this.alocacoesPageData = alocs)
-      this.sizeAlocs = this.alocacoesPageData.totalElements
-      if(this.sizeAlocs > 0) {
-        this.alocService.listar(0, this.sizeAlocs).subscribe(alocs => {
-          alocs.content.forEach((alc: Alocacao) => {
-            this.alocacoesArray.push(alc);
-          })
-          if(this.alocacoesArray.length > 0) {
-            this.alocacoesArray.sort((a: Alocacao, b: Alocacao) => {
-              if ((a.dataAula === undefined || b.dataAula === undefined) || (a.dataAula === null || b.dataAula === null)) {
-                return 0;
-              }
-              const dateA = new Date(a.dataAula);
-              const dateB = new Date(b.dataAula);
-              return dateB.getTime() - dateA.getTime();
-            });
-            
-            const currentYear = new Date().getFullYear();
-            this.alocacoesArray = this.alocacoesArray.filter((alocacao) => {
-              const allocacaoDate = new Date(this.formatarDtStrDt(alocacao.dataAula));
-              return allocacaoDate.getFullYear() === currentYear;
-            });
-            
-            this.filtrarAlocacoesPorDiaSemana();
-          }
-        });
-      }
     }
   }
 

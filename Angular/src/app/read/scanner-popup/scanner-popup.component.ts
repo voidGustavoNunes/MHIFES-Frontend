@@ -197,7 +197,7 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
   }
 
   carregarUsersScan() {
-    this.alocService.listar(0,10)
+    this.alocService.listarAtivos(0,10)
     .subscribe({
       next: (itens:any) => {
         this.alocacoesPageData = itens;
@@ -214,32 +214,29 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
 
   listarPage() {
     let alocsAllData: Alocacao[] = [];
-    if(this.sizeAloc > 0) {
-      this.alocService.listarAtivos(0, this.sizeAloc).subscribe(alocs => alocsAllData = alocs.content)
-    } else {
-      this.alocService.listar(0, 10).subscribe(alocs => this.alocacoesPageData = alocs)
-      this.sizeAloc = this.alocacoesPageData.totalElements
-      if(this.sizeAloc > 0) {
-        this.alocService.listar(0, this.sizeAloc).subscribe(alocs => alocsAllData = alocs.content)
-      }
-    }
 
-    if(alocsAllData.length > 0) {
-      this.alocacoesArray = alocsAllData.filter((alocacao) => {
-        const hoje = new Date();
-        const periodo = alocacao.periodoDisciplina.periodo;
-        if(periodo) {
-          if(hoje.getTime() >= this.formatarDtStrDtScan(periodo.dataInicio).getTime() && hoje.getTime() <= this.formatarDtStrDtScan(periodo.dataFim).getTime()) {
-            return true;
-          } else {
-            return false;
-          }
-        } else {
-          return false;
+    if(this.sizeAloc > 0) {
+      this.alocService.listarAtivos(0, this.sizeAloc).subscribe(alocs => {
+        alocsAllData = alocs.content
+
+        if(alocsAllData.length > 0) {
+          this.alocacoesArray = alocsAllData.filter((alocacao) => {
+            const hoje = new Date();
+            const periodo = alocacao.periodoDisciplina.periodo;
+            if(periodo) {
+              if(hoje.getTime() >= this.formatarDtStrDtScan(periodo.dataInicio).getTime() && hoje.getTime() <= this.formatarDtStrDtScan(periodo.dataFim).getTime()) {
+                return true;
+              } else {
+                return false;
+              }
+            } else {
+              return false;
+            }
+          })
+
+          this.mostrarHorarioUserScan()
         }
       })
-
-      this.mostrarHorarioUserScan()
     }
   }
   
