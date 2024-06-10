@@ -12,6 +12,7 @@ import { FiltrarPesquisa } from '../../../models/share/filtrar-pesquisa.models';
 import { PrimeNgImportsModule } from '../../../shared/prime-ng-imports/prime-ng-imports.module';
 import { Page, PageEvent } from '../../../models/share/page.models';
 import { PaginatorState } from 'primeng/paginator';
+import JsBarcode from 'jsbarcode';
 
 @Component({
   selector: 'app-alunos-r',
@@ -37,6 +38,7 @@ import { PaginatorState } from 'primeng/paginator';
 
 export class AlunosRComponent implements OnInit, OnDestroy {
   @ViewChild('searchInput') inputSearch!: ElementRef;
+  @ViewChild('barcodeImage', { static: false }) barcodeImage!: ElementRef;
 
   alunosData: Aluno[] = [];
   alunosFilter: Aluno[] = [];
@@ -56,6 +58,7 @@ export class AlunosRComponent implements OnInit, OnDestroy {
   
   alunoInfo!: Aluno;
   visibleInfo: boolean = false;
+  visibleBarcode: boolean = false;
   
   filterOptions: FiltrarPesquisa[] = [];
   selectedFilter!: FiltrarPesquisa;
@@ -325,5 +328,79 @@ export class AlunosRComponent implements OnInit, OnDestroy {
       }
   });
   }
+
+  generateBarcode(matricula: string) {
+    if (!matricula) {
+      return;
+    }
+    
+    this.visibleBarcode = true;
+
+    // Aguarde a renderização do popup para gerar o código de barras
+    setTimeout(() => {
+      const barcodeElement = this.barcodeImage.nativeElement;
+      JsBarcode(barcodeElement, matricula, {
+        format: 'CODE128',
+        lineColor: '#000000',
+        width: 2,
+        height: 100,
+        displayValue: true
+      });
+    }, 0);
+  }
+
+  hideBarcodeDialog() {
+    this.visibleBarcode = false;
+  }
+
+  printBarcode() {
+    // Obtenha o elemento que contém o código de barras
+    const barcodeElement = this.barcodeImage.nativeElement;
+
+    // Crie uma nova janela de impressão
+    const printWindow = window.open('', '_blank', 'width=300,height=300');
+
+    if (printWindow) {
+        printWindow.document.write('<html><head><title>Código de Barras</title>');
+        printWindow.document.write('<style>');
+        printWindow.document.write(`
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            .barcode-container {
+                display: grid;
+                grid-template-columns: repeat(3, 3.2cm);
+                grid-auto-rows: 2cm;
+                gap: 0.35cm; /* Ajuste do espaçamento entre etiquetas */
+                margin:8 7;
+                padding: 0;
+            }
+            .barcode-container img {
+                width: 100%;
+                height: auto;
+                margin: 0;
+                padding: 0;
+            }
+        `);
+        printWindow.document.write('</style></head><body>');
+        
+        // Adicione múltiplas imagens do código de barras à janela de impressão
+        printWindow.document.write('<div class="barcode-container">');
+        for (let i = 0; i < 3; i++) { // Repita três vezes para preencher uma linha
+            printWindow.document.write('<img src="' + barcodeElement.src + '">');
+        }
+        printWindow.document.write('</div>');
+
+        printWindow.document.write('</body></html>');
+        printWindow.document.close();
+        
+        // Espere o conteúdo ser carregado na janela de impressão antes de iniciar a impressão
+        printWindow.onload = () => {
+            printWindow.print();
+            printWindow.close(); // Feche a janela de impressão após a impressão
+        };
+    }
+}
 
 }

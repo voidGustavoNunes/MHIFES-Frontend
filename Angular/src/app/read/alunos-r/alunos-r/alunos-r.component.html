@@ -45,6 +45,7 @@
                       <p-toast></p-toast>
                       <p-confirmPopup></p-confirmPopup>
                       <button type="button" class="botaoDele" (click)="confirm2($event, aluno?.id)" severity="danger" pButton>Deletar</button>
+                      <button type="button" class="botaoBarcode" (click)="generateBarcode(aluno?.matricula)" pButton>Gerar Código de Barras</button>
                   </td>
               </tr>
           </ng-template>
@@ -66,6 +67,18 @@
   </div>
 
   <p-scrollTop></p-scrollTop>
+
+    <!-- Popup para exibir o código de barras -->
+    <p-dialog header="Código de Barras" [(visible)]="visibleBarcode" [modal]="true" [style]="{ width: '50vw' }" [draggable]="false" [resizable]="false">
+        <div class="barcode-container" style="text-align: center;">
+        <img #barcodeImage />
+        </div>
+        <div class="divBotao">
+            <button type="button" class="p-button" (click)="printBarcode()">Imprimir</button>
+            <button type="button" class="botaoInfo" (click)="visibleBarcode = false" pButton>Fechar</button>
+        </div>
+    </p-dialog>
+
 </div>
 
 

@@ -80,9 +80,11 @@
           }
           .botaoInfo{
               @include themeButton(#A2FF7F, #1E8805);
+              
           }
           .botaoInfo:focus{
               border: .02rem solid #1E8805;
+              margin: 5rem auto 0;
           }
 
           .botaoEdit{
@@ -98,7 +100,14 @@
           }
           .botaoDele:focus{
               border: .02rem solid #89041E;
-          }
+            }
+            .botaoBarcode{
+                @include themeButton(#4A82FD, white);
+                margin: 0 .5rem;
+            }
+            .botaoBarcode:focus{
+                border: .02rem solid #4A82FD;
+            }
       }
       .tbBody:hover{
           background-color: #E5E7EB;
@@ -142,9 +151,11 @@
     
     .botaoInfo{
         @include themeButton(#A2FF7F, #1E8805);
+        
     }
     .botaoInfo:focus{
         border: .02rem solid #1E8805;
+        
     }
 
     .botaoEdit{
@@ -234,4 +245,5 @@
           }
       }
   }
+  
 }
