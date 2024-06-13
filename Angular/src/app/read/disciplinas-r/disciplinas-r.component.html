@@ -39,8 +39,6 @@
                     <td>{{disciplina?.sigla}}</td>
                     <td>
                         <button type="button" class="botaoEdit" (click)="showEditDialog(disciplina)" pButton>Editar</button>
-                        <p-toast></p-toast>
-                        <p-confirmPopup></p-confirmPopup>
                         <button type="button" class="botaoDele" (click)="confirm2($event, disciplina?.id)" severity="danger" pButton>Deletar</button>
                     </td>
                 </tr>

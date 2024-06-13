@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Aluno} from '../models/postgres/aluno.models';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
+import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
+import { Observable, catchError, map, throwError } from 'rxjs';
 import { Page } from '../models/share/page.models';
 
 @Injectable()
@@ -35,6 +35,13 @@ export class AlunoService {
   }
 
   excluir(id: number): Observable<Object> {
-    return this.http.delete(`${this.API}/${id}`, {observe: 'response'});
+    return this.http.delete(`${this.API}/${id}`, {observe: 'response'})
+    .pipe(
+      catchError(error => this.handleError(error))
+    );
+  }
+
+  private handleError(error: HttpErrorResponse) {
+    return throwError(() => new Error(error.message || 'Erro desconhecido'));
   }
 };

@@ -317,9 +317,13 @@ export class AlunosRComponent implements OnInit, OnDestroy {
         this.ngOnInit();
       },
       error: (err: any) => {
-        if (err.status == 401) {
+        if (err.status === 403) {
           this.messages = [
-            { severity: 'error', summary: 'Erro', detail: 'Não foi possível deletar registro associado a períodos.', life: 3000 },
+            { severity: 'error', summary: 'Erro', detail: 'Você não tem permissão para deletar este registro associado a alocações.', life: 3000 },
+          ];
+        } else if (err.status === 401) {
+          this.messages = [
+            { severity: 'error', summary: 'Erro', detail: 'Não foi possível deletar registro.', life: 3000 },
           ];
         } else {
           this.messages = [
@@ -405,10 +409,10 @@ export class AlunosRComponent implements OnInit, OnDestroy {
     }
   }
 
-  badgeOptionExclui() {
+  badgeOptionExclui(event: Event) {
     if(this.checkOptionsSelected.length > 0) {
       for (const key of this.checkOptionsSelected) {
-        this.deletarID(key.id)
+        this.confirm2(event, key.id)
       }
     }
   }

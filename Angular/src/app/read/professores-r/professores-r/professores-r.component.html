@@ -4,7 +4,7 @@
     <div class="opcao">
         <div class="btn-opcao">
           <a (click)="showDialog()" class="p-button botaoC">Cadastrar +</a>
-          <p-button label="Deletar" [raised]="true" severity="danger" badge="{{checkOptionsSelected.length}}" badgeClass="p-badge-danger" (onClick)="badgeOptionExclui()" />
+          <p-button label="Deletar" [raised]="true" severity="danger" badge="{{checkOptionsSelected.length}}" badgeClass="p-badge-danger" (onClick)="badgeOptionExclui($event)" />
           <p-button label="Gerar Código de Barras" [raised]="true" severity="info" badge="{{checkOptionsSelected.length}}" badgeClass="p-badge-info" (onClick)="badgeOptionGerarCodBarra()" />
       </div>
         
@@ -50,8 +50,6 @@
                     <td>
                         <button type="button" class="botaoInfo" (click)="showInfoDialog(professor)" pButton>Info</button>
                         <button type="button" class="botaoEdit" (click)="showEditDialog(professor)" pButton>Editar</button>
-                        <p-toast></p-toast>
-                        <p-confirmPopup></p-confirmPopup>
                         <button type="button" class="botaoDele" (click)="confirm2($event, professor?.id)" severity="danger" pButton>Deletar</button>
                     </td>
                 </tr>

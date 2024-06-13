@@ -31,14 +31,10 @@ export class AuthInterceptor implements HttpInterceptor {
 
         return next.handle(req).pipe(
             catchError((err: HttpErrorResponse) => {
-                    if(err.status === 401) {
+                    if (err.status === 403){
                         this.router.navigate(["/forbidden"]);
-                        // console.log('nao eh para vir daqui')
-                        // this.ngZone.run(() => this.router.navigate(['/forbidden']));
-                    } else if (err.status === 403){
-                        this.router.navigate(["/"]);
                     }
-                    const errorMess = new Error("Alguma coisa está errada.");
+                    const errorMess = new Error("Você não tem permissão para realizar esta ação.");
                     return throwError(() => errorMess);
                 }
             )

@@ -30,7 +30,6 @@
             text-transform: uppercase;
             border: .1rem solid #00208F;
             box-shadow: 0 .2rem .2rem rgba(0, 0, 0, 0.26);
-            margin-right: 1rem;
 
         }
         .botaoC:active{
@@ -250,22 +249,6 @@
     .p-badge.p-badge-info {
         background-color: #ffffff;
         color: #0ea5e9;
-    }
-    p-button.p-element.botaoC>button.p-ripple.p-element.p-button.p-component{
-        color: white;
-        background-color: #00208F;
-        text-decoration: none;
-        letter-spacing: .1rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        border: .1rem solid #00208F;
-        box-shadow: 0 .2rem .2rem rgba(0, 0, 0, 0.26);
-    }
-
-    p-button.p-element.botaoC>button.p-ripple.p-element.p-button.p-component:active{
-        background-color: white;
-        color: #00208F;
-        box-shadow: 0 .2rem .2rem rgba(0, 0, 0, 0.4);
     }
 }
 

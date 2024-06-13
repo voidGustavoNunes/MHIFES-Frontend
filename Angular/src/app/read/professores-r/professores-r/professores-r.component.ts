@@ -331,6 +331,23 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
     });
   }
 
+  confirm3(event: Event, id: number) {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: 'Deseja excluir esses registros?',
+      icon: 'pi pi-info-circle',
+      acceptButtonStyleClass: 'p-button-danger p-button-sm',
+      accept: () => {
+        this.deletarID(id);
+      },
+      reject: () => {
+        this.messages = [
+          { severity: 'info', summary: 'Cancelado', detail: 'Exclusão cancelada.', life: 3000 },
+        ];
+      }
+    });
+  }
+
   enviarFormSave() {
     this.professorService.criar(this.professoresCadast).subscribe({
       next: (data: any) => {
@@ -406,10 +423,13 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
         // window.location.reload();
       },
       error: (err: any) => {
-        console.log('err',err.status)
-        if (err.status == 401) {
+        if (err.status === 403) {
           this.messages = [
-            { severity: 'error', summary: 'Erro', detail: 'Não foi possível deletar registro associado a alocações.', life: 3000 },
+            { severity: 'error', summary: 'Erro', detail: 'Você não tem permissão para deletar este registro associado a alocações.', life: 3000 },
+          ];
+        } else if (err.status === 401) {
+          this.messages = [
+            { severity: 'error', summary: 'Erro', detail: 'Não foi possível deletar registro.', life: 3000 },
           ];
         } else {
           this.messages = [
@@ -442,11 +462,10 @@ onRFIDEnter() {
     this.rfidDialogVisible = false;
   }
 
-  badgeOptionExclui() {
+  badgeOptionExclui(event: Event) {
     if(this.checkOptionsSelected.length > 0) {
       for (const key of this.checkOptionsSelected) {
-        console.log(key.sigla,' - ',key.id)
-        this.deletarID(key.id)
+        this.confirm3(event, key.id)
       }
     }
   }
