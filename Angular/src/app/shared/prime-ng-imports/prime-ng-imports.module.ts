@@ -24,6 +24,7 @@ import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 import { TabViewModule } from 'primeng/tabview';
 import { RadioButtonModule } from 'primeng/radiobutton';
+import { SplitButtonModule } from 'primeng/splitbutton';
 
 @NgModule({
   exports: [
@@ -51,7 +52,8 @@ import { RadioButtonModule } from 'primeng/radiobutton';
     CheckboxModule,
     InputMaskModule,
     TabViewModule,
-    RadioButtonModule
+    RadioButtonModule,
+    SplitButtonModule
   ]
 })
 export class PrimeNgImportsModule { }

@@ -1,1 +1,40 @@
-<p>loading-page works!</p>
+<div class="card">
+    <p-splitButton 
+        label="Cadastrar" 
+        [model]="items" />
+    <p-button label="Excluir" badge="{{selectedProducts.length}}" />
+    <p-button label="Gerar código" badge="{{selectedProducts.length}}" />
+    <p-table 
+        [value]="products" 
+        [(selection)]="selectedProducts" 
+        dataKey="nome" 
+        [tableStyle]="{'min-width': '50rem'}">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th style="width: 4rem"><p-tableHeaderCheckbox /></th>
+                    <!-- <th>Code</th> -->
+                    <th>Nome</th>
+                    <th>Sigla</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-product>
+                <tr>
+                    <td>
+                        <p-tableCheckbox [value]="product" />
+                    </td>
+                    <!-- <td>{{product.id}}</td> -->
+                    <td>{{product.nome}}</td>
+                    <td>{{product.sigla}}</td>
+                </tr>
+            </ng-template>
+    </p-table>
+    
+    <p-button (click)="mostrarR = !mostrarR" label="Show Selected Products" />
+
+    <div *ngIf="mostrarR">
+        <div *ngIf="selectedProducts.length > 0">
+            <div *ngFor="let sel of selectedProducts">{{ sel.id }}:{{ sel.nome }}</div>
+        </div>
+        <div *ngIf="selectedProducts.length <= 0">Não há nenhum selecionado</div>
+    </div>
+</div>

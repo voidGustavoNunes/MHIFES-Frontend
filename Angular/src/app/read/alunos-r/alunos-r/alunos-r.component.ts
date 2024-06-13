@@ -69,6 +69,7 @@ export class AlunosRComponent implements OnInit, OnDestroy {
   sizeAln: number = 0;
 
   alunosPageData!: Page<Aluno>;
+  checkOptionsSelected: Aluno[] = []
 
   constructor(
     private alunService: AlunoService,
@@ -117,6 +118,7 @@ export class AlunosRComponent implements OnInit, OnDestroy {
       this.firstAln = event.first;
       this.rowsAln = event.rows;
       this.pageAln = event.page;
+      this.checkOptionsSelected = []
       this.listarPage()
     }
   }
@@ -315,9 +317,9 @@ export class AlunosRComponent implements OnInit, OnDestroy {
         this.ngOnInit();
       },
       error: (err: any) => {
-        if (err.status) {
+        if (err.status == 401) {
           this.messages = [
-            { severity: 'error', summary: 'Erro', detail: 'Não foi possível deletar registro.', life: 3000 },
+            { severity: 'error', summary: 'Erro', detail: 'Não foi possível deletar registro associado a períodos.', life: 3000 },
           ];
         } else {
           this.messages = [
@@ -401,6 +403,22 @@ export class AlunosRComponent implements OnInit, OnDestroy {
             printWindow.close(); // Feche a janela de impressão após a impressão
         };
     }
-}
+  }
+
+  badgeOptionExclui() {
+    if(this.checkOptionsSelected.length > 0) {
+      for (const key of this.checkOptionsSelected) {
+        this.deletarID(key.id)
+      }
+    }
+  }
+
+  badgeOptionGerarCodBarra() {
+    if(this.checkOptionsSelected.length > 0) {
+      for (const key of this.checkOptionsSelected) {
+        this.generateBarcode(key.matricula)
+      }
+    }
+  }
 
 }

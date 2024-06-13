@@ -1,9 +1,13 @@
 <div class="caixa">
     <h1>Professores</h1>
-    <!-- <h1 *ngIf="professoresOrientador.length > 0">Professores & Coordenadores</h1> -->
 
     <div class="opcao">
-        <a (click)="showDialog()" class="p-button botaoC">Cadastrar +</a>
+        <div class="btn-opcao">
+          <a (click)="showDialog()" class="p-button botaoC">Cadastrar +</a>
+          <p-button label="Deletar" [raised]="true" severity="danger" badge="{{checkOptionsSelected.length}}" badgeClass="p-badge-danger" (onClick)="badgeOptionExclui()" />
+          <p-button label="Gerar Código de Barras" [raised]="true" severity="info" badge="{{checkOptionsSelected.length}}" badgeClass="p-badge-info" (onClick)="badgeOptionGerarCodBarra()" />
+      </div>
+        
         <div class="pesq">
             <p-overlayPanel #op1>
                 <div style="display: flex; flex-direction: column; align-items: center; gap: .5rem;">
@@ -19,85 +23,18 @@
         </div>
     </div>
 
-    <!-- <div class="eqTable" *ngIf="professoresOrientador.length > 0">
-        <p-table
-            #dt2
-            [value]="professoresOrientador"
-            styleClass="p-datatable-striped"
-            [tableStyle]="{'min-width': '50rem'}"
-            [globalFilterFields]="['nome', 'matricula', 'curso']"
-        >
-            <ng-template pTemplate="caption">
-                <h3>Coordenadores</h3>
-                <div class="pesq">
-                    <p-overlayPanel #op>
-                        <div style="display: flex; flex-direction: column; align-items: center; gap: .5rem;">
-                            <p-dropdown [options]="filterOptions" [(ngModel)]="selectedFilterOri" optionLabel="nome" [showClear]="true" placeholder="Selecione um filtro"></p-dropdown>
-                            <p-button label="Limpar filtro" severity="warning" (click)="limparFilter('o')"></p-button>
-                        </div>
-                    </p-overlayPanel>
-                    <p-inputGroup>
-                        <button type="button" pButton (click)="op.toggle($event)" icon="pi pi-filter-fill"></button>
-                        <input #searchInputOri type="text" pInputText placeholder="Pesquisar coordenador" (keydown)="onKeyDown('o',$event, searchInputOri.value)" />
-                        <button type="button" pButton icon="pi pi-search" (click)="filterField('o',searchInputOri.value)"></button>
-                    </p-inputGroup>
-                </div>
-            </ng-template>
-            <ng-template pTemplate="header">
-                <tr class="tbHeader">
-                    <th>Nome</th>
-                    <th>Sigla</th>
-                    <th>Matrícula</th>
-                    <th></th>
-                </tr>
-            </ng-template>
-            <ng-template pTemplate="body" let-professor>
-                <tr class="tbBody">
-                    <td>{{professor?.nome}}</td>
-                    <td>{{professor?.sigla}}</td>
-                    <td>{{professor?.matricula}}</td>
-                    <td>
-                        <button type="button" class="botaoInfo" (click)="showInfoDialog(professor)" pButton>Info</button>
-                        <button type="button" class="botaoEdit" (click)="showEditDialog(professor)" pButton>Editar</button>
-                        <p-toast></p-toast>
-                        <p-confirmPopup></p-confirmPopup>
-                        <button type="button" class="botaoDele" (click)="confirm2($event, professor?.id)" severity="danger" pButton>Deletar</button>
-                    </td>
-                </tr>
-            </ng-template>
-            <ng-template pTemplate="emptymessage">
-                <tr>
-                    <td colspan="3">Não há professores orientadores cadastrados.</td>
-                </tr>
-            </ng-template>
-        </p-table>
-    </div> -->
-
     <div class="eqTable">
         <p-table
             #dt1
             [value]="professoresData"
             styleClass="p-datatable-striped"
             [tableStyle]="{'min-width': '50rem'}"
+            [(selection)]="checkOptionsSelected" 
+            dataKey="matricula" 
         >
-            <!-- <ng-template pTemplate="caption">
-                <h3>Professores</h3>
-                <div class="pesq">
-                    <p-overlayPanel #op1>
-                        <div style="display: flex; flex-direction: column; align-items: center; gap: .5rem;">
-                            <p-dropdown [options]="filterOptions" [(ngModel)]="selectedFilterProf" optionLabel="nome" [showClear]="true" placeholder="Selecione um filtro"></p-dropdown>
-                            <p-button label="Limpar filtro" severity="warning" (click)="limparFilter()"></p-button>
-                        </div>
-                    </p-overlayPanel>
-                    <p-inputGroup>
-                        <button type="button" pButton (click)="op1.toggle($event)" icon="pi pi-filter-fill"></button>
-                        <input #searchInputProf type="text" pInputText placeholder="Pesquisar professor" (keydown)="onKeyDown(,$event, searchInputProf.value)" />
-                        <button type="button" pButton icon="pi pi-search" (click)="filterField(,searchInputProf.value)"></button>
-                    </p-inputGroup>
-                </div>
-            </ng-template> -->
             <ng-template pTemplate="header">
                 <tr class="tbHeader">
+                    <th><p-tableHeaderCheckbox /></th>
                     <th>Nome</th>
                     <th>Sigla</th>
                     <th>Matrícula</th>
@@ -106,6 +43,7 @@
             </ng-template>
             <ng-template pTemplate="body" let-professor>
                 <tr class="tbBody">
+                    <td><p-tableCheckbox [value]="professor"/></td>
                     <td>{{professor?.nome}}</td>
                     <td>{{professor?.sigla}}</td>
                     <td>{{professor?.matricula}}</td>
@@ -150,7 +88,6 @@
     <p-dialog class="pHeader" [header]=ehTitulo [(visible)]="visible" [modal]="true" [breakpoints]="{ '960px': '75vw' }" [style]="{ width: '50vw' }" [draggable]="false" [resizable]="false">
         <form id="meuFormulario" [formGroup]="form" (ngSubmit)="onSubmit()">
             <div class="divInput pSwtich">
-                <!-- <p-inputSwitch #switch id="coordProf" class="form-control" formControlName="ehCoordenador" (click)="switchCooda = !switchCooda;" ></p-inputSwitch> -->
                 <p-inputSwitch #switch id="coordProf" class="form-control" formControlName="ehCoordenador" (click)="switchCooda = !switchCooda; patchForm()" ></p-inputSwitch>
                 <label for="coordProf">É coordenador?</label>
             </div>
@@ -173,16 +110,6 @@
                     <button type="button" class="lerRFIDButton" (click)="openRFIDDialog()">Ler RFID</button>
                 </span>
             </div>          
-            <!-- <div class="divInput" *ngIf="!switchCooda">
-                <span class="p-float-label">
-                    <input pInputText id="curso" class="form-control" formControlName="curso" maxlength="150" />
-                    <label for="curso">Curso</label>
-                </span>
-                <div *ngIf="form.hasError('peloMenosUmSelecionado') && form.get('curso')?.touched" class="validation-error">
-                    <p>Informação inválida! Preencha o campo.</p>
-                </div>
-            </div> -->
-            <!-- <div class="divInput" *ngIf="switchCooda"> -->
             <div class="divInput" *ngIf="!switchCooda">
                 <span class="p-float-label">
                     <p-dropdown #dropdown appendTo="body" [options]="coordenadoriasArray" optionLabel="nome" [filter]="true" filterBy="nome" [showClear]="true" placeholder="Selecione a coordenadoria" inputId="coodaProf" class="form-control" formControlName="coordenadoria">

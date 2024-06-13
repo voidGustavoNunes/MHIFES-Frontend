@@ -79,6 +79,7 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
 
   professoresPageData!: Page<Professor>;
   coordenasPageData!: Page<Coordenadoria>;
+  checkOptionsSelected: Professor[] = []
 
   constructor(
     private professorService: ProfessorService,
@@ -147,6 +148,7 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
       this.firstProfsr = event.first;
       this.rowsProfsr = event.rows;
       this.pageProfsr = event.page;
+      this.checkOptionsSelected = []
       this.listarPage()
     }
   }
@@ -404,9 +406,10 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
         // window.location.reload();
       },
       error: (err: any) => {
-        if (err.status) {
+        console.log('err',err.status)
+        if (err.status == 401) {
           this.messages = [
-            { severity: 'error', summary: 'Erro', detail: 'Não foi possível deletar registro.', life: 3000 },
+            { severity: 'error', summary: 'Erro', detail: 'Não foi possível deletar registro associado a alocações.', life: 3000 },
           ];
         } else {
           this.messages = [
@@ -435,8 +438,25 @@ onRFIDEnter() {
   }
 }
 
-closeRFIDDialog() {
-  this.rfidDialogVisible = false;
-}
+  closeRFIDDialog() {
+    this.rfidDialogVisible = false;
+  }
+
+  badgeOptionExclui() {
+    if(this.checkOptionsSelected.length > 0) {
+      for (const key of this.checkOptionsSelected) {
+        console.log(key.sigla,' - ',key.id)
+        this.deletarID(key.id)
+      }
+    }
+  }
+
+  badgeOptionGerarCodBarra() {
+    if(this.checkOptionsSelected.length > 0) {
+      for (const key of this.checkOptionsSelected) {
+        // this.generateBarcode(key.matricula)
+      }
+    }
+  }
 
 }

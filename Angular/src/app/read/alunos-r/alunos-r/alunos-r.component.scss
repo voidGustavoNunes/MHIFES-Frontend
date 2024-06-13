@@ -25,6 +25,8 @@
           text-transform: uppercase;
           border: .1rem solid #00208F;
           box-shadow: 0 .2rem .2rem rgba(0, 0, 0, 0.26);
+          margin-right: 1rem;
+
       }
       .botaoC:active{
           background-color: white;
@@ -194,6 +196,14 @@
         border-spacing: 0px;
         width: 100.25rem;
     }
+    .p-badge.p-badge-danger {
+        background-color: white;
+        color: #ef4444;
+    }
+    .p-badge.p-badge-info {
+        background-color: #ffffff;
+        color: #0ea5e9;
+    }
 }
 
 @media screen and (min-width: 686px) {
@@ -203,6 +213,12 @@
           display: flex;
           justify-content: space-between;
           flex-wrap: nowrap;
+
+          .btn-opcao{
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+          }
       }
   }
 
@@ -215,6 +231,12 @@
           .botaoSalva, .botaoEdit{
               margin-right: 5rem;
           }
+      }
+      .divPButton{
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        justify-content: center;
       }
   }
 }
@@ -231,6 +253,12 @@
           .pesq{
               margin-top: 2rem;
           }
+
+          .btn-opcao{
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+          }
       }
   }
   .card{
@@ -243,6 +271,12 @@
           .botaoSalva, .botaoEdit{
               margin-bottom: 1rem;
           }
+      }
+      .divPButton{
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        align-items: center;
       }
   }
   

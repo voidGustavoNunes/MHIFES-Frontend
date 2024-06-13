@@ -18,11 +18,13 @@ import { HorariosRComponent } from './read/horarios-r/horarios-r.component';
 import { RelatoriosRComponent } from './read/relatorios-r/relatorios-r.component';
 import { ScannerPopupComponent } from './read/scanner-popup/scanner-popup.component';
 import { DataResolver } from './_auth/data.resolver';
+import { LoadingPageComponent } from './begin/loading-page/loading-page.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'login', pathMatch: 'full' },
     { path: 'login', component: LoginComponent, canActivate: [LoggedGuard] },
     { path: 'forbidden', component: ForbiddenComponent },
+    { path: 'loading', component: LoadingPageComponent },
     { path: 'relatorios', component: RelatoriosRComponent },
     
     { path: 'home', component: HomeComponent, canActivate:[AuthGuard], data:{roles:["ADMIN", "USER"]} },
