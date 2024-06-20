@@ -26,26 +26,12 @@
         
             <div class="formInput">
                 <p-password placeholder="Senha" class="form-control" formControlName="password" [toggleMask]="true" (keydown)="onKeyDown($event)"></p-password>
-                <!-- <p-password placeholder="Role" class="form-control" formControlName="password" [toggleMask]="true" [minlength]="6" [maxLength]="15"></p-password> -->
                 <div *ngIf="form.get('password')?.invalid && errP" class="validation-error">
-                <!-- <div *ngIf="errS" class="validation-error"> -->
                     <p>{{ mssP }}</p>
                 </div>
             </div>
             <div class="formInput">
                 
-                <!-- <p-dropdown appendTo="body" [options]="disciplinasArray" optionLabel="nome" [filter]="true" filterBy="nome" [showClear]="true" placeholder="Selecione uma disciplina" inputId="discEvent" class="form-control" formControlName="disciplina">
-                    <ng-template pTemplate="selectedItem" let-selectedOption>
-                        <div class="flex align-items-center gap-2">
-                            <div>{{ selectedOption?.nome }}</div>
-                        </div>
-                    </ng-template>
-                    <ng-template let-disciplinaData pTemplate="item">
-                        <div class="flex align-items-center gap-2">
-                            <div>{{ disciplinaData.nome }}</div>
-                        </div>
-                    </ng-template>
-                </p-dropdown> -->
                 <p-dropdown appendTo="body" [(ngModel)]="selectedRole" [ngModelOptions]="{standalone: true}" [options]="papeisRole" optionLabel="label" placeholder="Selecione o papel do usuário" (ngModelChange)="onSelectDrop()" ></p-dropdown>
 
                 <div *ngIf="form.get('role')?.invalid && errR" class="validation-error">
@@ -56,7 +42,6 @@
 
         <ng-template pTemplate="footer">
             <p-button type="submit" label="Cadastrar" (onClick)="onSubmit()"></p-button>
-            <!-- <a href="login" rel="noopener noreferrer" class="font-bold">Já possui uma conta?</a> -->
         </ng-template>
     </p-card>
 </div>

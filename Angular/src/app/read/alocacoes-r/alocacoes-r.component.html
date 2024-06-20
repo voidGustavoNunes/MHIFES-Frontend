@@ -450,6 +450,9 @@
           <b>Turma: </b> {{alocacaoInfo?.turma}}
         </div>
       </div>
+      <div class="divInput">
+        <b>Semestre: </b> {{alocacaoInfo?.periodoDisciplina?.periodo?.ano}}/{{alocacaoInfo?.periodoDisciplina?.periodo?.semestre}}
+      </div>
       <div class="divInput dtAlocacao">
         <b>Período: </b> {{ alocacaoInfo?.periodoDisciplina?.periodo?.dataInicio | date: 'fullDate' : '' : 'pt-BR' }}<b>
           - </b>{{ alocacaoInfo?.periodoDisciplina?.periodo?.dataFim | date: 'fullDate' : '' : 'pt-BR' }}

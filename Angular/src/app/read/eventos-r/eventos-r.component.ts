@@ -295,8 +295,6 @@ export class EventosRComponent implements OnInit, OnDestroy {
     this.cadastrar = true;
     this.editar = false;
     this.dropdownLocal.writeValue(null);
-    this.calendarExtra.writeValue(null);
-    this.switch.writeValue(null);
 
     this.diasIntervalo = [];
     this.datasHour = [];
@@ -476,11 +474,14 @@ export class EventosRComponent implements OnInit, OnDestroy {
   }
 
   formatarHora(tempo: any) {
+    if(tempo) {
       const partes = tempo.split(':');
       const horas = partes[0];
       const minutos = partes[1];
 
       return `${horas}h ${minutos}min`;
+    }
+    return `00:00`
   }
 
   formatarTmStrTm(tempo: any) {

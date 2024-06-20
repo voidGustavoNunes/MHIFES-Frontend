@@ -195,29 +195,46 @@ export class NavHeaderComponent implements OnInit, OnDestroy {
         }
       },
       {
-        label: 'Relatórios',
-        routerLink:'relatorios',
+        label: 'Gerenciar recursos',
         style: {
           'margin-right': '.5rem',
           'font-weight': '600'
-        }
+        },
+        items: [
+          {
+            label: 'Eventos',
+            routerLink:'eventos',
+          },
+          {
+            label: 'Alocações',
+            routerLink:'alocacoes',
+          }
+        ]
+      },
+      {
+        label: 'Análises',
+        style: {
+          'margin-right': '.5rem',
+          'font-weight': '600'
+        },
+        items: [
+          {
+            label: 'Relatórios',
+            routerLink:'relatorios',
+          },
+          {
+            label: 'Consultar',
+            command: () => this.openScanner.emit()
+          }
+        ]
       }
     ]
-    
-    // this.window.addEventListener('beforeunload', () => {
-    //   this.logout();
-    // });
   }
   
   ngOnDestroy(): void {
     this.logout();
   }
   
-  // @HostListener('window:beforeunload')
-  // onBeforeUnload(): void {
-  //   this.logout();
-  // }
-
   isLogged() {
     return this.userAuthService.isLoggedIn();
   }

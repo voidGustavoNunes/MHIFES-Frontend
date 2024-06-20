@@ -110,21 +110,29 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     const scannerInput = document.getElementById('scannerInput');
     const otherInputs = document.querySelectorAll('input:not(#scannerInput)');
+    const otherTextareas = document.querySelectorAll('textarea:not(#scannerInput)');
     const otherInputsArray = Array.from(otherInputs);
+    const otherTextareasArray = Array.from(otherTextareas);
 
     document.addEventListener('click', (event:any) => {
-      const isPrimeNGInput = event.target.classList.contains('p-inputtext') || event.target.classList.contains('p-inputnumber');
-      // console.log('is ',isPrimeNGInput)
+      const targetElement = event.target as HTMLElement;
+      const isPrimeNGInput = targetElement.classList.contains('p-inputtext') || targetElement.classList.contains('p-inputnumber');
+      const isOtherInput = otherInputsArray.some((input: any) => input.contains(targetElement));
+      const isOtherText = otherTextareasArray.some((input: any) => input.contains(targetElement));
 
-      if ( (scannerInput?.contains(event.target) || !scannerInput?.contains(event.target)) && !otherInputsArray.some((input:any) => input.contains(event.target)) && !isPrimeNGInput ) {
-        // console.log('voltou fc')
-        // this.scannerInput.nativeElement.addEventListener('blur', () => {
-          this.scannerInput.nativeElement.focus();
-        // });
-      } else if( (scannerInput?.contains(event.target) || !scannerInput?.contains(event.target)) && (otherInputsArray.some((input:any) => input.contains(event.target)) || isPrimeNGInput) ) {
-        // console.log('saiu fc')
-        this.scannerInput.nativeElement.blur();
+      if (scannerInput) {
+          if (!isOtherInput && !isOtherText && !isPrimeNGInput && !scannerInput.contains(targetElement)) {
+            this.scannerInput.nativeElement.focus();
+          } else if (isOtherInput || isOtherText || isPrimeNGInput) {
+            this.scannerInput.nativeElement.blur();
+          }
       }
+
+      // if ( (scannerInput?.contains(event.target) || !scannerInput?.contains(event.target)) && !otherInputsArray.some((input:any) => input.contains(event.target)) && !isPrimeNGInput ) {
+      //   this.scannerInput.nativeElement.focus();
+      // } else if( (scannerInput?.contains(event.target) || !scannerInput?.contains(event.target)) && (otherInputsArray.some((input:any) => input.contains(event.target)) || isPrimeNGInput) ) {
+      //   this.scannerInput.nativeElement.blur();
+      // }
     });
   }
   
@@ -144,21 +152,17 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
 
     if ((this.isLoggedScan() && !url.includes('login') && !url.includes('forbidden')) || (this.isLoggedScan() && url.includes('relatorios'))) {
     // if ((!url.includes('login') && !url.includes('forbidden')) || (url.includes('relatorios'))) {
-      if(role === "ADMIN" || login === this.barcode) {
+      // if(role === "ADMIN") {
         setTimeout(() => {
           if(this.barcode != '') this.previousBarcode = this.barcode;
           else if(this.codeConsulta != '') this.previousBarcode = this.codeConsulta;
           if(this.barcode == '' && this.codeConsulta == '') this.previousBarcode = '';
-          console.log('perv ',this.previousBarcode)
           this.barcode = ''
           this.codeConsulta = ''
           this.mssMatriculaVazia = ''
           this.carregarUsersScan()
         }, 500);
-      } else if(login != this.previousBarcode) {
-        this.visible = true
-        this.mssMatriculaVazia = 'Favor fazer o login.'
-      }
+      // }
     } else {
       this.barcode = '';
       this.codeConsulta = '';
@@ -166,9 +170,10 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
   }
 
   mostrarHorarioUserScan() {
+    this.ehAluno = false
+    this.ehProfessor = false
     for (const aloc of this.alocacoesArray) {
       for (const aln of aloc.periodoDisciplina.alunos) {
-        // console.log('aln ',aln.matricula, 'prev ', this.previousBarcode)
         if(aln.matricula === this.previousBarcode){
           this.alunoComHorario = aln;
           this.ehAluno = true;
@@ -176,6 +181,7 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
         }
       }
       if(!this.ehAluno) {
+        console.log('code ',aloc.professor.matricula)
         if(aloc.professor.matricula === this.previousBarcode){
           this.professorComHorario = aloc.professor;
           this.ehProfessor = true;
@@ -191,7 +197,6 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
       this.visible = true
     } else {
       this.visible = true
-      console.log('nao tem matr.')
       this.mssMatriculaVazia = 'Não há horário para esta matrícula.'
     }
   }
@@ -218,7 +223,7 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
     if(this.sizeAloc > 0) {
       this.alocService.listarAtivos(0, this.sizeAloc).subscribe(alocs => {
         alocsAllData = alocs.content
-
+        
         if(alocsAllData.length > 0) {
           this.alocacoesArray = alocsAllData.filter((alocacao) => {
             const hoje = new Date();
@@ -339,16 +344,29 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
       const periodo = alocacao.periodoDisciplina.periodo;
       if(periodo) {
         if(hoje.getTime() >= this.formatarDtStrDtScan(periodo.dataInicio).getTime() && hoje.getTime() <= this.formatarDtStrDtScan(periodo.dataFim).getTime()) {
-          const studentFound = alocacao.periodoDisciplina.alunos.some(
-            (aln) => aln.matricula === this.previousBarcode
-          );
-    
-          if (studentFound) {
-            const diaSemana = this.formatarDtStrDtScan(alocacao.dataAula).getDay();
-            alocacaoUnique[diaSemana].push(alocacao);
-    
-            if (diaSemana >= 1 && diaSemana <= 5) {
-              alocacaoUniqueSemFinalSemana[diaSemana - 1].push(alocacao);
+          if(this.ehAluno) {
+            const studentFound = alocacao.periodoDisciplina.alunos.some(
+              (aln) => aln.matricula === this.previousBarcode
+            );
+      
+            if (studentFound) {
+              const diaSemana = this.formatarDtStrDtScan(alocacao.dataAula).getDay();
+              alocacaoUnique[diaSemana].push(alocacao);
+      
+              if (diaSemana >= 1 && diaSemana <= 5) {
+                alocacaoUniqueSemFinalSemana[diaSemana - 1].push(alocacao);
+              }
+            }
+          } else if(this.ehProfessor) {
+            const teacherFound = alocacao.professor.matricula === this.previousBarcode
+      
+            if (teacherFound) {
+              const diaSemana = this.formatarDtStrDtScan(alocacao.dataAula).getDay();
+              alocacaoUnique[diaSemana].push(alocacao);
+      
+              if (diaSemana >= 1 && diaSemana <= 5) {
+                alocacaoUniqueSemFinalSemana[diaSemana - 1].push(alocacao);
+              }
             }
           }
         }
@@ -405,7 +423,6 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
       });
     
       alocacaoUniqueSemFinalSemana[diaSemana] = alocacoesUnicasSemFinalSemana;
-      console.log(alocacaoUniqueSemFinalSemana[diaSemana])
     });
   
     this.alocacoesAgrupadas = alocacaoUnique;

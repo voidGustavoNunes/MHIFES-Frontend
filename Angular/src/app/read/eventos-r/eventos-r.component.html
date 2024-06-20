@@ -43,6 +43,8 @@
                     <td>
                         <button type="button" class="botaoInfo" (click)="showInfoDialog(evento)" pButton>Info</button>
                         <button type="button" class="botaoEdit" (click)="showEditDialog(evento, formatarDatas(evento?.dataEvento))" pButton>Editar</button>
+                        <p-toast></p-toast>
+                        <p-confirmPopup></p-confirmPopup>
                         <button type="button" class="botaoDele" (click)="confirm2($event, evento?.id)" severity="danger" pButton>Deletar</button>
                     </td>
                 </tr>
@@ -231,7 +233,7 @@
                 <b>Data do evento:</b> {{eventoInfo?.dataEvento | date: 'fullDate' : '' : 'pt-BR'}}
             </div>
             <div class="divInput">
-                <b>Horário:</b> {{ eventoInfo?.horario }}
+                <b>Horário:</b> {{ formatarHora(eventoInfo?.horario?.horaInicio) }} - {{ formatarHora(eventoInfo?.horario?.horaFim) }}
                 <!-- <b>Horário:</b> {{ formatarHora(eventoInfo?.horarioInicio) }} -->
             </div>
             <div class="divInput">

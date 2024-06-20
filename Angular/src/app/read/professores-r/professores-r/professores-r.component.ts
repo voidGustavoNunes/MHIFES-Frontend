@@ -224,6 +224,7 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
   }
 
   patchForm() {
+    this.switchCooda = !this.switchCooda;
     if(this.switchCooda) {
       this.form.patchValue({
         coordenadoria: null
@@ -331,14 +332,14 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
     });
   }
 
-  confirm3(event: Event, id: number) {
+  confirm3(event: Event, codes: Professor[]) {
     this.confirmationService.confirm({
       target: event.target as EventTarget,
       message: 'Deseja excluir esses registros?',
       icon: 'pi pi-info-circle',
       acceptButtonStyleClass: 'p-button-danger p-button-sm',
       accept: () => {
-        this.deletarID(id);
+        codes.forEach(prf => this.deletarID(prf.id));
       },
       reject: () => {
         this.messages = [
@@ -464,9 +465,7 @@ onRFIDEnter() {
 
   badgeOptionExclui(event: Event) {
     if(this.checkOptionsSelected.length > 0) {
-      for (const key of this.checkOptionsSelected) {
-        this.confirm3(event, key.id)
-      }
+      this.confirm3(event, this.checkOptionsSelected)
     }
   }
 

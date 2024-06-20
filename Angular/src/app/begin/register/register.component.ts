@@ -75,7 +75,7 @@ export class RegisterComponent implements OnInit {
 
   ngOnInit() {
     this.papeisRole = [
-      // { label: 'Admin', value: UserRole.ADMIN },
+      { label: 'Admin', value: UserRole.ADMIN },
       { label: 'User', value: UserRole.USER }
     ];
   }
@@ -87,10 +87,13 @@ export class RegisterComponent implements OnInit {
   }
 
   onSelectDrop() {
-    console.log(this.selectedRole)
     if (this.selectedRole.label === 'User') {
       this.form.patchValue({
         role: "USER"
+      });
+    } else if (this.selectedRole.label === 'Admin') {
+      this.form.patchValue({
+        role: "ADMIN"
       });
     }
   }
@@ -99,16 +102,10 @@ export class RegisterComponent implements OnInit {
     this.userService.register(this.user).subscribe({
       next: (data: any) => {
         this.user = data;
-        // this.ngOnInit();
         this.messages = [
           { severity: 'success', summary: 'Sucesso', detail: 'Usuário registrado com sucesso!', life: 3000 },
         ];
         this.form.reset();
-        // setTimeout(() => {
-        //   this.router.navigate(['login']).then(() => {
-        //     window.location.reload();
-        //   });
-        // }, 3000);
       },
       error: (err: any) => {
         if (err.status === 400) {
@@ -126,7 +123,6 @@ export class RegisterComponent implements OnInit {
   }
 
   onSubmit() {
-    console.log(this.form.value)
     if(this.form.valid) {
       this.user = this.form.value;
       this.enviarForm();

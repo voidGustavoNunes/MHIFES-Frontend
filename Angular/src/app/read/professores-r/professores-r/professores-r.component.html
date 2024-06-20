@@ -50,6 +50,8 @@
                     <td>
                         <button type="button" class="botaoInfo" (click)="showInfoDialog(professor)" pButton>Info</button>
                         <button type="button" class="botaoEdit" (click)="showEditDialog(professor)" pButton>Editar</button>
+                        <p-toast></p-toast>
+                        <p-confirmPopup></p-confirmPopup>
                         <button type="button" class="botaoDele" (click)="confirm2($event, professor?.id)" severity="danger" pButton>Deletar</button>
                     </td>
                 </tr>
@@ -86,7 +88,7 @@
     <p-dialog class="pHeader" [header]=ehTitulo [(visible)]="visible" [modal]="true" [breakpoints]="{ '960px': '75vw' }" [style]="{ width: '50vw' }" [draggable]="false" [resizable]="false">
         <form id="meuFormulario" [formGroup]="form" (ngSubmit)="onSubmit()">
             <div class="divInput pSwtich">
-                <p-inputSwitch #switch id="coordProf" class="form-control" formControlName="ehCoordenador" (click)="switchCooda = !switchCooda; patchForm()" ></p-inputSwitch>
+                <p-inputSwitch #switch id="coordProf" class="form-control" formControlName="ehCoordenador" (click)="patchForm()" ></p-inputSwitch>
                 <label for="coordProf">É coordenador?</label>
             </div>
             <div class="divInput">

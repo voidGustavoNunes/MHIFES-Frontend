@@ -32,13 +32,10 @@
             <ng-template pTemplate="body" let-equipamento>
                 <tr class="tbBody">
                     <td>{{equipamento?.nome}}</td>
-                    <!-- <td>{{equipamento?.descricao}}</td> -->
-                    <!-- <td>
-                        <button type="button" class="botaoInfo" pButton>Info</button>
-                    </td> -->
-                    <!-- <td></td> -->
                     <td>
                         <button type="button" class="botaoEdit" (click)="showEditDialog(equipamento)" pButton>Editar</button>
+                        <p-toast></p-toast>
+                        <p-confirmPopup></p-confirmPopup>
                         <button type="button" class="botaoDele" (click)="confirm2($event, equipamento?.id)" severity="danger" pButton>Deletar</button>
                     </td>
                 </tr>

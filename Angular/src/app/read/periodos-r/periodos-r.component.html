@@ -41,6 +41,8 @@
                     <td>
                         <button type="button" class="botaoInfo" (click)="showInfoDialog(periodo)" pButton>Info</button>
                         <button type="button" class="botaoEdit" (click)="showEditDialog(periodo, formatarDatas(periodo?.dataInicio), formatarDatas(periodo?.dataFim))" pButton>Editar</button>
+                        <p-toast></p-toast>
+                        <p-confirmPopup></p-confirmPopup>
                         <button type="button" class="botaoDele" (click)="confirm2($event, periodo?.id)" severity="danger" pButton>Deletar</button>
                     </td>
                 </tr>

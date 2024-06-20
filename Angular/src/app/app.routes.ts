@@ -16,8 +16,6 @@ import { ForbiddenComponent } from './begin/forbidden/forbidden.component';
 import { LoggedGuard } from './_auth/logged.guard';
 import { HorariosRComponent } from './read/horarios-r/horarios-r.component';
 import { RelatoriosRComponent } from './read/relatorios-r/relatorios-r.component';
-import { ScannerPopupComponent } from './read/scanner-popup/scanner-popup.component';
-import { DataResolver } from './_auth/data.resolver';
 import { LoadingPageComponent } from './begin/loading-page/loading-page.component';
 
 export const routes: Routes = [
@@ -40,6 +38,6 @@ export const routes: Routes = [
     { path: 'locais', component: LocaisRComponent, canActivate:[AuthGuard], data:{roles:["ADMIN"]} },
     { path: 'horarios', component: HorariosRComponent, canActivate:[AuthGuard], data:{roles:["ADMIN"]} },
     
-    { path: 'eventos', component: EventosRComponent, canActivate:[AuthGuard], data:{roles:["ADMIN"]} },
-    { path: 'alocacoes', component: AlocacoesRComponent, canActivate:[AuthGuard], data:{roles:["ADMIN"]} },
+    { path: 'eventos', component: EventosRComponent, canActivate:[AuthGuard], data:{roles:["ADMIN", "USER"]} },
+    { path: 'alocacoes', component: AlocacoesRComponent, canActivate:[AuthGuard], data:{roles:["ADMIN", "USER"]} },
 ];

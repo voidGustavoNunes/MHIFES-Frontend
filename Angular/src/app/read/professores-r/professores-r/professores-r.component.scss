@@ -133,6 +133,9 @@
             font-size: .8rem;
         }
     }
+    .pSwtich label {
+        margin-left: 2.5rem;
+    }
     .divInput{
         width: fit-content;
         margin: 0 auto 2rem;
@@ -249,6 +252,9 @@
     .p-badge.p-badge-info {
         background-color: #ffffff;
         color: #0ea5e9;
+    }
+    p-inputswitch#coordProf {
+        width: 1rem;
     }
 }
 
