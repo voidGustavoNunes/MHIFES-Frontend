@@ -85,7 +85,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   alocacoesCadast: Alocacao[] = [];
   alocacoesEdit: Alocacao[] = [];
   alocacaoInfo!: Alocacao;
-  
+
   alocacoesDataDelete: Alocacao[] = [];
   alocacoesDeleteFilter: Alocacao[] = [];
   selectedFilterInat!: FiltrarPesquisa;
@@ -144,12 +144,12 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
 
   // Tabela
   cols!: Column[];
-  
+
   firstAloc: number = 0;
   pageAloc: number = 0;
   rowsAloc: number = 10;
   sizeAloc: number = 0;
-  
+
   firstDelAloc: number = 0;
   pageDelAloc: number = 0;
   rowsDelAloc: number = 10;
@@ -165,7 +165,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   visibleMigra: boolean = false;
   mysqlAlocacoes: AlocacaoMySQL[] = [];
   dataMysqlAlocacoes: AlocacaoMySQL[] = [];
-  
+
   constructor(
     private alocService: AlocacaoService,
     private router: Router,
@@ -209,12 +209,12 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       { nome: 'Hora de início', id: 3 },
     ];
 
-    this.unsubscribe$ = this.alocService.listarAtivos(0,10)
+    this.unsubscribe$ = this.alocService.listarAtivos(0, 10)
       .subscribe({
         next: (itens: any) => {
           this.alocacoesPageData = itens;
           this.sizeAloc = this.alocacoesPageData.totalElements;
-          
+
           this.alocacoesData = this.alocacoesPageData.content;
 
           // this.alocacoesData.sort((a: Alocacao, b: Alocacao) => {
@@ -225,7 +225,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
           //   const dateB = new Date(b.dataAula);
           //   return dateB.getTime() - dateA.getTime();
           // });
-          
+
           // this.listarPage()
           this.listarPageObj(0)
         },
@@ -236,7 +236,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
         }
       });
 
-    this.unsubscribe$Loc = this.locService.listar(0,10)
+    this.unsubscribe$Loc = this.locService.listar(0, 10)
       .subscribe({
         next: (itens: any) => {
           this.locaisPageData = itens
@@ -249,7 +249,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
         }
       });
 
-    this.unsubscribe$Prof = this.professorService.listar(0,10)
+    this.unsubscribe$Prof = this.professorService.listar(0, 10)
       .subscribe({
         next: (itens: any) => {
           this.professoresPageData = itens
@@ -262,7 +262,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
         }
       });
 
-    this.unsubscribe$Hor = this.hourService.listar(0,10)
+    this.unsubscribe$Hor = this.hourService.listar(0, 10)
       .subscribe({
         next: (itens: any) => {
           this.horariosPageData = itens
@@ -274,31 +274,31 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
           ];
         }
       });
-      
-    this.unsubscribe$Per = this.periodService.listar(0,10)
-    .subscribe({
-      next: (itens: any) => {
-        this.periodosPageData = itens
-        this.listarPageObj(3)
-      },
-      error: (err: any) => {
-        this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Dados de períodos não encontrados.', life: 3000 },
-        ];
-      }
-    });
-      
+
+    this.unsubscribe$Per = this.periodService.listar(0, 10)
+      .subscribe({
+        next: (itens: any) => {
+          this.periodosPageData = itens
+          this.listarPageObj(3)
+        },
+        error: (err: any) => {
+          this.messages = [
+            { severity: 'error', summary: 'Erro', detail: 'Dados de períodos não encontrados.', life: 3000 },
+          ];
+        }
+      });
+
     this.unsubscribe$Migr = this.migraService.listaMysql()
-    .subscribe({
-      next: (itens: any) => {
-        this.dataMysqlAlocacoes = itens
-      },
-      error: (err: any) => {
-        this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Dados de mysql alocações não encontrados.', life: 3000 },
-        ];
-      }
-    });
+      .subscribe({
+        next: (itens: any) => {
+          this.dataMysqlAlocacoes = itens
+        },
+        error: (err: any) => {
+          this.messages = [
+            { severity: 'error', summary: 'Erro', detail: 'Dados de mysql alocações não encontrados.', life: 3000 },
+          ];
+        }
+      });
 
     // Colunas da tabela
     this.cols = [
@@ -320,15 +320,15 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     this.unsubscribe$Prof.unsubscribe();
     this.unsubscribe$Hor.unsubscribe();
   }
-  
+
   onPageChange(event: PaginatorState, stat: number) {
     if (event.first !== undefined && event.rows !== undefined && event.page !== undefined) {
-      if(stat == 0) {
+      if (stat == 0) {
         this.firstAloc = event.first;
         this.rowsAloc = event.rows;
         this.pageAloc = event.page;
         this.listarPageAt()
-      } else if(stat == 1) {
+      } else if (stat == 1) {
         this.firstDelAloc = event.first;
         this.rowsDelAloc = event.rows;
         this.pageDelAloc = event.page;
@@ -336,12 +336,12 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       }
     }
   }
-  
+
   listarPageAt() {
     this.alocService.listarAtivos(this.pageAloc, this.rowsAloc).subscribe(alcc => {
       this.alocacoesData = alcc.content;
 
-      if(this.alocacoesData.length > 0) {
+      if (this.alocacoesData.length > 0) {
         this.alocacoesData.sort((a: Alocacao, b: Alocacao) => {
           if ((a.dataAula === undefined || b.dataAula === undefined) || (a.dataAula === null || b.dataAula === null)) {
             return 0;
@@ -357,8 +357,8 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   listarPageInat() {
     this.alocService.listarInativos(this.pageDelAloc, this.rowsDelAloc).subscribe(alcc => {
       this.alocacoesDataDelete = alcc.content;
-      
-      if(this.alocacoesDataDelete.length > 0) {
+
+      if (this.alocacoesDataDelete.length > 0) {
         this.alocacoesDataDelete.sort((a: Alocacao, b: Alocacao) => {
           if ((a.dataAula === undefined || b.dataAula === undefined) || (a.dataAula === null || b.dataAula === null)) {
             return 0;
@@ -372,11 +372,11 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   }
 
   listarPageObj(object: number) {
-    if(object == 0) {
-      this.alocService.listarInativos(0,10).subscribe(alcc => {
+    if (object == 0) {
+      this.alocService.listarInativos(0, 10).subscribe(alcc => {
         this.alocacoesDataDelete = alcc.content
 
-        if(this.alocacoesDataDelete.length > 0) {
+        if (this.alocacoesDataDelete.length > 0) {
           this.alocacoesDataDelete.sort((a: Alocacao, b: Alocacao) => {
             if ((a.dataAula === undefined || b.dataAula === undefined) || (a.dataAula === null || b.dataAula === null)) {
               return 0;
@@ -389,14 +389,14 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
         }
       })
       this.pageFilter()
-    } else if(object == 1) {
+    } else if (object == 1) {
       let sizeUm = this.horariosPageData.totalElements
-      if(sizeUm > 0) {
-        this.hourService.listar(0,sizeUm).subscribe(hor => this.horariosArray = hor.content)
-        this.horariosArray.sort((a:Horario, b:Horario) => {
+      if (sizeUm > 0) {
+        this.hourService.listar(0, sizeUm).subscribe(hor => this.horariosArray = hor.content)
+        this.horariosArray.sort((a: Horario, b: Horario) => {
           let hAi = this.formatMiliss(a.horaInicio)
           let hBi = this.formatMiliss(b.horaFim)
-          
+
           if (hAi < hBi) {
             return -1;
           } else if (hAi > hBi) {
@@ -406,39 +406,39 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
           }
         })
       }
-    } else if(object == 2) {
+    } else if (object == 2) {
       let sizeDois = this.locaisPageData.totalElements
-      if(sizeDois > 0) {
-        this.locService.listar(0,sizeDois).subscribe(locs => this.locaisArray = locs.content)
+      if (sizeDois > 0) {
+        this.locService.listar(0, sizeDois).subscribe(locs => this.locaisArray = locs.content)
         this.locaisArray.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1)
       }
-    } else if(object == 3) {
+    } else if (object == 3) {
       let sizeTres = this.periodosPageData.totalElements
-      if(sizeTres > 0) {
-        this.periodService.listar(0,sizeTres).subscribe(pero => this.periodosArray = pero.content)
+      if (sizeTres > 0) {
+        this.periodService.listar(0, sizeTres).subscribe(pero => this.periodosArray = pero.content)
         this.periodosArray.sort((a: Periodo, b: Periodo) => {
           const dateA = new Date(a.dataInicio);
           const dateB = new Date(b.dataInicio);
           return dateB.getTime() - dateA.getTime();
         });
       }
-    } else if(object == 4) {
+    } else if (object == 4) {
       let sizeQuatro = this.professoresPageData.totalElements
-      if(sizeQuatro > 0) {
-        this.professorService.listar(0,sizeQuatro).subscribe(prfs => this.professoresArray = prfs.content)
+      if (sizeQuatro > 0) {
+        this.professorService.listar(0, sizeQuatro).subscribe(prfs => this.professoresArray = prfs.content)
         this.professoresArray.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1)
       }
     }
   }
-  
+
   pageFilter() {
-    if(this.sizeAloc > 0) {
-      this.alocService.listarAtivos(0,this.sizeAloc).subscribe(alcc => {
+    if (this.sizeAloc > 0) {
+      this.alocService.listarAtivos(0, this.sizeAloc).subscribe(alcc => {
         this.alocacoesFilter = alcc.content
       })
     }
-    if(this.sizeDelAloc > 0) {
-      this.alocService.listarInativos(0,this.sizeDelAloc).subscribe(alcc => {
+    if (this.sizeDelAloc > 0) {
+      this.alocService.listarInativos(0, this.sizeDelAloc).subscribe(alcc => {
         this.alocacoesDeleteFilter = alcc.content
       })
     }
@@ -487,18 +487,18 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       periodoDisciplina: value.periodoDisciplina,
     })
 
-    if(dtEv != null) {
+    if (dtEv != null) {
       const eventoData = this.formatarDtStrDt(dtEv);
       this.calendar.writeValue(eventoData);
     }
-    
+
     let perEdit = value.periodoDisciplina;
     if (perEdit && perEdit?.periodo && this.periodosArray) {
       for (const ped of this.periodosArray) {
-        console.log('if 2 ',ped == perEdit.periodo)
-        console.log('if 1 ',ped)
-        console.log('if 1 ',perEdit.periodo)
-        if(ped.id == perEdit.periodo.id) {
+        console.log('if 2 ', ped == perEdit.periodo)
+        console.log('if 1 ', ped)
+        console.log('if 1 ', perEdit.periodo)
+        if (ped.id == perEdit.periodo.id) {
           this.selectedPeriodo = ped;
           this.updateDisciplinaStateEdit()
         }
@@ -532,7 +532,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     this.form.reset();
     this.visibleLog = false;
     this.alocacaoHour = [];
-    
+
     let nulo!: Periodo;
     this.selectedPeriodo = nulo;
     this.periodosDisciplinaArray = [];
@@ -693,7 +693,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
 
       this.periodosDisciplinaArray = this.selectedPeriodo.periodoDisciplinas;
       this.enableDisciplina = true;
-      
+
       let discp: Disciplina = this.form.get('periodoDisciplina.disciplina')?.value;
       if (discp) {
         this.form.patchValue({
@@ -722,18 +722,18 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       this.maxDateAula.setMonth(this.maxDateAula.getMonth());
       this.maxDateAula.setFullYear(this.maxDateAula.getFullYear());
 
-      
-      console.log('perdisc ',this.selectedPeriodo)
+
+      console.log('perdisc ', this.selectedPeriodo)
       this.periodosDisciplinaArray = this.selectedPeriodo.periodoDisciplinas;
-      
-      if(perdisc.periodo?.id != this.selectedPeriodo.id) {
+
+      if (perdisc.periodo?.id != this.selectedPeriodo.id) {
         this.form.patchValue({
           periodoDisciplina: null,
           dataAula: null
         })
       } else {
         for (const ped of this.selectedPeriodo.periodoDisciplinas) {
-          if(perdisc.id == ped.id) {
+          if (perdisc.id == ped.id) {
             this.form.patchValue({
               periodoDisciplina: ped
             })
@@ -773,14 +773,14 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   }
 
   limparFilter(tipo: string) {
-    if(tipo == 'a') {
+    if (tipo == 'a') {
       const inputElement = this.inputSearch.nativeElement.value
       if (inputElement) {
         this.inputSearch.nativeElement.value = '';
       }
       this.selectedFilter = {} as FiltrarPesquisa;
       this.listarPageAt()
-    } else if(tipo == 'i') {
+    } else if (tipo == 'i') {
       const inputElement = this.inputSearchInat.nativeElement.value
       if (inputElement) {
         this.inputSearchInat.nativeElement.value = '';
@@ -791,7 +791,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   }
 
   searchFilter0(tipo: string, term: string) {
-    if(tipo == 'a') {
+    if (tipo == 'a') {
       this.alocacoesData = this.alocacoesFilter.filter(aloca => {
         if (aloca.professor.nome.toLowerCase().includes(term.toLowerCase())) {
           return aloca;
@@ -799,7 +799,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
           return null;
         }
       })
-    } else if(tipo == 'i') {
+    } else if (tipo == 'i') {
       this.alocacoesDataDelete = this.alocacoesDeleteFilter.filter(aloca => {
         if (aloca.professor.nome.toLowerCase().includes(term.toLowerCase())) {
           return aloca;
@@ -811,7 +811,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   }
 
   searchFilter1(tipo: string, term: string) {
-    if(tipo == 'a') {
+    if (tipo == 'a') {
       this.alocacoesData = this.alocacoesFilter.filter(aloca => {
         if (aloca.local.nome.toLowerCase().includes(term.toLowerCase())) {
           return aloca;
@@ -819,7 +819,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
           return null;
         }
       })
-    } else if(tipo == 'i') {
+    } else if (tipo == 'i') {
       this.alocacoesDataDelete = this.alocacoesDeleteFilter.filter(aloca => {
         if (aloca.local.nome.toLowerCase().includes(term.toLowerCase())) {
           return aloca;
@@ -831,7 +831,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   }
 
   searchFilter2(tipo: string, term: string) {
-    if(tipo == 'a') {
+    if (tipo == 'a') {
       this.alocacoesData = this.alocacoesFilter.filter(aloca => {
         if (aloca.periodoDisciplina.disciplina.nome.toLowerCase().includes(term.toLowerCase())) {
           return aloca;
@@ -839,7 +839,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
           return null;
         }
       })
-    } else if(tipo == 'i') {
+    } else if (tipo == 'i') {
       this.alocacoesDataDelete = this.alocacoesDeleteFilter.filter(aloca => {
         if (aloca.periodoDisciplina.disciplina.nome.toLowerCase().includes(term.toLowerCase())) {
           return aloca;
@@ -853,7 +853,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   searchFilter3(tipo: string, term: string) {
     const compA = this.formatarTmStrTm(term);
     if (compA != null) {
-      if(tipo == 'a') {
+      if (tipo == 'a') {
         this.alocacoesData = this.alocacoesFilter.filter(aloca => {
           const compB = this.formatarTmStrTm(aloca.horario.horaInicio);
           if (compB != null) {
@@ -866,7 +866,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
             return null;
           }
         })
-      } else if(tipo == 'i') {
+      } else if (tipo == 'i') {
         this.alocacoesDataDelete = this.alocacoesDeleteFilter.filter(aloca => {
           const compB = this.formatarTmStrTm(aloca.horario.horaInicio);
           if (compB != null) {
@@ -892,7 +892,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
 
   filterField(tipo: string, searchTerm: string) {
     if (searchTerm && (searchTerm != null || searchTerm != '')) {
-      if(tipo == 'a') {
+      if (tipo == 'a') {
         if (this.selectedFilter) {
           if (this.selectedFilter.id == 0) this.searchFilter0(tipo, searchTerm);
           if (this.selectedFilter.id == 1) this.searchFilter1(tipo, searchTerm);
@@ -903,7 +903,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
             { severity: 'warn', summary: 'Atenção', detail: 'Selecione um filtro!', life: 3000 },
           ];
         }
-      } else if(tipo == 'i') {
+      } else if (tipo == 'i') {
         if (this.selectedFilterInat) {
           if (this.selectedFilterInat.id == 0) this.searchFilter0(tipo, searchTerm);
           if (this.selectedFilterInat.id == 1) this.searchFilter1(tipo, searchTerm);
@@ -994,13 +994,13 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   }
 
   updateMask(tipo: string) {
-    if(tipo == 'a') {
+    if (tipo == 'a') {
       if (this.selectedFilter?.id == 3) {
         this.txtFilter = '00:00';
       } else {
         this.txtFilter = 'Pesquisar alocação';
       }
-    } else if(tipo == 'i') {
+    } else if (tipo == 'i') {
       if (this.selectedFilterInat?.id == 3) {
         this.txtFilterInat = '00:00';
       } else {
@@ -1084,7 +1084,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   }
 
   saveMigrationMysql() {
-    if(this.mysqlAlocacoes.length > 0) {
+    if (this.mysqlAlocacoes.length > 0) {
       this.migraService.migrateAlocacoes(this.mysqlAlocacoes).subscribe({
         next: (data: any) => {
           this.messages = [
@@ -1197,43 +1197,72 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       });
   }
 
-  jsonForObject(descricao: string): any {
+  jsonForObject(descricao: string | null): any {
+    if (!descricao) {
+      return null;
+    }
     let alocacao: Alocacao = JSON.parse(descricao);
     return alocacao;
   }
 
+  isDifferent(antiga: any, nova: any, field: string): boolean {
+    if (!antiga && !nova) {
+        return false;
+    }
+    if (!antiga || !nova) {
+        return true;
+    }
+    return this.formatarApresentacao(antiga, field) !== this.formatarApresentacao(nova, field);
+  }
+
+  shouldDisplayField(log: any, field: string): boolean {
+    const antiga = this.jsonForObject(log.descricaoAntiga);
+    const nova = this.jsonForObject(log.descricaoNova);
+    if (log.operacao === 'Exclusão') {
+        return !!antiga;
+    }
+    return this.isDifferent(antiga, nova, field);
+  }
+
   formatarApresentacao(alocacao: Alocacao, field: string): any {
+    if (!alocacao) {
+      return '';
+    }
 
     const datePipe = new DatePipe('pt-BR');
 
-    if (field == 'disciplina') {
-      return alocacao.periodoDisciplina.disciplina.nome;
+    switch (field) {
+      case 'disciplina':
+        return alocacao.periodoDisciplina.disciplina.nome;
+      case 'professor':
+        return alocacao.professor.nome;
+      case 'local':
+        if (alocacao.local == null) {
+          return 'Sem local';
+        }
+        return alocacao.local.nome;
+      case 'periodo':
+        if (alocacao.periodoDisciplina.periodo) {
+          return `${datePipe.transform(alocacao.periodoDisciplina.periodo.dataInicio, 'dd/MM/yyyy')} - ${datePipe.transform(alocacao.periodoDisciplina.periodo.dataFim, 'dd/MM/yyyy')}`;
+        }
+        break;
+      case 'horario':
+        return `${alocacao.horario.horaInicio}min - ${alocacao.horario.horaFim}min`;
+      case 'dataAula':
+        if (alocacao.dataAula === undefined || alocacao.dataAula === null) {
+          return 'Sem data';
+        }
+        return datePipe.transform(alocacao.dataAula, 'dd/MM/yyyy');
+      case 'turma':
+        return alocacao.turma;
+      case 'alunos':
+        if (alocacao.periodoDisciplina.alunos.length > 0) {
+          return alocacao.periodoDisciplina.alunos.map((aluno: Aluno) => aluno.nome).join(', ');
+        }
+        return 'Sem alunos';
+      default:
+        return '';
     }
-    if (field == 'professor') {
-      return alocacao.professor.nome;
-    }
-    if (field == 'local') {
-      return alocacao.local.nome;
-    }
-    if (field == 'periodo') {
-      if (alocacao.periodoDisciplina.periodo) {
-        return datePipe.transform(alocacao.periodoDisciplina.periodo.dataInicio, 'dd/MM/yyyy') + ' - ' + datePipe.transform(alocacao.periodoDisciplina.periodo.dataFim, 'dd/MM/yyyy');
-      }
-    }
-    if (field == 'horario') {
-      return alocacao.horario.horaInicio + 'min - ' + alocacao.horario.horaFim + 'min';
-    }
-    if (field == 'dataAula') {
-      return datePipe.transform(alocacao.dataAula, 'dd/MM/yyyy');
-    }
-    if (field == 'turma') {
-      return alocacao.turma;
-    }
-    if (field == 'alunos') {
-      return alocacao.periodoDisciplina.alunos.map((aluno: Aluno) => aluno.nome).join(', ');
-    }
-
-    return '';
   }
 
   formatarDiferenca(valorAnterior: any, valorAtual: any): any {

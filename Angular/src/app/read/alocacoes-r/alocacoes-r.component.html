@@ -487,9 +487,19 @@
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-col>
-              <tr>
+              <tr *ngIf="shouldDisplayField(log, col.field)">
                 <td>{{ col.header }}</td>
-                <td>{{ formatarApresentacao(jsonForObject(log.descricao), col.field) }}</td>
+                <td>
+                  <ng-container *ngIf="log.operacao === 'Exclusão' || isDifferent(jsonForObject(log.descricaoAntiga), jsonForObject(log.descricaoNova), col.field)">
+                    <div *ngIf="log.operacao === 'Exclusão' || log.descricaoAntiga" class="old-description">
+                      {{ formatarApresentacao(jsonForObject(log.descricaoAntiga), col.field) }}
+                    </div>
+                    <hr *ngIf="log.descricaoAntiga && log.descricaoNova" class="description-separator">
+                    <div *ngIf="log.descricaoNova" class="new-description">
+                      {{ formatarApresentacao(jsonForObject(log.descricaoNova), col.field) }}
+                    </div>
+                  </ng-container>
+                </td>
               </tr>
             </ng-template>
           </p-table>
@@ -513,13 +523,13 @@
     <div id="meuFormInfo">
       <div class="divInput">
         <p-floatLabel>
-          <p-multiSelect 
+          <p-multiSelect
               appendTo="body"
-              inputId="float-label" 
-              [options]="dataMysqlAlocacoes" 
-              [(ngModel)]="mysqlAlocacoes" 
+              inputId="float-label"
+              [options]="dataMysqlAlocacoes"
+              [(ngModel)]="mysqlAlocacoes"
               optionLabel="disciplinaMySQL.sigla"
-              display="chip" 
+              display="chip"
               [showClear]="true" >
               <ng-template let-value pTemplate="selectedItems">
                 <div class="inline-flex align-items-center gap-2 px-1" *ngFor="let option of value">
@@ -536,7 +546,7 @@
                 <div class="py-2 px-3">
                     <b>
                         {{ sqlAloc ? sqlAloc.length : 0 }}
-                    </b> 
+                    </b>
                     itens{{ (sqlAloc ? sqlAloc.length : 0) > 1 ? 's' : '' }} selecionados.
                 </div>
             </ng-template>
