@@ -1036,13 +1036,13 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
         this.alocacoesCadast = data;
         // this.goToRouteSave();
         this.messages = [
-          { severity: 'success', summary: 'Sucesso', detail: 'Alocação cadastrada com sucesso!', life: 3000 },
+          { severity: 'success', summary: 'Sucesso', detail: 'Alocação cadastrada com sucesso!', life: 5000 },
         ];
         this.ngOnInit();
       },
       error: (err: any) => {
         this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Cadastro não enviado.', life: 3000 },
+          { severity: 'error', summary: 'Erro', detail: err, life: 5000, sticky: true },
         ];
       }
     });
@@ -1055,12 +1055,12 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
         // this.goToRouteEdit(id);
         this.ngOnInit();
         this.messages = [
-          { severity: 'success', summary: 'Sucesso', detail: 'Alocação editada com sucesso!', life: 3000 },
+          { severity: 'success', summary: 'Sucesso', detail: 'Alocação editada com sucesso!', life: 5000 },
         ];
       },
       error: (err: any) => {
         this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Edição não enviada.', life: 3000 },
+          { severity: 'error', summary: 'Erro', detail: err, life: 5000, sticky: true },
         ];
       }
     });
@@ -1183,18 +1183,18 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (data: any) => {
           this.messages = [
-            { severity: 'success', summary: 'Sucesso', detail: 'Registro deletado com sucesso!', life: 3000 },
+            { severity: 'success', summary: 'Sucesso', detail: 'Registro deletado com sucesso!', life: 5000 },
           ];
           this.ngOnInit();
         },
         error: (err: any) => {
           if (err.status) {
             this.messages = [
-              { severity: 'error', summary: 'Erro', detail: 'Não foi possível deletar registro.', life: 3000 },
+              { severity: 'error', summary: 'Erro', detail: err, life: 5000, sticky: true },
             ];
           } else {
             this.messages = [
-              { severity: 'error', summary: 'Erro desconhecido', detail: err, life: 3000 },
+              { severity: 'error', summary: 'Erro desconhecido', detail: err, life: 5000 },
             ];
           }
         }

@@ -72,28 +72,28 @@ export class EventosRComponent implements OnInit, OnDestroy {
   ehTitulo: string = '';
   editar: boolean = false;
   cadastrar: boolean = false;
-  
+
   visible: boolean = false;
   visibleEdit: boolean = false;
   visibleInfo: boolean = false;
-  
+
   diasIntervalo: Date[] | null = null;
-  
+
   disableIntervalo: boolean = true;
   disableFinal: boolean = true;
   disableSemana: boolean = false;
-  
+
   filterOptions: FiltrarPesquisa[] = [];
   selectedFilter!: FiltrarPesquisa;
   txtFilter: string = 'Pesquisar evento';
-  
+
   messages!: Message[];
-  
+
   checkedReplica: boolean = false;
   enableCheck: boolean = false;
   datasHour: EventoHourData[] = [];
   minDate!: Date;
-  
+
   firstEvn: number = 0;
   pageEvn: number = 0;
   rowsEvn: number = 10;
@@ -134,11 +134,11 @@ export class EventosRComponent implements OnInit, OnDestroy {
       next: (itens:any) => {
         this.eventosPageData = itens;
         this.sizeEvn = this.eventosPageData.totalElements;
-        
+
         this.eventosData = this.eventosPageData.content;
         this.eventosData.sort((a:any, b:any) => (a.nome < b.nome ) ? -1 : 1);
         this.pageFilter()
-        
+
         this.eventosData.sort((a: Evento, b: Evento) => {
           const dateA = new Date(a.dataEvento);
           const dateB = new Date(b.dataEvento);
@@ -185,7 +185,7 @@ export class EventosRComponent implements OnInit, OnDestroy {
     this.unsubscribe$Hor.unsubscribe();
   }
 
-  
+
   onPageChange(event: PaginatorState) {
     if (event.first !== undefined && event.rows !== undefined && event.page !== undefined) {
       this.firstEvn = event.first;
@@ -216,7 +216,7 @@ export class EventosRComponent implements OnInit, OnDestroy {
         this.horariosArray.sort((a:Horario, b:Horario) => {
           let hAi = this.formatMiliss(a.horaInicio)
           let hBi = this.formatMiliss(b.horaFim)
-          
+
           if (hAi < hBi) {
             return -1;
           } else if (hAi > hBi) {
@@ -240,7 +240,7 @@ export class EventosRComponent implements OnInit, OnDestroy {
       this.eventService.listar(0, this.sizeEvn).subscribe(evnt => this.eventosFilter = evnt.content)
     }
   }
-  
+
   // verificarHoraFimMaiorQueInicio(formGroup: FormGroup) {
   //   const horaInicio = formGroup.get('horarioInicio')?.value;
   //   const horaFim = formGroup.get('horarioFim')?.value;
@@ -257,7 +257,7 @@ export class EventosRComponent implements OnInit, OnDestroy {
     const fiveYearsAgo = new Date(today.getFullYear() - 5, today.getMonth(), today.getDate());
     this.minDate = fiveYearsAgo;
   }
-  
+
   showInfoDialog(value: Evento) {
     this.visibleInfo = true;
     this.eventoInfo = value;
@@ -300,7 +300,7 @@ export class EventosRComponent implements OnInit, OnDestroy {
     this.datasHour = [];
     this.setMinDate();
   }
-  
+
   hideDialog() {
     if(this.cadastrar) {
       this.visible = false;
@@ -333,7 +333,7 @@ export class EventosRComponent implements OnInit, OnDestroy {
 
   verificarDataHour() {
     let hora: Horario = this.form.get('horario')?.value;
-    
+
     this.diasIntervalo?.sort((a:Date, b:Date) => {
       const dateA = new Date(a);
       const dateB = new Date(b);
@@ -348,7 +348,7 @@ export class EventosRComponent implements OnInit, OnDestroy {
       }
     })
     this.datasHour = this.datasHour.filter(item => this.diasIntervalo?.includes(item.dataEvento));
-    
+
     this.datasHour.sort((a:EventoHourData, b:EventoHourData) => {
       const dateA = new Date(a.dataEvento);
       const dateB = new Date(b.dataEvento);
@@ -406,14 +406,14 @@ export class EventosRComponent implements OnInit, OnDestroy {
 
   searchFilter1(term: string) {
     const dateTerm = this.formatarDtStrDt(term);
-    
+
     if (dateTerm instanceof Date && !isNaN(dateTerm.getTime())) {
       this.eventosData = this.eventosFilter.filter(evento => {
         const tiparDT = evento.dataEvento;
         if (typeof tiparDT === 'string') {
           const tiparFormat = this.formatarDatas(tiparDT);
           const searchTerm = this.formatarDtStrDt(tiparFormat);
-          
+
           if (dateTerm.getTime() === searchTerm?.getTime()) {
             return evento;
           } else {
@@ -489,7 +489,7 @@ export class EventosRComponent implements OnInit, OnDestroy {
       const partes = tempo.split(':');
       const horas =  parseInt(partes[0], 10);
       const minutos =  parseInt(partes[1], 10) - 1;
-      
+
       if (!isNaN(horas) && !isNaN(minutos) && horas >= 0 && horas <= 23 && minutos >= 0 && minutos <= 59) {
         return { horas, minutos };
       } else {
@@ -499,7 +499,7 @@ export class EventosRComponent implements OnInit, OnDestroy {
       return null;
     }
   }
-  
+
   formatMiliss(tempo: any) {
     if (tempo) {
       const partes = tempo.split(':');
@@ -516,7 +516,7 @@ export class EventosRComponent implements OnInit, OnDestroy {
       this.filterField(searchTerm);
     }
   }
-  
+
   filterField(searchTerm: string) {
     if (searchTerm && (searchTerm != null || searchTerm != '')) {
       if(this.selectedFilter) {
@@ -559,12 +559,12 @@ export class EventosRComponent implements OnInit, OnDestroy {
         // this.goToRouteSave();
         this.ngOnInit();
         this.messages = [
-          { severity: 'success', summary: 'Sucesso', detail: 'Evento cadastrado com sucesso!', life: 3000 },
+          { severity: 'success', summary: 'Sucesso', detail: 'Evento cadastrado com sucesso!', life: 5000 },
         ];
       },
       error: (err: any) => {
         this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Cadastro não enviado.', life: 3000 },
+          { severity: 'error', summary: 'Erro', detail: err, life: 5000, sticky: true },
         ];
       }
     });
@@ -576,13 +576,13 @@ export class EventosRComponent implements OnInit, OnDestroy {
         this.eventosEdit = data;
         // this.goToRouteEdit(id);
         this.messages = [
-          { severity: 'success', summary: 'Sucesso', detail: 'Evento editado com sucesso!', life: 3000 },
+          { severity: 'success', summary: 'Sucesso', detail: 'Evento editado com sucesso!', life: 5000 },
         ];
         this.ngOnInit();
       },
       error: (err: any) => {
         this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Edição não enviada.', life: 3000 },
+          { severity: 'error', summary: 'Erro', detail: err, life: 5000, sticky: true },
         ];
       }
     });
@@ -619,7 +619,7 @@ export class EventosRComponent implements OnInit, OnDestroy {
       //  DATA INÍCIO
       this.eventosCadast = this.form.value;
       this.enviarFormSave();
-      
+
       //  DATAS INTERVALO
       const ultimoDiaIntervalo = new Date(this.datasHour[this.datasHour.length - 1].dataEvento);
 
@@ -635,13 +635,13 @@ export class EventosRComponent implements OnInit, OnDestroy {
       });
     }
   }
-  
+
   deletarID(id: number) {
     this.eventService.excluir(id)
     .subscribe({
       next: (data: any) => {
         this.messages = [
-          { severity: 'success', summary: 'Sucesso', detail: 'Registro deletado com sucesso!', life: 3000 },
+          { severity: 'success', summary: 'Sucesso', detail: 'Registro deletado com sucesso!', life: 5000 },
         ];
         this.ngOnInit();
         // window.location.reload();
@@ -649,7 +649,7 @@ export class EventosRComponent implements OnInit, OnDestroy {
       error: (err: any) => {
         if (err.status) {
           this.messages = [
-            { severity: 'error', summary: 'Erro', detail: 'Não foi possível deletar registro.', life: 3000 },
+            { severity: 'error', summary: 'Erro', detail: err, life: 5000, sticky: true },
           ];
         } else {
           this.messages = [

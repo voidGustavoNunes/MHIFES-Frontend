@@ -287,7 +287,7 @@
         z-index: 11000;
     }
     .p-message-info, .p-message-success, .p-message-error, .p-message-warn {
-        color: black;
+      color: red;
     }
     .card .p-dropdown, .p-multiselect, .p-inputnumber-input{
         background-color: #BFE4FF;
@@ -443,7 +443,7 @@
         .opcao{
             display: flex;
             flex-direction: column;
-            
+
             .op-btn .botaoC {
                 margin-bottom: 1rem;
                 width: fit-content;
@@ -511,6 +511,6 @@
 
 .description-separator {
   border: none;
-  border-top: 1px solid #ccc;
+  border-top: 1px solid #e0e0e0; /* Cinza claro */
   margin: 5px 0;
 }
