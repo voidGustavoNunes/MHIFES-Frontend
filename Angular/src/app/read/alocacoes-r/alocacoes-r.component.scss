@@ -89,10 +89,10 @@
                 box-shadow: none;
             }
         }
-        
+
         .tbHeader{
             border-radius: .5rem 0;
-            
+
             th{
                 background-color: #256CF0 !important;
                 color: white;
@@ -102,13 +102,13 @@
                 text-transform: uppercase;
             }
         }
-        
+
         .tbBody{
-            
+
             td{
                 text-align: center;
             }
-            
+
             button:active{
                 box-shadow: none;
             }
@@ -253,7 +253,7 @@
         .botaoCancela:focus{
             border: .02rem solid #89041E;
         }
-    
+
         .botaoM{
             margin-right: .5rem;
             @include themeButton(white, #68696d);
@@ -306,7 +306,7 @@
     }
 
     // LOG DIALOG
-    
+
     .custom-header {
         display: flex;
         span{margin-right: 1rem;}
@@ -329,7 +329,7 @@
     .p-accordion-header-link:has(.severity-success), .p-accordion .p-accordion-content:has(.severity-success) {
         border-left: 5px solid #22C55E;
     }
-    
+
     .p-datatable-header{
         display: flex;
         align-items: center;
@@ -365,7 +365,7 @@
             }
         }
     }
-    
+
     .card{
         #meuFormInfo{
             .divInput.dtAlocacao.flexContainer{
@@ -499,4 +499,18 @@
             width: 60vw;
         }
     }
+}
+
+.old-description {
+  color: #FF6347; /* Tomate */
+}
+
+.new-description {
+  color: #4682B4; /* Aço Azul */
+}
+
+.description-separator {
+  border: none;
+  border-top: 1px solid #ccc;
+  margin: 5px 0;
 }

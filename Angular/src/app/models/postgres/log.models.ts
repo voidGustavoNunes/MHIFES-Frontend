@@ -3,7 +3,8 @@ import { Usuario } from "./usuario";
 export interface Log {
     id: number;
     data: Date;
-    descricao: string;
+    descricaoNova: string;
+    descricaoAntiga: string;
     operacao: Operacao;
     idRegistro: number;
     usuario: Usuario;
