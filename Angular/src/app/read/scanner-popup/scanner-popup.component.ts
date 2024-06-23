@@ -116,14 +116,13 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
 
     document.addEventListener('click', (event:any) => {
       const targetElement = event.target as HTMLElement;
-      const isPrimeNGInput = targetElement.classList.contains('p-inputtext') || targetElement.classList.contains('p-inputnumber');
+      const isPrimeNGInput = targetElement.classList.contains('p-inputtext') || targetElement.classList.contains('p-inputnumber') || targetElement.classList.contains('p-inputtextarea');
       const isOtherInput = otherInputsArray.some((input: any) => input.contains(targetElement));
-      const isOtherText = otherTextareasArray.some((input: any) => input.contains(targetElement));
 
       if (scannerInput) {
-          if (!isOtherInput && !isOtherText && !isPrimeNGInput && !scannerInput.contains(targetElement)) {
+          if (!isOtherInput && !isPrimeNGInput && !scannerInput.contains(targetElement)) {
             this.scannerInput.nativeElement.focus();
-          } else if (isOtherInput || isOtherText || isPrimeNGInput) {
+          } else if (isOtherInput || isPrimeNGInput) {
             this.scannerInput.nativeElement.blur();
           }
       }

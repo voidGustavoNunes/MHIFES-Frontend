@@ -25,6 +25,7 @@ import { ToastModule } from 'primeng/toast';
 import { TabViewModule } from 'primeng/tabview';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { SplitButtonModule } from 'primeng/splitbutton';
+import { InputTextareaModule } from 'primeng/inputtextarea';
 
 @NgModule({
   exports: [
@@ -53,7 +54,8 @@ import { SplitButtonModule } from 'primeng/splitbutton';
     InputMaskModule,
     TabViewModule,
     RadioButtonModule,
-    SplitButtonModule
+    SplitButtonModule,
+    InputTextareaModule
   ]
 })
 export class PrimeNgImportsModule { }

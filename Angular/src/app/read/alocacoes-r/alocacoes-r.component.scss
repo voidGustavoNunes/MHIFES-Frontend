@@ -286,6 +286,9 @@
         right: 1.25rem;
         z-index: 11000;
     }
+    .p-message-info, .p-message-success, .p-message-error, .p-message-warn {
+        color: black;
+    }
     .card .p-dropdown, .p-multiselect, .p-inputnumber-input{
         background-color: #BFE4FF;
     }
@@ -339,6 +342,15 @@
     .p-datatable-header i.pi.pi-search {
         color: #256CF0;
     }
+    .divInput p-checkbox.p-element.ng-valid.ng-dirty.ng-touched {
+        margin-right: 1rem;
+    }
+    .p-dialog-content div#migraForm {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: -2rem;
+    }
 }
 
 @media screen and (min-width: 686px) {
@@ -348,6 +360,9 @@
             display: flex;
             justify-content: space-between;
             flex-wrap: nowrap;
+            .op-btn .botaoC {
+                margin-right: 1rem;
+            }
         }
     }
     
@@ -429,7 +444,10 @@
             display: flex;
             flex-direction: column;
             
-            .botaoC{width: fit-content;}
+            .op-btn .botaoC {
+                margin-bottom: 1rem;
+                width: fit-content;
+            }
 
             .pesq{
                 margin-top: 2rem;

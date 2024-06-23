@@ -573,7 +573,6 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     if (ini && this.selectedPeriodo) {
       const periodoFim = new Date(this.selectedPeriodo.dataFim);
       this.diasIntervalo = this.calcularDiasSemana(ini, periodoFim, codes);
-      this.calendarIntervalo.writeValue(this.diasIntervalo);
     }
   }
 
@@ -626,8 +625,13 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     })
   }
 
-  onSwitchChange() {
-    this.enableCalendar = !this.enableCalendar;
+  onSwitchChange(e: any) {
+    console.log('Checkbox selecionado:', e.checked);
+    if(e.checked) {
+      this.enableCalendar = true;
+    } else {
+      this.enableCalendar = false;
+    }
   }
 
   verificarDataHour() {
