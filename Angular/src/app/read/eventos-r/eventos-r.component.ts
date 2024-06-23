@@ -564,7 +564,7 @@ export class EventosRComponent implements OnInit, OnDestroy {
       },
       error: (err: any) => {
         this.messages = [
-          { severity: 'error', summary: 'Erro', detail: err, life: 5000, sticky: true },
+          { severity: 'error', summary: 'Erro', detail: err, sticky: true },
         ];
       }
     });
@@ -582,7 +582,7 @@ export class EventosRComponent implements OnInit, OnDestroy {
       },
       error: (err: any) => {
         this.messages = [
-          { severity: 'error', summary: 'Erro', detail: err, life: 5000, sticky: true },
+          { severity: 'error', summary: 'Erro', detail: err, sticky: true },
         ];
       }
     });
@@ -649,7 +649,7 @@ export class EventosRComponent implements OnInit, OnDestroy {
       error: (err: any) => {
         if (err.status) {
           this.messages = [
-            { severity: 'error', summary: 'Erro', detail: err, life: 5000, sticky: true },
+            { severity: 'error', summary: 'Erro', detail: err, sticky: true },
           ];
         } else {
           this.messages = [
