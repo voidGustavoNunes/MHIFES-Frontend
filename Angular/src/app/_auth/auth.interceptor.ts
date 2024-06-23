@@ -8,18 +8,18 @@ import { Injectable, NgZone } from "@angular/core";
     providedIn: 'root'
 })
 export class AuthInterceptor implements HttpInterceptor {
-    
+
     constructor(
         private userAuthService: UserAuthService,
         private router: Router,
         private ngZone: NgZone
     ) {}
-    
+
     intercept(
         req: HttpRequest<any>,
         next: HttpHandler
     ): Observable<HttpEvent<any>> {
-    
+
         if(req.headers.get("No-Auth") === "True") {
             return next.handle(req.clone());
         }
@@ -34,8 +34,7 @@ export class AuthInterceptor implements HttpInterceptor {
                     if (err.status === 403){
                         this.router.navigate(["/forbidden"]);
                     }
-                    const errorMess = new Error("Você não tem permissão para realizar esta ação.");
-                    return throwError(() => errorMess);
+                    return throwError(err);
                 }
             )
         );
@@ -50,5 +49,5 @@ export class AuthInterceptor implements HttpInterceptor {
             }
         );
     }
-    
+
 }

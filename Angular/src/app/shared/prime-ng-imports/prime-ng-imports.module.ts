@@ -15,6 +15,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessagesModule } from 'primeng/messages';
+import { MessageModule } from 'primeng/message';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { PaginatorModule } from 'primeng/paginator';
@@ -42,6 +43,7 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
     ScrollTopModule,
     CalendarModule,
     MessagesModule,
+    MessageModule,
     OverlayPanelModule,
     InputNumberModule,
     MultiSelectModule,
