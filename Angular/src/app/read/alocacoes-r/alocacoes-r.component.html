@@ -544,7 +544,9 @@
             </ng-template>
             <ng-template let-sqlAloc pTemplate="item">
                 <div class="flex align-items-center gap-2">
-                    <div>{{ sqlAloc.disciplinaMySQL.sigla }} - {{ sqlAloc.ano }}/{{ sqlAloc.semestre }}</div>
+                    <div *ngIf="!sqlAloc.professor2">{{ sqlAloc.disciplinaMySQL.sigla }} - {{ sqlAloc.ano }}/{{ sqlAloc.semestre }} - {{ sqlAloc.professor1.nome }}</div>
+                    <div *ngIf="!sqlAloc.professor1">{{ sqlAloc.disciplinaMySQL.sigla }} - {{ sqlAloc.ano }}/{{ sqlAloc.semestre }} - {{ sqlAloc.professor2.nome }}</div>
+                    <div *ngIf="sqlAloc.professor1 && sqlAloc.professor2">{{ sqlAloc.disciplinaMySQL.sigla }} - {{ sqlAloc.ano }}/{{ sqlAloc.semestre }} - {{ sqlAloc.professor1.nome }}</div>
                 </div>
             </ng-template>
           </p-multiSelect>
@@ -553,8 +555,8 @@
       </div>
     </div>
 
-    <div class="cardLog" *ngIf="dataMysqlAlocacoes.length <= 0">
-      <h3>Não há alocações registradas.</h3>
+    <div class="cardLog" *ngIf="mssMysql != ''">
+      <h3>{{ mssMysql }}</h3>
     </div>
 
     <div class="divBotao">

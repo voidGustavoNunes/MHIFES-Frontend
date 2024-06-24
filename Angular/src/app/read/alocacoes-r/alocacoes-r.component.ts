@@ -172,6 +172,8 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   
   checkOptionsSelected: Alocacao[] = []
 
+  mssMysql: string = ''
+
   constructor(
     private alocService: AlocacaoService,
     private router: Router,
@@ -298,8 +300,11 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (itens: any) => {
           this.dataMysqlAlocacoes = itens
+          if(this.dataMysqlAlocacoes.length <= 0) this.mssMysql = 'Não há alocações registradas.'
+          else this.mssMysql = ''
         },
         error: (err: any) => {
+          this.mssMysql = ''
           this.messages = [
             { severity: 'error', summary: 'Erro', detail: err, sticky: true },
           ];
@@ -346,20 +351,34 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   listarPageAt() {
     this.alocService.listarAtivos(this.pageAloc, this.rowsAloc).subscribe(alcc => {
       this.alocacoesData = alcc.content;
-
-      this.firstAloc = 0
-      this.sizeAloc = this.sizeAlocTemp
-      this.rowsAloc = 10
     });
   }
 
   listarPageInat() {
     this.alocService.listarInativos(this.pageDelAloc, this.rowsDelAloc).subscribe(alcc => {
       this.alocacoesDataDelete = alcc.content;
+    });
+  }
+
+  limparPageAt() {
+    this.alocService.listarAtivos(this.pageAloc, this.rowsAloc).subscribe(alcc => {
+      this.alocacoesData = alcc.content;
+
+      this.firstAloc = 0
+      this.sizeAloc = this.sizeAlocTemp
+      this.rowsAloc = 10
+      this.sizeAlocTemp = 0
+    });
+  }
+
+  limparPageInat() {
+    this.alocService.listarInativos(this.pageDelAloc, this.rowsDelAloc).subscribe(alcc => {
+      this.alocacoesDataDelete = alcc.content;
 
       this.firstDelAloc = 0
       this.sizeDelAloc = this.sizeDelAlocTemp
       this.rowsDelAloc = 10
+      this.sizeDelAlocTemp = 0
     });
   }
 
@@ -775,14 +794,14 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
         this.inputSearch.nativeElement.value = '';
       }
       this.selectedFilter = {} as FiltrarPesquisa;
-      this.listarPageAt()
+      this.limparPageAt()
     } else if (tipo == 'i') {
       const inputElement = this.inputSearchInat.nativeElement.value
       if (inputElement) {
         this.inputSearchInat.nativeElement.value = '';
       }
       this.selectedFilterInat = {} as FiltrarPesquisa;
-      this.listarPageInat()
+      this.limparPageInat()
     }
   }
 
@@ -1079,15 +1098,14 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       this.migraService.migrateAlocacoes(this.mysqlAlocacoes).subscribe({
         next: (data: any) => {
           this.messages = [
-            { severity: 'success', summary: 'Sucesso', detail: data, life: 3000 },
-            // { severity: 'success', summary: 'Sucesso', detail: 'Migração realizada com sucesso!', life: 3000 },
+            { severity: 'success', summary: 'Sucesso', detail: 'Migração realizada com sucesso!', life: 3000 },
           ];
           this.hideDialog();
           this.ngOnInit();
         },
         error: (err: any) => {
           this.messages = [
-            { severity: 'error', summary: 'Erro', detail: 'Migração não enviada.', life: 3000 },
+            { severity: 'error', summary: 'Erro', detail: err, life: 3000 },
           ];
         }
       });
