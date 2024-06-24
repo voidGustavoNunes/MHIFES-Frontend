@@ -47,7 +47,7 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
 
   professoresCadast: Professor[] = [];
   professoresEdit!: Professor;
-  
+
   professoresData: Professor[] = [];
   professoresFilterProf: Professor[] = [];
 
@@ -60,18 +60,18 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
   editar: boolean = false;
   cadastrar: boolean = false;
   switchCooda: boolean = false;
-  
+
   messages!: Message[];
   mss: boolean = false;
-  
+
   filterOptions: FiltrarPesquisa[] = [];
   selectedFilterProf!: FiltrarPesquisa;
-  
+
   professorInfo!: Professor;
   visibleInfo: boolean = false;
 
   coordenadoriasArray: Coordenadoria[] = [];
-  
+
   firstProfsr: number = 0;
   pageProfsr: number = 0;
   rowsProfsr: number = 10;
@@ -112,7 +112,7 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
       next: (itens:any) => {
         this.professoresPageData = itens;
         this.sizeProfsr = this.professoresPageData.totalElements;
-        
+
         this.professoresData = this.professoresPageData.content;
         this.professoresData.sort((a:any, b:any) => (a.nome < b.nome ) ? -1 : 1);
         this.pageFilter()
@@ -123,7 +123,7 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
         ];
       }
     });
-    
+
     this.unsubscribe$Coord = this.coordaService.listar(0,10)
     .subscribe({
       next: (itens:any) => {
@@ -143,7 +143,7 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
     this.unsubscribe$Coord.unsubscribe();
   }
 
-  
+
   onPageChange(event: PaginatorState) {
     if (event.first !== undefined && event.rows !== undefined && event.page !== undefined) {
       this.firstProfsr = event.first;
@@ -162,7 +162,7 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
         this.professoresData.sort((a:any, b:any) => (a.nome < b.nome ) ? -1 : 1);
       });
   }
-  
+
   listarPageObj() {
     let sizeAll = this.coordenasPageData.totalElements
     if(sizeAll > 0) {
@@ -216,7 +216,7 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
     this.switch.writeValue(false);
     this.switchCooda = false;
   }
-  
+
   hideDialog() {
     this.visible = false;
     this.form.reset();
@@ -281,7 +281,7 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
       this.filterField(searchTerm);
     }
   }
-  
+
   filterField(searchTerm: string) {
     if(this.selectedFilterProf) {
       if (searchTerm && (searchTerm != null || searchTerm != '')) {
@@ -345,15 +345,9 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
         this.ngOnInit();
       },
       error: (err: any) => {
-        if (err.status === 400) {
           this.messages = [
-            { severity: 'error', summary: 'Erro', detail: 'Matrícula já existente!', life: 3000 },
+            { severity: 'error', summary: 'Erro', detail: err, sticky: true }
           ];
-        } else {
-          this.messages = [
-            { severity: 'error', summary: 'Erro', detail: 'Cadastro não enviado.', life: 3000 },
-          ];
-        }
       }
     });
   }
@@ -370,7 +364,7 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
       },
       error: (err: any) => {
         this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Edição não enviada.', life: 3000 },
+          { severity: 'error', summary: 'Erro', detail: err, sticky: true }
         ];
       }
     });
@@ -409,26 +403,16 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
         // window.location.reload();
       },
       error: (err: any) => {
-        if (err.status === 403) {
-          this.messages = [
-            { severity: 'error', summary: 'Erro', detail: 'Você não tem permissão para deletar este registro associado a alocações.', life: 3000 },
-          ];
-        } else if (err.status === 401) {
-          this.messages = [
-            { severity: 'error', summary: 'Erro', detail: 'Não foi possível deletar registro.', life: 3000 },
-          ];
-        } else {
-          this.messages = [
-            { severity: 'error', summary: 'Erro desconhecido', detail: err, life: 3000 },
-          ];
-        }
+        this.messages = [
+          { severity: 'error', summary: 'Erro', detail: err, sticky: true }
+        ];
       }
   });
   }
 
   rfidDialogVisible: boolean = false;
   rfidValue: string = '';
-  
+
   openRFIDDialog() {
     this.rfidDialogVisible = true;
     this.rfidValue = '';
