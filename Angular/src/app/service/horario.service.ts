@@ -19,30 +19,38 @@ export class HorarioService {
       .set('page', page.toString())
       .set('size', size.toString());
 
-    return this.http.get<Page<Horario>>(`${this.API}`, { params });
-  }
-
-  buscarPorId(id: number): Observable<Horario> {
-    return this.http.get<Horario>(`${this.API}/${id}`);
-  }
-
-  criar(record: Horario[]): Observable<Object> {
-    return this.http.post(`${this.API}`, record);
-  }
-
-  atualizar(id: number, record: Horario[]): Observable<Object> {
-    return this.http.put(`${this.API}/${id}`, record);
-  }
-
-  excluir(id: number): Observable<Object> {
-    return this.http.delete(`${this.API}/${id}`, {observe: 'response'})
-    .pipe(
+    return this.http.get<Page<Horario>>(`${this.API}`, { params }).pipe(
       catchError(error => this.handleError(error))
     );
   }
 
+  buscarPorId(id: number): Observable<Horario> {
+    return this.http.get<Horario>(`${this.API}/${id}`).pipe(
+      catchError(error => this.handleError(error))
+    );
+  }
+
+  criar(record: Horario[]): Observable<Object> {
+    return this.http.post(`${this.API}`, record).pipe(
+      catchError(error => this.handleError(error))
+    );
+  }
+
+  atualizar(id: number, record: Horario[]): Observable<Object> {
+    return this.http.put(`${this.API}/${id}`, record).pipe(
+      catchError(error => this.handleError(error))
+    );
+  }
+
+  excluir(id: number): Observable<Object> {
+    return this.http.delete(`${this.API}/${id}`, { observe: 'response' })
+      .pipe(
+        catchError(error => this.handleError(error))
+      );
+  }
+
   private handleError(error: HttpErrorResponse) {
-    return throwError(() => new Error(error.message || 'Erro desconhecido'));
+    return throwError(error.error.error || error.error.message || 'Erro desconhecido');
   }
   
   acharTimeInicio(page: number, size: number, time: string): Observable<Page<Horario>> {

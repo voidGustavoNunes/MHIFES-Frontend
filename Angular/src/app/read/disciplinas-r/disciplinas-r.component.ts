@@ -46,13 +46,13 @@ export class DisciplinasRComponent implements OnInit, OnDestroy {
   visible: boolean = false;
   editar: boolean = false;
   cadastrar: boolean = false;
-  
+
   messages!: Message[];
   mss: boolean = false;
-  
+
   filterOptions: FiltrarPesquisa[] = [];
   selectedFilter!: FiltrarPesquisa;
-  
+
   firstDiscp: number = 0;
   pageDiscp: number = 0;
   rowsDiscp: number = 10;
@@ -67,42 +67,42 @@ export class DisciplinasRComponent implements OnInit, OnDestroy {
     private router: Router,
     private formBuilder: FormBuilder,
     private confirmationService: ConfirmationService
-    ) {
-      this.form = this.formBuilder.group({
-        id: [null],
-        nome: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
-        sigla: [null, [Validators.required, Validators.maxLength(10)]]
-      });
+  ) {
+    this.form = this.formBuilder.group({
+      id: [null],
+      nome: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
+      sigla: [null, [Validators.required, Validators.maxLength(10)]]
+    });
   }
 
   ngOnInit() {
     this.filterOptions = [
-      {nome: 'Nome', id: 0},
-      {nome: 'Sigla', id: 1}
+      { nome: 'Nome', id: 0 },
+      { nome: 'Sigla', id: 1 }
     ];
 
-    this.unsubscribe$ = this.disciService.listar(0,10)
-    .subscribe({
-      next: (itens:any) => {
-        this.disciplinasPageData = itens;
-        this.sizeDiscp = this.disciplinasPageData.totalElements;
-        
-        this.disciplinasData = this.disciplinasPageData.content;
-        this.disciplinasData.sort((a:any, b:any) => (a.nome < b.nome ) ? -1 : 1);
-        this.pageFilter()
-      },
-      error: (err: any) => {
-        this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Dados não encontrados.', life: 3000 },
-        ];
-      }
-    });
+    this.unsubscribe$ = this.disciService.listar(0, 10)
+      .subscribe({
+        next: (itens: any) => {
+          this.disciplinasPageData = itens;
+          this.sizeDiscp = this.disciplinasPageData.totalElements;
+
+          this.disciplinasData = this.disciplinasPageData.content;
+          this.disciplinasData.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1);
+          this.pageFilter()
+        },
+        error: (err: any) => {
+          this.messages = [
+            { severity: 'error', summary: 'Erro', detail: err, sticky: true },
+          ];
+        }
+      });
   }
 
   ngOnDestroy() {
     this.unsubscribe$.unsubscribe();
   }
-  
+
   onPageChange(event: PaginatorState) {
     if (event.first !== undefined && event.rows !== undefined && event.page !== undefined) {
       this.firstDiscp = event.first;
@@ -114,15 +114,15 @@ export class DisciplinasRComponent implements OnInit, OnDestroy {
 
   listarPage() {
     this.disciService.listar(this.pageDiscp, this.rowsDiscp)
-    .subscribe((itens:any) => {
+      .subscribe((itens: any) => {
         this.disciplinasPageData = itens;
         this.disciplinasData = this.disciplinasPageData.content;
-        this.disciplinasData.sort((a:any, b:any) => (a.nome < b.nome ) ? -1 : 1);
+        this.disciplinasData.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1);
       });
   }
 
   pageFilter() {
-    if(this.sizeDiscp > 0) {
+    if (this.sizeDiscp > 0) {
       this.disciService.listar(0, this.sizeDiscp).subscribe(discp => this.dicisplinasFilter = discp.content)
     }
   }
@@ -147,13 +147,13 @@ export class DisciplinasRComponent implements OnInit, OnDestroy {
     this.cadastrar = true;
     this.editar = false;
   }
-  
+
   hideDialog() {
     this.visible = false;
     this.form.reset();
   }
-  
-  limparFilter(){
+
+  limparFilter() {
     const inputElement = this.inputSearch.nativeElement.value
     if (inputElement) {
       this.inputSearch.nativeElement.value = '';
@@ -195,9 +195,9 @@ export class DisciplinasRComponent implements OnInit, OnDestroy {
 
   filterField(searchTerm: string) {
     if (searchTerm && (searchTerm != null || searchTerm != '')) {
-      if(this.selectedFilter) {
-        if(this.selectedFilter.id == 0) this.searchFilterWord0(searchTerm);
-        if(this.selectedFilter.id == 1) this.searchFilterWord1(searchTerm);
+      if (this.selectedFilter) {
+        if (this.selectedFilter.id == 0) this.searchFilterWord0(searchTerm);
+        if (this.selectedFilter.id == 1) this.searchFilterWord1(searchTerm);
       } else {
         this.messages = [
           { severity: 'warn', summary: 'Atenção', detail: 'Selecione um filtro!', life: 3000 },
@@ -239,7 +239,7 @@ export class DisciplinasRComponent implements OnInit, OnDestroy {
       },
       error: (err: any) => {
         this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Cadastro não enviado.', life: 3000 },
+          { severity: 'error', summary: 'Erro', detail: err, sticky: true },
         ];
       }
     });
@@ -257,7 +257,7 @@ export class DisciplinasRComponent implements OnInit, OnDestroy {
       },
       error: (err: any) => {
         this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Edição não enviada.', life: 3000 },
+          { severity: 'error', summary: 'Erro', detail: err, sticky: true },
         ];
       }
     });
@@ -287,25 +287,19 @@ export class DisciplinasRComponent implements OnInit, OnDestroy {
 
   deletarID(id: number) {
     this.disciService.excluir(id)
-    .subscribe({
-      next: (data: any) => {
-        this.messages = [
-          { severity: 'success', summary: 'Sucesso', detail: 'Registro deletado com sucesso!', life: 3000 },
-        ];
-        this.ngOnInit();
-      },
-      error: (err: any) => {
-        if (err.status) {
+      .subscribe({
+        next: (data: any) => {
           this.messages = [
-            { severity: 'error', summary: 'Erro', detail: 'Não foi possível deletar registro.', life: 3000 },
+            { severity: 'success', summary: 'Sucesso', detail: 'Registro deletado com sucesso!', life: 3000 },
           ];
-        } else {
+          this.ngOnInit();
+        },
+        error: (err: any) => {
           this.messages = [
-            { severity: 'error', summary: 'Erro desconhecido', detail: err, life: 3000 },
+            { severity: 'error', summary: 'Erro', detail: err, sticky: true },
           ];
         }
-      }
-  });
+      });
   }
 
 }

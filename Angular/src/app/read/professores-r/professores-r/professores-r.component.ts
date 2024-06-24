@@ -89,15 +89,15 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
     private formBuilder: FormBuilder,
     private confirmationService: ConfirmationService,
     private coordaService: CoordenadoriaService
-    ) {
-      this.form = this.formBuilder.group({
-        id: [null],
-        nome: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
-        matricula: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
-        sigla: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
-        ehCoordenador: [false, [Validators.required]],
-        coordenadoria: [null],
-      });
+  ) {
+    this.form = this.formBuilder.group({
+      id: [null],
+      nome: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
+      matricula: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
+      sigla: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
+      ehCoordenador: [false, [Validators.required]],
+      coordenadoria: [null],
+    });
   }
 
   ngOnInit() {
@@ -107,35 +107,35 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
       {nome: 'Matrícula', id: 2}
     ];
 
-    this.unsubscribe$ = this.professorService.listar(0,10)
-    .subscribe({
-      next: (itens:any) => {
-        this.professoresPageData = itens;
-        this.sizeProfsr = this.professoresPageData.totalElements;
+    this.unsubscribe$ = this.professorService.listar(0, 10)
+      .subscribe({
+        next: (itens: any) => {
+          this.professoresPageData = itens;
+          this.sizeProfsr = this.professoresPageData.totalElements;
 
-        this.professoresData = this.professoresPageData.content;
-        this.professoresData.sort((a:any, b:any) => (a.nome < b.nome ) ? -1 : 1);
-        this.pageFilter()
-      },
-      error: (err: any) => {
-        this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Dados de professores não encontrados.', life: 3000 },
-        ];
-      }
-    });
+          this.professoresData = this.professoresPageData.content;
+          this.professoresData.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1);
+          this.pageFilter()
+        },
+        error: (err: any) => {
+          this.messages = [
+            { severity: 'error', summary: 'Erro', detail: err, sticky: true },
+          ];
+        }
+      });
 
-    this.unsubscribe$Coord = this.coordaService.listar(0,10)
-    .subscribe({
-      next: (itens:any) => {
-        this.coordenasPageData = itens
-        this.listarPageObj()
-      },
-      error: (err: any) => {
-        this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Dados de coordenadorias não encontrados.', life: 3000 },
-        ];
-      }
-    });
+    this.unsubscribe$Coord = this.coordaService.listar(0, 10)
+      .subscribe({
+        next: (itens: any) => {
+          this.coordenasPageData = itens
+          this.listarPageObj()
+        },
+        error: (err: any) => {
+          this.messages = [
+            { severity: 'error', summary: 'Erro', detail: err, sticky: true },
+          ];
+        }
+      });
   }
 
   ngOnDestroy() {
@@ -156,23 +156,23 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
 
   listarPage() {
     this.professorService.listar(this.pageProfsr, this.rowsProfsr)
-    .subscribe((itens:any) => {
+      .subscribe((itens: any) => {
         this.professoresPageData = itens;
         this.professoresData = this.professoresPageData.content;
-        this.professoresData.sort((a:any, b:any) => (a.nome < b.nome ) ? -1 : 1);
+        this.professoresData.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1);
       });
   }
 
   listarPageObj() {
     let sizeAll = this.coordenasPageData.totalElements
-    if(sizeAll > 0) {
-      this.coordaService.listar(0,sizeAll).subscribe(codr => this.coordenadoriasArray = codr.content)
+    if (sizeAll > 0) {
+      this.coordaService.listar(0, sizeAll).subscribe(codr => this.coordenadoriasArray = codr.content)
       this.coordenadoriasArray.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1)
     }
   }
 
   pageFilter() {
-    if(this.sizeProfsr > 0) {
+    if (this.sizeProfsr > 0) {
       this.professorService.listar(0, this.sizeProfsr).subscribe(prfs => this.professoresFilterProf = prfs.content)
     }
   }
@@ -198,7 +198,7 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
       coordenadoria: value.coordenadoria,
     });
     this.switch.writeValue(value.ehCoordenador);
-    if(!value.ehCoordenador) {
+    if (!value.ehCoordenador) {
       this.dropdown.writeValue(value.coordenadoria)
     }
   }
@@ -226,7 +226,7 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
 
   patchForm() {
     this.switchCooda = !this.switchCooda;
-    if(this.switchCooda) {
+    if (this.switchCooda) {
       this.form.patchValue({
         coordenadoria: null
       })
@@ -239,7 +239,7 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
         this.inputSearchProf.nativeElement.value = '';
       }
       this.selectedFilterProf = {} as FiltrarPesquisa;
-      
+
     this.professorService.listar(0, 10).subscribe(pfs => {
       this.professoresData = pfs.content;
 
@@ -345,9 +345,9 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
         this.ngOnInit();
       },
       error: (err: any) => {
-          this.messages = [
-            { severity: 'error', summary: 'Erro', detail: err, sticky: true }
-          ];
+        this.messages = [
+          { severity: 'error', summary: 'Erro', detail: err, sticky: true }
+        ];
       }
     });
   }
@@ -394,20 +394,20 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
 
   deletarID(id: number) {
     this.professorService.excluir(id)
-    .subscribe({
-      next: (data: any) => {
-        this.messages = [
-          { severity: 'success', summary: 'Sucesso', detail: 'Registro deletado com sucesso!', life: 3000 },
-        ];
-        this.ngOnInit();
-        // window.location.reload();
-      },
-      error: (err: any) => {
-        this.messages = [
-          { severity: 'error', summary: 'Erro', detail: err, sticky: true }
-        ];
-      }
-  });
+      .subscribe({
+        next: (data: any) => {
+          this.messages = [
+            { severity: 'success', summary: 'Sucesso', detail: 'Registro deletado com sucesso!', life: 3000 },
+          ];
+          this.ngOnInit();
+          // window.location.reload();
+        },
+        error: (err: any) => {
+          this.messages = [
+            { severity: 'error', summary: 'Erro', detail: err, sticky: true }
+          ];
+        }
+      });
   }
 
   rfidDialogVisible: boolean = false;
@@ -416,30 +416,30 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
   openRFIDDialog() {
     this.rfidDialogVisible = true;
     this.rfidValue = '';
-}
-
-onRFIDEnter() {
-  if (this.rfidValue.length === 10) {
-    const matriculaControl = this.form.get('matricula');
-    if (matriculaControl) {
-      matriculaControl.setValue(this.rfidValue);
-    }
-    this.rfidDialogVisible = false;
   }
-}
+
+  onRFIDEnter() {
+    if (this.rfidValue.length === 10) {
+      const matriculaControl = this.form.get('matricula');
+      if (matriculaControl) {
+        matriculaControl.setValue(this.rfidValue);
+      }
+      this.rfidDialogVisible = false;
+    }
+  }
 
   closeRFIDDialog() {
     this.rfidDialogVisible = false;
   }
 
   badgeOptionExclui(event: Event) {
-    if(this.checkOptionsSelected.length > 0) {
+    if (this.checkOptionsSelected.length > 0) {
       this.confirm3(event, this.checkOptionsSelected)
     }
   }
 
   badgeOptionGerarCodBarra() {
-    if(this.checkOptionsSelected.length > 0) {
+    if (this.checkOptionsSelected.length > 0) {
       for (const key of this.checkOptionsSelected) {
         // this.generateBarcode(key.matricula)
       }

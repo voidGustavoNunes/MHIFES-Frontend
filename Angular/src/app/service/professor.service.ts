@@ -19,42 +19,40 @@ export class ProfessorService {
       .set('page', page.toString())
       .set('size', size.toString());
 
-    return this.http.get<Page<Professor>>(`${this.API}`, { params });
+    return this.http.get<Page<Professor>>(`${this.API}`, { params }).pipe(
+      catchError(error => this.handleError(error))
+    );
   }
 
   buscarPorId(id: number): Observable<Professor> {
-    return this.http.get<Professor>(`${this.API}/${id}`);
+    return this.http.get<Professor>(`${this.API}/${id}`).pipe(
+      catchError(error => this.handleError(error))
+    );
   }
 
   criar(record: Professor[]): Observable<Object> {
     return this.http.post(`${this.API}`, record).pipe(
-      catchError((error: any) => {
-        return throwError(error.error.message || 'Erro desconhecido');
-      })
+      catchError(error => this.handleError(error))
     );
   }
 
   atualizar(id: number, record: Professor): Observable<Object> {
     return this.http.put(`${this.API}/${id}`, record).pipe(
-      catchError((error: any) => {
-        return throwError(error.error.message || 'Erro desconhecido');
-      })
+      catchError(error => this.handleError(error))
     );
   }
 
   excluir(id: number): Observable<Object> {
-    return this.http.delete(`${this.API}/${id}`, {observe: 'response'})
-    .pipe(
-      catchError((error: any) => {
-        return throwError(error.error.message || 'Erro desconhecido');
-      })
-    );
+    return this.http.delete(`${this.API}/${id}`, { observe: 'response' })
+      .pipe(
+        catchError(error => this.handleError(error))
+      );
   }
 
   private handleError(error: HttpErrorResponse) {
-    return throwError(() => new Error(error.message || 'Erro desconhecido'));
+    return throwError(error.error.error || error.error.message || 'Erro desconhecido');
   }
-  
+
   acharNome(page: number, size: number, substring: string): Observable<Page<Professor>> {
     const params = new HttpParams()
       .set('page', page.toString())
@@ -63,7 +61,7 @@ export class ProfessorService {
 
     return this.http.get<Page<Professor>>(`${this.API}/filter/nome`, { params });
   }
-  
+
   acharSigla(page: number, size: number, substring: string): Observable<Page<Professor>> {
     const params = new HttpParams()
       .set('page', page.toString())
@@ -72,7 +70,7 @@ export class ProfessorService {
 
     return this.http.get<Page<Professor>>(`${this.API}/filter/sigla`, { params });
   }
-  
+
   acharMatricula(page: number, size: number, substring: string): Observable<Page<Professor>> {
     const params = new HttpParams()
       .set('page', page.toString())

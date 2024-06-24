@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Observable, catchError, first, map, throwError } from 'rxjs';
 import { Alocacao } from '../models/postgres/alocacao.models';
 import { Log } from '../models/postgres/log.models';
@@ -11,16 +11,14 @@ export class AlocacaoService {
 
   constructor(private http: HttpClient) { }
 
-  // listar(): Observable<Alocacao[]> {
-  //   return this.http.get<Alocacao[]>(`${this.API}`);
-  // }
-
   listar(page: number, size: number): Observable<Page<Alocacao>> {
     const params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString());
 
-    return this.http.get<Page<Alocacao>>(`${this.API}`, { params });
+    return this.http.get<Page<Alocacao>>(`${this.API}`, { params }).pipe(
+      catchError(error => this.handleError(error))
+    );
   }
 
   listarAtivos(page: number, size: number): Observable<Page<Alocacao>> {
@@ -28,7 +26,9 @@ export class AlocacaoService {
       .set('page', page.toString())
       .set('size', size.toString());
 
-    return this.http.get<Page<Alocacao>>(`${this.API}/ativos`, { params });
+    return this.http.get<Page<Alocacao>>(`${this.API}/ativos`, { params }).pipe(
+      catchError(error => this.handleError(error))
+    );
   }
 
   listarInativos(page: number, size: number): Observable<Page<Alocacao>> {
@@ -36,39 +36,43 @@ export class AlocacaoService {
       .set('page', page.toString())
       .set('size', size.toString());
 
-    return this.http.get<Page<Alocacao>>(`${this.API}/inativos`, { params });
+    return this.http.get<Page<Alocacao>>(`${this.API}/inativos`, { params }).pipe(
+      catchError(error => this.handleError(error))
+    );
   }
 
   buscarPorId(id: number): Observable<Alocacao> {
-    return this.http.get<Alocacao>(`${this.API}/${id}`);
+    return this.http.get<Alocacao>(`${this.API}/${id}`).pipe(
+      catchError(error => this.handleError(error))
+    );
   }
 
   criar(record: Alocacao[]): Observable<Object> {
     return this.http.post(`${this.API}`, record).pipe(
-      catchError((error: any) => {
-        return throwError(error.error.message || 'Erro desconhecido');
-      })
+      catchError(error => this.handleError(error))
     );
   }
 
   atualizar(id: number, record: Alocacao[]): Observable<Object> {
     return this.http.put(`${this.API}/${id}`, record).pipe(
-      catchError(error => {
-        return throwError(error.error.message || 'Erro desconhecido');
-      })
+      catchError(error => this.handleError(error))
     );
   }
 
   excluir(id: number): Observable<Object> {
-    return this.http.delete(`${this.API}/${id}`, {observe: 'response'}).pipe(
-      catchError(error => {
-        return throwError(error.error.message || 'Erro desconhecido');
-      })
+    return this.http.delete(`${this.API}/${id}`, { observe: 'response' }).pipe(
+      catchError(error => this.handleError(error))
     );
   }
 
   buscarPorIdRegistro(id: number): Observable<Log[]> {
-    return this.http.get<Log[]>(`${this.API}/log/${id}`);
+    return this.http.get<Log[]>(`${this.API}/log/${id}`).pipe(
+      catchError(error => this.handleError(error))
+    );
+  }
+
+  private handleError(error: HttpErrorResponse) {
+    return throwError(error.error.error || error.error.message || 'Erro desconhecido');
   }
 
   

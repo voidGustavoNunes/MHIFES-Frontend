@@ -63,33 +63,33 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
   visible: boolean = false;
   editar: boolean = false;
   cadastrar: boolean = false;
-  
+
   messages!: Message[];
   mss: boolean = false;
-  
+
   filterOptions: FiltrarPesquisa[] = [];
   selectedFilter!: FiltrarPesquisa;
   txtFilter: string = 'Pesquisar período';
-  
+
   minDate!: Date;
 
   minAno!: number;
   maxAno!: number;
-  
+
   unsubscribe$Aln!: Subscription;
   unsubscribe$Disc!: Subscription;
-  
+
   alunosArray: Aluno[] = [];
   disciplinasArray: Disciplina[] = [];
   previousDiscPer: PeriodoDisciplina[] = [];
-  
-  selectedDisciplinas: Disciplina[]=[];
+
+  selectedDisciplinas: Disciplina[] = [];
   selectedDiscAlunos: PerDiscMultiSelect[] = [];
   selectedAlunos: Aluno[][] = [];
-  
+
   minCalend!: Date;
   maxCalend!: Date;
-  
+
   firstPerds: number = 0;
   pagePerds: number = 0;
   rowsPerds: number = 10;
@@ -108,74 +108,74 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
     private confirmationService: ConfirmationService,
     private disciService: DisciplinaService,
     private alunService: AlunoService
-    ) {
-      this.form = this.formBuilder.group({
-        id: [null],
-        ano: [null, [Validators.required]],
-        semestre: [null, [Validators.required]],
-        dataInicio: [null, [Validators.required]],
-        dataFim: [null, [Validators.required]],
-        periodoDisciplinas: this.formBuilder.array([], [Validators.required])
-      }, { validator: this.validarDatas });
+  ) {
+    this.form = this.formBuilder.group({
+      id: [null],
+      ano: [null, [Validators.required]],
+      semestre: [null, [Validators.required]],
+      dataInicio: [null, [Validators.required]],
+      dataFim: [null, [Validators.required]],
+      periodoDisciplinas: this.formBuilder.array([], [Validators.required])
+    }, { validator: this.validarDatas });
 
-      const date = new Date();
-      this.minAno = date.getFullYear() - 10;
-      this.maxAno = date.getFullYear() + 5;
+    const date = new Date();
+    this.minAno = date.getFullYear() - 10;
+    this.maxAno = date.getFullYear() + 5;
   }
 
   ngOnInit() {
 
     this.filterOptions = [
-      {nome: 'Data de Início', id: 0},
-      {nome: 'Ano', id: 1}
+      { nome: 'Data de Início', id: 0 },
+      { nome: 'Ano', id: 1 }
     ];
 
-    this.unsubscribe$ = this.periodService.listar(0,10)
-    .subscribe({
-      next: (itens:any) => {
-        this.periodosPageData = itens;
-        this.sizePerds = this.periodosPageData.totalElements;
-        
-        this.periodosData = this.periodosPageData.content;
-        this.periodosData.sort((a: Periodo, b: Periodo) => {
-          const dateA = new Date(a.dataInicio);
-          const dateB = new Date(b.dataInicio);
-          return dateB.getTime() - dateA.getTime();
-        });
-        this.pageFilter()
-      },
-      error: (err: any) => {
-        this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Dados de períodos não encontrados.', life: 3000 },
-        ];
-      }
-    });
-    
-    this.unsubscribe$Disc = this.disciService.listar(0,10)
-    .subscribe({
-      next: (itens:any) => {
-        this.disciplinasPageData = itens
-        this.listarPageObj(2)
-      },
-      error: (err: any) => {
-        this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Dados de disciplinas não encontrados.', life: 3000 },
-        ];
-      }
-    });
+    this.unsubscribe$ = this.periodService.listar(0, 10)
+      .subscribe({
+        next: (itens: any) => {
+          this.periodosPageData = itens;
+          this.sizePerds = this.periodosPageData.totalElements;
 
-    this.unsubscribe$Aln = this.alunService.listar(0,10)
-    .subscribe({
-      next: (itens:any) => {
-        this.alunosPageData = itens
-        this.listarPageObj(1)
-      },
-      error: (err: any) => {
-        this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Dados de alunos não encontrados.', life: 3000 },
-        ];
-      }
-    });
+          this.periodosData = this.periodosPageData.content;
+          this.periodosData.sort((a: Periodo, b: Periodo) => {
+            const dateA = new Date(a.dataInicio);
+            const dateB = new Date(b.dataInicio);
+            return dateB.getTime() - dateA.getTime();
+          });
+          this.pageFilter()
+        },
+        error: (err: any) => {
+          this.messages = [
+            { severity: 'error', summary: 'Erro', detail: err, sticky: true },
+          ];
+        }
+      });
+
+    this.unsubscribe$Disc = this.disciService.listar(0, 10)
+      .subscribe({
+        next: (itens: any) => {
+          this.disciplinasPageData = itens
+          this.listarPageObj(2)
+        },
+        error: (err: any) => {
+          this.messages = [
+            { severity: 'error', summary: 'Erro', detail: err, sticky: true },
+          ];
+        }
+      });
+
+    this.unsubscribe$Aln = this.alunService.listar(0, 10)
+      .subscribe({
+        next: (itens: any) => {
+          this.alunosPageData = itens
+          this.listarPageObj(1)
+        },
+        error: (err: any) => {
+          this.messages = [
+            { severity: 'error', summary: 'Erro', detail: err, sticky: true },
+          ];
+        }
+      });
   }
 
   ngOnDestroy() {
@@ -183,7 +183,7 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
     this.unsubscribe$Aln.unsubscribe();
     this.unsubscribe$Disc.unsubscribe();
   }
-  
+
   onPageChange(event: PaginatorState) {
     if (event.first !== undefined && event.rows !== undefined && event.page !== undefined) {
       this.firstPerds = event.first;
@@ -195,7 +195,7 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
 
   listarPage() {
     this.periodService.listar(this.pagePerds, this.rowsPerds)
-    .subscribe((itens:any) => {
+      .subscribe((itens: any) => {
         this.periodosPageData = itens;
         this.periodosData = this.periodosPageData.content;
         this.periodosData.sort((a: Periodo, b: Periodo) => {
@@ -207,23 +207,23 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
   }
 
   listarPageObj(object: number) {
-    if(object == 1) {
+    if (object == 1) {
       let sizeUm = this.alunosPageData.totalElements
-      if(sizeUm > 0) {
-        this.alunService.listar(0,sizeUm).subscribe(alno => this.alunosArray = alno.content)
+      if (sizeUm > 0) {
+        this.alunService.listar(0, sizeUm).subscribe(alno => this.alunosArray = alno.content)
         this.alunosArray.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1)
       }
-    } else if(object == 2) {
+    } else if (object == 2) {
       let sizeDois = this.disciplinasPageData.totalElements
-      if(sizeDois > 0) {
-        this.disciService.listar(0,sizeDois).subscribe(discp => this.disciplinasArray = discp.content)
+      if (sizeDois > 0) {
+        this.disciService.listar(0, sizeDois).subscribe(discp => this.disciplinasArray = discp.content)
         this.disciplinasArray.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1)
       }
     }
-  }  
+  }
 
   pageFilter() {
-    if(this.sizePerds > 0) {
+    if (this.sizePerds > 0) {
       this.periodService.listar(0, this.sizePerds).subscribe(perds => this.periodosFilter = perds.content)
     }
   }
@@ -231,8 +231,8 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
   updateCalendarMinMaxCalend() {
     // let anoInput = this.form.get('ano')?.value;
     let anoInput = parseInt(this.form.get('ano')?.value);
-    
-    if(!isNaN(anoInput)) {
+
+    if (!isNaN(anoInput)) {
       this.minCalend = new Date(anoInput, 0, 1);
       this.maxCalend = new Date(anoInput, 11, 31);
       this.form.patchValue({
@@ -253,13 +253,13 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
   }
 
   onSelectDisciplinas() {
-    if(this.selectedDisciplinas.length <= 0) {
+    if (this.selectedDisciplinas.length <= 0) {
       this.clearSelect();
-    } else if(this.selectedDisciplinas.length > 0 && this.selectedDiscAlunos.length > 0) {
+    } else if (this.selectedDisciplinas.length > 0 && this.selectedDiscAlunos.length > 0) {
       this.verificarGetDiscp();
 
       let removedIndexes = [];
-      
+
       for (let i = 0; i < this.selectedDiscAlunos.length; i++) {
         const item = this.selectedDiscAlunos[i];
         if (!this.selectedDisciplinas.some(e => e.id === item.disciplina?.id)) {
@@ -297,7 +297,7 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
 
   adicionarDisciplinaComAlunos(disciplina: Disciplina, alunos: Array<Aluno>) {
     this.verificarGetDiscp();
-    
+
     const index = this.selectedDiscAlunos.findIndex(item => item.disciplina?.id === disciplina.id);
     if (index === -1) {
       this.selectedDiscAlunos.push({ disciplina, alunos });
@@ -305,7 +305,7 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
     } else {
       this.selectedDiscAlunos[index].disciplina = disciplina;
       this.selectedDiscAlunos[index].alunos = alunos;
-      if(this.getDisciplina().length <= 0){
+      if (this.getDisciplina().length <= 0) {
         this.pushGetDiscpVazio(disciplina, alunos);
       } else {
         this.pushGetDiscpId(disciplina, alunos, index, null, null);
@@ -325,15 +325,15 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
       idPreviousDiscp = this.previousDiscPer[previousIndex].disciplina?.id;
       periodoPrevious = this.previousDiscPer[previousIndex].periodo;
     }
-    
+
     const index = this.selectedDiscAlunos.findIndex(item => item.disciplina?.id === disciplina.id);
     if (index === -1 || (index === -1 && disciplina.id != idPreviousDiscp)) {
       this.selectedDiscAlunos.push({ disciplina, alunos });
       this.pushGetDiscpVazio(disciplina, alunos);
-    } else if((index !== -1) || (disciplina.id == idPreviousDiscp)) {
+    } else if ((index !== -1) || (disciplina.id == idPreviousDiscp)) {
       this.selectedDiscAlunos[index].disciplina = disciplina;
       this.selectedDiscAlunos[index].alunos = alunos;
-      if(this.getDisciplina().length <= 0){
+      if (this.getDisciplina().length <= 0) {
         this.pushGetDiscpVazio(disciplina, alunos);
       } else {
         this.pushGetDiscpId(disciplina, alunos, index, idPrevious, periodoPrevious);
@@ -389,22 +389,22 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
     this.onMinDate()
 
     value.periodoDisciplinas
-    .filter(le => {
-      if(le.disciplina !== null && le.alunos !== null && le.periodo !== null) {
-        this.selectedDisciplinas.push(le.disciplina);
-        this.selectedAlunos.push(le.alunos);
-        this.selectedDiscAlunos.push({disciplina: le.disciplina, alunos: le.alunos })
-        
-        const tempDiscp: PeriodoDisciplina = {
-          id: le.id,
-          periodo: value,
-          disciplina: le.disciplina,
-          alunos: le.alunos
-        };
-        this.addDiscp(tempDiscp);
-      }
-    })
-    
+      .filter(le => {
+        if (le.disciplina !== null && le.alunos !== null && le.periodo !== null) {
+          this.selectedDisciplinas.push(le.disciplina);
+          this.selectedAlunos.push(le.alunos);
+          this.selectedDiscAlunos.push({ disciplina: le.disciplina, alunos: le.alunos })
+
+          const tempDiscp: PeriodoDisciplina = {
+            id: le.id,
+            periodo: value,
+            disciplina: le.disciplina,
+            alunos: le.alunos
+          };
+          this.addDiscp(tempDiscp);
+        }
+      })
+
     this.previousDiscPer = value.periodoDisciplinas;
     this.multiselectDiscp.writeValue(value.periodoDisciplinas.map(le => le.disciplina));
   }
@@ -423,19 +423,19 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
     this.editar = false;
     this.setMinDate();
   }
-  
+
   hideDialog() {
     this.visible = false;
     this.form.reset();
   }
-  
-  limparFilter(){
+
+  limparFilter() {
     const inputElement = this.inputSearch.nativeElement.value
     if (inputElement) {
       this.inputSearch.nativeElement.value = '';
     }
     this.selectedFilter = {} as FiltrarPesquisa;
-    
+
     this.periodService.listar(0, 10).subscribe(alno => {
       this.periodosData = alno.content;
 
@@ -473,12 +473,12 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
       this.filterField(searchTerm);
     }
   }
-  
+
   filterField(searchTerm: string) {
     if (searchTerm && (searchTerm != null || searchTerm != '')) {
-      if(this.selectedFilter) {
-        if(this.selectedFilter.id == 0) this.searchFilter0(searchTerm);
-        if(this.selectedFilter.id == 1) this.searchFilter1(searchTerm);
+      if (this.selectedFilter) {
+        if (this.selectedFilter.id == 0) this.searchFilter0(searchTerm);
+        if (this.selectedFilter.id == 1) this.searchFilter1(searchTerm);
       } else {
         this.messages = [
           { severity: 'warn', summary: 'Atenção', detail: 'Selecione um filtro!', life: 3000 },
@@ -517,7 +517,7 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
   }
 
   formatarDtStrDt(date: string) {
-    if(date) {
+    if (date) {
       const partes = date.split('/');
       const ano = parseInt(partes[0], 10);
       const mes = parseInt(partes[1], 10) - 1;
@@ -558,7 +558,7 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
       },
       error: (err: any) => {
         this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Cadastro não enviado.', life: 3000 },
+          { severity: 'error', summary: 'Erro', detail: err, sticky: true },
         ];
       }
     });
@@ -576,7 +576,7 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
       },
       error: (err: any) => {
         this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Edição não enviada.', life: 3000 },
+          { severity: 'error', summary: 'Erro', detail: err, sticky: true },
         ];
       }
     });
@@ -585,7 +585,7 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
   onSubmit() {
     console.log(this.form.value)
 
-    if(this.getDisciplina().length > 0) {
+    if (this.getDisciplina().length > 0) {
       this.verificarGetDiscp();
       if (this.form.valid && this.cadastrar) {
         this.periodosCadast = this.form.value;
@@ -630,26 +630,20 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
 
   deletarID(id: number) {
     this.periodService.excluir(id)
-    .subscribe({
-      next: (data: any) => {
-        this.messages = [
-          { severity: 'success', summary: 'Sucesso', detail: 'Registro deletado com sucesso!', life: 3000 },
-        ];
-        this.ngOnInit();
-        // window.location.reload();
-      },
-      error: (err: any) => {
-        if (err.status) {
+      .subscribe({
+        next: (data: any) => {
           this.messages = [
-            { severity: 'error', summary: 'Erro', detail: 'Não foi possível deletar registro.', life: 3000 },
+            { severity: 'success', summary: 'Sucesso', detail: 'Registro deletado com sucesso!', life: 3000 },
           ];
-        } else {
+          this.ngOnInit();
+          // window.location.reload();
+        },
+        error: (err: any) => {
           this.messages = [
-            { severity: 'error', summary: 'Erro desconhecido', detail: err, life: 3000 },
+            { severity: 'error', summary: 'Erro', detail: err, sticky: true },
           ];
         }
-      }
-  });
+      });
   }
 
 }

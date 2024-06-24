@@ -41,34 +41,34 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
 
   @ViewChild('tableToPrintPrxAln') tableToPrintPrxAln!: ElementRef;
   @ViewChild('tableToPrintSmnAln') tableToPrintSmnAln!: ElementRef;
-  
+
   messages!: Message[];
   barcode: string = '';
   codeConsulta: string = '';
   previousBarcode: string = '';
-  
+
   unsubscribe$!: Subscription;
   alocacoesArray: Alocacao[] = [];
-  
+
   alunoComHorario!: Aluno;
   professorComHorario!: Professor;
-  
+
   visible: boolean = false;
   visibleConsu: boolean = false;
   mssMatriculaVazia: string = '';
-  
+
   filterOptionsScan: FiltrarPesquisa[] = [];
   selectedFilterScan!: FiltrarPesquisa;
-  
+
   alocacoesAgrupadas: Alocacao[][] = [];
   alocacoesAgrupadasSemFinalSemana: Alocacao[][] = [];
   semanaExibido: string = '';
-  
+
   alocacaoMaisProxima!: Alocacao | undefined;
-  
+
   diasDaSemana = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
   diasDaSemanaSemFinal = ['SEG', 'TER', 'QUA', 'QUI', 'SEX'];
-  
+
   siglasAgrupadas: Alocacao[] = [];
   columnsHorario: HorarioTable[] = [
     {inicio: '07:00', fim: '07:50'},
@@ -90,7 +90,7 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
   ];
 
   mssVazio = ['Sem aulas agendadas para este período.', '', '', '', '', '', ''];
-  
+
   ehAluno: boolean = false;
   ehProfessor: boolean = false;
 
@@ -138,7 +138,7 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
       // }
     });
   }
-  
+
   isLoggedScan() {
     return this.userAuthService.isLoggedIn();
   }
@@ -146,7 +146,7 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
   openConsultaDialog() {
     this.visibleConsu = true;
   }
-  
+
   onKey() {
     const url = this.router.url;
     const role = this.userAuthService.getRole();
@@ -226,7 +226,7 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
     if(this.sizeAloc > 0) {
       this.alocService.listarAtivos(0, this.sizeAloc).subscribe(alocs => {
         alocsAllData = alocs.content
-        
+
         if(alocsAllData.length > 0) {
           this.alocacoesArray = alocsAllData.filter((alocacao) => {
             const hoje = new Date();
@@ -247,7 +247,7 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
       })
     }
   }
-  
+
   formatarTmStrTmScan(tempo: any) {
     if (tempo) {
       const partes = tempo.split(':');
@@ -309,7 +309,7 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
       this.alocacaoMaisProxima = undefined;
       return;
     }
-    
+
     this.alocacoesAgrupadas[indiceDiaAtual]
       .find((alocacao) => {
         const diaSemanaAlocacao = this.diasDaSemana[this.formatarDtStrDtScan(alocacao.dataAula).getDay()];
@@ -317,11 +317,11 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
         let minIni = this.formatarTmStrTmScan(alocacao?.horario?.horaInicio)?.minutos;
         let hFim = this.formatarTmStrTmScan(alocacao?.horario?.horaFim)?.horas;
         let minFim = this.formatarTmStrTmScan(alocacao?.horario?.horaFim)?.minutos;
-        
+
         if(hIni != undefined && minIni != undefined && hFim != undefined && minFim != undefined) {
           const horaInicioEmMinutos = hIni * 60 + minIni;
           const horaFimEmMinutos = hFim * 60 + minFim;
-          
+
           const proximidade = 30; //  Isso permite que a hora atual seja até ... minutos antes do horário de início da alocação.
 
           if (
@@ -334,14 +334,14 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
 
     if(this.alocacaoMaisProxima) this.semanaExibido = diaSemanaHoje;
   }
-  
+
   filtrarAlocacoesPorDiaSemanaScan() {
     const alocacaoUnique: Alocacao[][] = Array.from({ length: 7 }, () => []);
     const alocacaoUniqueSemFinalSemana: Alocacao[][] = Array.from({ length: 5 }, () => []);
-  
+
     // const horariosUnicos: Horario[] = [];
     const siglasUnique: Alocacao[] = [];
-  
+
     this.alocacoesArray.forEach((alocacao) => {
       const hoje = new Date();
       const periodo = alocacao.periodoDisciplina.periodo;
@@ -351,22 +351,22 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
             const studentFound = alocacao.periodoDisciplina.alunos.some(
               (aln) => aln.matricula === this.previousBarcode
             );
-      
+
             if (studentFound) {
               const diaSemana = this.formatarDtStrDtScan(alocacao.dataAula).getDay();
               alocacaoUnique[diaSemana].push(alocacao);
-      
+
               if (diaSemana >= 1 && diaSemana <= 5) {
                 alocacaoUniqueSemFinalSemana[diaSemana - 1].push(alocacao);
               }
             }
           } else if(this.ehProfessor) {
             const teacherFound = alocacao.professor.matricula === this.previousBarcode
-      
+
             if (teacherFound) {
               const diaSemana = this.formatarDtStrDtScan(alocacao.dataAula).getDay();
               alocacaoUnique[diaSemana].push(alocacao);
-      
+
               if (diaSemana >= 1 && diaSemana <= 5) {
                 alocacaoUniqueSemFinalSemana[diaSemana - 1].push(alocacao);
               }
@@ -375,10 +375,10 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
         }
       }
     });
-    
+
     alocacaoUnique.forEach((diaAlocacoes, diaSemana) => {
       const alocacoesUnicas: Alocacao[] = [];
-    
+
       diaAlocacoes.forEach((alocacaoAtual) => {
         const hIni = this.formatarTmStrTmScan(alocacaoAtual?.horario?.horaInicio)?.horas;
         const minIni = this.formatarTmStrTmScan(alocacaoAtual?.horario?.horaInicio)?.minutos;
@@ -388,53 +388,53 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
         const jaInserida = alocacoesUnicas.some((alocacao) =>
           alocacao.periodoDisciplina.disciplina.nome === alocacaoAtual.periodoDisciplina.disciplina.nome && this.formatarTmStrTmScan(alocacao.horario.horaInicio)?.horas === hIni && this.formatarTmStrTmScan(alocacao.horario.horaInicio)?.minutos === minIni && this.formatarTmStrTmScan(alocacao.horario.horaFim)?.horas === hFim && this.formatarTmStrTmScan(alocacao.horario.horaFim)?.minutos === minFim
         );
-    
+
         if (!jaInserida) {
           alocacoesUnicas.push(alocacaoAtual);
         }
       });
-    
+
       alocacaoUnique[diaSemana] = alocacoesUnicas;
     });
 
     alocacaoUniqueSemFinalSemana.forEach((diaAlocacoes, diaSemana) => {
       const alocacoesUnicasSemFinalSemana: Alocacao[] = [];
-      
+
       diaAlocacoes.forEach((alocacaoAtual) => {
         const hIni = this.formatMilissScan(alocacaoAtual.horario.horaInicio);
         const hFim = this.formatMilissScan(alocacaoAtual.horario.horaFim);
         const diaAlocSemana = this.diasDaSemanaSemFinal[this.formatarDtStrDtScan(alocacaoAtual.dataAula).getDay()];
-        
+
         const jaInseridaSemFinal = alocacoesUnicasSemFinalSemana.some((alocacao) =>
           alocacao.periodoDisciplina.disciplina.nome === alocacaoAtual.periodoDisciplina.disciplina.nome && this.formatMilissScan(alocacao.horario.horaInicio) === hIni && this.formatMilissScan(alocacao.horario.horaInicio) === hIni && this.formatMilissScan(alocacao.horario.horaFim) === hFim && this.formatMilissScan(alocacao.horario.horaFim) === hFim && diaAlocSemana === this.diasDaSemanaSemFinal[this.formatarDtStrDtScan(alocacao.dataAula).getDay()]
         );
-        
+
         if (!jaInseridaSemFinal) {
           alocacoesUnicasSemFinalSemana.push(alocacaoAtual);
-          
+
           // const jaHora = horariosUnicos.some((hora) => this.formatMilissScan(hora.horaInicio) === hIni && this.formatMilissScan(hora.horaInicio) === hIni && this.formatMilissScan(hora.horaFim) === hFim && this.formatMilissScan(hora.horaFim) === hFim);
-          
+
           // if(!jaHora) {
           //   horariosUnicos.push(alocacaoAtual.horario);
           // }
           const jaSigla = siglasUnique.some((sgl) => sgl.periodoDisciplina.disciplina.nome === alocacaoAtual.periodoDisciplina.disciplina.nome && sgl.periodoDisciplina.disciplina.sigla === alocacaoAtual.periodoDisciplina.disciplina.sigla);
-          
+
           if(!jaSigla) {
             siglasUnique.push(alocacaoAtual);
           }
         }
       });
-    
+
       alocacaoUniqueSemFinalSemana[diaSemana] = alocacoesUnicasSemFinalSemana;
     });
-  
+
     this.alocacoesAgrupadas = alocacaoUnique;
     this.alocacoesAgrupadasSemFinalSemana = alocacaoUniqueSemFinalSemana;
     this.alocacoesAgrupadasSemFinalSemana.forEach((arrayAloc) => {
       arrayAloc.sort((a:Alocacao, b:Alocacao) => {
         let hAi = this.formatMilissScan(a.horario.horaInicio)
         let hBi = this.formatMilissScan(b.horario.horaInicio)
-        
+
         if (hAi < hBi) {
           return -1;
         } else if (hAi > hBi) {
@@ -450,7 +450,7 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
     // this.columnsHorario.sort((a:Horario, b:Horario) => {
     //   let hAi = this.formatMilissScan(a.horaInicio)
     //   let hBi = this.formatMilissScan(b.horaInicio)
-      
+
     //   if (hAi < hBi) {
     //     return -1;
     //   } else if (hAi > hBi) {
@@ -467,7 +467,7 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
       const hFFormatado = this.formatarHoraScan(alocacao.horario.horaFim);
       const colHi = this.formatarHoraScan(colHora.inicio);
       const colHf = this.formatarHoraScan(colHora.fim);
-      
+
       if (colHi >= hIFormatado && colHf <= hFFormatado) {
         return alocacao;
       }
@@ -491,7 +491,7 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
       if(this.selectedFilterScan.id == 0) {
         const printContents = this.tableToPrintPrxAln.nativeElement.innerHTML;
         const printWindow = window.open('', '_blank', 'width=800,height=600');
-    
+
         if (printWindow) {
           printWindow.document.write('<html><head><title>Imprimir Tabela Próxima Aula</title>');
           printWindow.document.write('<style>');
@@ -501,9 +501,9 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
           printWindow.document.write('</style></head><body>');
           printWindow.document.write(printContents);
           printWindow.document.write('</body></html>');
-          
+
           printWindow.document.close();
-    
+
           // Espere o conteúdo ser carregado na janela de impressão antes de iniciar a impressão
           printWindow.onload = () => {
             printWindow.print();
@@ -513,16 +513,16 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
       } else if(this.selectedFilterScan.id == 1) {
         const printContents = this.tableToPrintSmnAln.nativeElement.innerHTML;
         const printWindow = window.open('', '_blank', 'width=800,height=600');
-    
+
         if (printWindow) {
           printWindow.document.write('<html><head><title>Imprimir Tabela Horário da Semana</title>');
           printWindow.document.write(this.getStyles());
           printWindow.document.write('</head><body>');
           printWindow.document.write(printContents);
           printWindow.document.write('</body></html>');
-          
+
           printWindow.document.close();
-    
+
           // Espere o conteúdo ser carregado na janela de impressão antes de iniciar a impressão
           printWindow.onload = () => {
             printWindow.print();
@@ -534,7 +534,7 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
       if(this.selectedFilterScan.id == 0) {
         const printContents = this.tableToPrintPrxPrf.nativeElement.innerHTML;
         const printWindow = window.open('', '_blank', 'width=800,height=600');
-    
+
         if (printWindow) {
           printWindow.document.write('<html><head><title>Imprimir Tabela Próxima Aula</title>');
           printWindow.document.write('<style>');
@@ -544,9 +544,9 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
           printWindow.document.write('</style></head><body>');
           printWindow.document.write(printContents);
           printWindow.document.write('</body></html>');
-          
+
           printWindow.document.close();
-    
+
           // Espere o conteúdo ser carregado na janela de impressão antes de iniciar a impressão
           printWindow.onload = () => {
             printWindow.print();
@@ -556,16 +556,16 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
       } else if(this.selectedFilterScan.id == 1) {
         const printContents = this.tableToPrintSmnPrf.nativeElement.innerHTML;
         const printWindow = window.open('', '_blank', 'width=800,height=600');
-    
+
         if (printWindow) {
           printWindow.document.write('<html><head><title>Imprimir Tabela Horário da Semana</title>');
           printWindow.document.write(this.getStyles());
           printWindow.document.write('</head><body>');
           printWindow.document.write(printContents);
           printWindow.document.write('</body></html>');
-          
+
           printWindow.document.close();
-    
+
           // Espere o conteúdo ser carregado na janela de impressão antes de iniciar a impressão
           printWindow.onload = () => {
             printWindow.print();
