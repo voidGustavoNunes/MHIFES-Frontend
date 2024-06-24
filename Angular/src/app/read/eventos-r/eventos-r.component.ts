@@ -104,6 +104,8 @@ export class EventosRComponent implements OnInit, OnDestroy {
   eventosPageData!: Page<Evento>;
   horariosPageData!: Page<Horario>;
   locaisPageData!: Page<Local>;
+  
+  checkOptionsSelected: Evento[] = []
 
   constructor(
     private eventService: EventoService,
@@ -537,6 +539,23 @@ export class EventosRComponent implements OnInit, OnDestroy {
     });
   }
 
+  confirm3(event: Event, codes: Evento[]) {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: 'Deseja excluir esses registros?',
+      icon: 'pi pi-info-circle',
+      acceptButtonStyleClass: 'p-button-danger p-button-sm',
+      accept: () => {
+        codes.forEach(alno => this.deletarID(alno.id));
+      },
+      reject: () => {
+        this.messages = [
+          { severity: 'info', summary: 'Cancelado', detail: 'Exclusão cancelada.', life: 3000 },
+        ];
+      }
+    });
+  }
+
   enviarFormSave() {
     this.eventService.criar(this.eventosCadast).subscribe({
       next: (data: any) => {
@@ -643,6 +662,12 @@ export class EventosRComponent implements OnInit, OnDestroy {
         }
       }
     });
+  }
+
+  badgeOptionExclui(event: Event) {
+    if(this.checkOptionsSelected.length > 0) {
+      this.confirm3(event, this.checkOptionsSelected)
+    }
   }
 
 }

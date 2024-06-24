@@ -2,7 +2,10 @@
     <h1>Locais</h1>
 
     <div class="opcao">
-        <a (click)="showDialog()" class="p-button botaoC">Cadastrar +</a>
+        <div class="btn-opcao">
+          <a (click)="showDialog()" class="p-button botaoC">Cadastrar +</a>
+          <p-button label="Deletar" [raised]="true" severity="danger" badge="{{checkOptionsSelected.length}}" badgeClass="p-badge-danger" (onClick)="badgeOptionExclui($event)" />
+      </div>
         
         <div class="pesq">
             <p-overlayPanel #op>
@@ -25,9 +28,12 @@
             [value]="locaisData"
             styleClass="p-datatable-striped"
             [tableStyle]="{'min-width': '50rem'}"
+            [(selection)]="checkOptionsSelected" 
+            dataKey="nome"
         >
             <ng-template pTemplate="header">
                 <tr class="tbHeader">
+                    <th><p-tableHeaderCheckbox /></th>
                     <th>Nome</th>
                     <th>Capacidade</th>
                     <th></th>
@@ -35,6 +41,7 @@
             </ng-template>
             <ng-template pTemplate="body" let-local>
                 <tr class="tbBody">
+                    <td><p-tableCheckbox [value]="local"/></td>
                     <td>{{local?.nome}}</td>
                     <td>{{local?.capacidade}}</td>
                     <td>

@@ -100,6 +100,8 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
   periodosPageData!: Page<Periodo>;
   alunosPageData!: Page<Aluno>;
   disciplinasPageData!: Page<Disciplina>;
+  
+  checkOptionsSelected: Periodo[] = []
 
   constructor(
     private periodService: PeriodoService,
@@ -546,6 +548,23 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
     });
   }
 
+  confirm3(event: Event, codes: Periodo[]) {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: 'Deseja excluir esses registros?',
+      icon: 'pi pi-info-circle',
+      acceptButtonStyleClass: 'p-button-danger p-button-sm',
+      accept: () => {
+        codes.forEach(alno => this.deletarID(alno.id));
+      },
+      reject: () => {
+        this.messages = [
+          { severity: 'info', summary: 'Cancelado', detail: 'Exclusão cancelada.', life: 3000 },
+        ];
+      }
+    });
+  }
+
   enviarFormSave() {
     this.periodService.criar(this.periodosCadast).subscribe({
       next: (data: any) => {
@@ -652,5 +671,11 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
   });
   }
 
+
+  badgeOptionExclui(event: Event) {
+    if(this.checkOptionsSelected.length > 0) {
+      this.confirm3(event, this.checkOptionsSelected)
+    }
+  }
 }
 

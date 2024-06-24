@@ -2,7 +2,10 @@
     <h1>Eventos</h1>
 
     <div class="opcao">
-        <a (click)="showDialog()" class="p-button botaoC">Cadastrar +</a>
+        <div class="btn-opcao">
+          <a (click)="showDialog()" class="p-button botaoC">Cadastrar +</a>
+          <p-button label="Deletar" [raised]="true" severity="danger" badge="{{checkOptionsSelected.length}}" badgeClass="p-badge-danger" (onClick)="badgeOptionExclui($event)" />
+      </div>
         
         <div class="pesq">
             <p-overlayPanel #op>
@@ -26,9 +29,12 @@
             [value]="eventosData"
             styleClass="p-datatable-striped"
             [tableStyle]="{'min-width': '50rem'}"
+            [(selection)]="checkOptionsSelected" 
+            dataKey="nome"
         >
             <ng-template pTemplate="header">
                 <tr class="tbHeader">
+                    <th><p-tableHeaderCheckbox /></th>
                     <th>Nome</th>
                     <th>Data do Evento</th>
                     <th>Horário</th>
@@ -37,6 +43,7 @@
             </ng-template>
             <ng-template pTemplate="body" let-evento>
                 <tr class="tbBody">
+                    <td><p-tableCheckbox [value]="evento"/></td>
                     <td>{{evento?.nome}}</td>
                     <td class="dtEvento">{{evento?.dataEvento | date: 'dd/MM/yyyy'}}</td>
                     <td>{{ formatarHora(evento?.horario?.horaInicio) }} - {{ formatarHora(evento?.horario?.horaFim) }}</td>

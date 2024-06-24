@@ -219,6 +219,18 @@
         right: 1.25rem;
         z-index: 11000;
     }
+    .p-message-warn {
+        color: #8b7400;
+    }
+    .p-message-success {
+        color: #016b06;
+    }
+    .p-message-info {
+        color: #00028b;
+    }
+    .p-message-error {
+      color: red;
+    }
     .p-datatable-header{
         display: flex;
         align-items: center;

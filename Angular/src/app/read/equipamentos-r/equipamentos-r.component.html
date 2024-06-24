@@ -2,7 +2,10 @@
     <h1>Equipamentos</h1>
 
     <div class="opcao">
-        <a (click)="showDialog()" class="p-button botaoC">Cadastrar +</a>
+        <div class="btn-opcao">
+          <a (click)="showDialog()" class="p-button botaoC">Cadastrar +</a>
+          <p-button label="Deletar" [raised]="true" severity="danger" badge="{{checkOptionsSelected.length}}" badgeClass="p-badge-danger" (onClick)="badgeOptionExclui($event)" />
+      </div>
         
         <div class="pesq">
             <p-inputGroup>
@@ -19,18 +22,19 @@
             [value]="equipamentosData"
             styleClass="p-datatable-striped"
             [tableStyle]="{'min-width': '50rem'}"
+            [(selection)]="checkOptionsSelected" 
+            dataKey="nome" 
         >
             <ng-template pTemplate="header">
                 <tr class="tbHeader">
+                    <th><p-tableHeaderCheckbox /></th>
                     <th>Nome</th>
-                    <!-- <th>Descrição</th> -->
-                    <!-- <th></th> -->
-                    <!-- <th></th> -->
                     <th></th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-equipamento>
                 <tr class="tbBody">
+                    <td><p-tableCheckbox [value]="equipamento"/></td>
                     <td>{{equipamento?.nome}}</td>
                     <td>
                         <button type="button" class="botaoEdit" (click)="showEditDialog(equipamento)" pButton>Editar</button>

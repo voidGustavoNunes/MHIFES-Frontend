@@ -286,7 +286,16 @@
         right: 1.25rem;
         z-index: 11000;
     }
-    .p-message-info, .p-message-success, .p-message-error, .p-message-warn {
+    .p-message-warn {
+        color: #8b7400;
+    }
+    .p-message-success {
+        color: #016b06;
+    }
+    .p-message-info {
+        color: #00028b;
+    }
+    .p-message-error {
       color: red;
     }
     .card .p-dropdown, .p-multiselect, .p-inputnumber-input{
@@ -349,7 +358,12 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        margin: 2rem 0 -2rem;
+        margin: 4rem 0 -4rem;
+    }
+    button.p-ripple.p-element.p-button.p-component.p-button-danger.p-button-raised {
+        letter-spacing: 0.1rem;
+        font-weight: 600;
+        text-transform: uppercase;
     }
 }
 
@@ -360,9 +374,11 @@
             display: flex;
             justify-content: space-between;
             flex-wrap: nowrap;
-            .op-btn .botaoC {
-                margin-right: 1rem;
-            }
+            .btn-opcao{
+                display: flex;
+                gap: 1rem;
+                flex-wrap: wrap;
+              }
         }
     }
 
@@ -444,10 +460,11 @@
             display: flex;
             flex-direction: column;
 
-            .op-btn .botaoC {
-                margin-bottom: 1rem;
-                width: fit-content;
-            }
+            .btn-opcao{
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+              }
 
             .pesq{
                 margin-top: 2rem;

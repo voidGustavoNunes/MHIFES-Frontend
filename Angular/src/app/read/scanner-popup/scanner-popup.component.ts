@@ -97,6 +97,8 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
   alocacoesPageData!: Page<Alocacao>;
   sizeAloc: number = 0;
 
+  mss: string = ''
+
   constructor(
     private router: Router,
     private userAuthService: UserAuthService,
@@ -150,12 +152,11 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
   onKey() {
     const url = this.router.url;
     const role = this.userAuthService.getRole();
-    const login = this.userAuthService.getLogin();
-    this.visibleConsu = false;
+    // this.visibleConsu = false;
+    this.mss = 'Aguarde os dados estão sendo carregados...'
 
     if ((this.isLoggedScan() && !url.includes('login') && !url.includes('forbidden')) || (this.isLoggedScan() && url.includes('relatorios'))) {
-    // if ((!url.includes('login') && !url.includes('forbidden')) || (url.includes('relatorios'))) {
-      // if(role === "ADMIN") {
+      if(role === "ADMIN" || role === "USER") {
         setTimeout(() => {
           if(this.barcode != '') this.previousBarcode = this.barcode;
           else if(this.codeConsulta != '') this.previousBarcode = this.codeConsulta;
@@ -165,7 +166,7 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
           this.mssMatriculaVazia = ''
           this.carregarUsersScan()
         }, 500);
-      // }
+      }
     } else {
       this.barcode = '';
       this.codeConsulta = '';
@@ -175,6 +176,7 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
   mostrarHorarioUserScan() {
     this.ehAluno = false
     this.ehProfessor = false
+    console.log('leng ',this.alocacoesArray.length)
     for (const aloc of this.alocacoesArray) {
       for (const aln of aloc.periodoDisciplina.alunos) {
         if(aln.matricula === this.previousBarcode){
@@ -185,6 +187,7 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
       }
       if(!this.ehAluno) {
         console.log('code ',aloc.professor.matricula)
+        console.log('barc ',this.previousBarcode)
         if(aloc.professor.matricula === this.previousBarcode){
           this.professorComHorario = aloc.professor;
           this.ehProfessor = true;
@@ -197,8 +200,12 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
       this.filtrarAlocacoesPorDiaSemanaScan();
       this.selectedFilterScan = this.filterOptionsScan[0];
       this.mssMatriculaVazia = ''
+      this.mss = ''
+      this.visibleConsu = false
       this.visible = true
     } else {
+      this.mss = ''
+      this.visibleConsu = false
       this.visible = true
       this.mssMatriculaVazia = 'Não há horário para esta matrícula.'
     }
@@ -493,12 +500,9 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
         const printWindow = window.open('', '_blank', 'width=800,height=600');
     
         if (printWindow) {
-          printWindow.document.write('<html><head><title>Imprimir Tabela Próxima Aula</title>');
-          printWindow.document.write('<style>');
-          printWindow.document.write(`
-            ${this.getStyles()}
-          `);
-          printWindow.document.write('</style></head><body>');
+          printWindow.document.write('<html><head><title>Imprimir Tabela Horário da Semana</title>');
+          printWindow.document.write(this.getStyles());
+          printWindow.document.write('</head><body>');
           printWindow.document.write(printContents);
           printWindow.document.write('</body></html>');
           
@@ -536,12 +540,9 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
         const printWindow = window.open('', '_blank', 'width=800,height=600');
     
         if (printWindow) {
-          printWindow.document.write('<html><head><title>Imprimir Tabela Próxima Aula</title>');
-          printWindow.document.write('<style>');
-          printWindow.document.write(`
-            ${this.getStyles()}
-          `);
-          printWindow.document.write('</style></head><body>');
+          printWindow.document.write('<html><head><title>Imprimir Tabela Horário da Semana</title>');
+          printWindow.document.write(this.getStyles());
+          printWindow.document.write('</head><body>');
           printWindow.document.write(printContents);
           printWindow.document.write('</body></html>');
           

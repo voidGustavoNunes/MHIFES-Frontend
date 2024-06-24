@@ -2,8 +2,9 @@
   <h1>Alocações</h1>
 
   <div class="opcao">
-    <div class="op-btn">
+    <div class="btn-opcao">
       <a (click)="showDialog()" class="p-button botaoC">Cadastrar +</a>
+      <p-button label="Deletar" [raised]="true" severity="danger" badge="{{checkOptionsSelected.length}}" badgeClass="p-badge-danger" (onClick)="badgeOptionExclui($event)" />
       <a (click)="showMigraDialog()" class="p-button botaoM">Migrar +</a>
     </div>
 
@@ -25,9 +26,12 @@
   </div>
 
   <div class="eqTable">
-    <p-table #dt1 [value]="alocacoesData" styleClass="p-datatable-striped" [tableStyle]="{'min-width': '50rem'}" >
+    <p-table #dt1 [value]="alocacoesData" styleClass="p-datatable-striped" [tableStyle]="{'min-width': '50rem'}"
+    [(selection)]="checkOptionsSelected"
+    dataKey="professor.nome" >
       <ng-template pTemplate="header">
         <tr class="tbHeader">
+          <th><p-tableHeaderCheckbox /></th>
           <th>Professor</th>
           <th>Local</th>
           <th>Disciplina</th>
@@ -37,6 +41,7 @@
       </ng-template>
       <ng-template pTemplate="body" let-alocacao>
         <tr class="tbBody">
+          <td><p-tableCheckbox [value]="alocacao"/></td>
           <td>{{alocacao?.professor?.nome}}</td>
           <td>{{alocacao?.local?.nome}}</td>
           <td>{{alocacao?.periodoDisciplina?.disciplina?.nome}}</td>
@@ -530,25 +535,16 @@
               [options]="dataMysqlAlocacoes"
               [(ngModel)]="mysqlAlocacoes"
               optionLabel="disciplinaMySQL.sigla"
-              display="chip"
-              [showClear]="true" >
-              <ng-template let-value pTemplate="selectedItems">
-                <div class="inline-flex align-items-center gap-2 px-1" *ngFor="let option of value">
-                    <div>{{ option.disciplinaMySQL.sigla }} - {{ option.ano }}/{{ option.semestre }}</div>
-                </div>
-                <div *ngIf="!value || value.length === 0">Select Countries</div>
+              display="chip" >
+            <ng-template let-value pTemplate="selectedItems">
+              <div class="inline-flex align-items-center gap-2 px-1" *ngFor="let option of value">
+                  <div>{{ option.disciplinaMySQL.sigla }} - {{ option.ano }}/{{ option.semestre }}</div>
+              </div>
+              <div *ngIf="!value || value.length === 0">Select Countries</div>
             </ng-template>
             <ng-template let-sqlAloc pTemplate="item">
                 <div class="flex align-items-center gap-2">
                     <div>{{ sqlAloc.disciplinaMySQL.sigla }} - {{ sqlAloc.ano }}/{{ sqlAloc.semestre }}</div>
-                </div>
-            </ng-template>
-            <ng-template let-sqlAloc pTemplate="footer">
-                <div class="py-2 px-3">
-                    <b>
-                        {{ sqlAloc ? sqlAloc.length : 0 }}
-                    </b>
-                    itens{{ (sqlAloc ? sqlAloc.length : 0) > 1 ? 's' : '' }} selecionados.
                 </div>
             </ng-template>
           </p-multiSelect>

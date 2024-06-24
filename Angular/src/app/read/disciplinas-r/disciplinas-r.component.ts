@@ -61,6 +61,8 @@ export class DisciplinasRComponent implements OnInit, OnDestroy {
   sizeDiscpTemp: number = 0;
 
   disciplinasPageData!: Page<Disciplina>;
+  
+  checkOptionsSelected: Disciplina[] = []
 
   constructor(
     private disciService: DisciplinaService,
@@ -227,6 +229,23 @@ export class DisciplinasRComponent implements OnInit, OnDestroy {
     });
   }
 
+  confirm3(event: Event, codes: Disciplina[]) {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: 'Deseja excluir esses registros?',
+      icon: 'pi pi-info-circle',
+      acceptButtonStyleClass: 'p-button-danger p-button-sm',
+      accept: () => {
+        codes.forEach(alno => this.deletarID(alno.id));
+      },
+      reject: () => {
+        this.messages = [
+          { severity: 'info', summary: 'Cancelado', detail: 'Exclusão cancelada.', life: 3000 },
+        ];
+      }
+    });
+  }
+
   enviarFormSave() {
     this.disciService.criar(this.disciplinasCadast).subscribe({
       next: (data: any) => {
@@ -306,6 +325,13 @@ export class DisciplinasRComponent implements OnInit, OnDestroy {
         }
       }
   });
+  }
+  
+
+  badgeOptionExclui(event: Event) {
+    if(this.checkOptionsSelected.length > 0) {
+      this.confirm3(event, this.checkOptionsSelected)
+    }
   }
 
 }

@@ -58,6 +58,8 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
   sizeEqpTemp: number = 0;
 
   equipamentosPageData!: Page<Equipamento>;
+  
+  checkOptionsSelected: Equipamento[] = []
 
   constructor(
     private equipService: EquipamentoService,
@@ -202,6 +204,23 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
     });
   }
 
+  confirm3(event: Event, codes: Equipamento[]) {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: 'Deseja excluir esses registros?',
+      icon: 'pi pi-info-circle',
+      acceptButtonStyleClass: 'p-button-danger p-button-sm',
+      accept: () => {
+        codes.forEach(alno => this.deletarID(alno.id));
+      },
+      reject: () => {
+        this.messages = [
+          { severity: 'info', summary: 'Cancelado', detail: 'Exclusão cancelada.', life: 3000 },
+        ];
+      }
+    });
+  }
+
   enviarFormSave() {
     this.equipService.criar(this.equipamentosCadast).subscribe({
       next: (data: any) => {
@@ -291,6 +310,12 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
         }
       }
     });
+  }
+
+  badgeOptionExclui(event: Event) {
+    if(this.checkOptionsSelected.length > 0) {
+      this.confirm3(event, this.checkOptionsSelected)
+    }
   }
 
 }

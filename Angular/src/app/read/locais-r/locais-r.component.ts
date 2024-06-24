@@ -79,6 +79,8 @@ export class LocaisRComponent implements OnInit, OnDestroy {
 
   locaisPageData!: Page<Local>;
   equipamentosPageData!: Page<Equipamento>;
+  
+  checkOptionsSelected: Local[] = []
 
   constructor(
     private locService: LocalService,
@@ -403,6 +405,23 @@ export class LocaisRComponent implements OnInit, OnDestroy {
     });
   }
 
+  confirm3(event: Event, codes: Local[]) {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: 'Deseja excluir esses registros?',
+      icon: 'pi pi-info-circle',
+      acceptButtonStyleClass: 'p-button-danger p-button-sm',
+      accept: () => {
+        codes.forEach(alno => this.deletarID(alno.id));
+      },
+      reject: () => {
+        this.messages = [
+          { severity: 'info', summary: 'Cancelado', detail: 'Exclusão cancelada.', life: 3000 },
+        ];
+      }
+    });
+  }
+
   enviarFormSave() {
     this.locService.criar(this.locaisCadast).subscribe({
       next: (data: any) => {
@@ -511,4 +530,10 @@ export class LocaisRComponent implements OnInit, OnDestroy {
   });
   }
 
+
+  badgeOptionExclui(event: Event) {
+    if(this.checkOptionsSelected.length > 0) {
+      this.confirm3(event, this.checkOptionsSelected)
+    }
+  }
 }

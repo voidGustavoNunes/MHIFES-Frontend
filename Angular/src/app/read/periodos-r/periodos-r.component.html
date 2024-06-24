@@ -2,7 +2,10 @@
     <h1>Períodos</h1>
 
     <div class="opcao">
-        <a (click)="showDialog()" class="p-button botaoC">Cadastrar +</a>
+        <div class="btn-opcao">
+          <a (click)="showDialog()" class="p-button botaoC">Cadastrar +</a>
+          <p-button label="Deletar" [raised]="true" severity="danger" badge="{{checkOptionsSelected.length}}" badgeClass="p-badge-danger" (onClick)="badgeOptionExclui($event)" />
+      </div>
         
         <div class="pesq">
             <p-overlayPanel #op>
@@ -25,9 +28,12 @@
             [value]="periodosData"
             styleClass="p-datatable-striped"
             [tableStyle]="{'min-width': '50rem'}"
+            [(selection)]="checkOptionsSelected" 
+            dataKey="dataInicio" 
         >
             <ng-template pTemplate="header">
                 <tr class="tbHeader">
+                    <th><p-tableHeaderCheckbox /></th>
                     <th>Intervalo</th>
                     <th>Período</th>
                     <th></th>
@@ -35,7 +41,7 @@
             </ng-template>
             <ng-template pTemplate="body" let-periodo>
                 <tr class="tbBody">
-                    <!-- <td class="texto-limitado">{{periodo?.descricao }}</td> -->
+                    <td><p-tableCheckbox [value]="periodo"/></td>
                     <td>{{periodo?.dataInicio | date: 'dd/MM/yyyy'}} - {{periodo?.dataFim | date: 'dd/MM/yyyy'}}</td>
                     <td>{{periodo?.ano}}/{{periodo?.semestre}}</td>
                     <td>

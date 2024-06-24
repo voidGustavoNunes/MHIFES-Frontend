@@ -203,6 +203,11 @@
         background-color: #ffffff;
         color: #0ea5e9;
     }
+    button.p-ripple.p-element.p-button.p-component.p-button-danger.p-button-raised {
+        letter-spacing: 0.1rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
 }
 
 @media screen and (min-width: 686px) {

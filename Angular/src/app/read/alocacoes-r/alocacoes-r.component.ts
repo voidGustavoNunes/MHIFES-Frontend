@@ -169,6 +169,8 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   visibleMigra: boolean = false;
   mysqlAlocacoes: AlocacaoMySQL[] = [];
   dataMysqlAlocacoes: AlocacaoMySQL[] = [];
+  
+  checkOptionsSelected: Alocacao[] = []
 
   constructor(
     private alocService: AlocacaoService,
@@ -998,6 +1000,23 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     });
   }
 
+  confirm3(event: Event, codes: Alocacao[]) {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: 'Deseja excluir esses registros?',
+      icon: 'pi pi-info-circle',
+      acceptButtonStyleClass: 'p-button-danger p-button-sm',
+      accept: () => {
+        codes.forEach(alno => this.deletarID(alno.id));
+      },
+      reject: () => {
+        this.messages = [
+          { severity: 'info', summary: 'Cancelado', detail: 'Exclusão cancelada.', life: 3000 },
+        ];
+      }
+    });
+  }
+
   enviarFormSave() {
     this.alocService.criar(this.alocacoesCadast).subscribe({
       next: (data: any) => {
@@ -1242,5 +1261,11 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       return `${valorAnterior} -> ${valorAtual}`;
     }
     return valorAtual;
+  }
+  
+  badgeOptionExclui(event: Event) {
+    if(this.checkOptionsSelected.length > 0) {
+      this.confirm3(event, this.checkOptionsSelected)
+    }
   }
 }

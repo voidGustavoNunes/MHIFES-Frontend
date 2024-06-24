@@ -16,6 +16,9 @@
                 <label for="username">Matrícula</label>
             </p-floatLabel>
         </div>
+        <div class="tab3-mss" *ngIf="mss != ''">
+            {{ mss }}
+        </div>
         <div style="display: flex; justify-content: space-around;">
             <p-button label="Cancelar" severity="secondary" (click)="visibleConsu = false" />
             <p-button label="Consultar" (click)="onKey()" />

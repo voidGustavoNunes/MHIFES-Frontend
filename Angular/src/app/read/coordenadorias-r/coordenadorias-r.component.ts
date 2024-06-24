@@ -66,6 +66,8 @@ export class CoordenadoriasRComponent implements OnInit, OnDestroy {
 
   coordenadoriasPageData!: Page<Coordenadoria>;
   professoresPageData!: Page<Professor>;
+  
+  checkOptionsSelected: Coordenadoria[] = []
 
   constructor(
     private coordaService: CoordenadoriaService,
@@ -241,6 +243,23 @@ export class CoordenadoriasRComponent implements OnInit, OnDestroy {
     });
   }
 
+  confirm3(event: Event, codes: Coordenadoria[]) {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: 'Deseja excluir esses registros?',
+      icon: 'pi pi-info-circle',
+      acceptButtonStyleClass: 'p-button-danger p-button-sm',
+      accept: () => {
+        codes.forEach(alno => this.deletarID(alno.id));
+      },
+      reject: () => {
+        this.messages = [
+          { severity: 'info', summary: 'Cancelado', detail: 'Exclusão cancelada.', life: 3000 },
+        ];
+      }
+    });
+  }
+
   enviarFormSave() {
     this.coordaService.criar(this.coordenadoriasCadast).subscribe({
       next: (data: any) => {
@@ -330,6 +349,12 @@ export class CoordenadoriasRComponent implements OnInit, OnDestroy {
         }
       }
   });
+  }
+
+  badgeOptionExclui(event: Event) {
+    if(this.checkOptionsSelected.length > 0) {
+      this.confirm3(event, this.checkOptionsSelected)
+    }
   }
 
 }
