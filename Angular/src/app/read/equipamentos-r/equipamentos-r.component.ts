@@ -305,7 +305,6 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
       }
     });
   }
-<<<<<<< HEAD
 
   badgeOptionExclui(event: Event) {
     if(this.checkOptionsSelected.length > 0) {
@@ -313,6 +312,4 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
     }
   }
 
-=======
->>>>>>> 93afa7ac6485091a21db822382ac73ce41aeeaa9
 }
