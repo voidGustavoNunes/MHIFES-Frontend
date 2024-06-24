@@ -44,14 +44,14 @@ export class LocaisRComponent implements OnInit, OnDestroy {
   locaisCadast!: Local;
   locaisEdit!: Local;
   localCadEdit!: Local;
-  
+
   equipamentosData: Equipamento[] = [];
   previousEquipLocal: LocalEquipamento[] = [];
-  
-  selectedEquipamentos: Equipamento[]=[];
+
+  selectedEquipamentos: Equipamento[] = [];
   selectedEquipQtd: LocalEquipMultiSelect[] = [];
   selectedQtd: number[] = [];
-  
+
   unsubscribe$!: Subscription;
   unsubscribe$EQ!: Subscription;
   form: FormGroup;
@@ -60,16 +60,16 @@ export class LocaisRComponent implements OnInit, OnDestroy {
   visible: boolean = false;
   editar: boolean = false;
   cadastrar: boolean = false;
-  
+
   localInfo!: Local;
   visibleInfo: boolean = false;
-  
+
   messages!: Message[];
   mss: boolean = false;
-  
+
   filterOptions: FiltrarPesquisa[] = [];
   selectedFilter!: FiltrarPesquisa;
-  
+
   firstLocs: number = 0;
   pageLocs: number = 0;
   rowsLocs: number = 10;
@@ -88,57 +88,57 @@ export class LocaisRComponent implements OnInit, OnDestroy {
     private router: Router,
     private formBuilder: FormBuilder,
     private confirmationService: ConfirmationService
-    ) {
-      this.form = this.formBuilder.group({
-        id: [null],
-        nome: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
-        capacidade: [null, [Validators.required]],
-        localEquipamentos: this.formBuilder.array([], [Validators.required])
-      });
+  ) {
+    this.form = this.formBuilder.group({
+      id: [null],
+      nome: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
+      capacidade: [null, [Validators.required]],
+      localEquipamentos: this.formBuilder.array([], [Validators.required])
+    });
   }
 
   ngOnInit() {
     this.filterOptions = [
-      {nome: 'Nome do local', id: 0},
-      {nome: 'Capacidade', id: 1}
+      { nome: 'Nome do local', id: 0 },
+      { nome: 'Capacidade', id: 1 }
     ];
 
-    this.unsubscribe$ = this.locService.listar(0,10)
-    .subscribe({
-      next: (itens:any) => {
-        this.locaisPageData = itens;
-        this.sizeLocs = this.locaisPageData.totalElements;
-        
-        this.locaisData = this.locaisPageData.content;
-        this.locaisData.sort((a:any, b:any) => (a.nome < b.nome ) ? -1 : 1);
-        this.pageFilter()
-      },
-      error: (err: any) => {
-        this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Dados de locais não encontrados.' },
-        ];
-      }
-    });
+    this.unsubscribe$ = this.locService.listar(0, 10)
+      .subscribe({
+        next: (itens: any) => {
+          this.locaisPageData = itens;
+          this.sizeLocs = this.locaisPageData.totalElements;
 
-    this.unsubscribe$EQ = this.equipService.listar(0,10)
-    .subscribe({
-      next: (itens:any) => {
-        this.equipamentosPageData = itens
-        this.listarPageObj()
-      },
-      error: (err: any) => {
-        this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Dados de equipamentos não encontrados.' },
-        ];
-      }
-    });
+          this.locaisData = this.locaisPageData.content;
+          this.locaisData.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1);
+          this.pageFilter()
+        },
+        error: (err: any) => {
+          this.messages = [
+            { severity: 'error', summary: 'Erro', detail: err, sticky: true },
+          ];
+        }
+      });
+
+    this.unsubscribe$EQ = this.equipService.listar(0, 10)
+      .subscribe({
+        next: (itens: any) => {
+          this.equipamentosPageData = itens
+          this.listarPageObj()
+        },
+        error: (err: any) => {
+          this.messages = [
+            { severity: 'error', summary: 'Erro', detail: err, sticky: true },
+          ];
+        }
+      });
   }
 
   ngOnDestroy() {
     this.unsubscribe$.unsubscribe();
     this.unsubscribe$EQ.unsubscribe();
   }
-  
+
   onPageChange(event: PaginatorState) {
     if (event.first !== undefined && event.rows !== undefined && event.page !== undefined) {
       this.firstLocs = event.first;
@@ -150,23 +150,23 @@ export class LocaisRComponent implements OnInit, OnDestroy {
 
   listarPage() {
     this.locService.listar(this.pageLocs, this.rowsLocs)
-    .subscribe((itens:any) => {
+      .subscribe((itens: any) => {
         this.locaisPageData = itens;
         this.locaisData = this.locaisPageData.content;
-        this.locaisData.sort((a:any, b:any) => (a.nome < b.nome ) ? -1 : 1);
+        this.locaisData.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1);
       });
   }
-  
+
   listarPageObj() {
     let sizeAll = this.equipamentosPageData.totalElements
-    if(sizeAll > 0) {
-      this.equipService.listar(0,sizeAll).subscribe(eqps => this.equipamentosData = eqps.content)
+    if (sizeAll > 0) {
+      this.equipService.listar(0, sizeAll).subscribe(eqps => this.equipamentosData = eqps.content)
       this.equipamentosData.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1)
     }
   }
 
   pageFilter() {
-    if(this.sizeLocs > 0) {
+    if (this.sizeLocs > 0) {
       this.locService.listar(0, this.sizeLocs).subscribe(locs => this.locaisFilter = locs.content)
     }
   }
@@ -180,13 +180,13 @@ export class LocaisRComponent implements OnInit, OnDestroy {
   }
 
   onSelectEquipamentos() {
-    if(this.selectedEquipamentos.length <= 0) {
+    if (this.selectedEquipamentos.length <= 0) {
       this.clearSelect();
-    } else if(this.selectedEquipamentos.length > 0 && this.selectedEquipQtd.length > 0) {
+    } else if (this.selectedEquipamentos.length > 0 && this.selectedEquipQtd.length > 0) {
       this.verificarGetEquip();
 
       let removedIndexes = [];
-      
+
       for (let i = 0; i < this.selectedEquipQtd.length; i++) {
         const item = this.selectedEquipQtd[i];
         if (!this.selectedEquipamentos.some(e => e.id === item.equipamento?.id)) {
@@ -224,7 +224,7 @@ export class LocaisRComponent implements OnInit, OnDestroy {
 
   adicionarEquipamentoComQuantidade(equipamento: Equipamento, quantidade: number) {
     this.verificarGetEquip();
-    
+
     const index = this.selectedEquipQtd.findIndex(item => item.equipamento?.id === equipamento.id);
     if (index === -1) {
       this.selectedEquipQtd.push({ equipamento, quantidade });
@@ -232,7 +232,7 @@ export class LocaisRComponent implements OnInit, OnDestroy {
     } else {
       this.selectedEquipQtd[index].equipamento = equipamento;
       this.selectedEquipQtd[index].quantidade = quantidade;
-      if(this.getEquipamento().length <= 0){
+      if (this.getEquipamento().length <= 0) {
         this.pushGetEquipVazio(equipamento, quantidade);
       } else {
         this.pushGetEquipId(equipamento, quantidade, index, null, null);
@@ -252,15 +252,15 @@ export class LocaisRComponent implements OnInit, OnDestroy {
       idPreviousEquip = this.previousEquipLocal[previousIndex].equipamento?.id;
       localPrevious = this.previousEquipLocal[previousIndex].local;
     }
-    
+
     const index = this.selectedEquipQtd.findIndex(item => item.equipamento?.id === equipamento.id);
     if (index === -1 || (index === -1 && equipamento.id != idPreviousEquip)) {
       this.selectedEquipQtd.push({ equipamento, quantidade });
       this.pushGetEquipVazio(equipamento, quantidade);
-    } else if((index !== -1) || (equipamento.id == idPreviousEquip)) {
+    } else if ((index !== -1) || (equipamento.id == idPreviousEquip)) {
       this.selectedEquipQtd[index].equipamento = equipamento;
       this.selectedEquipQtd[index].quantidade = quantidade;
-      if(this.getEquipamento().length <= 0){
+      if (this.getEquipamento().length <= 0) {
         this.pushGetEquipVazio(equipamento, quantidade);
       } else {
         this.pushGetEquipId(equipamento, quantidade, index, idPrevious, localPrevious);
@@ -272,14 +272,14 @@ export class LocaisRComponent implements OnInit, OnDestroy {
     this.visibleInfo = true;
     this.localInfo = value;
   }
-  
+
   showEditDialog(value: Local) {
     this.form.reset();
     this.ehTitulo = 'Atualizar Local'
     this.visible = true;
     this.cadastrar = false;
     this.editar = true;
-    
+
     this.clearSelect();
 
     this.form.patchValue({
@@ -290,22 +290,22 @@ export class LocaisRComponent implements OnInit, OnDestroy {
     });
 
     value.localEquipamentos
-    .filter(le => {
-      if(le.equipamento !== null && le.quantidade !== null && le.local !== null) {
-        this.selectedEquipamentos.push(le.equipamento);
-        this.selectedQtd.push(le.quantidade);
-        this.selectedEquipQtd.push({equipamento: le.equipamento, quantidade: le.quantidade })
-        
-        const tempEquipamento: LocalEquipamento = {
-          id: le.id,
-          local: value,
-          equipamento: le.equipamento,
-          quantidade: le.quantidade
-        };
-        this.addEquip(tempEquipamento);
-      }
-    })
-    
+      .filter(le => {
+        if (le.equipamento !== null && le.quantidade !== null && le.local !== null) {
+          this.selectedEquipamentos.push(le.equipamento);
+          this.selectedQtd.push(le.quantidade);
+          this.selectedEquipQtd.push({ equipamento: le.equipamento, quantidade: le.quantidade })
+
+          const tempEquipamento: LocalEquipamento = {
+            id: le.id,
+            local: value,
+            equipamento: le.equipamento,
+            quantidade: le.quantidade
+          };
+          this.addEquip(tempEquipamento);
+        }
+      })
+
     this.previousEquipLocal = value.localEquipamentos;
     this.multiselect.writeValue(value.localEquipamentos.map(le => le.equipamento));
 
@@ -320,15 +320,15 @@ export class LocaisRComponent implements OnInit, OnDestroy {
     this.multiselect.writeValue(null);
     this.clearSelect();
   }
-  
+
   hideDialog() {
     this.visible = false;
     this.form.reset();
     this.multiselect.writeValue(null);
     this.clearSelect();
   }
-  
-  limparFilter(){
+
+  limparFilter() {
     const inputElement = this.inputSearch.nativeElement.value
     if (inputElement) {
       this.inputSearch.nativeElement.value = '';
@@ -373,9 +373,9 @@ export class LocaisRComponent implements OnInit, OnDestroy {
 
   filterField(searchTerm: string) {
     if (searchTerm && (searchTerm != null || searchTerm != '')) {
-      if(this.selectedFilter) {
-        if(this.selectedFilter.id == 0) this.searchFilter0(searchTerm);
-        if(this.selectedFilter.id == 1) this.searchFilter1(searchTerm);
+      if (this.selectedFilter) {
+        if (this.selectedFilter.id == 0) this.searchFilter0(searchTerm);
+        if (this.selectedFilter.id == 1) this.searchFilter1(searchTerm);
       } else {
         this.messages = [
           { severity: 'warn', summary: 'Atenção', detail: 'Selecione um filtro!', life: 3000 },
@@ -434,7 +434,7 @@ export class LocaisRComponent implements OnInit, OnDestroy {
       },
       error: (err: any) => {
         this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Cadastro não enviado.', life: 3000 },
+          { severity: 'error', summary: 'Erro', detail: err, sticky: true },
         ];
       }
     });
@@ -452,8 +452,7 @@ export class LocaisRComponent implements OnInit, OnDestroy {
       },
       error: (err: any) => {
         this.messages = [
-          // { severity: 'error', summary: 'Erro', detail: err, life: 3000 },
-          { severity: 'error', summary: 'Erro', detail: 'Edição não enviada.', life: 3000 },
+          { severity: 'error', summary: 'Erro', detail: err, sticky: true },
         ];
       }
     });
@@ -462,7 +461,7 @@ export class LocaisRComponent implements OnInit, OnDestroy {
   onSubmit() {
     console.log(this.form.value)
 
-    if(this.getEquipamento().length > 0) {
+    if (this.getEquipamento().length > 0) {
       this.verificarGetEquip();
 
       if (this.form.valid && this.cadastrar) {
@@ -508,26 +507,20 @@ export class LocaisRComponent implements OnInit, OnDestroy {
 
   deletarID(id: number) {
     this.locService.excluir(id)
-    .subscribe({
-      next: (data: any) => {
-        this.ngOnInit();
-        this.messages = [
-          { severity: 'success', summary: 'Sucesso', detail: 'Registro deletado com sucesso!', life: 3000 },
-        ];
-        // window.location.reload();
-      },
-      error: (err: any) => {
-        if (err.status) {
+      .subscribe({
+        next: (data: any) => {
+          this.ngOnInit();
           this.messages = [
-            { severity: 'error', summary: 'Erro', detail: 'Não foi possível deletar registro.', life: 3000 },
+            { severity: 'success', summary: 'Sucesso', detail: 'Registro deletado com sucesso!', life: 3000 },
           ];
-        } else {
+          // window.location.reload();
+        },
+        error: (err: any) => {
           this.messages = [
-            { severity: 'error', summary: 'Erro desconhecido', detail: err, life: 3000 },
+            { severity: 'error', summary: 'Erro', detail: err, sticky: true },
           ];
         }
-      }
-  });
+      });
   }
 
 

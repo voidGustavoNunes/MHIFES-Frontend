@@ -44,7 +44,7 @@ export class AlunosRComponent implements OnInit, OnDestroy {
   alunosFilter: Aluno[] = [];
   alunosCadast: Aluno[] = [];
   alunosEdit!: Aluno;
-  
+
   unsubscribe$!: Subscription;
   form: FormGroup;
 
@@ -52,14 +52,14 @@ export class AlunosRComponent implements OnInit, OnDestroy {
   visible: boolean = false;
   editar: boolean = false;
   cadastrar: boolean = false;
-  
+
   messages!: Message[];
   mss: boolean = false;
-  
+
   alunoInfo!: Aluno;
   visibleInfo: boolean = false;
   visibleBarcode: boolean = false;
-  
+
   filterOptions: FiltrarPesquisa[] = [];
   selectedFilter!: FiltrarPesquisa;
 
@@ -78,43 +78,43 @@ export class AlunosRComponent implements OnInit, OnDestroy {
     private router: Router,
     private formBuilder: FormBuilder,
     private confirmationService: ConfirmationService
-    ) {
-      this.form = this.formBuilder.group({
-        id: [null],
-        nome: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
-        matricula: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
-        curso: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]]
-      });
+  ) {
+    this.form = this.formBuilder.group({
+      id: [null],
+      nome: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
+      matricula: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
+      curso: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]]
+    });
   }
 
   ngOnInit() {
     this.filterOptions = [
-      {nome: 'Nome', id: 0},
-      {nome: 'Matrícula', id: 1}
+      { nome: 'Nome', id: 0 },
+      { nome: 'Matrícula', id: 1 }
     ];
 
-    this.unsubscribe$ = this.alunService.listar(0,10)
-    .subscribe({
-      next: (itens:any) => {
-        this.alunosPageData = itens;
-        this.sizeAln = this.alunosPageData.totalElements;
-        
-        this.alunosData = this.alunosPageData.content;
-        this.alunosData.sort((a:any, b:any) => (a.nome < b.nome ) ? -1 : 1);
-        this.pageFilter()
-      },
-      error: (err: any) => {
-        this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Dados não encontrados.', life: 3000 },
-        ];
-      }
-    });
+    this.unsubscribe$ = this.alunService.listar(0, 10)
+      .subscribe({
+        next: (itens: any) => {
+          this.alunosPageData = itens;
+          this.sizeAln = this.alunosPageData.totalElements;
+
+          this.alunosData = this.alunosPageData.content;
+          this.alunosData.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1);
+          this.pageFilter()
+        },
+        error: (err: any) => {
+          this.messages = [
+            { severity: 'error', summary: 'Erro', detail: err, sticky: true },
+          ];
+        }
+      });
   }
 
   ngOnDestroy() {
     this.unsubscribe$.unsubscribe();
   }
-  
+
   onPageChange(event: PaginatorState) {
     if (event.first !== undefined && event.rows !== undefined && event.page !== undefined) {
       this.firstAln = event.first;
@@ -127,15 +127,15 @@ export class AlunosRComponent implements OnInit, OnDestroy {
 
   listarPage() {
     this.alunService.listar(this.pageAln, this.rowsAln)
-    .subscribe((itens:any) => {
+      .subscribe((itens: any) => {
         this.alunosPageData = itens;
         this.alunosData = this.alunosPageData.content;
-        this.alunosData.sort((a:any, b:any) => (a.nome < b.nome ) ? -1 : 1);
+        this.alunosData.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1);
       });
   }
 
   pageFilter() {
-    if(this.sizeAln > 0) {
+    if (this.sizeAln > 0) {
       this.alunService.listar(0, this.sizeAln).subscribe(alno => this.alunosFilter = alno.content)
     }
   }
@@ -174,7 +174,7 @@ export class AlunosRComponent implements OnInit, OnDestroy {
     this.form.reset();
   }
 
-  limparFilter(){
+  limparFilter() {
     const inputElement = this.inputSearch.nativeElement.value
     if (inputElement) {
       this.inputSearch.nativeElement.value = '';
@@ -216,9 +216,9 @@ export class AlunosRComponent implements OnInit, OnDestroy {
 
   filterField(searchTerm: string) {
     if (searchTerm && (searchTerm != null || searchTerm != '')) {
-      if(this.selectedFilter) {
-        if(this.selectedFilter.id == 0) this.searchFilter0(searchTerm);
-        if(this.selectedFilter.id == 1) this.searchFilter1(searchTerm);
+      if (this.selectedFilter) {
+        if (this.selectedFilter.id == 0) this.searchFilter0(searchTerm);
+        if (this.selectedFilter.id == 1) this.searchFilter1(searchTerm);
       } else {
         this.messages = [
           { severity: 'warn', summary: 'Atenção', detail: 'Selecione um filtro!', life: 3000 },
@@ -277,7 +277,7 @@ export class AlunosRComponent implements OnInit, OnDestroy {
       },
       error: (err: any) => {
         this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Cadastro não enviado.', life: 3000 },
+          { severity: 'error', summary: 'Erro', detail: err, sticky: true },
         ];
       }
     });
@@ -295,7 +295,7 @@ export class AlunosRComponent implements OnInit, OnDestroy {
       },
       error: (err: any) => {
         this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Edição não enviada.', life: 3000 },
+          { severity: 'error', summary: 'Erro', detail: err, sticky: true },
         ];
       }
     });
@@ -333,37 +333,26 @@ export class AlunosRComponent implements OnInit, OnDestroy {
 
   deletarID(id: number) {
     this.alunService.excluir(id)
-    .subscribe({
-      next: (data: any) => {
-        this.messages = [
-          { severity: 'success', summary: 'Sucesso', detail: 'Registro deletado com sucesso!', life: 3000 },
-        ];
-        this.ngOnInit();
-      },
-      error: (err: any) => {
-        if (err.status === 403) {
+      .subscribe({
+        next: (data: any) => {
           this.messages = [
-            { severity: 'error', summary: 'Erro', detail: 'Você não tem permissão para deletar este registro associado a alocações.', life: 3000 },
+            { severity: 'success', summary: 'Sucesso', detail: 'Registro deletado com sucesso!', life: 3000 },
           ];
-        } else if (err.status === 401) {
+          this.ngOnInit();
+        },
+        error: (err: any) => {
           this.messages = [
-            { severity: 'error', summary: 'Erro', detail: 'Não foi possível deletar registro.', life: 3000 },
+            { severity: 'error', summary: 'Erro', detail: err, sticky: true },
           ];
-        } else {
-          this.messages = [
-            { severity: 'error', summary: 'Erro desconhecido', detail: err, life: 3000 },
-          ];
-          // console.log('Erro desconhecido:', err);
         }
-      }
-  });
+      });
   }
 
   generateBarcode(matricula: string) {
     if (!matricula) {
       return;
     }
-    
+
     this.visibleBarcode = true;
 
     // Aguarde a renderização do popup para gerar o código de barras
@@ -391,9 +380,9 @@ export class AlunosRComponent implements OnInit, OnDestroy {
     const printWindow = window.open('', '_blank', 'width=300,height=300');
 
     if (printWindow) {
-        printWindow.document.write('<html><head><title>Código de Barras</title>');
-        printWindow.document.write('<style>');
-        printWindow.document.write(`
+      printWindow.document.write('<html><head><title>Código de Barras</title>');
+      printWindow.document.write('<style>');
+      printWindow.document.write(`
             body {
                 margin: 0;
                 padding: 0;
@@ -413,34 +402,34 @@ export class AlunosRComponent implements OnInit, OnDestroy {
                 padding: 0;
             }
         `);
-        printWindow.document.write('</style></head><body>');
-        
-        // Adicione múltiplas imagens do código de barras à janela de impressão
-        printWindow.document.write('<div class="barcode-container">');
-        for (let i = 0; i < 3; i++) { // Repita três vezes para preencher uma linha
-            printWindow.document.write('<img src="' + barcodeElement.src + '">');
-        }
-        printWindow.document.write('</div>');
+      printWindow.document.write('</style></head><body>');
 
-        printWindow.document.write('</body></html>');
-        printWindow.document.close();
-        
-        // Espere o conteúdo ser carregado na janela de impressão antes de iniciar a impressão
-        printWindow.onload = () => {
-            printWindow.print();
-            printWindow.close(); // Feche a janela de impressão após a impressão
-        };
+      // Adicione múltiplas imagens do código de barras à janela de impressão
+      printWindow.document.write('<div class="barcode-container">');
+      for (let i = 0; i < 3; i++) { // Repita três vezes para preencher uma linha
+        printWindow.document.write('<img src="' + barcodeElement.src + '">');
+      }
+      printWindow.document.write('</div>');
+
+      printWindow.document.write('</body></html>');
+      printWindow.document.close();
+
+      // Espere o conteúdo ser carregado na janela de impressão antes de iniciar a impressão
+      printWindow.onload = () => {
+        printWindow.print();
+        printWindow.close(); // Feche a janela de impressão após a impressão
+      };
     }
   }
 
   badgeOptionExclui(event: Event) {
-    if(this.checkOptionsSelected.length > 0) {
+    if (this.checkOptionsSelected.length > 0) {
       this.confirm3(event, this.checkOptionsSelected)
     }
   }
 
   badgeOptionGerarCodBarra() {
-    if(this.checkOptionsSelected.length > 0) {
+    if (this.checkOptionsSelected.length > 0) {
       for (const key of this.checkOptionsSelected) {
         this.generateBarcode(key.matricula)
       }

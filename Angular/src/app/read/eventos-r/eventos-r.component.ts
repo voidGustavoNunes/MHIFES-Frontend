@@ -114,73 +114,73 @@ export class EventosRComponent implements OnInit, OnDestroy {
     private formBuilder: FormBuilder,
     private confirmationService: ConfirmationService,
     private hourService: HorarioService,
-    ) {
-      this.form = this.formBuilder.group({
-        id: [null],
-        nome: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
-        dataEvento: [null, [Validators.required]],
-        descricao: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(5000)]],
-        horario: [null, [Validators.required]],
-        local: [null, [Validators.required]]
-      })
-      // , { validator: this.verificarHoraFimMaiorQueInicio });
+  ) {
+    this.form = this.formBuilder.group({
+      id: [null],
+      nome: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
+      dataEvento: [null, [Validators.required]],
+      descricao: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(5000)]],
+      horario: [null, [Validators.required]],
+      local: [null, [Validators.required]]
+    })
+    // , { validator: this.verificarHoraFimMaiorQueInicio });
   }
 
   ngOnInit() {
     this.filterOptions = [
-      {nome: 'Nome', id: 0},
-      {nome: 'Data do Evento', id: 1},
-      {nome: 'Hora de início', id: 2}
+      { nome: 'Nome', id: 0 },
+      { nome: 'Data do Evento', id: 1 },
+      { nome: 'Hora de início', id: 2 }
     ];
 
-    this.unsubscribe$ = this.eventService.listar(0,10)
-    .subscribe({
-      next: (itens:any) => {
-        this.eventosPageData = itens;
-        this.sizeEvn = this.eventosPageData.totalElements;
+    this.unsubscribe$ = this.eventService.listar(0, 10)
+      .subscribe({
+        next: (itens: any) => {
+          this.eventosPageData = itens;
+          this.sizeEvn = this.eventosPageData.totalElements;
 
-        this.eventosData = this.eventosPageData.content;
-        this.eventosData.sort((a:any, b:any) => (a.nome < b.nome ) ? -1 : 1);
-        this.pageFilter()
+          this.eventosData = this.eventosPageData.content;
+          this.eventosData.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1);
+          this.pageFilter()
 
-        this.eventosData.sort((a: Evento, b: Evento) => {
-          const dateA = new Date(a.dataEvento);
-          const dateB = new Date(b.dataEvento);
-          return dateB.getTime() - dateA.getTime();
-        });
-      },
-      error: (err: any) => {
-        this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Dados de eventos não encontrados.' },
-        ];
-      }
-    });
+          this.eventosData.sort((a: Evento, b: Evento) => {
+            const dateA = new Date(a.dataEvento);
+            const dateB = new Date(b.dataEvento);
+            return dateB.getTime() - dateA.getTime();
+          });
+        },
+        error: (err: any) => {
+          this.messages = [
+            { severity: 'error', summary: 'Erro', detail: err, sticky: true },
+          ];
+        }
+      });
 
-    this.unsubscribe$LA = this.locService.listar(0,10)
-    .subscribe({
-      next: (itens:any) => {
-        this.locaisPageData = itens
-        this.listarPageObj(2)
-      },
-      error: (err: any) => {
-        this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Dados de locais não encontrados.' },
-        ];
-      }
-    });
+    this.unsubscribe$LA = this.locService.listar(0, 10)
+      .subscribe({
+        next: (itens: any) => {
+          this.locaisPageData = itens
+          this.listarPageObj(2)
+        },
+        error: (err: any) => {
+          this.messages = [
+            { severity: 'error', summary: 'Erro', detail: err, sticky: true },
+          ];
+        }
+      });
 
-    this.unsubscribe$Hor = this.hourService.listar(0,10)
-    .subscribe({
-      next: (itens:any) => {
-        this.horariosPageData = itens
-        this.listarPageObj(1)
-      },
-      error: (err: any) => {
-        this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Dados de horários não encontrados.' },
-        ];
-      }
-    });
+    this.unsubscribe$Hor = this.hourService.listar(0, 10)
+      .subscribe({
+        next: (itens: any) => {
+          this.horariosPageData = itens
+          this.listarPageObj(1)
+        },
+        error: (err: any) => {
+          this.messages = [
+            { severity: 'error', summary: 'Erro', detail: err, sticky: true },
+          ];
+        }
+      });
   }
 
   ngOnDestroy() {
@@ -201,7 +201,7 @@ export class EventosRComponent implements OnInit, OnDestroy {
 
   listarPage() {
     this.eventService.listar(this.pageEvn, this.rowsEvn)
-    .subscribe((itens:any) => {
+      .subscribe((itens: any) => {
         this.eventosPageData = itens;
         this.eventosData = this.eventosPageData.content;
         this.eventosData.sort((a: Evento, b: Evento) => {
@@ -213,11 +213,11 @@ export class EventosRComponent implements OnInit, OnDestroy {
   }
 
   listarPageObj(object: number) {
-    if(object == 1) {
+    if (object == 1) {
       let sizeUm = this.horariosPageData.totalElements
-      if(sizeUm > 0) {
-        this.hourService.listar(0,sizeUm).subscribe(hor => this.horariosArray = hor.content)
-        this.horariosArray.sort((a:Horario, b:Horario) => {
+      if (sizeUm > 0) {
+        this.hourService.listar(0, sizeUm).subscribe(hor => this.horariosArray = hor.content)
+        this.horariosArray.sort((a: Horario, b: Horario) => {
           let hAi = this.formatMiliss(a.horaInicio)
           let hBi = this.formatMiliss(b.horaFim)
 
@@ -230,17 +230,17 @@ export class EventosRComponent implements OnInit, OnDestroy {
           }
         })
       }
-    } else if(object == 2) {
+    } else if (object == 2) {
       let sizeDois = this.locaisPageData.totalElements
-      if(sizeDois > 0) {
-        this.locService.listar(0,sizeDois).subscribe(locs => this.locaisArray = locs.content)
+      if (sizeDois > 0) {
+        this.locService.listar(0, sizeDois).subscribe(locs => this.locaisArray = locs.content)
         this.locaisArray.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1)
       }
     }
   }
 
   pageFilter() {
-    if(this.sizeEvn > 0) {
+    if (this.sizeEvn > 0) {
       this.eventService.listar(0, this.sizeEvn).subscribe(evnt => this.eventosFilter = evnt.content)
     }
   }
@@ -306,9 +306,9 @@ export class EventosRComponent implements OnInit, OnDestroy {
   }
 
   hideDialog() {
-    if(this.cadastrar) {
+    if (this.cadastrar) {
       this.visible = false;
-    } else if(this.editar) {
+    } else if (this.editar) {
       this.visibleEdit = false;
     }
     this.form.reset();
@@ -322,13 +322,13 @@ export class EventosRComponent implements OnInit, OnDestroy {
     let hora: Horario = this.form.get('horario')?.value;
     let ini: Date = this.form.get('dataEvento')?.value;
 
-    if(ini && hora) {
+    if (ini && hora) {
       this.enableCheck = true;
     } else {
       this.enableCheck = false;
     }
 
-    if(this.diasIntervalo && this.diasIntervalo?.length > 0) {
+    if (this.diasIntervalo && this.diasIntervalo?.length > 0) {
       this.diasIntervalo = [];
       this.datasHour = [];
       this.replicaIntervalo()
@@ -338,7 +338,7 @@ export class EventosRComponent implements OnInit, OnDestroy {
   verificarDataHour() {
     let hora: Horario = this.form.get('horario')?.value;
 
-    this.diasIntervalo?.sort((a:Date, b:Date) => {
+    this.diasIntervalo?.sort((a: Date, b: Date) => {
       const dateA = new Date(a);
       const dateB = new Date(b);
       return dateA.getTime() - dateB.getTime();
@@ -348,12 +348,12 @@ export class EventosRComponent implements OnInit, OnDestroy {
       const existe = this.datasHour.some(item => item.dataEvento === dtInt);
 
       if (!existe) {
-        this.datasHour.push({dataEvento: dtInt, horario: hora});
+        this.datasHour.push({ dataEvento: dtInt, horario: hora });
       }
     })
     this.datasHour = this.datasHour.filter(item => this.diasIntervalo?.includes(item.dataEvento));
 
-    this.datasHour.sort((a:EventoHourData, b:EventoHourData) => {
+    this.datasHour.sort((a: EventoHourData, b: EventoHourData) => {
       const dateA = new Date(a.dataEvento);
       const dateB = new Date(b.dataEvento);
       return dateA.getTime() - dateB.getTime();
@@ -364,28 +364,28 @@ export class EventosRComponent implements OnInit, OnDestroy {
     // let houI: Time = this.form.get('horarioInicio')?.value;
     // let houF: Time = this.form.get('horarioFim')?.value;
     // if(houI && houF) {
-      // this.checkedReplica = !this.checkedReplica;
-      console.log(this.checkedReplica)
-    if(this.checkedReplica) {
+    // this.checkedReplica = !this.checkedReplica;
+    console.log(this.checkedReplica)
+    if (this.checkedReplica) {
       let ini: Date = this.form.get('dataEvento')?.value;
       this.minDate = new Date(ini);
       this.minDate.setDate(ini.getDate() + 1);
       this.minDate.setMonth(ini.getMonth());
       this.minDate.setFullYear(ini.getFullYear());
     }
-    if(!this.checkedReplica) {
+    if (!this.checkedReplica) {
       this.diasIntervalo = [];
       this.datasHour = [];
     }
   }
 
-  limparFilter(){
+  limparFilter() {
     const inputElement = this.inputSearch.nativeElement.value
     if (inputElement) {
       this.inputSearch.nativeElement.value = '';
     }
     this.selectedFilter = {} as FiltrarPesquisa;
-    
+
     this.eventService.listar(0, 10).subscribe(evn => {
       this.eventosData = evn.content;
 
@@ -448,7 +448,7 @@ export class EventosRComponent implements OnInit, OnDestroy {
   }
 
   formatarDtStrDt(date: string) {
-    if(date) {
+    if (date) {
       const partes = date.split('/');
       const ano = parseInt(partes[0], 10);
       const mes = parseInt(partes[1], 10) - 1;
@@ -461,7 +461,7 @@ export class EventosRComponent implements OnInit, OnDestroy {
   }
 
   formatarHora(tempo: any) {
-    if(tempo) {
+    if (tempo) {
       const partes = tempo.split(':');
       const horas = partes[0];
       const minutos = partes[1];
@@ -472,10 +472,10 @@ export class EventosRComponent implements OnInit, OnDestroy {
   }
 
   formatarTmStrTm(tempo: any) {
-    if(tempo) {
+    if (tempo) {
       const partes = tempo.split(':');
-      const horas =  parseInt(partes[0], 10);
-      const minutos =  parseInt(partes[1], 10) - 1;
+      const horas = parseInt(partes[0], 10);
+      const minutos = parseInt(partes[1], 10) - 1;
 
       if (!isNaN(horas) && !isNaN(minutos) && horas >= 0 && horas <= 23 && minutos >= 0 && minutos <= 59) {
         return { horas, minutos };
@@ -615,11 +615,11 @@ export class EventosRComponent implements OnInit, OnDestroy {
 
   conditionCreateSave() {
     let ini: Date = this.form.get('dataEvento')?.value;
-    if(!this.checkedReplica) {
+    if (!this.checkedReplica) {
       //  DATA INÍCIO
       this.eventosCadast = this.form.value;
       this.enviarFormSave();
-    } else if(this.checkedReplica) {
+    } else if (this.checkedReplica) {
       //  DATA INÍCIO
       this.eventosCadast = this.form.value;
       this.enviarFormSave();
@@ -628,7 +628,7 @@ export class EventosRComponent implements OnInit, OnDestroy {
       const ultimoDiaIntervalo = new Date(this.datasHour[this.datasHour.length - 1].dataEvento);
 
       this.datasHour.forEach((dt: EventoHourData) => {
-        if(dt.dataEvento.getTime() != ini?.getTime()) {
+        if (dt.dataEvento.getTime() != ini?.getTime()) {
           this.form.patchValue({
             dataEvento: dt.dataEvento,
             horario: dt.horario
@@ -642,26 +642,20 @@ export class EventosRComponent implements OnInit, OnDestroy {
 
   deletarID(id: number) {
     this.eventService.excluir(id)
-    .subscribe({
-      next: (data: any) => {
-        this.messages = [
-          { severity: 'success', summary: 'Sucesso', detail: 'Registro deletado com sucesso!', life: 5000 },
-        ];
-        this.ngOnInit();
-        // window.location.reload();
-      },
-      error: (err: any) => {
-        if (err.status) {
+      .subscribe({
+        next: (data: any) => {
+          this.messages = [
+            { severity: 'success', summary: 'Sucesso', detail: 'Registro deletado com sucesso!', life: 5000 },
+          ];
+          this.ngOnInit();
+          // window.location.reload();
+        },
+        error: (err: any) => {
           this.messages = [
             { severity: 'error', summary: 'Erro', detail: err, sticky: true },
           ];
-        } else {
-          this.messages = [
-            { severity: 'error', summary: 'Erro', detail: 'Erro desconhecido ' + err },
-          ];
         }
-      }
-    });
+      });
   }
 
   badgeOptionExclui(event: Event) {

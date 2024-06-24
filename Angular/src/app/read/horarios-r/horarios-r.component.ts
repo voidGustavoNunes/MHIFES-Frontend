@@ -49,13 +49,13 @@ export class HorariosRComponent implements OnInit, OnDestroy {
   visible: boolean = false;
   editar: boolean = false;
   cadastrar: boolean = false;
-  
+
   messages!: Message[];
-  
+
   filterOptions: FiltrarPesquisa[] = [];
   selectedFilter!: FiltrarPesquisa;
   txtFilter: string = 'Pesquisar horário';
-  
+
   firstHors: number = 0;
   pageHours: number = 0;
   rowsHors: number = 10;
@@ -72,53 +72,53 @@ export class HorariosRComponent implements OnInit, OnDestroy {
     private router: Router,
     private formBuilder: FormBuilder,
     private confirmationService: ConfirmationService
-    ) {
-      this.form = this.formBuilder.group({
-        id: [null],
-        horaInicio: [null, [Validators.required]],
-        horaFim: [null, [Validators.required]]
-      }, { validator: this.verificarHoraFimMaiorQueInicio });
+  ) {
+    this.form = this.formBuilder.group({
+      id: [null],
+      horaInicio: [null, [Validators.required]],
+      horaFim: [null, [Validators.required]]
+    }, { validator: this.verificarHoraFimMaiorQueInicio });
   }
 
   ngOnInit() {
     this.filterOptions = [
-      {nome: 'Hora de início', id: 0},
-      {nome: 'Hora de fim', id: 1},
+      { nome: 'Hora de início', id: 0 },
+      { nome: 'Hora de fim', id: 1 },
     ];
 
-    this.unsubscribe$ = this.hourService.listar(0,10)
-    .subscribe({
-      next: (itens:any) => {
-        this.horasPageData = itens;
-        this.sizeHors = this.horasPageData.totalElements;
-        
-        this.horariosData = this.horasPageData.content;
-        this.horariosData.sort((a:Horario, b:Horario) => {
-          let hAi = this.formatMiliss(a.horaInicio)
-          let hBi = this.formatMiliss(b.horaFim)
-          
-          if (hAi < hBi) {
-            return -1;
-          } else if (hAi > hBi) {
-            return 1;
-          } else {
-            return 0;
-          }
-        });
-        this.pageFilter()
-      },
-      error: (err: any) => {
-        this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Dados não encontrados.', life: 3000 },
-        ];
-      }
-    });
+    this.unsubscribe$ = this.hourService.listar(0, 10)
+      .subscribe({
+        next: (itens: any) => {
+          this.horasPageData = itens;
+          this.sizeHors = this.horasPageData.totalElements;
+
+          this.horariosData = this.horasPageData.content;
+          this.horariosData.sort((a: Horario, b: Horario) => {
+            let hAi = this.formatMiliss(a.horaInicio)
+            let hBi = this.formatMiliss(b.horaFim)
+
+            if (hAi < hBi) {
+              return -1;
+            } else if (hAi > hBi) {
+              return 1;
+            } else {
+              return 0;
+            }
+          });
+          this.pageFilter()
+        },
+        error: (err: any) => {
+          this.messages = [
+            { severity: 'error', summary: 'Erro', detail: err, sticky: true },
+          ];
+        }
+      });
   }
 
   ngOnDestroy() {
     this.unsubscribe$.unsubscribe();
   }
-  
+
   onPageChange(event: PaginatorState) {
     if (event.first !== undefined && event.rows !== undefined && event.page !== undefined) {
       this.firstHors = event.first;
@@ -127,16 +127,16 @@ export class HorariosRComponent implements OnInit, OnDestroy {
       this.listarPage()
     }
   }
-  
+
   listarPage() {
     this.hourService.listar(this.pageHours, this.rowsHors)
-    .subscribe((itens:any) => {
+      .subscribe((itens: any) => {
         this.horasPageData = itens;
         this.horariosData = this.horasPageData.content;
-        this.horariosData.sort((a:Horario, b:Horario) => {
+        this.horariosData.sort((a: Horario, b: Horario) => {
           let hAi = this.formatMiliss(a.horaInicio)
           let hBi = this.formatMiliss(b.horaFim)
-          
+
           if (hAi < hBi) {
             return -1;
           } else if (hAi > hBi) {
@@ -149,11 +149,11 @@ export class HorariosRComponent implements OnInit, OnDestroy {
   }
 
   pageFilter() {
-    if(this.sizeHors > 0) {
+    if (this.sizeHors > 0) {
       this.hourService.listar(0, this.sizeHors).subscribe(hors => this.horariosFilter = hors.content)
     }
   }
-  
+
   verificarHoraFimMaiorQueInicio(formGroup: FormGroup) {
     const horaInicio = formGroup.get('horaInicio')?.value;
     const horaFim = formGroup.get('horaFim')?.value;
@@ -185,19 +185,19 @@ export class HorariosRComponent implements OnInit, OnDestroy {
     this.cadastrar = true;
     this.editar = false;
   }
-  
+
   hideDialog() {
     this.visible = false;
     this.form.reset();
   }
-  
-  limparFilter(){
+
+  limparFilter() {
     const inputElement = this.inputSearch.nativeElement.value
     if (inputElement) {
       this.inputSearch.nativeElement.value = '';
     }
     this.selectedFilter = {} as FiltrarPesquisa;
-    
+
     this.hourService.listar(0, 10).subscribe(hors => {
       this.horariosData = hors.content;
 
@@ -233,9 +233,9 @@ export class HorariosRComponent implements OnInit, OnDestroy {
 
   filterField(searchTerm: string) {
     if (searchTerm && (searchTerm != null || searchTerm != '')) {
-      if(this.selectedFilter) {
-        if(this.selectedFilter.id == 0) this.searchFilter0(searchTerm);
-        if(this.selectedFilter.id == 1) this.searchFilter1(searchTerm);
+      if (this.selectedFilter) {
+        if (this.selectedFilter.id == 0) this.searchFilter0(searchTerm);
+        if (this.selectedFilter.id == 1) this.searchFilter1(searchTerm);
       } else {
         this.messages = [
           { severity: 'warn', summary: 'Atenção', detail: 'Selecione um filtro!', life: 3000 },
@@ -257,19 +257,19 @@ export class HorariosRComponent implements OnInit, OnDestroy {
   }
 
   formatarHora(tempo: any) {
-      const partes = tempo.split(':');
-      const horas = partes[0];
-      const minutos = partes[1];
+    const partes = tempo.split(':');
+    const horas = partes[0];
+    const minutos = partes[1];
 
-      return `${horas}h ${minutos}min`;
+    return `${horas}h ${minutos}min`;
   }
 
   formatarTmStrTm(tempo: any) {
-    if(tempo) {
+    if (tempo) {
       const partes = tempo.split(':');
-      const horas =  parseInt(partes[0], 10);
-      const minutos =  parseInt(partes[1], 10) - 1;
-      
+      const horas = parseInt(partes[0], 10);
+      const minutos = parseInt(partes[1], 10) - 1;
+
       if (!isNaN(horas) && !isNaN(minutos) && horas >= 0 && horas <= 23 && minutos >= 0 && minutos <= 59) {
         return { horas, minutos };
       } else {
@@ -279,7 +279,7 @@ export class HorariosRComponent implements OnInit, OnDestroy {
       return null;
     }
   }
-  
+
   formatMiliss(tempo: any) {
     if (tempo) {
       const partes = tempo.split(':');
@@ -337,7 +337,7 @@ export class HorariosRComponent implements OnInit, OnDestroy {
       },
       error: (err: any) => {
         this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Cadastro não enviado.', life: 3000 },
+          { severity: 'error', summary: 'Erro', detail: err, sticky: true },
         ];
       }
     });
@@ -355,7 +355,7 @@ export class HorariosRComponent implements OnInit, OnDestroy {
       },
       error: (err: any) => {
         this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Edição não enviada.', life: 3000 },
+          { severity: 'error', summary: 'Erro', detail: err, sticky: true },
         ];
       }
     });
@@ -385,25 +385,19 @@ export class HorariosRComponent implements OnInit, OnDestroy {
 
   deletarID(id: number) {
     this.hourService.excluir(id)
-    .subscribe({
-      next: (data: any) => {
-        this.messages = [
-          { severity: 'success', summary: 'Sucesso', detail: 'Registro deletado com sucesso!', life: 3000 },
-        ];
-        this.ngOnInit();
-      },
-      error: (err: any) => {
-        if (err.status) {
+      .subscribe({
+        next: (data: any) => {
           this.messages = [
-            { severity: 'error', summary: 'Erro', detail: 'Não foi possível deletar registro.', life: 3000 },
+            { severity: 'success', summary: 'Sucesso', detail: 'Registro deletado com sucesso!', life: 3000 },
           ];
-        } else {
+          this.ngOnInit();
+        },
+        error: (err: any) => {
           this.messages = [
-            { severity: 'error', summary: 'Erro desconhecido', detail: err, life: 3000 },
+            { severity: 'error', summary: 'Erro', detail: err, sticky: true },
           ];
         }
-      }
-  });
+      });
   }
 
 

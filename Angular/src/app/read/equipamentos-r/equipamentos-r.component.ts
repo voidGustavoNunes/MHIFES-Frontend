@@ -46,10 +46,10 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
   visible: boolean = false;
   editar: boolean = false;
   cadastrar: boolean = false;
-  
+
   messages!: Message[];
   mss: boolean = false;
-  
+
   firstEqp: number = 0;
   pageEqp: number = 0;
   rowsEqp: number = 10;
@@ -79,14 +79,14 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
       next: (itens:any) => {
         this.equipamentosPageData = itens;
         this.sizeEqp = this.equipamentosPageData.totalElements;
-        
+
         this.equipamentosData = this.equipamentosPageData.content;
         this.equipamentosData.sort((a:any, b:any) => (a.nome < b.nome ) ? -1 : 1);
         this.pageFilter()
       },
       error: (err: any) => {
         this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Dados não encontrados.', life: 3000 },
+          { severity: 'error', summary: 'Erro', detail: err, sticky: true },
         ];
       }
     });
@@ -95,7 +95,7 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.unsubscribe$.unsubscribe();
   }
-  
+
   onPageChange(event: PaginatorState) {
     if (event.first !== undefined && event.rows !== undefined && event.page !== undefined) {
       this.firstEqp = event.first;
@@ -139,12 +139,12 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
     this.cadastrar = true;
     this.editar = false;
   }
-  
+
   hideDialog() {
     this.visible = false;
     this.form.reset();
   }
-  
+
   limparFilter(){
     const inputElement = this.inputSearch.nativeElement.value
     if (inputElement) {
@@ -176,7 +176,7 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
       }
     }
   }
-  
+
   filterField(searchTerm: string) {
     if (searchTerm && (searchTerm != null || searchTerm != '')) {
       this.searchFilterWord(searchTerm);
@@ -233,7 +233,7 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
       },
       error: (err: any) => {
         this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Cadastro não enviado.', life: 3000 },
+          { severity: 'error', summary: 'Erro', detail: err, sticky: true },
         ];
       }
     });
@@ -251,7 +251,7 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
       },
       error: (err: any) => {
         this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Edição não enviada.', life: 3000 },
+          { severity: 'error', summary: 'Erro', detail: err, sticky: true },
         ];
       }
     });
@@ -298,19 +298,14 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
         // window.location.reload();
       },
       error: (err: any) => {
-        if (err.status) {
           this.messages = [
-            { severity: 'error', summary: 'Erro', detail: 'Não foi possível deletar registro.', life: 3000 },
+            { severity: 'error', summary: 'Erro', detail: err, sticky: true },
           ];
-        } else {
-          this.messages = [
-            { severity: 'error', summary: 'Erro desconhecido', detail: err, life: 3000 },
-          ];
-          // console.log('Erro desconhecido:', err);
-        }
+
       }
     });
   }
+<<<<<<< HEAD
 
   badgeOptionExclui(event: Event) {
     if(this.checkOptionsSelected.length > 0) {
@@ -318,4 +313,6 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
     }
   }
 
+=======
+>>>>>>> 93afa7ac6485091a21db822382ac73ce41aeeaa9
 }

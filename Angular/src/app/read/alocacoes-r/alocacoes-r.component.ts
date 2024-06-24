@@ -237,7 +237,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
         },
         error: (err: any) => {
           this.messages = [
-            { severity: 'error', summary: 'Erro', detail: 'Dados de alocações não encontrados.', life: 3000 },
+            { severity: 'error', summary: 'Erro', detail: err, sticky: true },
           ];
         }
       });
@@ -301,7 +301,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
         },
         error: (err: any) => {
           this.messages = [
-            { severity: 'error', summary: 'Erro', detail: 'Dados de mysql alocações não encontrados.', life: 3000 },
+            { severity: 'error', summary: 'Erro', detail: err, sticky: true },
           ];
         }
       });

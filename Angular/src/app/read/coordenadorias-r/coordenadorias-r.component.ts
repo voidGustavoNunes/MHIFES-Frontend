@@ -51,7 +51,7 @@ export class CoordenadoriasRComponent implements OnInit, OnDestroy {
   visible: boolean = false;
   editar: boolean = false;
   cadastrar: boolean = false;
-  
+
   messages!: Message[];
   mss: boolean = false;
 
@@ -75,51 +75,51 @@ export class CoordenadoriasRComponent implements OnInit, OnDestroy {
     private formBuilder: FormBuilder,
     private confirmationService: ConfirmationService,
     private professorService: ProfessorService
-    ) {
-      this.form = this.formBuilder.group({
-        id: [null],
-        nome: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
-        coordenador: [null, [Validators.required]]
-      });
+  ) {
+    this.form = this.formBuilder.group({
+      id: [null],
+      nome: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(150)]],
+      coordenador: [null, [Validators.required]]
+    });
   }
 
   ngOnInit() {
-    this.unsubscribe$ = this.coordaService.listar(0,10)
-    .subscribe({
-      next: (itens:any) => {
-        this.coordenadoriasPageData = itens
-        this.sizeCoor = this.coordenadoriasPageData.totalElements;
-        
-        this.coordenadoriasData = this.coordenadoriasPageData.content;
-        this.coordenadoriasData.sort((a:any, b:any) => (a.nome < b.nome ) ? -1 : 1);
-        this.pageFilter()
-      },
-      error: (err: any) => {
-        this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Dados de coordenadorias não encontrados.', life: 3000 },
-        ];
-      }
-    });
+    this.unsubscribe$ = this.coordaService.listar(0, 10)
+      .subscribe({
+        next: (itens: any) => {
+          this.coordenadoriasPageData = itens
+          this.sizeCoor = this.coordenadoriasPageData.totalElements;
 
-    this.unsubscribe$Prof = this.professorService.listar(0,10)
-    .subscribe({
-      next: (itens:any) => {
-        this.professoresPageData = itens
-        this.listarPageObj()
-      },
-      error: (err: any) => {
-        this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Dados de professores não encontrados.', life: 3000 },
-        ];
-      }
-    });
+          this.coordenadoriasData = this.coordenadoriasPageData.content;
+          this.coordenadoriasData.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1);
+          this.pageFilter()
+        },
+        error: (err: any) => {
+          this.messages = [
+            { severity: 'error', summary: 'Erro', detail: err, sticky: true },
+          ];
+        }
+      });
+
+    this.unsubscribe$Prof = this.professorService.listar(0, 10)
+      .subscribe({
+        next: (itens: any) => {
+          this.professoresPageData = itens
+          this.listarPageObj()
+        },
+        error: (err: any) => {
+          this.messages = [
+            { severity: 'error', summary: 'Erro', detail: err, sticky: true },
+          ];
+        }
+      });
   }
 
   ngOnDestroy() {
     this.unsubscribe$.unsubscribe();
     this.unsubscribe$Prof.unsubscribe();
   }
-  
+
   onPageChange(event: PaginatorState) {
     if (event.first !== undefined && event.rows !== undefined && event.page !== undefined) {
       this.firstCoor = event.first;
@@ -131,19 +131,19 @@ export class CoordenadoriasRComponent implements OnInit, OnDestroy {
 
   listarPage() {
     this.coordaService.listar(this.pageCoor, this.rowsCoor).subscribe(itens => this.coordenadoriasData = itens.content);
-    this.coordenadoriasData.sort((a:any, b:any) => (a.nome < b.nome ) ? -1 : 1);
+    this.coordenadoriasData.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1);
   }
-  
+
   listarPageObj() {
     let sizeAll = this.professoresPageData.totalElements
-    if(sizeAll > 0) {
-      this.professorService.listar(0,sizeAll).subscribe(prfs => {
+    if (sizeAll > 0) {
+      this.professorService.listar(0, sizeAll).subscribe(prfs => {
         prfs.content.forEach((prf: Professor) => {
-          if(prf.ehCoordenador) {
+          if (prf.ehCoordenador) {
             this.coordenadoresArray.push(prf);
           }
         })
-        if(this.coordenadoresArray.length > 0) {
+        if (this.coordenadoresArray.length > 0) {
           this.coordenadoresArray.sort((a: any, b: any) => (a.nome < b.nome) ? -1 : 1)
         }
       })
@@ -151,7 +151,7 @@ export class CoordenadoriasRComponent implements OnInit, OnDestroy {
   }
 
   pageFilter() {
-    if(this.sizeCoor > 0) {
+    if (this.sizeCoor > 0) {
       this.coordaService.listar(0, this.sizeCoor).subscribe(coord => this.coordenadoriasFilter = coord.content)
     }
   }
@@ -178,13 +178,13 @@ export class CoordenadoriasRComponent implements OnInit, OnDestroy {
     this.cadastrar = true;
     this.editar = false;
   }
-  
+
   hideDialog() {
     this.visible = false;
     this.form.reset();
   }
-  
-  limparFilter(){
+
+  limparFilter() {
     const inputElement = this.inputSearch.nativeElement.value
     if (inputElement) {
       this.inputSearch.nativeElement.value = '';
@@ -272,7 +272,7 @@ export class CoordenadoriasRComponent implements OnInit, OnDestroy {
       },
       error: (err: any) => {
         this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Cadastro não enviado.', life: 3000 },
+          { severity: 'error', summary: 'Erro', detail: err, sticky: true },
         ];
       }
     });
@@ -290,7 +290,7 @@ export class CoordenadoriasRComponent implements OnInit, OnDestroy {
       },
       error: (err: any) => {
         this.messages = [
-          { severity: 'error', summary: 'Erro', detail: 'Edição não enviada.', life: 3000 },
+          { severity: 'error', summary: 'Erro', detail: err, sticky: true },
         ];
       }
     });
@@ -329,26 +329,20 @@ export class CoordenadoriasRComponent implements OnInit, OnDestroy {
 
   deletarID(id: number) {
     this.coordaService.excluir(id)
-    .subscribe({
-      next: (data: any) => {
-        this.messages = [
-          { severity: 'success', summary: 'Sucesso', detail: 'Registro deletado com sucesso!', life: 3000 },
-        ];
-        this.ngOnInit();
-        // window.location.reload();
-      },
-      error: (err: any) => {
-        if (err.status) {
+      .subscribe({
+        next: (data: any) => {
           this.messages = [
-            { severity: 'error', summary: 'Erro', detail: 'Não foi possível deletar registro.', life: 3000 },
+            { severity: 'success', summary: 'Sucesso', detail: 'Registro deletado com sucesso!', life: 3000 },
           ];
-        } else {
+          this.ngOnInit();
+          // window.location.reload();
+        },
+        error: (err: any) => {
           this.messages = [
-            { severity: 'error', summary: 'Erro desconhecido', detail: err, life: 3000 },
+            { severity: 'error', summary: 'Erro', detail: err, sticky: true },
           ];
         }
-      }
-  });
+      });
   }
 
   badgeOptionExclui(event: Event) {
