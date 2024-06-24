@@ -44,4 +44,22 @@ export class PeriodoService {
   private handleError(error: HttpErrorResponse) {
     return throwError(() => new Error(error.message || 'Erro desconhecido'));
   }
+  
+  acharDia(page: number, size: number, substring: string): Observable<Page<Periodo>> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('substring', substring);
+
+    return this.http.get<Page<Periodo>>(`${this.API}/filter/dia`, { params });
+  }
+  
+  acharAno(page: number, size: number, ano: number): Observable<Page<Periodo>> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('ano', ano.toString());
+
+    return this.http.get<Page<Periodo>>(`${this.API}/filter/ano`, { params });
+  }
 };

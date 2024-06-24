@@ -67,6 +67,8 @@ export class AlunosRComponent implements OnInit, OnDestroy {
   pageAln: number = 0;
   rowsAln: number = 10;
   sizeAln: number = 0;
+  
+  sizeAlnTemp: number = 0;
 
   alunosPageData!: Page<Aluno>;
   checkOptionsSelected: Aluno[] = []
@@ -178,26 +180,31 @@ export class AlunosRComponent implements OnInit, OnDestroy {
       this.inputSearch.nativeElement.value = '';
     }
     this.selectedFilter = {} as FiltrarPesquisa;
-    this.alunosData = this.alunosFilter;
+    
+    this.alunService.listar(0, 10).subscribe(alno => {
+      this.alunosData = alno.content;
+
+      this.firstAln = 0
+      this.sizeAln = this.sizeAlnTemp
+      this.rowsAln = 10
+    });
   }
 
   searchFilter0(term: string) {
-    this.alunosData = this.alunosFilter.filter(el => {
-      if (el.nome.toLowerCase().includes(term.toLowerCase())) {
-        return el;
-      } else {
-        return null;
-      }
+    this.alunService.acharNome(0, 10, term).subscribe(alno => {
+      this.alunosFilter = alno.content
+      this.alunosData = this.alunosFilter
+      this.sizeAlnTemp = this.sizeAln
+      this.sizeAln = alno.totalElements
     })
   }
 
   searchFilter1(term: string) {
-    this.alunosData = this.alunosFilter.filter(el => {
-      if (el.matricula.toLowerCase().includes(term.toLowerCase())) {
-        return el;
-      } else {
-        return null;
-      }
+    this.alunService.acharMatricula(0, 10, term).subscribe(alno => {
+      this.alunosFilter = alno.content
+      this.alunosData = this.alunosFilter
+      this.sizeAlnTemp = this.sizeAln
+      this.sizeAln = alno.totalElements
     })
   }
 

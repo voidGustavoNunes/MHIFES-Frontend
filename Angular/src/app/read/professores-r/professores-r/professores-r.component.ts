@@ -77,6 +77,8 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
   rowsProfsr: number = 10;
   sizeProfsr: number = 0;
 
+  sizeProfsrTemp: number = 0;
+
   professoresPageData!: Page<Professor>;
   coordenasPageData!: Page<Coordenadoria>;
   checkOptionsSelected: Professor[] = []
@@ -102,8 +104,7 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
     this.filterOptions = [
       {nome: 'Nome', id: 0},
       {nome: 'Sigla', id: 1},
-      {nome: 'Matrícula', id: 2},
-      {nome: 'Orientadores', id: 3}
+      {nome: 'Matrícula', id: 2}
     ];
 
     this.unsubscribe$ = this.professorService.listar(0,10)
@@ -238,55 +239,41 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
         this.inputSearchProf.nativeElement.value = '';
       }
       this.selectedFilterProf = {} as FiltrarPesquisa;
-      this.professoresData = this.professoresFilterProf;
+      
+    this.professorService.listar(0, 10).subscribe(pfs => {
+      this.professoresData = pfs.content;
+
+      this.firstProfsr = 0
+      this.sizeProfsr = this.sizeProfsrTemp
+      this.rowsProfsr = 10
+    });
   }
 
   searchFilter0(term: string) {
-      this.professoresData = this.professoresFilterProf.filter(el => {
-        if (el.nome.toLowerCase().includes(term.toLowerCase())) {
-          return el;
-        } else {
-          return null;
-        }
-      })
+    this.professorService.acharNome(0, 10, term).subscribe(pfs => {
+      this.professoresFilterProf = pfs.content
+      this.professoresData = this.professoresFilterProf
+      this.sizeProfsrTemp = this.sizeProfsr
+      this.sizeProfsr = pfs.totalElements
+    })
   }
 
   searchFilter1(term: string) {
-      this.professoresData = this.professoresFilterProf.filter(el => {
-        if (el.sigla.toLowerCase().includes(term.toLowerCase())) {
-          return el;
-        } else {
-          return null;
-        }
-      })
+    this.professorService.acharSigla(0, 10, term).subscribe(pfs => {
+      this.professoresFilterProf = pfs.content
+      this.professoresData = this.professoresFilterProf
+      this.sizeProfsrTemp = this.sizeProfsr
+      this.sizeProfsr = pfs.totalElements
+    })
   }
 
   searchFilter2(term: string) {
-      this.professoresData = this.professoresFilterProf.filter(el => {
-        if (el.matricula.toString().toLowerCase().includes(term.toLowerCase())) {
-          return el;
-        } else {
-          return null;
-        }
-      })
-  }
-
-  searchFilter3(term: string) {
-      this.professoresData = this.professoresFilterProf.filter(el => {
-        if(term == null || term == '') {
-          if (el.ehCoordenador) {
-            return el;
-          } else {
-            return null;
-          }
-        } else {
-          if (el.ehCoordenador && el.nome.toString().toLowerCase().includes(term.toLowerCase())) {
-            return el;
-          } else {
-            return null;
-          }
-        }
-      })
+    this.professorService.acharMatricula(0, 10, term).subscribe(pfs => {
+      this.professoresFilterProf = pfs.content
+      this.professoresData = this.professoresFilterProf
+      this.sizeProfsrTemp = this.sizeProfsr
+      this.sizeProfsr = pfs.totalElements
+    })
   }
 
   onKeyDown(event: KeyboardEvent, searchTerm: string) {
@@ -297,12 +284,10 @@ export class ProfessoresRComponent implements OnInit, OnDestroy {
   
   filterField(searchTerm: string) {
     if(this.selectedFilterProf) {
-      if(this.selectedFilterProf.id == 3 && (searchTerm == null || searchTerm == '')) this.searchFilter3(searchTerm);
-      else if (searchTerm && (searchTerm != null || searchTerm != '')) {
+      if (searchTerm && (searchTerm != null || searchTerm != '')) {
         if(this.selectedFilterProf.id == 0) this.searchFilter0(searchTerm);
         if(this.selectedFilterProf.id == 1) this.searchFilter1(searchTerm);
         if(this.selectedFilterProf.id == 2) this.searchFilter2(searchTerm);
-        if(this.selectedFilterProf.id == 3) this.searchFilter2(searchTerm);
       } else {
         this.messages = [
           { severity: 'warn', summary: 'Atenção', detail: 'Informação inválida. Preencha o campo!', life: 3000 },

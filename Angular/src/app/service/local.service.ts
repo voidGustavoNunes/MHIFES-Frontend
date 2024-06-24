@@ -44,4 +44,22 @@ export class LocalService {
   private handleError(error: HttpErrorResponse) {
     return throwError(() => new Error(error.message || 'Erro desconhecido'));
   }
+  
+  acharNome(page: number, size: number, substring: string): Observable<Page<Local>> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('substring', substring);
+
+    return this.http.get<Page<Local>>(`${this.API}/filter/nome`, { params });
+  }
+  
+  acharCapacidade(page: number, size: number, capa: number): Observable<Page<Local>> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('capa', capa.toString());
+
+    return this.http.get<Page<Local>>(`${this.API}/filter/capacidade`, { params });
+  }
 };

@@ -35,6 +35,12 @@ import { Page } from '../../models/share/page.models';
 export class ScannerPopupComponent implements OnInit, AfterViewInit {
   // @ViewChild('scannerInput') scannerInput!: InputText;
   @ViewChild('scannerInput') scannerInput!: ElementRef;
+
+  @ViewChild('tableToPrintPrxPrf') tableToPrintPrxPrf!: ElementRef;
+  @ViewChild('tableToPrintSmnPrf') tableToPrintSmnPrf!: ElementRef;
+
+  @ViewChild('tableToPrintPrxAln') tableToPrintPrxAln!: ElementRef;
+  @ViewChild('tableToPrintSmnAln') tableToPrintSmnAln!: ElementRef;
   
   messages!: Message[];
   barcode: string = '';
@@ -104,15 +110,13 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.scannerInput.nativeElement.focus();
+    // this.scannerInput.nativeElement.focus();
   }
 
   ngAfterViewInit(): void {
     const scannerInput = document.getElementById('scannerInput');
     const otherInputs = document.querySelectorAll('input:not(#scannerInput)');
-    const otherTextareas = document.querySelectorAll('textarea:not(#scannerInput)');
     const otherInputsArray = Array.from(otherInputs);
-    const otherTextareasArray = Array.from(otherTextareas);
 
     document.addEventListener('click', (event:any) => {
       const targetElement = event.target as HTMLElement;
@@ -480,5 +484,142 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
     }
     if(alocV === null || alocV === undefined){ return true }
     else{ return false }
+  }
+
+  printTable() {
+    if(this.ehAluno) {
+      if(this.selectedFilterScan.id == 0) {
+        const printContents = this.tableToPrintPrxAln.nativeElement.innerHTML;
+        const printWindow = window.open('', '_blank', 'width=800,height=600');
+    
+        if (printWindow) {
+          printWindow.document.write('<html><head><title>Imprimir Tabela Próxima Aula</title>');
+          printWindow.document.write('<style>');
+          printWindow.document.write(`
+            ${this.getStyles()}
+          `);
+          printWindow.document.write('</style></head><body>');
+          printWindow.document.write(printContents);
+          printWindow.document.write('</body></html>');
+          
+          printWindow.document.close();
+    
+          // Espere o conteúdo ser carregado na janela de impressão antes de iniciar a impressão
+          printWindow.onload = () => {
+            printWindow.print();
+            printWindow.close(); // Feche a janela de impressão após a impressão
+          };
+        }
+      } else if(this.selectedFilterScan.id == 1) {
+        const printContents = this.tableToPrintSmnAln.nativeElement.innerHTML;
+        const printWindow = window.open('', '_blank', 'width=800,height=600');
+    
+        if (printWindow) {
+          printWindow.document.write('<html><head><title>Imprimir Tabela Horário da Semana</title>');
+          printWindow.document.write(this.getStyles());
+          printWindow.document.write('</head><body>');
+          printWindow.document.write(printContents);
+          printWindow.document.write('</body></html>');
+          
+          printWindow.document.close();
+    
+          // Espere o conteúdo ser carregado na janela de impressão antes de iniciar a impressão
+          printWindow.onload = () => {
+            printWindow.print();
+            printWindow.close(); // Feche a janela de impressão após a impressão
+          };
+        }
+      }
+    } else if(this.ehProfessor) {
+      if(this.selectedFilterScan.id == 0) {
+        const printContents = this.tableToPrintPrxPrf.nativeElement.innerHTML;
+        const printWindow = window.open('', '_blank', 'width=800,height=600');
+    
+        if (printWindow) {
+          printWindow.document.write('<html><head><title>Imprimir Tabela Próxima Aula</title>');
+          printWindow.document.write('<style>');
+          printWindow.document.write(`
+            ${this.getStyles()}
+          `);
+          printWindow.document.write('</style></head><body>');
+          printWindow.document.write(printContents);
+          printWindow.document.write('</body></html>');
+          
+          printWindow.document.close();
+    
+          // Espere o conteúdo ser carregado na janela de impressão antes de iniciar a impressão
+          printWindow.onload = () => {
+            printWindow.print();
+            printWindow.close(); // Feche a janela de impressão após a impressão
+          };
+        }
+      } else if(this.selectedFilterScan.id == 1) {
+        const printContents = this.tableToPrintSmnPrf.nativeElement.innerHTML;
+        const printWindow = window.open('', '_blank', 'width=800,height=600');
+    
+        if (printWindow) {
+          printWindow.document.write('<html><head><title>Imprimir Tabela Horário da Semana</title>');
+          printWindow.document.write(this.getStyles());
+          printWindow.document.write('</head><body>');
+          printWindow.document.write(printContents);
+          printWindow.document.write('</body></html>');
+          
+          printWindow.document.close();
+    
+          // Espere o conteúdo ser carregado na janela de impressão antes de iniciar a impressão
+          printWindow.onload = () => {
+            printWindow.print();
+            printWindow.close(); // Feche a janela de impressão após a impressão
+          };
+        }
+      }
+    }
+  }
+
+  getStyles(): string {
+    return `
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          margin: 20px;
+        }
+        table {
+          width: 50%;
+          margin: 1rem auto;
+          border: .1rem solid #B1CAFA;
+        }
+        th {
+          background-color: #256CF0;
+          color: white;
+          font-weight: 600;
+          letter-spacing: .1rem;
+          text-align: center;
+          text-transform: uppercase;
+          font-size: .7rem;
+        }
+        td:first-child {
+          background-color: #256CF0;
+          color: white;
+          font-weight: 600;
+          letter-spacing: .1rem;
+          text-align: center;
+          text-transform: uppercase;
+          width: .05%;
+        }
+        td {
+          text-align: center;
+          border-bottom: .1rem solid #B1CAFA;
+          border-left: .1rem solid #B1CAFA;
+          height: 5rem;
+          font-size: .7rem;
+          box-sizing: border-box;
+          width: 1%;
+        }
+        li {
+          list-style: none;
+          font-size: .7rem;
+        }
+      </style>
+    `;
   }
 }

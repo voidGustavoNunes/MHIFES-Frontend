@@ -49,4 +49,31 @@ export class EventoService {
       })
     );
   }
+  
+  acharNome(page: number, size: number, substring: string): Observable<Page<Evento>> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('substring', substring);
+
+    return this.http.get<Page<Evento>>(`${this.API}/filter/nome`, { params });
+  }
+  
+  acharDia(page: number, size: number, substring: string): Observable<Page<Evento>> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('substring', substring);
+
+    return this.http.get<Page<Evento>>(`${this.API}/filter/dia`, { params });
+  }
+  
+  acharTimeInicio(page: number, size: number, time: string): Observable<Page<Evento>> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('time', time.toString());
+
+    return this.http.get<Page<Evento>>(`${this.API}/filter/inicio`, { params });
+  }
 };

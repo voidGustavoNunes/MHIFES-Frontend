@@ -44,4 +44,22 @@ export class DisciplinaService {
   private handleError(error: HttpErrorResponse) {
     return throwError(() => new Error(error.message || 'Erro desconhecido'));
   }
+  
+  acharNome(page: number, size: number, substring: string): Observable<Page<Disciplina>> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('substring', substring);
+
+    return this.http.get<Page<Disciplina>>(`${this.API}/filter/nome`, { params });
+  }
+  
+  acharSigla(page: number, size: number, substring: string): Observable<Page<Disciplina>> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('substring', substring);
+
+    return this.http.get<Page<Disciplina>>(`${this.API}/filter/sigla`, { params });
+  }
 };

@@ -99,6 +99,8 @@ export class EventosRComponent implements OnInit, OnDestroy {
   rowsEvn: number = 10;
   sizeEvn: number = 0;
 
+  sizeEvnTemp: number = 0;
+
   eventosPageData!: Page<Evento>;
   horariosPageData!: Page<Horario>;
   locaisPageData!: Page<Local>;
@@ -381,7 +383,14 @@ export class EventosRComponent implements OnInit, OnDestroy {
       this.inputSearch.nativeElement.value = '';
     }
     this.selectedFilter = {} as FiltrarPesquisa;
-    this.eventosData = this.eventosFilter;
+    
+    this.eventService.listar(0, 10).subscribe(evn => {
+      this.eventosData = evn.content;
+
+      this.firstEvn = 0
+      this.sizeEvn = this.sizeEvnTemp
+      this.rowsEvn = 10
+    });
   }
 
   updateMask() {
@@ -395,55 +404,31 @@ export class EventosRComponent implements OnInit, OnDestroy {
   }
 
   searchFilter0(term: string) {
-    this.eventosData = this.eventosFilter.filter(evento => {
-      if (evento.nome.toLowerCase().includes(term.toLowerCase())) {
-        return evento;
-      } else {
-        return null;
-      }
+    this.eventService.acharNome(0, 10, term).subscribe(evn => {
+      this.eventosFilter = evn.content
+      this.eventosData = this.eventosFilter
+      this.sizeEvnTemp = this.sizeEvn
+      this.sizeEvn = evn.totalElements
     })
   }
 
   searchFilter1(term: string) {
-    const dateTerm = this.formatarDtStrDt(term);
-
-    if (dateTerm instanceof Date && !isNaN(dateTerm.getTime())) {
-      this.eventosData = this.eventosFilter.filter(evento => {
-        const tiparDT = evento.dataEvento;
-        if (typeof tiparDT === 'string') {
-          const tiparFormat = this.formatarDatas(tiparDT);
-          const searchTerm = this.formatarDtStrDt(tiparFormat);
-
-          if (dateTerm.getTime() === searchTerm?.getTime()) {
-            return evento;
-          } else {
-            return null;
-          }
-        } else {
-          return null;
-        }
-      })
-    }
+    this.eventService.acharDia(0, 10, term).subscribe(evn => {
+      this.eventosFilter = evn.content
+      this.eventosData = this.eventosFilter
+      this.sizeEvnTemp = this.sizeEvn
+      this.sizeEvn = evn.totalElements
+    })
   }
 
-  // searchFilter2(term: string) {
-  //   const compA = this.formatarTmStrTm(term);
-  //   if(compA != null) {
-  //     this.eventosData = this.eventosFilter.filter(evento => {
-  //       const compB = this.formatarTmStrTm(evento.horarioInicio);
-  //       if(compB != null) {
-  //         if (compA.horas === compB.horas && compA.minutos === compB.minutos) {
-  //           return evento;
-  //         } else {
-  //           return null;
-  //         }
-  //       } else {
-  //         return null;
-  //       }
-  //     })
-  //   }
-  //   return null;
-  // }
+  searchFilter2(term: string) {
+    this.eventService.acharTimeInicio(0, 10, term).subscribe(evn => {
+      this.eventosFilter = evn.content
+      this.eventosData = this.eventosFilter
+      this.sizeEvnTemp = this.sizeEvn
+      this.sizeEvn = evn.totalElements
+    })
+  }
 
   formatarDatas(date: string) {
     const partes = date.split('-');
@@ -522,7 +507,7 @@ export class EventosRComponent implements OnInit, OnDestroy {
       if(this.selectedFilter) {
         if(this.selectedFilter.id == 0) this.searchFilter0(searchTerm);
         if(this.selectedFilter.id == 1) this.searchFilter1(searchTerm);
-        // if(this.selectedFilter.id == 2) this.searchFilter2(searchTerm);
+        if(this.selectedFilter.id == 2) this.searchFilter2(searchTerm);
       } else {
         this.messages = [
           { severity: 'warn', summary: 'Atenção', detail: 'Selecione um filtro!', life: 3000 },

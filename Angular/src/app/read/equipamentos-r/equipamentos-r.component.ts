@@ -55,6 +55,8 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
   rowsEqp: number = 10;
   sizeEqp: number = 0;
 
+  sizeEqpTemp: number = 0;
+
   equipamentosPageData!: Page<Equipamento>;
 
   constructor(
@@ -146,17 +148,23 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
     if (inputElement) {
       this.inputSearch.nativeElement.value = '';
     }
-    this.equipamentosData = this.equipamentosFilter;
+
+    this.equipService.listar(0, 10).subscribe(eqpm => {
+      this.equipamentosData = eqpm.content;
+
+      this.firstEqp = 0
+      this.sizeEqp = this.sizeEqpTemp
+      this.rowsEqp = 10
+    });
   }
 
   searchFilterWord(term: string) {
-    this.equipamentosData = this.equipamentosFilter.filter(el => {
-      if (el.nome.toLowerCase().includes(term.toLowerCase())) {
-        return el;
-      } else {
-        return null;
-      }
-    })
+    this.equipService.acharNome(0, 10, term).subscribe(eqpm => {
+      this.equipamentosFilter = eqpm.content
+      this.equipamentosData = this.equipamentosFilter
+      this.sizeEqpTemp = this.sizeEqp
+      this.sizeEqp = eqpm.totalElements
+    });
   }
 
   onKeyDown(event: KeyboardEvent, searchTerm: string) {

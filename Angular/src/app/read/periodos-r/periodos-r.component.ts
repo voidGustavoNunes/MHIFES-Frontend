@@ -95,6 +95,8 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
   rowsPerds: number = 10;
   sizePerds: number = 0;
 
+  sizePerdsTemp: number = 0;
+
   periodosPageData!: Page<Periodo>;
   alunosPageData!: Page<Aluno>;
   disciplinasPageData!: Page<Disciplina>;
@@ -433,45 +435,37 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
       this.inputSearch.nativeElement.value = '';
     }
     this.selectedFilter = {} as FiltrarPesquisa;
-    this.periodosData = this.periodosFilter;
+    
+    this.periodService.listar(0, 10).subscribe(alno => {
+      this.periodosData = alno.content;
+
+      this.firstPerds = 0
+      this.sizePerds = this.sizePerdsTemp
+      this.rowsPerds = 10
+    });
   }
 
   searchFilter0(term: string) {
-    const dateTerm = this.formatarDtStrDt(term);
-    
-    if (dateTerm instanceof Date && !isNaN(dateTerm.getTime())) {
-      this.periodosData = this.periodosFilter.filter(prd => {
-        const tiparDT = prd.dataInicio;
-        if (typeof tiparDT === 'string') {
-          const tiparFormat = this.formatarDatas(tiparDT);
-          const searchTerm = this.formatarDtStrDt(tiparFormat);
-          
-          if (dateTerm.getTime() === searchTerm?.getTime()) {
-            return prd;
-          } else {
-            return null;
-          }
-        } else {
-          return null;
-        }
-      })
-    }
+    this.periodService.acharDia(0, 10, term).subscribe(alno => {
+      this.periodosFilter = alno.content
+      this.periodosData = this.periodosFilter
+      this.sizePerdsTemp = this.sizePerds
+      this.sizePerds = alno.totalElements
+    })
   }
 
   searchFilter1(term: string) {
-    this.periodosData = this.periodosFilter.filter(el => {
-      const searchTermAsNumber = parseInt(term);
-      if (!isNaN(searchTermAsNumber)) {
-        const ano = el.ano;
-        if (ano === searchTermAsNumber) {
-          return el;
-        } else {
-          return null;
-        }
-      } else {
-        return null;
-      }
-    })
+    const searchTermAsNumber = parseInt(term);
+    if (!isNaN(searchTermAsNumber)) {
+      this.periodService.acharAno(0, 10, searchTermAsNumber).subscribe(alno => {
+        this.periodosFilter = alno.content
+        this.periodosData = this.periodosFilter
+        this.sizePerdsTemp = this.sizePerds
+        this.sizePerds = alno.totalElements
+      })
+    } else {
+      this.periodosData = []
+    }
   }
 
   onKeyDown(event: KeyboardEvent, searchTerm: string) {

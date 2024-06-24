@@ -62,6 +62,8 @@ export class CoordenadoriasRComponent implements OnInit, OnDestroy {
   rowsCoor: number = 10;
   sizeCoor: number = 0;
 
+  sizeCoorTemp: number = 0;
+
   coordenadoriasPageData!: Page<Coordenadoria>;
   professoresPageData!: Page<Professor>;
 
@@ -185,16 +187,22 @@ export class CoordenadoriasRComponent implements OnInit, OnDestroy {
     if (inputElement) {
       this.inputSearch.nativeElement.value = '';
     }
-    this.coordenadoriasData = this.coordenadoriasFilter;
+    
+    this.coordaService.listar(0, 10).subscribe(coord => {
+      this.coordenadoriasData = coord.content;
+
+      this.firstCoor = 0
+      this.sizeCoor = this.sizeCoorTemp
+      this.rowsCoor = 10
+    });
   }
 
   searchFilterWord(term: string) {
-    this.coordenadoriasData = this.coordenadoriasFilter.filter(el => {
-      if (el.nome.toLowerCase().includes(term.toLowerCase())) {
-        return el;
-      } else {
-        return null;
-      }
+    this.coordaService.acharNome(0, 10, term).subscribe(coord => {
+      this.coordenadoriasFilter = coord.content
+      this.coordenadoriasData = this.coordenadoriasFilter
+      this.sizeCoorTemp = this.sizeCoor
+      this.sizeCoor = coord.totalElements
     })
   }
 

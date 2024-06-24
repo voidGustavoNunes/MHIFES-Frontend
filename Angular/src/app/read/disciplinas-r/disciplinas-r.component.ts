@@ -58,6 +58,8 @@ export class DisciplinasRComponent implements OnInit, OnDestroy {
   rowsDiscp: number = 10;
   sizeDiscp: number = 0;
 
+  sizeDiscpTemp: number = 0;
+
   disciplinasPageData!: Page<Disciplina>;
 
   constructor(
@@ -157,26 +159,31 @@ export class DisciplinasRComponent implements OnInit, OnDestroy {
       this.inputSearch.nativeElement.value = '';
     }
     this.selectedFilter = {} as FiltrarPesquisa;
-    this.disciplinasData = this.dicisplinasFilter;
+
+    this.disciService.listar(0, 10).subscribe(alno => {
+      this.disciplinasData = alno.content;
+
+      this.firstDiscp = 0
+      this.sizeDiscp = this.sizeDiscpTemp
+      this.rowsDiscp = 10
+    });
   }
 
   searchFilterWord0(term: string) {
-    this.disciplinasData = this.dicisplinasFilter.filter(el => {
-      if (el.nome.toLowerCase().includes(term.toLowerCase())) {
-        return el;
-      } else {
-        return null;
-      }
+    this.disciService.acharNome(0, 10, term).subscribe(alno => {
+      this.dicisplinasFilter = alno.content
+      this.disciplinasData = this.dicisplinasFilter
+      this.sizeDiscpTemp = this.sizeDiscp
+      this.sizeDiscp = alno.totalElements
     })
   }
 
   searchFilterWord1(term: string) {
-    this.disciplinasData = this.dicisplinasFilter.filter(el => {
-      if (el.sigla.toLowerCase().includes(term.toLowerCase())) {
-        return el;
-      } else {
-        return null;
-      }
+    this.disciService.acharSigla(0, 10, term).subscribe(alno => {
+      this.dicisplinasFilter = alno.content
+      this.disciplinasData = this.dicisplinasFilter
+      this.sizeDiscpTemp = this.sizeDiscp
+      this.sizeDiscp = alno.totalElements
     })
   }
 

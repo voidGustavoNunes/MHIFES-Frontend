@@ -14,29 +14,29 @@
     box-shadow: 0 .2rem .2rem rgba(0, 0, 0, 0.26);
 }
 
-.card{
-    .p-scan{
+.card {
+    .p-scan {
         margin: 1rem 0 2rem;
         text-align: center;
         font-size: 1.1rem;
     }
 
-    .rdButtonScan{
+    .rdButtonScan {
         display: flex;
         margin: 1rem 3rem 0;
         font-size: 1rem;
         justify-content: center;
     }
 
-    .eqTableScan{
+    .eqTableScan {
         width: 35rem;
         margin: 1rem auto;
         border: .1rem solid #B1CAFA;
-        
-        .tbHeaderScan{
+
+        .tbHeaderScan {
             border-radius: .5rem 0;
-            
-            th{
+
+            th {
                 background-color: #256CF0 !important;
                 color: white;
                 font-weight: 600;
@@ -46,8 +46,8 @@
                 font-size: .7rem;
             }
         }
-        
-        .tbBodyScan{
+
+        .tbBodyScan {
             td:first-child {
                 background-color: #256CF0 !important;
                 color: white;
@@ -57,7 +57,8 @@
                 text-transform: uppercase;
                 width: .05%;
             }
-            td{
+
+            td {
                 text-align: center;
                 border-bottom: .1rem solid #B1CAFA;
                 border-left: .1rem solid #B1CAFA;
@@ -67,17 +68,19 @@
                 width: 1%;
             }
         }
-        .discSiglaScan{
-            li{
+
+        .discSiglaScan {
+            li {
                 list-style: none;
                 font-size: .7rem;
             }
         }
     }
 
-    .tab3-btn-scan{
+    .tab3-btn-scan {
         margin-top: 1rem;
-        button:active{
+
+        button:active {
             box-shadow: none;
         }
     }
@@ -91,33 +94,48 @@
         right: 1.25rem;
         z-index: 11000;
     }
-    p-radiobutton.p-element{
+
+    p-radiobutton.p-element {
         margin: 0 .5rem;
     }
+
     .p-datatable>.p-datatable-wrapper {
         overflow: auto;
     }
+
     .p-datatable-table {
         border-spacing: 0px;
         width: 100.25rem;
     }
+
     .p-radiobutton .p-radiobutton-box {
         width: 1rem;
         height: 1rem;
     }
+
     .field-checkbox.ng-star-inserted {
         display: flex;
         align-items: center;
     }
-    .p-datatable .p-datatable-tbody > tr > td {
+
+    .p-datatable .p-datatable-tbody>tr>td {
         font-size: .7rem;
     }
+
     .p-dialog-content .tab3-btn-scan {
         display: flex;
         justify-content: center;
     }
-    .p-dialog-content .botaoCscan .p-ripple{
+
+    .p-dialog-content .botaoIscan .p-ripple {
         @include themeButton(#00208F, white);
+        text-decoration: none;
+        letter-spacing: .1rem;
+        // font-weight: 600;
+        text-transform: uppercase;
+        font-size: .7rem;
+    }
+    .p-dialog-content .botaoCscan .p-ripple {
         text-decoration: none;
         letter-spacing: .1rem;
         // font-weight: 600;

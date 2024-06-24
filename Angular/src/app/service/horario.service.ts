@@ -44,4 +44,22 @@ export class HorarioService {
   private handleError(error: HttpErrorResponse) {
     return throwError(() => new Error(error.message || 'Erro desconhecido'));
   }
+  
+  acharTimeInicio(page: number, size: number, time: string): Observable<Page<Horario>> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('time', time.toString());
+
+    return this.http.get<Page<Horario>>(`${this.API}/filter/inicio`, { params });
+  }
+  
+  acharTimeFim(page: number, size: number, time: string): Observable<Page<Horario>> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('time', time.toString());
+
+    return this.http.get<Page<Horario>>(`${this.API}/filter/fim`, { params });
+  }
 };

@@ -75,6 +75,8 @@ export class LocaisRComponent implements OnInit, OnDestroy {
   rowsLocs: number = 10;
   sizeLocs: number = 0;
 
+  sizeLocsTemp: number = 0;
+
   locaisPageData!: Page<Local>;
   equipamentosPageData!: Page<Equipamento>;
 
@@ -330,29 +332,35 @@ export class LocaisRComponent implements OnInit, OnDestroy {
       this.inputSearch.nativeElement.value = '';
     }
     this.selectedFilter = {} as FiltrarPesquisa;
-    this.locaisData = this.locaisFilter;
+  
+    this.locService.listar(0, 10).subscribe(alno => {
+      this.locaisData = alno.content;
+
+      this.firstLocs = 0
+      this.sizeLocs = this.sizeLocsTemp
+      this.rowsLocs = 10
+    });
   }
 
   searchFilter0(term: string) {
-    this.locaisData = this.locaisFilter.filter(local => {
-      if (local.nome.toLowerCase().includes(term.toLowerCase())) {
-        return local;
-      } else {
-        return null;
-      }
+    this.locService.acharNome(0, 10, term).subscribe(alno => {
+      this.locaisFilter = alno.content
+      this.locaisData = this.locaisFilter
+      this.sizeLocsTemp = this.sizeLocs
+      this.sizeLocs = alno.totalElements
     })
   }
 
   searchFilter1(term: string) {
     const searchTermAsNumber = parseInt(term);
-
-    this.locaisData = this.locaisFilter.filter(local => {
-      if (!isNaN(searchTermAsNumber) && local?.capacidade == searchTermAsNumber) {
-        return local;
-      } else {
-        return null;
-      }
-    })
+    if (!isNaN(searchTermAsNumber)) {
+      this.locService.acharCapacidade(0, 10, searchTermAsNumber).subscribe(alno => {
+        this.locaisFilter = alno.content
+        this.locaisData = this.locaisFilter
+        this.sizeLocsTemp = this.sizeLocs
+        this.sizeLocs = alno.totalElements
+      })
+    }
   }
 
   onKeyDown(event: KeyboardEvent, searchTerm: string) {

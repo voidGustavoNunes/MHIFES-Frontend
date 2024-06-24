@@ -44,4 +44,22 @@ export class AlunoService {
   private handleError(error: HttpErrorResponse) {
     return throwError(() => new Error(error.message || 'Erro desconhecido'));
   }
+
+  acharNome(page: number, size: number, substring: string): Observable<Page<Aluno>> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('substring', substring);
+
+    return this.http.get<Page<Aluno>>(`${this.API}/filter/nome`, { params });
+  }
+
+  acharMatricula(page: number, size: number, substring: string): Observable<Page<Aluno>> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('substring', substring);
+
+    return this.http.get<Page<Aluno>>(`${this.API}/filter/matricula`, { params });
+  }
 };

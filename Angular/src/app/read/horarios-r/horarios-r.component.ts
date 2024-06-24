@@ -61,6 +61,8 @@ export class HorariosRComponent implements OnInit, OnDestroy {
   rowsHors: number = 10;
   sizeHors: number = 0;
 
+  sizeHorsTemp: number = 0;
+
   horasPageData!: Page<Horario>;
 
   constructor(
@@ -193,45 +195,32 @@ export class HorariosRComponent implements OnInit, OnDestroy {
       this.inputSearch.nativeElement.value = '';
     }
     this.selectedFilter = {} as FiltrarPesquisa;
-    this.horariosData = this.horariosFilter;
+    
+    this.hourService.listar(0, 10).subscribe(hors => {
+      this.horariosData = hors.content;
+
+      this.firstHors = 0
+      this.sizeHors = this.sizeHorsTemp
+      this.rowsHors = 10
+    });
   }
 
   searchFilter0(term: string) {
-    const compA = this.formatarTmStrTm(term);
-    if(compA != null) {
-      this.horariosData = this.horariosFilter.filter(hour => {
-        const compB = this.formatarTmStrTm(hour.horaInicio);
-        if(compB != null) {
-          if (compA.horas === compB.horas && compA.minutos === compB.minutos) {
-            return hour;
-          } else {
-            return null;
-          }
-        } else {
-          return null;
-        }
-      })
-    }
-    return null;
+    this.hourService.acharTimeInicio(0, 10, term).subscribe(hors => {
+      this.horariosFilter = hors.content
+      this.horariosData = this.horariosFilter
+      this.sizeHorsTemp = this.sizeHors
+      this.sizeHors = hors.totalElements
+    })
   }
 
   searchFilter1(term: string) {
-    const compA = this.formatarTmStrTm(term);
-    if(compA != null) {
-      this.horariosData = this.horariosFilter.filter(hour => {
-        const compB = this.formatarTmStrTm(hour.horaFim);
-        if(compB != null) {
-          if (compA.horas === compB.horas && compA.minutos === compB.minutos) {
-            return hour;
-          } else {
-            return null;
-          }
-        } else {
-          return null;
-        }
-      })
-    }
-    return null;
+    this.hourService.acharTimeFim(0, 10, term).subscribe(hors => {
+      this.horariosFilter = hors.content
+      this.horariosData = this.horariosFilter
+      this.sizeHorsTemp = this.sizeHors
+      this.sizeHors = hors.totalElements
+    })
   }
 
   onKeyDown(event: KeyboardEvent, searchTerm: string) {

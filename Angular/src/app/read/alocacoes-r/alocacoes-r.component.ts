@@ -150,10 +150,14 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
   rowsAloc: number = 10;
   sizeAloc: number = 0;
 
+  sizeAlocTemp: number = 0;
+
   firstDelAloc: number = 0;
   pageDelAloc: number = 0;
   rowsDelAloc: number = 10;
   sizeDelAloc: number = 0;
+
+  sizeDelAlocTemp: number = 0;
 
   alocacoesPageData!: Page<Alocacao>;
   alocacoesDelPageData!: Page<Alocacao>;
@@ -341,16 +345,9 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     this.alocService.listarAtivos(this.pageAloc, this.rowsAloc).subscribe(alcc => {
       this.alocacoesData = alcc.content;
 
-      if (this.alocacoesData.length > 0) {
-        this.alocacoesData.sort((a: Alocacao, b: Alocacao) => {
-          if ((a.dataAula === undefined || b.dataAula === undefined) || (a.dataAula === null || b.dataAula === null)) {
-            return 0;
-          }
-          const dateA = new Date(a.dataAula);
-          const dateB = new Date(b.dataAula);
-          return dateB.getTime() - dateA.getTime();
-        });
-      }
+      this.firstAloc = 0
+      this.sizeAloc = this.sizeAlocTemp
+      this.rowsAloc = 10
     });
   }
 
@@ -358,16 +355,9 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     this.alocService.listarInativos(this.pageDelAloc, this.rowsDelAloc).subscribe(alcc => {
       this.alocacoesDataDelete = alcc.content;
 
-      if (this.alocacoesDataDelete.length > 0) {
-        this.alocacoesDataDelete.sort((a: Alocacao, b: Alocacao) => {
-          if ((a.dataAula === undefined || b.dataAula === undefined) || (a.dataAula === null || b.dataAula === null)) {
-            return 0;
-          }
-          const dateA = new Date(a.dataAula);
-          const dateB = new Date(b.dataAula);
-          return dateB.getTime() - dateA.getTime();
-        });
-      }
+      this.firstDelAloc = 0
+      this.sizeDelAloc = this.sizeDelAlocTemp
+      this.rowsDelAloc = 10
     });
   }
 
@@ -796,96 +786,74 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
 
   searchFilter0(tipo: string, term: string) {
     if (tipo == 'a') {
-      this.alocacoesData = this.alocacoesFilter.filter(aloca => {
-        if (aloca.professor.nome.toLowerCase().includes(term.toLowerCase())) {
-          return aloca;
-        } else {
-          return null;
-        }
+      this.alocService.acharProfessorAtivo(0, 10, term).subscribe(alcc => {
+        this.alocacoesFilter = alcc.content
+        this.alocacoesData = this.alocacoesFilter
+        this.sizeAlocTemp = this.sizeAloc
+        this.sizeAloc = alcc.totalElements
       })
     } else if (tipo == 'i') {
-      this.alocacoesDataDelete = this.alocacoesDeleteFilter.filter(aloca => {
-        if (aloca.professor.nome.toLowerCase().includes(term.toLowerCase())) {
-          return aloca;
-        } else {
-          return null;
-        }
+      this.alocService.acharProfessorInativo(0, 10, term).subscribe(alcc => {
+        this.alocacoesDeleteFilter = alcc.content
+        this.alocacoesDataDelete = this.alocacoesDeleteFilter
+        this.sizeDelAlocTemp = this.sizeDelAloc
+        this.sizeDelAloc = alcc.totalElements
       })
     }
   }
 
   searchFilter1(tipo: string, term: string) {
     if (tipo == 'a') {
-      this.alocacoesData = this.alocacoesFilter.filter(aloca => {
-        if (aloca.local.nome.toLowerCase().includes(term.toLowerCase())) {
-          return aloca;
-        } else {
-          return null;
-        }
+      this.alocService.acharLocalAtivo(0, 10, term).subscribe(alcc => {
+        this.alocacoesFilter = alcc.content
+        this.alocacoesData = this.alocacoesFilter
+        this.sizeAlocTemp = this.sizeAloc
+        this.sizeAloc = alcc.totalElements
       })
     } else if (tipo == 'i') {
-      this.alocacoesDataDelete = this.alocacoesDeleteFilter.filter(aloca => {
-        if (aloca.local.nome.toLowerCase().includes(term.toLowerCase())) {
-          return aloca;
-        } else {
-          return null;
-        }
+      this.alocService.acharLocalInativo(0, 10, term).subscribe(alcc => {
+        this.alocacoesDeleteFilter = alcc.content
+        this.alocacoesDataDelete = this.alocacoesDeleteFilter
+        this.sizeDelAlocTemp = this.sizeDelAloc
+        this.sizeDelAloc = alcc.totalElements
       })
     }
   }
 
   searchFilter2(tipo: string, term: string) {
     if (tipo == 'a') {
-      this.alocacoesData = this.alocacoesFilter.filter(aloca => {
-        if (aloca.periodoDisciplina.disciplina.nome.toLowerCase().includes(term.toLowerCase())) {
-          return aloca;
-        } else {
-          return null;
-        }
+      this.alocService.acharDisciplinaAtivo(0, 10, term).subscribe(alcc => {
+        this.alocacoesFilter = alcc.content
+        this.alocacoesData = this.alocacoesFilter
+        this.sizeAlocTemp = this.sizeAloc
+        this.sizeAloc = alcc.totalElements
       })
     } else if (tipo == 'i') {
-      this.alocacoesDataDelete = this.alocacoesDeleteFilter.filter(aloca => {
-        if (aloca.periodoDisciplina.disciplina.nome.toLowerCase().includes(term.toLowerCase())) {
-          return aloca;
-        } else {
-          return null;
-        }
+      this.alocService.acharDisciplinaInativo(0, 10, term).subscribe(alcc => {
+        this.alocacoesDeleteFilter = alcc.content
+        this.alocacoesDataDelete = this.alocacoesDeleteFilter
+        this.sizeDelAlocTemp = this.sizeDelAloc
+        this.sizeDelAloc = alcc.totalElements
       })
     }
   }
 
   searchFilter3(tipo: string, term: string) {
-    const compA = this.formatarTmStrTm(term);
-    if (compA != null) {
-      if (tipo == 'a') {
-        this.alocacoesData = this.alocacoesFilter.filter(aloca => {
-          const compB = this.formatarTmStrTm(aloca.horario.horaInicio);
-          if (compB != null) {
-            if (compA.horas === compB.horas && compA.minutos === compB.minutos) {
-              return aloca;
-            } else {
-              return null;
-            }
-          } else {
-            return null;
-          }
-        })
-      } else if (tipo == 'i') {
-        this.alocacoesDataDelete = this.alocacoesDeleteFilter.filter(aloca => {
-          const compB = this.formatarTmStrTm(aloca.horario.horaInicio);
-          if (compB != null) {
-            if (compA.horas === compB.horas && compA.minutos === compB.minutos) {
-              return aloca;
-            } else {
-              return null;
-            }
-          } else {
-            return null;
-          }
-        })
-      }
+    if (tipo == 'a') {
+      this.alocService.acharHorarioAtivo(0, 10, term).subscribe(alcc => {
+        this.alocacoesFilter = alcc.content
+        this.alocacoesData = this.alocacoesFilter
+        this.sizeAlocTemp = this.sizeAloc
+        this.sizeAloc = alcc.totalElements
+      })
+    } else if (tipo == 'i') {
+      this.alocService.acharHorarioInativo(0, 10, term).subscribe(alcc => {
+        this.alocacoesDeleteFilter = alcc.content
+        this.alocacoesDataDelete = this.alocacoesDeleteFilter
+        this.sizeDelAlocTemp = this.sizeDelAloc
+        this.sizeDelAloc = alcc.totalElements
+      })
     }
-    return null;
   }
 
   onKeyDown(tipo: string, event: KeyboardEvent, searchTerm: string) {
