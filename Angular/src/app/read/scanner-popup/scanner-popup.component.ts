@@ -176,7 +176,7 @@ export class ScannerPopupComponent implements OnInit, AfterViewInit {
   mostrarHorarioUserScan() {
     this.ehAluno = false
     this.ehProfessor = false
-    console.log('leng ',this.alocacoesArray.length)
+    console.log('leng só vai mostrar se for do ano atual',this.alocacoesArray.length)
     for (const aloc of this.alocacoesArray) {
       for (const aln of aloc.periodoDisciplina.alunos) {
         if(aln.matricula === this.previousBarcode){
