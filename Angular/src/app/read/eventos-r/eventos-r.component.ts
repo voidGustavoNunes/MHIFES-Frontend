@@ -195,6 +195,7 @@ export class EventosRComponent implements OnInit, OnDestroy {
       this.firstEvn = event.first;
       this.rowsEvn = event.rows;
       this.pageEvn = event.page;
+      this.checkOptionsSelected = []
       this.listarPage()
     }
   }

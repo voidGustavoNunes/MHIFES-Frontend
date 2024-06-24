@@ -144,6 +144,7 @@ export class LocaisRComponent implements OnInit, OnDestroy {
       this.firstLocs = event.first;
       this.rowsLocs = event.rows;
       this.pageLocs = event.page;
+      this.checkOptionsSelected = []
       this.listarPage()
     }
   }

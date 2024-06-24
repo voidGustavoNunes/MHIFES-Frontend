@@ -101,6 +101,7 @@ export class EquipamentosRComponent implements OnInit, OnDestroy {
       this.firstEqp = event.first;
       this.rowsEqp = event.rows;
       this.pageEqp = event.page;
+      this.checkOptionsSelected = []
       this.listarPage()
     }
   }

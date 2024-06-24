@@ -338,6 +338,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
         this.firstAloc = event.first;
         this.rowsAloc = event.rows;
         this.pageAloc = event.page;
+        this.checkOptionsSelected = []
         this.listarPageAt()
       } else if (stat == 1) {
         this.firstDelAloc = event.first;

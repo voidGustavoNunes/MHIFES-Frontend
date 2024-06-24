@@ -191,6 +191,7 @@ export class PeriodosRComponent implements OnInit, OnDestroy {
       this.firstPerds = event.first;
       this.rowsPerds = event.rows;
       this.pagePerds = event.page;
+      this.checkOptionsSelected = []
       this.listarPage()
     }
   }

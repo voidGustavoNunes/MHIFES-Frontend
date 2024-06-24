@@ -125,6 +125,7 @@ export class CoordenadoriasRComponent implements OnInit, OnDestroy {
       this.firstCoor = event.first;
       this.rowsCoor = event.rows;
       this.pageCoor = event.page;
+      this.checkOptionsSelected = []
       this.listarPage()
     }
   }

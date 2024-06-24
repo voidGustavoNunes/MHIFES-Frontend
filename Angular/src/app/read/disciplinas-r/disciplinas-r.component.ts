@@ -110,6 +110,7 @@ export class DisciplinasRComponent implements OnInit, OnDestroy {
       this.firstDiscp = event.first;
       this.rowsDiscp = event.rows;
       this.pageDiscp = event.page;
+      this.checkOptionsSelected = []
       this.listarPage()
     }
   }

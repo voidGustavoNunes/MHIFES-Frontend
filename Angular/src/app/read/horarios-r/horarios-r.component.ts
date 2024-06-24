@@ -124,6 +124,7 @@ export class HorariosRComponent implements OnInit, OnDestroy {
       this.firstHors = event.first;
       this.rowsHors = event.rows;
       this.pageHours = event.page;
+      this.checkOptionsSelected = []
       this.listarPage()
     }
   }
