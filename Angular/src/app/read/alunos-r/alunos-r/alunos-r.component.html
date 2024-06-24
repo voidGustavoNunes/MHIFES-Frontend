@@ -1,145 +1,143 @@
 <div class="caixa">
-  <h1>Alunos</h1>
-
-  <div class="opcao">
-      <div class="btn-opcao">
-        <a (click)="showDialog()" class="p-button botaoC">Cadastrar +</a>
-        <p-button label="Deletar" [raised]="true" severity="danger" badge="{{checkOptionsSelected.length}}" badgeClass="p-badge-danger" (onClick)="badgeOptionExclui($event)" />
-        <p-button label="Gerar Código de Barras" [raised]="true" severity="info" badge="{{checkOptionsSelected.length}}" badgeClass="p-badge-info" (onClick)="badgeOptionGerarCodBarra()" />
-    </div>
-
-      <div class="pesq">
-        <p-overlayPanel #op>
-            <div style="display: flex; flex-direction: column; align-items: center; gap: .5rem;">
-                <p-dropdown [options]="filterOptions" [(ngModel)]="selectedFilter" optionLabel="nome" [showClear]="true" placeholder="Selecione um filtro"></p-dropdown>
-                <p-button label="Limpar filtro" severity="warning" (click)="limparFilter()"></p-button>
-            </div>
-        </p-overlayPanel>
-          <p-inputGroup>
-              <button type="button" pButton icon="pi pi-filter-fill" (click)="op.toggle($event)"></button>
-              <input #searchInput type="text" pInputText placeholder="Pesquisar aluno" (keydown)="onKeyDown($event, searchInput.value)" />
-              <button type="button" pButton icon="pi pi-search" (click)="filterField(searchInput.value)"></button>
-          </p-inputGroup>
+    <h1>Alunos</h1>
+  
+    <div class="opcao">
+        <div class="btn-opcao">
+          <a (click)="showDialog()" class="p-button botaoC">Cadastrar +</a>
+          <p-button label="Deletar" [raised]="true" severity="danger" badge="{{checkOptionsSelected.length}}" badgeClass="p-badge-danger" (onClick)="badgeOptionExclui($event)" />
+          <p-button label="Gerar Código de Barras" [raised]="true" severity="info" badge="{{checkOptionsSelected.length}}" badgeClass="p-badge-info" (onClick)="badgeOptionGerarCodBarra()" />
       </div>
-  </div>
-
-  <div class="eqTable">
-      <p-table
-          #dt1
-          [value]="alunosData"
-          styleClass="p-datatable-striped"
-          [tableStyle]="{'min-width': '50rem'}"
-          [(selection)]="checkOptionsSelected" 
-          dataKey="matricula" 
-      >
-          <ng-template pTemplate="header">
-              <tr class="tbHeader">
-                  <th><p-tableHeaderCheckbox /></th>
-                  <th>Nome</th>
-                  <th>matricula</th>
-                  <!-- <th>curso</th> -->
-                  <th></th>
-              </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-aluno>
-              <tr class="tbBody">
-                    <td><p-tableCheckbox [value]="aluno"/></td>
-                  <td>{{aluno?.nome}}</td>
-                  <td>{{aluno?.matricula}}</td>
-                  <!-- <td>{{aluno?.curso}}</td> -->
-                  <td>
-                    <button type="button" class="botaoInfo" (click)="showInfoDialog(aluno)" pButton>Info</button>
-                      <button type="button" class="botaoEdit" (click)="showEditDialog(aluno)" pButton>Editar</button>
-                      <p-toast></p-toast>
-                      <p-confirmPopup></p-confirmPopup>
-                      <button type="button" class="botaoDele" (click)="confirm2($event, aluno?.id)" severity="danger" pButton>Deletar</button>
-                      <button type="button" class="botaoBarcode" (click)="generateBarcode(aluno?.matricula)" pButton>Gerar Código de Barras</button>
-                  </td>
-              </tr>
-          </ng-template>
-          <ng-template pTemplate="emptymessage">
-              <tr>
-                  <td colspan="3">Não há alunos cadastrados.</td>
-              </tr>
-          </ng-template>
-        </p-table>
-        
-        <p-paginator
-        (onPageChange)="onPageChange($event)"
-        [first]="firstAln"
-        [rows]="rowsAln"
-        [totalRecords]="sizeAln"
-        [rowsPerPageOptions]="[10, 20, 40, 60]"
-        [showCurrentPageReport]="true"
-        currentPageReportTemplate="Mostrando do {first} ao {last} de {totalRecords} registros" />
-  </div>
-
-  <p-scrollTop></p-scrollTop>
-
-</div>
-
-
-<!-- Popup para exibir o código de barras -->
-<div class="card flex justify-content-center">
-    <p-dialog header="Código de Barras" [(visible)]="visibleBarcode" [modal]="true" [style]="{ width: '50vw' }" [draggable]="false" [resizable]="false">
-        <div class="barcode-container" style="text-align: center;">
-        <img #barcodeImage />
+  
+        <div class="pesq">
+          <p-overlayPanel #op>
+              <div style="display: flex; flex-direction: column; align-items: center; gap: .5rem;">
+                  <p-dropdown [options]="filterOptions" [(ngModel)]="selectedFilter" optionLabel="nome" [showClear]="true" placeholder="Selecione um filtro"></p-dropdown>
+                  <p-button label="Limpar filtro" severity="warning" (click)="limparFilter()"></p-button>
+              </div>
+          </p-overlayPanel>
+            <p-inputGroup>
+                <button type="button" pButton icon="pi pi-filter-fill" (click)="op.toggle($event)"></button>
+                <input #searchInput type="text" pInputText placeholder="Pesquisar aluno" (keydown)="onKeyDown($event, searchInput.value)" />
+                <button type="button" pButton icon="pi pi-search" (click)="filterField(searchInput.value)"></button>
+            </p-inputGroup>
         </div>
-        <div class="divPButton">
-            <p-button label="Imprimir" severity="info" (click)="printBarcode()" />
-            <p-button label="Cancelar" severity="secondary" (click)="visibleBarcode = false" />
-        </div>
-    </p-dialog>
-</div>
+    </div>
+  
+    <div class="eqTable">
+        <p-table
+            #dt1
+            [value]="alunosData"
+            styleClass="p-datatable-striped"
+            [tableStyle]="{'min-width': '50rem'}"
+            [(selection)]="checkOptionsSelected" 
+            dataKey="matricula" 
+        >
+            <ng-template pTemplate="header">
+                <tr class="tbHeader">
+                    <th><p-tableHeaderCheckbox /></th>
+                    <th>Nome</th>
+                    <th>matricula</th>
+                    <!-- <th>curso</th> -->
+                    <th></th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-aluno>
+                <tr class="tbBody">
+                      <td><p-tableCheckbox [value]="aluno"/></td>
+                    <td>{{aluno?.nome}}</td>
+                    <td>{{aluno?.matricula}}</td>
+                    <!-- <td>{{aluno?.curso}}</td> -->
+                    <td>
+                      <button type="button" class="botaoInfo" (click)="showInfoDialog(aluno)" pButton>Info</button>
+                        <button type="button" class="botaoEdit" (click)="showEditDialog(aluno)" pButton>Editar</button>
+                        <p-toast></p-toast>
+                        <p-confirmPopup></p-confirmPopup>
+                        <button type="button" class="botaoDele" (click)="confirm2($event, aluno?.id)" severity="danger" pButton>Deletar</button>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="3">Não há alunos cadastrados.</td>
+                </tr>
+            </ng-template>
+          </p-table>
+          
+          <p-paginator
+          (onPageChange)="onPageChange($event)"
+          [first]="firstAln"
+          [rows]="rowsAln"
+          [totalRecords]="sizeAln"
+          [rowsPerPageOptions]="[10, 20, 40, 60]"
+          [showCurrentPageReport]="true"
+          currentPageReportTemplate="Mostrando do {first} ao {last} de {totalRecords} registros" />
+    </div>
+  
+    <p-scrollTop></p-scrollTop>
+  
+  </div>
+  
 
-<div class="card flex justify-content-center">
-  <p-dialog class="pHeader" [header]=ehTitulo [(visible)]="visible" [modal]="true" [breakpoints]="{ '960px': '75vw' }" [style]="{ width: '50vw' }" [draggable]="false" [resizable]="false">
-      <form id="meuFormulario" [formGroup]="form" (ngSubmit)="onSubmit()">
-          <div class="divInput">
-              <span class="p-float-label">
-                  <input pInputText id="nomeAlun" class="form-control" formControlName="nome" maxlength="150" />
-                  <label for="nomeAlun">Nome do aluno</label>
+  <div class="card flex justify-content-center">
+      <p-dialog header="Código de Barras" [(visible)]="visibleBarcode" [modal]="true" [style]="{ width: '50vw' }" [draggable]="false" [resizable]="false">
+          <div class="barcode-container" #barcodeImage style="text-align: center;">
+          </div>
+          <div class="divPButton">
+              <p-button label="Imprimir" severity="info" (click)="printBarcode()" />
+              <p-button label="Cancelar" severity="secondary" (click)="visibleBarcode = false" />
+          </div>
+      </p-dialog>
+  </div>
+  
+  
+  <div class="card flex justify-content-center">
+    <p-dialog class="pHeader" [header]=ehTitulo [(visible)]="visible" [modal]="true" [breakpoints]="{ '960px': '75vw' }" [style]="{ width: '50vw' }" [draggable]="false" [resizable]="false">
+        <form id="meuFormulario" [formGroup]="form" (ngSubmit)="onSubmit()">
+            <div class="divInput">
+                <span class="p-float-label">
+                    <input pInputText id="nomeAlun" class="form-control" formControlName="nome" maxlength="150" />
+                    <label for="nomeAlun">Nome do aluno</label>
+                </span>
+                <br>
+                <span class="p-float-label">
+                  <input pInputText id="matriculaAlun" class="form-control" formControlName="matricula" maxlength="150" />
+                  <label for="matriculaAlun">Matrícula</label>
               </span>
               <br>
               <span class="p-float-label">
-                <input pInputText id="matriculaAlun" class="form-control" formControlName="matricula" maxlength="150" />
-                <label for="matriculaAlun">Matrícula</label>
+                <input pInputText id="cursoAlun" class="form-control" formControlName="curso" maxlength="150" />
+                <label for="cursoAlun">Curso</label>
             </span>
             <br>
-            <span class="p-float-label">
-              <input pInputText id="cursoAlun" class="form-control" formControlName="curso" maxlength="150" />
-              <label for="cursoAlun">Curso</label>
-          </span>
-          <br>
-          </div>
-          <div class="divBotao">
-              <button type="submit" class="botaoSalva" *ngIf="cadastrar" pButton>Salvar</button>
-              <button type="submit" class="botaoEdit" *ngIf="editar" pButton>Atualizar</button>
-              <button type="button" class="botaoCancela" (click)="hideDialog()" pButton>Cancelar</button>
-          </div>
-      </form>
-  </p-dialog>
-</div>
-
-<div class="card flex justify-content-center">
-    <p-dialog header="Info do Aluno" [(visible)]="visibleInfo" [breakpoints]="{ '960px': '75vw' }" [style]="{width: '50vw', 'z-index': '1102'}">
-        <div id="meuFormInfo">
-            <div class="divInput">
-                <b>Nome do aluno:</b> {{alunoInfo?.nome}}
-            </div>
-            <div class="divInput">
-                <b>Matrícula:</b> {{alunoInfo?.matricula}}
-            </div>
-            <div class="divInput" style="white-space: pre-line;">
-                <b>Curso:</b> {{alunoInfo?.curso}}
             </div>
             <div class="divBotao">
-                <button type="button" class="botaoInfo" (click)="visibleInfo = false" pButton>Ok</button>
+                <button type="submit" class="botaoSalva" *ngIf="cadastrar" pButton>Salvar</button>
+                <button type="submit" class="botaoEdit" *ngIf="editar" pButton>Atualizar</button>
+                <button type="button" class="botaoCancela" (click)="hideDialog()" pButton>Cancelar</button>
             </div>
-        </div>
+        </form>
     </p-dialog>
-</div>
-
-<div class="card">
-    <p-messages [(value)]="messages" [showTransitionOptions]="'500ms'" [hideTransitionOptions]="'500ms'" [enableService]="false"></p-messages>
-</div>
+  </div>
+  
+  <div class="card flex justify-content-center">
+      <p-dialog header="Info do Aluno" [(visible)]="visibleInfo" [breakpoints]="{ '960px': '75vw' }" [style]="{width: '50vw', 'z-index': '1102'}">
+          <div id="meuFormInfo">
+              <div class="divInput">
+                  <b>Nome do aluno:</b> {{alunoInfo?.nome}}
+              </div>
+              <div class="divInput">
+                  <b>Matrícula:</b> {{alunoInfo?.matricula}}
+              </div>
+              <div class="divInput" style="white-space: pre-line;">
+                  <b>Curso:</b> {{alunoInfo?.curso}}
+              </div>
+              <div class="divBotao">
+                  <button type="button" class="botaoInfo" (click)="visibleInfo = false" pButton>Ok</button>
+              </div>
+          </div>
+      </p-dialog>
+  </div>
+  
+  <div class="card">
+      <p-messages [(value)]="messages" [showTransitionOptions]="'500ms'" [hideTransitionOptions]="'500ms'" [enableService]="false"></p-messages>
+  </div>
