@@ -215,6 +215,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
       { nome: 'Nome do Local', id: 1 },
       { nome: 'Nome da Disciplina', id: 2 },
       { nome: 'Hora de início', id: 3 },
+      { nome: 'Ano', id: 4 },
     ];
 
     this.unsubscribe$ = this.alocService.listarAtivos(0, 10)
@@ -878,6 +879,23 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     }
   }
 
+  searchFilter4(tipo: string, term: string) {
+    if (tipo == 'a') {
+      const searchTermAsNumber = parseInt(term);
+      
+      if (!isNaN(searchTermAsNumber)) {
+        this.alocService.acharAnoAtivo(0, 10, searchTermAsNumber).subscribe(alcc => {
+          this.alocacoesFilter = alcc.content
+          this.alocacoesData = this.alocacoesFilter
+          this.sizeAlocTemp = this.sizeAloc
+          this.sizeAloc = alcc.totalElements
+        })
+      } else {
+        this.alocacoesData = []
+      }
+    }
+  }
+
   onKeyDown(tipo: string, event: KeyboardEvent, searchTerm: string) {
     if (event.key === "Enter") {
       this.filterField(tipo, searchTerm);
@@ -892,6 +910,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
           if (this.selectedFilter.id == 1) this.searchFilter1(tipo, searchTerm);
           if (this.selectedFilter.id == 2) this.searchFilter2(tipo, searchTerm);
           if (this.selectedFilter.id == 3) this.searchFilter3(tipo, searchTerm);
+          if (this.selectedFilter.id == 4) this.searchFilter4(tipo, searchTerm);
         } else {
           this.messages = [
             { severity: 'warn', summary: 'Atenção', detail: 'Selecione um filtro!', life: 3000 },
@@ -903,6 +922,7 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
           if (this.selectedFilterInat.id == 1) this.searchFilter1(tipo, searchTerm);
           if (this.selectedFilterInat.id == 2) this.searchFilter2(tipo, searchTerm);
           if (this.selectedFilterInat.id == 3) this.searchFilter3(tipo, searchTerm);
+          if (this.selectedFilterInat.id == 4) this.searchFilter4(tipo, searchTerm);
         } else {
           this.messages = [
             { severity: 'warn', summary: 'Atenção', detail: 'Selecione um filtro!', life: 3000 },
@@ -991,6 +1011,8 @@ export class AlocacoesRComponent implements OnInit, OnDestroy {
     if (tipo == 'a') {
       if (this.selectedFilter?.id == 3) {
         this.txtFilter = '00:00';
+      } else if (this.selectedFilter?.id == 4) {
+        this.txtFilter = '0000';
       } else {
         this.txtFilter = 'Pesquisar alocação';
       }

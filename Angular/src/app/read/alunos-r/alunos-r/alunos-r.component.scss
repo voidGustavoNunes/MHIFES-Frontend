@@ -1,208 +1,251 @@
 @mixin themeButton($back: #BFE4FF, $color: #256CF0) {
-  background: $back;
-  color: $color;
-  border: none;
-  box-shadow: 0 .2rem .2rem rgba(0, 0, 0, 0.26);
+    background: $back;
+    color: $color;
+    border: none;
+    box-shadow: 0 .2rem .2rem rgba(0, 0, 0, 0.26);
 }
 
-.caixa{
-  h1{
-      font-size: 35px;
-      font-weight: 600;
-      text-align: center;
-      text-transform: uppercase;
-      margin-top: 2rem;
-  }
+.caixa {
+    h1 {
+        font-size: 35px;
+        font-weight: 600;
+        text-align: center;
+        text-transform: uppercase;
+        margin-top: 2rem;
+    }
 
-  .opcao{
-      margin-top: 3rem;
-      .botaoC{
-          color: white;
-          background-color: #00208F;
-          text-decoration: none;
-          letter-spacing: .1rem;
-          font-weight: 600;
-          text-transform: uppercase;
-          border: .1rem solid #00208F;
-          box-shadow: 0 .2rem .2rem rgba(0, 0, 0, 0.26);
+    .opcao {
+        margin-top: 3rem;
 
-      }
-      .botaoC:active{
-          background-color: white;
-          color: #00208F;
-          box-shadow: 0 .2rem .2rem rgba(0, 0, 0, 0.4);
-      }
+        .botaoC {
+            color: white;
+            background-color: #00208F;
+            text-decoration: none;
+            letter-spacing: .1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            border: .1rem solid #00208F;
+            box-shadow: 0 .2rem .2rem rgba(0, 0, 0, 0.26);
 
-      .pesq{
-          input{
-              background-color: #BFE4FF;
-              box-shadow: 0 .2rem .2rem rgba(0, 0, 0, 0.26);
-          }
-          input:focus {
-              outline: none;
-              border: .1rem solid #4A82FD;
-          }
-          button{
-              @include themeButton(#4A82FD, white);
-              height: 2.875rem;
-              box-shadow: 0 .2rem .2rem rgba(0, 0, 0, 0.5);
-          }
-          button:active{
-              box-shadow: none;
-          }
-      }
-  }
+        }
 
-  .eqTable{
-      margin: 4rem 0;
-      border: .1rem solid #B1CAFA;
+        .botaoC:active {
+            background-color: white;
+            color: #00208F;
+            box-shadow: 0 .2rem .2rem rgba(0, 0, 0, 0.4);
+        }
 
-      .tbHeader{
-          border-radius: .5rem 0;
-
-          th{
-              background-color: #256CF0 !important;
-              color: white;
-              font-weight: 600;
-              letter-spacing: .1rem;
-              text-align: center;
-              text-transform: uppercase;
-          }
-      }
-
-      .tbBody{
-
-          td{
-              text-align: center;
-          }
-
-          button:active{
-              box-shadow: none;
-          }
-          .botaoInfo{
-              @include themeButton(#A2FF7F, #1E8805);
-              
-          }
-          .botaoInfo:focus{
-              border: .02rem solid #1E8805;
-              margin: .5rem auto 0;
-          }
-
-          .botaoEdit{
-              @include themeButton(#FFDD77, #846406);
-              margin: 0 .5rem;
-          }
-          .botaoEdit:focus{
-              border: .02rem solid #846406;
-          }
-
-          .botaoDele{
-              @include themeButton(#FF8381, #89041E);
-          }
-          .botaoDele:focus{
-              border: .02rem solid #89041E;
+        .pesq {
+            input {
+                background-color: #BFE4FF;
+                box-shadow: 0 .2rem .2rem rgba(0, 0, 0, 0.26);
             }
-            .botaoBarcode{
+
+            input:focus {
+                outline: none;
+                border: .1rem solid #4A82FD;
+            }
+
+            button {
+                @include themeButton(#4A82FD, white);
+                height: 2.875rem;
+                box-shadow: 0 .2rem .2rem rgba(0, 0, 0, 0.5);
+            }
+
+            button:active {
+                box-shadow: none;
+            }
+        }
+    }
+
+    .eqTable {
+        margin: 4rem 0;
+        border: .1rem solid #B1CAFA;
+
+        .tbHeader {
+            border-radius: .5rem 0;
+
+            th {
+                background-color: #256CF0 !important;
+                color: white;
+                font-weight: 600;
+                letter-spacing: .1rem;
+                text-align: center;
+                text-transform: uppercase;
+            }
+        }
+
+        .tbBody {
+
+            td {
+                text-align: center;
+            }
+
+            button:active {
+                box-shadow: none;
+            }
+
+            .botaoInfo {
+                @include themeButton(#A2FF7F, #1E8805);
+                //   margin: .5rem auto 0;
+            }
+
+            .botaoInfo:focus {
+                border: .02rem solid #1E8805;
+            }
+
+            .botaoEdit {
+                @include themeButton(#FFDD77, #846406);
+                margin: 0 .5rem;
+            }
+
+            .botaoEdit:focus {
+                border: .02rem solid #846406;
+            }
+
+            .botaoDele {
+                @include themeButton(#FF8381, #89041E);
+            }
+
+            .botaoDele:focus {
+                border: .02rem solid #89041E;
+            }
+
+            .botaoBarcode {
                 @include themeButton(#4A82FD, white);
                 margin: 0 .5rem;
             }
-            .botaoBarcode:focus{
+
+            .botaoBarcode:focus {
                 border: .02rem solid #4A82FD;
             }
-      }
-      .tbBody:hover{
-          background-color: #E5E7EB;
-      }
-  }
+        }
+
+        .tbBody:hover {
+            background-color: #E5E7EB;
+        }
+    }
 }
 
-.card{
-    #meuFormInfo{
-        .divInput{
+.card {
+    #meuFormInfo {
+        .divInput {
             margin: 2rem 0;
         }
     }
-  #meuFormulario{
-      margin-top: 3rem;
-  }
-  .divInput{
-      width: fit-content;
-      margin: 0 auto 2rem;
-      input{
-          background-color: #BFE4FF;
-      }
-  }
-  .divBotao{
-      width: fit-content;
-      margin: 5rem auto 0;
-      button{
-          padding-left: 4rem;
-          padding-right: 4rem;
-      }
-      button:active{
-          box-shadow: none;
-      }
 
-    .botaoSalva{
-        @include themeButton();
-    }
-    .botaoSalva:focus{
-        border: .02rem solid #256CF0;
-    }
-    
-    .botaoInfo{
-        @include themeButton(#A2FF7F, #1E8805);
-        
-    }
-    .botaoInfo:focus{
-        border: .02rem solid #1E8805;
-        
+    #meuFormulario {
+        margin-top: 3rem;
     }
 
-    .botaoEdit{
-        @include themeButton(#FFDD77, #846406);
-    }
-    .botaoEdit:focus{
-        border: .02rem solid #846406;
+    .divInput {
+        width: fit-content;
+        margin: 0 auto 2rem;
+
+        input {
+            background-color: #BFE4FF;
+        }
     }
 
-    .botaoCancela{
-        @include themeButton(#FF8381, #89041E);
+    .divBotao {
+        width: fit-content;
+        margin: 5rem auto 0;
+
+        button {
+            padding-left: 4rem;
+            padding-right: 4rem;
+        }
+
+        button:active {
+            box-shadow: none;
+        }
+
+        .botaoSalva {
+            @include themeButton();
+        }
+
+        .botaoSalva:focus {
+            border: .02rem solid #256CF0;
+        }
+
+        .botaoInfo {
+            @include themeButton(#A2FF7F, #1E8805);
+
+        }
+
+        .botaoInfo:focus {
+            border: .02rem solid #1E8805;
+
+        }
+
+        .botaoEdit {
+            @include themeButton(#FFDD77, #846406);
+        }
+
+        .botaoEdit:focus {
+            border: .02rem solid #846406;
+        }
+
+        .botaoCancela {
+            @include themeButton(#FF8381, #89041E);
+        }
+
+        .botaoCancela:focus {
+            border: .02rem solid #89041E;
+        }
     }
-    .botaoCancela:focus{
-        border: .02rem solid #89041E;
-    }
-  }
 }
 
 :host ::ng-deep {
-  .p-dialog .p-dialog-header {
-      background-color: rgb(0, 15, 68);
-      color: white;
-      letter-spacing: .1rem;
-  }
-  .p-messages {
-      width: fit-content;
-      position: fixed;
-      top: 1.25rem;
-      right: 1.25rem;
-      z-index: 11000;
+    .p-dialog .p-dialog-header {
+        background-color: rgb(0, 15, 68);
+        color: white;
+        letter-spacing: .1rem;
     }
+
+    .p-messages {
+        width: fit-content;
+        position: fixed;
+        top: 1.25rem;
+        right: 1.25rem;
+        z-index: 11000;
+    }
+
+    .p-message-warn {
+        color: #8b7400;
+    }
+
+    .p-message-success {
+        color: #016b06;
+    }
+
+    .p-message-info {
+        color: #00028b;
+    }
+
+    .p-message-error {
+        color: red;
+    }
+
     .p-datatable>.p-datatable-wrapper {
         overflow-x: auto;
     }
+
     .p-datatable-table {
         border-spacing: 0px;
         width: 100.25rem;
     }
+
     .p-badge.p-badge-danger {
         background-color: white;
         color: #ef4444;
     }
+
     .p-badge.p-badge-info {
         background-color: #ffffff;
         color: #0ea5e9;
     }
+
     button.p-ripple.p-element.p-button.p-component.p-button-danger.p-button-raised {
         letter-spacing: 0.1rem;
         font-weight: 600;
@@ -211,77 +254,90 @@
 }
 
 @media screen and (min-width: 686px) {
-  .caixa{
-      margin: 0 6rem 12rem;
-      .opcao{
-          display: flex;
-          justify-content: space-between;
-          flex-wrap: nowrap;
+    .caixa {
+        margin: 0 6rem 12rem;
 
-          .btn-opcao{
+        .opcao {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: nowrap;
+
+            .btn-opcao {
+                display: flex;
+                gap: 1rem;
+                flex-wrap: wrap;
+            }
+        }
+    }
+
+    .card {
+        input {
+            width: 40vw;
+        }
+
+        .divBotao {
+            display: flex;
+
+            .botaoSalva,
+            .botaoEdit {
+                margin-right: 5rem;
+            }
+        }
+
+        .divPButton {
             display: flex;
             gap: 1rem;
             flex-wrap: wrap;
-          }
-      }
-  }
-
-  .card{
-      input{
-          width: 40vw;
-      }
-      .divBotao{
-          display: flex;
-          .botaoSalva, .botaoEdit{
-              margin-right: 5rem;
-          }
-      }
-      .divPButton{
-        display: flex;
-        gap: 1rem;
-        flex-wrap: wrap;
-        justify-content: center;
-      }
-  }
+            justify-content: center;
+        }
+    }
 }
 
 @media screen and (max-width: 685px) {
-  .caixa{
-      margin: 0 1rem 12rem;
-      .opcao{
-          display: flex;
-          flex-direction: column;
+    .caixa {
+        margin: 0 1rem 12rem;
 
-          .botaoC{width: fit-content;}
+        .opcao {
+            display: flex;
+            flex-direction: column;
 
-          .pesq{
-              margin-top: 2rem;
-          }
+            .botaoC {
+                width: fit-content;
+            }
 
-          .btn-opcao{
+            .pesq {
+                margin-top: 2rem;
+            }
+
+            .btn-opcao {
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    }
+
+    .card {
+        input {
+            width: 60vw;
+        }
+
+        .divBotao {
+            display: flex;
+            flex-direction: column;
+
+            .botaoSalva,
+            .botaoEdit {
+                margin-bottom: 1rem;
+            }
+        }
+
+        .divPButton {
             display: flex;
             flex-direction: column;
             gap: 1rem;
-          }
-      }
-  }
-  .card{
-      input{
-          width: 60vw;
-      }
-      .divBotao{
-          display: flex;
-          flex-direction: column;
-          .botaoSalva, .botaoEdit{
-              margin-bottom: 1rem;
-          }
-      }
-      .divPButton{
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-        align-items: center;
-      }
-  }
-  
+            align-items: center;
+        }
+    }
+
 }

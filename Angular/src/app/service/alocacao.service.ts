@@ -109,6 +109,16 @@ export class AlocacaoService {
 
     return this.http.get<Page<Alocacao>>(`${this.API}/ativos/filter/horario`, { params });
   }
+  acharAnoAtivo(page: number, size: number, ano: number): Observable<Page<Alocacao>> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('ano', ano.toString());
+
+    return this.http.get<Page<Alocacao>>(`${this.API}/ativos/filter/ano`, { params }).pipe(
+      catchError(error => this.handleError(error))
+    );
+  }
   
 	// FILTER ALOCAÇÃO INATIVO
   acharProfessorInativo(page: number, size: number, substring: string): Observable<Page<Alocacao>> {

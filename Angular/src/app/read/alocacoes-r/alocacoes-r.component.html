@@ -18,7 +18,7 @@
       </p-overlayPanel>
       <p-inputGroup>
         <button type="button" pButton (click)="op.toggle($event)" icon="pi pi-filter-fill"></button>
-        <input #searchInput type="text" pInputText [mask]="selectedFilter?.id === 3 ? '00:00' : null"
+        <input #searchInput type="text" pInputText [mask]="selectedFilter?.id === 3 ? '00:00' : selectedFilter?.id === 4 ? '0000' : null"
           [placeholder]="txtFilter" (keydown)="onKeyDown('a', $event, searchInput.value)" />
         <button type="button" pButton icon="pi pi-search" (click)="filterField('a', searchInput.value)"></button>
       </p-inputGroup>
@@ -36,6 +36,7 @@
           <th>Local</th>
           <th>Disciplina</th>
           <th>Horário</th>
+          <th>Semestre</th>
           <th></th>
         </tr>
       </ng-template>
@@ -46,6 +47,7 @@
           <td>{{alocacao?.local?.nome}}</td>
           <td>{{alocacao?.periodoDisciplina?.disciplina?.nome}}</td>
           <td>{{ formatarHora(alocacao?.horario?.horaInicio) }} - {{ formatarHora(alocacao?.horario?.horaFim) }}</td>
+          <td>{{alocacao?.periodoDisciplina?.periodo?.ano}}/{{alocacao?.periodoDisciplina?.periodo?.semestre}}</td>
           <td>
             <button type="button" class="botaoL" (click)="showDialogLog(alocacao)" pButton>Log</button>
             <button type="button" class="botaoInfo" (click)="showInfoDialog(alocacao)" pButton>Info</button>
